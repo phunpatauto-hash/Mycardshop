@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>ติดตามคำสั่งซื้อ - Card Shop</title>
+    <style>
+        body { font-family: sans-serif; background: #121212; color: white; display: flex; justify-content: center; padding: 50px; }
+        .track-card { background: #1e1e1e; padding: 30px; border-radius: 15px; width: 500px; border: 1px solid #333; }
+        .status-container { display: flex; justify-content: space-between; margin-top: 30px; position: relative; }
+        .status-step { text-align: center; z-index: 2; flex: 1; }
+        .circle { width: 30px; height: 30px; background: #444; border-radius: 50%; margin: 0 auto 10px; line-height: 30px; }
+        .active .circle { background: #ffcc00; color: black; box-shadow: 0 0 15px #ffcc00; }
+        .line { position: absolute; top: 15px; left: 10%; width: 80%; height: 2px; background: #444; z-index: 1; }
+        .progress-line { position: absolute; top: 15px; left: 10%; height: 2px; background: #ffcc00; z-index: 1; transition: 0.5s; width: 0%; }
+    </style>
+</head>
+<body>
+
+<div class="track-card">
+    <h2 style="color: #ffcc00; text-align: center;">ติดตามพัสดุ</h2>
+    <p style="text-align: center; color: #888;">หมายเลขคำสั่งซื้อ: #BT-999</p>
+    
+    <div class="status-container">
+        <div class="line"></div>
+        <div class="progress-line" id="progress-bar"></div>
+        
+        <div class="status-step" id="step-preparing">
+            <div class="circle">1</div>
+            <div style="font-size: 0.7rem;">เตรียมของ</div>
+        </div>
+        <div class="status-step" id="step-shipping">
+            <div class="circle">2</div>
+            <div style="font-size: 0.7rem;">ระหว่างส่ง</div>
+        </div>
+        <div class="status-step" id="step-delivered">
+            <div class="circle">3</div>
+            <div style="font-size: 0.7rem;">สำเร็จ</div>
+        </div>
+    </div>
+    
+    <div id="status-desc" style="margin-top: 40px; text-align: center; background: #2a2a2a; padding: 15px; border-radius: 8px;">
+        </div>
+    
+    <button onclick="location.href='Home page.html'" style="width:100%; margin-top:20px; background:none; border:1px solid #444; color:white; padding:10px; cursor:pointer;">กลับหน้าหลัก</button>
+</div>
+
+<script>
+    window.onload = function() {
+        const status = localStorage.getItem("orderStatus") || "preparing";
+        const bar = document.getElementById("progress-bar");
+        const desc = document.getElementById("status-desc");
+
+        if(status === "preparing") {
+            document.getElementById("step-preparing").classList.add("active");
+            bar.style.width = "0%";
+            desc.innerText = "📦 ร้านค้ากำลังแพ็คสินค้าของคุณอย่างระมัดระวัง";
+        } else if(status === "shipping") {
+            document.getElementById("step-preparing").classList.add("active");
+            document.getElementById("step-shipping").classList.add("active");
+            bar.style.width = "40%";
+            desc.innerText = "🚚 สินค้าถูกส่งออกจากคลังแล้ว กำลังเดินทางไปหาคุณ";
+        } else if(status === "delivered") {
+            document.getElementById("step-preparing").classList.add("active");
+            document.getElementById("step-shipping").classList.add("active");
+            document.getElementById("step-delivered").classList.add("active");
+            bar.style.width = "80%";
+            desc.innerText = "✅ สินค้าส่งถึงมือคุณเรียบร้อยแล้ว ขอให้สนุกกับการเล่นการ์ด!";
+        }
+    };
+</script>
+</body>
+</html>

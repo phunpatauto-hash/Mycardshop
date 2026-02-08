@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>สมัครสมาชิก</title>
+    <style>
+        body { font-family: sans-serif; background: #121212; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 2rem; border-radius: 10px; width: 350px; text-align: center; }
+        input { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>สมัครสมาชิก</h2>
+        <input type="text" id="reg-user" placeholder="ตั้งชื่อผู้ใช้">
+        <input type="password" id="reg-pass" placeholder="ตั้งรหัสผ่าน">
+        <button class="btn" onclick="saveData()">ตกลงสมัครสมาชิก</button>
+        <p><a href="login.html" style="color: #007bff; text-decoration: none; font-size: 0.8rem;">มีบัญชีอยู่แล้ว? เข้าสู่ระบบ</a></p>
+    </div>
+
+    <script>
+        function saveData() {
+            const user = document.getElementById('reg-user').value;
+            const pass = document.getElementById('reg-pass').value;
+
+            if (user === "" || pass === "") {
+                alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+                return;
+            }
+
+            // 1. ดึงรายการผู้ใช้เดิมที่มีอยู่ (ถ้าไม่มีให้เป็นอาเรย์ว่าง [])
+            let userList = JSON.parse(localStorage.getItem("userList")) || [];
+
+            // 2. ตรวจสอบว่าชื่อผู้ใช้ซ้ำกับคนอื่นไหม
+            const isExist = userList.find(u => u.username === user);
+            if (isExist) {
+                alert("ชื่อผู้ใช้นี้มีคนใช้แล้ว กรุณาใช้ชื่ออื่น");
+                return;
+            }
+
+            // 3. เพิ่มคนใหม่เข้าไปในรายการ
+            userList.push({ username: user, password: pass });
+
+            // 4. บันทึกรายการทั้งหมดกลับลงไป
+            localStorage.setItem("userList", JSON.stringify(userList));
+
+            alert("สมัครสมาชิกสำเร็จ! กำลังพากลับไปหน้าเข้าสู่ระบบ");
+            window.location.href = "login.html"; 
+        }
+    </script>
+</body>
+</html>

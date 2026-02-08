@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>เข้าสู่ระบบ</title>
+    <style>
+        body { font-family: sans-serif; background: #121212; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 350px; text-align: center; }
+        input { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; }
+        
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-content {
+            background: white; padding: 25px; border-radius: 12px; width: 300px; text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>เข้าสู่ระบบ</h2>
+    <input type="text" id="username" placeholder="ชื่อผู้ใช้">
+    <input type="password" id="password" placeholder="รหัสผ่าน">
+    <button class="btn" onclick="checkLogin()">Login</button>
+    <p><a href="registe.html">ยังไม่มีบัญชี? สมัครที่นี่</a></p>
+</div>
+
+<div class="modal-overlay" id="errorModal">
+    <div class="modal-content">
+        <h3>แจ้งเตือน</h3>
+        <p id="errorText"></p>
+        <button onclick="closeModal()" style="padding: 5px 15px; cursor: pointer;">ตกลง</button>
+    </div>
+</div>
+
+<script>
+    function checkLogin() {
+        const user = document.getElementById('username').value;
+        const pass = document.getElementById('password').value;
+        const modal = document.getElementById('errorModal');
+        const errorText = document.getElementById('errorText');
+
+        // 1. ดึงรายการผู้ใช้ทั้งหมดออกมา
+        const userList = JSON.parse(localStorage.getItem("userList")) || [];
+
+        if (user === "" || pass === "") {
+            errorText.innerText = "กรุณากรอกข้อมูลให้ครบถ้วน";
+            modal.style.display = "flex";
+            return;
+        }
+
+        // 2. ค้นหาผู้ใช้ที่ชื่อและรหัสตรงกัน
+        const foundUser = userList.find(u => u.username === user && u.password === pass);
+
+        if (foundUser) {
+            alert("เข้าสู่ระบบสำเร็จ!");
+            // เก็บชื่อผู้ใช้ปัจจุบันไว้แสดงในหน้า Home
+            localStorage.setItem("registeredUser", foundUser.username);
+            window.location.href = "Home page.html";
+        } else {
+            errorText.innerText = "ไม่พบบัญชีนี้ หรือข้อมูลไม่ถูกต้อง กรุณาสมัครสมาชิก";
+            modal.style.display = "flex";
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('errorModal').style.display = "none";
+    }
+</script>
+</body>
+</html>

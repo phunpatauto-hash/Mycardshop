@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>หน้าหลัก - My card game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- CSS เดิมของคุณทั้งหมด --- */
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Kanit', sans-serif; 
+            margin: 0; 
+            background-color: #121212; 
+            color: white;
+        }
+
+        .navbar {
+            background-color: #222;
+            color: white;
+            padding: 1rem 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid #333;
+        }
+
+        .navbar .logo { font-size: 1.5rem; font-weight: bold; color: #ffc831; }
+        .nav-links { list-style: none; display: flex; gap: 20px; margin: 0; align-items: center; }
+        .nav-links a { color: white; text-decoration: none; transition: 0.3s; font-size: 0.9rem; }
+        .nav-links a:hover { color: #ffc831; }
+
+        /* เพิ่ม Style สำหรับลิงก์โปรไฟล์ */
+        .profile-link {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: 0.3s;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+        .profile-link:hover {
+            background: rgba(255, 200, 49, 0.1);
+        }
+
+        .btn-blue {
+            background: #2b52ff; 
+            padding: 8px 18px; 
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            color: white;
+            text-decoration: none;
+        }
+        .btn-blue:hover { background: #1a3ecc !important; }
+
+        .hero {
+            height: 450px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            background-size: cover;
+            background-position: center;
+            animation: bgSlide 15s infinite;
+            position: relative;
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 1;
+        }
+
+        .hero h1, .hero p { position: relative; z-index: 2; }
+        .hero h1 { font-size: 3rem; margin-bottom: 10px; }
+
+        @keyframes bgSlide {
+            0%, 100% { background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREnu2Z4qwDqG2AuWKYP5_GkyFt5wG7MMtRYA&s'); }
+            33% { background-image: url('https://www.devsisters.com/_next/image?url=https%3A%2F%2Fdevsisters-branding-devhome-prod-files.s3.ap-northeast-1.amazonaws.com%2Fdata%2Fstory%2Fen%2F5%2F659f8f341c9ca.png&w=750&q=75'); }
+            66% { background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQTSW3gxddPaBTmeJHmgKHBybpemXlbk6AFxbhHarSmzBoGW3DPynaJywMIsiT-XkRTtGg&usqp=CAU'); }
+        }
+
+        .container { max-width: 1100px; margin: 3rem auto; padding: 0 20px; }
+        h2 { border-left: 5px solid #ffc831; padding-left: 15px; margin-bottom: 25px; }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: #1e1e1e;
+            padding: 0;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #333;
+            transition: 0.3s;
+        }
+        .card:hover { transform: translateY(-10px); border-color: #ffc831; }
+        .card-img { width: 100%; height: 200px; background: #333; object-fit: cover; }
+        .card-body { padding: 20px; }
+        .card h3 { margin: 0 0 10px 0; font-size: 1.2rem; color: #ffc831; }
+        .card p { color: #bbb; font-size: 0.9rem; line-height: 1.5; margin-bottom: 15px; }
+
+        .btn-view {
+            display: inline-block;
+            color: #ffc831;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        footer {
+            background: #1a1a1a;
+            color: #666;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 5rem;
+            border-top: 1px solid #333;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">Mycard game</div>
+        <ul class="nav-links">
+            <li><a href="Home page.html">หน้าแรก</a></li>
+            <li><a href="#">ติดต่อเรา</a></li>
+            
+            <li>
+                <a href="profile.html" class="profile-link" id="profile-container" style="display: none;">
+                    <span id="user-display" style="color: #ffc831; font-weight: bold;"></span>
+                </a>
+            </li>
+
+            <li><a href="javascript:void(0)" id="auth-btn" class="btn-blue">เข้าสู่ระบบ</a></li>
+            <li><a href="registe.html" class="btn-blue">สมัครสมาชิก</a></li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <h1 id="welcome-text">ยินดีต้อนรับ</h1>
+        <p>ศูนย์รวมการ์ดเกมที่ใหญ่ที่สุดสำหรับเหล่านักเล่นการ์ด</p>
+    </header>
+
+    <main class="container">
+        <h2>การ์ดเกมที่ขายในร้าน</h2>
+        <div class="grid">
+            <div class="card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRapA_9lF4_S2ZmdrmfEsY1UbKiMtnWJFXww&s" class="card-img" alt="Talingchan">
+                <div class="card-body">
+                    <h3>Battle of Talingchan</h3>
+                    <p>สัมผัสการต่อสู้สุดดุเดือดในย่านตลิ่งชัน การ์ดไทยสุดล้ำที่ต้องลอง</p>
+                    <a href="battle of talingchan.html" class="btn-view">ดูรายละเอียดสินค้า →</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4lpHXT1rPVWyib4khJhvM_x7vZrpCR1sUrf2puSuolWAK8gWexj3sWC1qYw56j0ZD6f0&usqp=CAU" class="card-img" alt="Cookie Run">
+                <div class="card-body">
+                    <h3>Cookie Run Braverse</h3>
+                    <p>การเดินทางครั้งใหม่ของเหล่าคุกกี้ ในรูปแบบการ์ดเกมสุดน่ารัก</p>
+                    <a href="#" class="btn-view" style="color: #666;">เร็วๆ นี้</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <img src="https://www.asmodee.co.uk/cdn/shop/collections/Pokemon_banner.jpg?v=1678984030&width=1296" class="card-img" alt="Pokemon">
+                <div class="card-body">
+                    <h3>Pokemon Card</h3>
+                    <p>สะสมและประลองฝีมือกับโปเกมอนที่คุณรักจากทั่วโลก</p>
+                    <a href="#" class="btn-view" style="color: #666;">เร็วๆ นี้</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Mycard Game - ความคืบหน้าโครงการ: 40%</p>
+    </footer>
+
+    <script>
+        window.onload = function() {
+            const user = localStorage.getItem("registeredUser");
+            const userDisplay = document.getElementById("user-display");
+            const profileContainer = document.getElementById("profile-container"); // ตัวแปรที่เพิ่มใหม่
+            const welcomeText = document.getElementById("welcome-text");
+            const authBtn = document.getElementById("auth-btn");
+
+            if (user) {
+                // ถ้าล็อกอินอยู่
+                profileContainer.style.display = "flex"; // แสดงลิงก์โปรไฟล์
+                userDisplay.innerText = "👤 " + user;
+                welcomeText.innerText = "ยินดีต้อนรับคุณ " + user;
+                authBtn.innerText = "ออกจากระบบ";
+                authBtn.onclick = logout;
+                
+                // เก็บค่า currentUser เพื่อให้หน้า Profile ดึงไปใช้ได้ถูกต้อง
+                localStorage.setItem("currentUser", user);
+            } else {
+                // ถ้าไม่ได้ล็อกอิน
+                profileContainer.style.display = "none"; // ซ่อนลิงก์โปรไฟล์
+                welcomeText.innerText = "ยินดีต้อนรับสู่ Mycard game";
+                authBtn.innerText = "เข้าสู่ระบบ";
+                authBtn.onclick = function() { window.location.href = "login.html"; };
+            }
+        };
+
+        function logout() {
+            if(confirm("คุณต้องการออกจากระบบใช่หรือไม่?")) {
+                localStorage.removeItem("registeredUser"); 
+                localStorage.removeItem("currentUser"); // ลบค่า current user ออกด้วย
+                location.reload(); 
+            }
+        }
+    </script>
+
+</body>
+</html>

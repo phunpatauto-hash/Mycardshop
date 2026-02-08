@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ชำระเงิน - Card Shop</title>
+    <style>
+        /* CSS เดิมคงไว้ทั้งหมด เพิ่มเติมส่วนแต่ง Stock */
+        body { font-family: 'Segoe UI', 'Kanit', sans-serif; margin: 0; background: #121212; color: white; }
+        .navbar { background: #1a1a1a; padding: 1rem 2rem; display: flex; justify-content: space-between; border-bottom: 1px solid #333; }
+        .navbar .logo { color: #ffcc00; font-weight: bold; }
+        .navbar a { color: #bbb; text-decoration: none; font-size: 0.9rem; }
+        .container { max-width: 1000px; margin: 2rem auto; display: flex; gap: 20px; padding: 0 20px; }
+        .address-section { flex: 1.5; background: #1e1e1e; padding: 25px; border-radius: 12px; }
+        .address-section h2 { color: #ffcc00; margin-top: 0; }
+        label { display: block; margin-bottom: 8px; font-size: 0.9rem; color: #ccc; }
+        input, select, textarea { 
+            width: 100%; padding: 12px; margin-bottom: 20px; 
+            background: #2a2a2a; border: 1px solid #444; border-radius: 8px; color: white; 
+        }
+        .order-summary { flex: 1; background: #1e1e1e; padding: 25px; border-radius: 12px; height: fit-content; }
+        .order-summary h2 { color: #ffcc00; margin-top: 0; }
+        .product-item { display: flex; gap: 15px; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 15px; }
+        .product-item img { width: 70px; height: 70px; border-radius: 5px; object-fit: cover; }
+        .product-info h4 { margin: 0; font-size: 0.95rem; }
+        .product-info p { margin: 5px 0; color: #ffcc00; font-weight: bold; }
+
+        /* ส่วนแสดงจำนวนคงเหลือ */
+        .stock-label { font-size: 0.8rem; color: #ff4444; margin-bottom: 5px; display: block; }
+        
+        .qty-control { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+        .btn-qty { background: #333; border: 1px solid #444; color: white; width: 25px; height: 25px; cursor: pointer; border-radius: 4px; }
+        .btn-qty:hover:not(:disabled) { background: #444; }
+        .btn-qty:disabled { opacity: 0.3; cursor: not-allowed; }
+        
+        .btn-remove { background: none; border: none; color: #888; cursor: pointer; font-size: 0.8rem; text-decoration: underline; margin-top: 10px; }
+        .total-row { display: flex; justify-content: space-between; margin-bottom: 10px; color: #bbb; }
+        .grand-total { border-top: 1px solid #333; padding-top: 15px; font-size: 1.5rem; font-weight: bold; display: flex; justify-content: space-between; }
+        .grand-total span:last-child { color: #ffcc00; }
+        .btn-confirm { width: 100%; background: #ffcc00; color: #000; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">CARD SHOP</div>
+        <div>
+            <span id="user-display" style="color:#ffcc00; margin-right:15px;"></span>
+            <a href="Home page.html">ย้อนกลับ</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="address-section">
+            <h2>ที่อยู่จัดส่ง</h2>
+            <input type="text" id="cust-name" placeholder="ชื่อผู้รับสินค้า">
+            <input type="text" placeholder="เบอร์โทรศัพท์">
+            <textarea rows="3" placeholder="ที่อยู่จัดส่ง..."></textarea>
+            <select><option>QR พร้อมเพย์</option><option>โอนผ่านธนาคาร</option></select>
+        </div>
+
+        <div class="order-summary">
+            <h2>สรุปคำสั่งซื้อ</h2>
+            <div id="cart-items">
+                <div class="product-item" id="item-1">
+                    <img src="https://th-test-11.slatic.net/p/9812450e7c8e4c7d1ef1d6cc3dcd4d0d.png">
+                    <div class="product-info">
+                        <h4>BATTLE DECK CT01</h4>
+                        <p>฿300</p>
+                        <span class="stock-label" id="stock-display">เหลือสินค้าในคลัง: 5 ชิ้น</span>
+                        
+                        <div class="qty-control">
+                            <button class="btn-qty" onclick="changeQty(-1)">-</button>
+                            <span id="qty-val" style="font-weight: bold; color: white;">1</span>
+                            <button class="btn-qty" id="plus-btn" onclick="changeQty(1)">+</button>
+                        </div>
+                        <button class="btn-remove" onclick="removeItem()">ลบรายการ</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="total-row"><span>ยอดรวมสินค้า</span> <span id="subtotal">฿300</span></div>
+            <div class="total-row"><span>ค่าจัดส่ง</span> <span>฿20</span></div>
+            <div class="grand-total"><span>ยอด</span> <span id="grand-total">฿350</span></div>
+
+            <button class="btn-confirm" id="confirm-btn" onclick="processPayment()">ยืนยันชำระเงิน</button>
+        </div>
+    </div>
+
+    <script>
+        let quantity = 1;
+        let stockCount = 5; // กำหนดจำนวนสินค้าในคลัง
+        const pricePerUnit = 300;
+        const shippingFee = 20;
+
+        window.onload = function() {
+            const user = localStorage.getItem("registeredUser");
+            if (user) document.getElementById("user-display").innerText = "👤 " + user;
+            updateUI();
+        };
+
+        function changeQty(amount) {
+            let newQty = quantity + amount;
+
+            // ตรวจสอบเงื่อนไขคลังสินค้า
+            if (newQty > stockCount) {
+                alert("ขออภัย! สินค้าในคลังมีจำกัดเพียง " + stockCount + " ชิ้นเท่านั้น");
+                return;
+            }
+            
+            if (newQty >= 1) {
+                quantity = newQty;
+                updateUI();
+            }
+        }
+
+        function removeItem() {
+            if (confirm("ต้องการลบสินค้า?")) {
+                document.getElementById("cart-items").innerHTML = "<p style='text-align:center;color:#666;'>ตะกร้าว่างเปล่า</p>";
+                quantity = 0;
+                updateUI();
+                document.getElementById("confirm-btn").disabled = true;
+                document.getElementById("confirm-btn").style.background = "#444";
+            }
+        }
+
+        function updateUI() {
+            document.getElementById("qty-val").innerText = quantity;
+            document.getElementById("stock-display").innerText = "เหลือสินค้าในคลัง: " + stockCount + " ชิ้น";
+            
+            // ปิดปุ่มบวกถ้าจำนวนเท่ากับสต็อก
+            document.getElementById("plus-btn").disabled = (quantity >= stockCount);
+
+            const subtotal = quantity * pricePerUnit;
+            const total = quantity > 0 ? subtotal + shippingFee : 0;
+
+            document.getElementById("subtotal").innerText = "฿" + subtotal;
+            document.getElementById("grand-total").innerText = "฿" + total;
+        }
+
+        function processPayment() {
+            const user = localStorage.getItem("registeredUser");
+            const nameInput = document.getElementById('cust-name').value;
+
+            if (!user) {
+                alert("กรุณาสมัครสมาชิกก่อนซื้อสินค้า");
+                window.location.href = "registe.html";
+                return;
+            }
+            if (!nameInput) {
+                alert("กรุณากรอกชื่อผู้รับ");
+                return;
+            }
+
+            alert("ชำระเงินสำเร็จ! ขอบคุณคุณ " + nameInput);
+            window.location.href = "Home page.html";
+        }
+    </script>
+</body>
+</html>
