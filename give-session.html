@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Giving Session - Star Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Kanit', sans-serif; background: #050505; color: white; margin: 0; text-align: center; overflow: hidden; }
+        .top-bar { padding: 15px; display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); border-bottom: 1px solid #222; }
+        .cancel-btn { background: none; color: #ff4444; border: 1px solid #ff4444; padding: 6px 15px; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        .arena { height: 55vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; position: relative; }
+        .card-box { width: 200px; height: 280px; border: 2px dashed #333; border-radius: 20px; background: #0a0a0a; display: flex; align-items: center; justify-content: center; overflow: hidden; transition: 0.5s; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        .card-box.active { border: 2px solid #ffc831; box-shadow: 0 0 20px rgba(255,200,49,0.3); }
+        .card-box img { width: 100%; height: 100%; object-fit: cover; }
+        #qty-selector { display: none; position: absolute; background: #151515; border: 1px solid #ffc831; padding: 15px; border-radius: 15px; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        .inventory-label { text-align: left; padding: 10px 20px; font-size: 0.8rem; color: #ffc831; background: #0a0a0a; border-top: 1px solid #222; }
+        .inventory { height: 200px; background: #0a0a0a; display: flex; gap: 15px; padding: 15px; overflow-x: auto; scroll-behavior: smooth; }
+        .thumb { width: 100px; height: 140px; flex-shrink: 0; cursor: pointer; border-radius: 12px; overflow: hidden; border: 2px solid #222; position: relative; transition: 0.3s; }
+        .thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .thumb .qty-tag { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.8); color: #ffc831; font-size: 0.7rem; padding: 2px 6px; border-radius: 5px; font-weight: bold; }
+        #get-btn { background: linear-gradient(45deg, #ffc831, #ff9000); color: black; padding: 12px 40px; border: none; border-radius: 25px; font-weight: bold; margin-top: 20px; cursor: pointer; display: none; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <div style="color: #ffc831; font-weight: bold;">ROOM: <span id="room-id-txt">------</span></div>
+    <div id="user-info" style="font-size: 0.8rem; color: #888;"></div>
+    <button class="cancel-btn" onclick="cancelSession()">✖ ยกเลิก</button>
+</div>
+
+<div class="arena">
+    <h2 id="status" style="font-size: 1.2rem; margin-bottom: 15px; color: #888;">กำลังโหลดข้อมูล...</h2>
+    <div class="card-box" id="display"><p style="color:#222">รอการเลือก...</p></div>
+    
+    <button id="get-btn" onclick="claimCard()">ยืนยันการรับการ์ด 🎁</button>
+
+    <div id="qty-selector">
+        <div style="margin-bottom: 10px; color: #ffc831;">ส่งให้เพื่อนจำนวนกี่ใบ?</div>
+        <input type="number" id="send-qty" value="1" min="1" style="width: 80px; padding: 8px; text-align: center; border-radius: 8px; border: 1px solid #333; background: #000; color: #fff;">
+        <div id="max-label" style="font-size: 0.75rem; color: #666; margin-top: 5px;"></div>
+        <div style="margin-top: 15px; display: flex; gap: 8px; justify-content: center;">
+            <button onclick="confirmSend()" style="background:#ffc831; border:none; padding: 8px 20px; border-radius: 8px; cursor:pointer; font-weight:bold;">ส่งเลย</button>
+            <button onclick="closeQty()" style="background:#333; color:white; border:none; padding: 8px 20px; border-radius: 8px; cursor:pointer;">ยกเลิก</button>
+        </div>
+    </div>
+</div>
+
+<div class="inventory-label" id="inv-label" style="display:none;">เลือกการ์ดจากสมุดสะสมของคุณ:</div>
+<div class="inventory" id="my-inv" style="display:none;"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBx2JfaAGVB7BGRJUW6HEKJCaPNiWU6igg",
+        authDomain: "test-3aad7.firebaseapp.com",
+        databaseURL: "https://test-3aad7-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "test-3aad7",
+        appId: "1:519483707112:web:0e589822c23e27bb51035d"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const roomID = sessionStorage.getItem("roomID");
+    const role = sessionStorage.getItem("myRole");
+    const currentUser = localStorage.getItem("registeredUser") || "Guest";
+    
+    let activeCardInRoom = null; 
+    let tempCardToSelect = null; 
+
+    document.getElementById('room-id-txt').innerText = roomID;
+    document.getElementById('user-info').innerText = `ผู้ใช้งาน: ${currentUser} (${role === 'sender' ? 'ผู้ส่ง' : 'ผู้รับ'})`;
+
+    // --- 1. ตรวจสอบสถานะห้องจาก Firebase ---
+    onValue(ref(db, 'gifts/' + roomID), (snapshot) => {
+        const data = snapshot.val();
+        if(!data) {
+            alert("เซสชันสิ้นสุดลงแล้ว");
+            window.location.href = "give.html";
+            return;
+        }
+
+        if(data.giftCard) {
+            activeCardInRoom = { ...data.giftCard, giftQty: data.giftQty };
+            document.getElementById('display').classList.add('active');
+            document.getElementById('display').innerHTML = `<img src="${data.giftCard.img}">`;
+            
+            const qtyText = data.giftQty > 1 ? ` [x${data.giftQty}]` : "";
+            if(role === 'sender') {
+                document.getElementById('status').innerText = `ส่ง ${data.giftCard.name}${qtyText} เรียบร้อย!`;
+                document.getElementById('status').style.color = "#ffc831";
+            } else {
+                document.getElementById('status').innerText = `${data.sender} มอบ ${data.giftCard.name}${qtyText} ให้คุณ`;
+                document.getElementById('status').style.color = "#ffc831";
+                document.getElementById('get-btn').style.display = "block";
+            }
+        } else {
+            document.getElementById('status').innerText = (role === 'sender') ? "เลือกการ์ดที่จะส่งให้เพื่อน" : `รอ ${data.sender} เลือกการ์ด...`;
+        }
+    });
+
+    // --- 2. แสดงการ์ดใน Inventory (เฉพาะผู้ส่ง) ---
+    if(role === 'sender') {
+        document.getElementById('my-inv').style.display = "flex";
+        document.getElementById('inv-label').style.display = "block";
+        
+        // แก้ไข: ดึงจาก 'myCollection' โดยตรงเหมือนหน้าสมุดสะสม
+        const allCards = JSON.parse(localStorage.getItem("myCollection")) || [];
+        
+        // รวมกลุ่มการ์ดที่ซ้ำกัน
+        const counts = {};
+        allCards.forEach(card => {
+            const key = card.name + card.rarity;
+            if (!counts[key]) {
+                counts[key] = { ...card, qty: 1, key: key };
+            } else {
+                counts[key].qty += 1;
+            }
+        });
+
+        Object.values(counts).forEach(card => {
+            const div = document.createElement('div');
+            div.className = 'thumb';
+            div.innerHTML = `
+                <div class="qty-tag">x${card.qty}</div>
+                <img src="${card.img}">
+                <div style="font-size: 0.5rem; background: rgba(0,0,0,0.7); position: absolute; bottom: 0; width: 100%; overflow: hidden;">${card.name}</div>
+            `;
+            div.onclick = () => window.openQtySelector(card);
+            document.getElementById('my-inv').appendChild(div);
+        });
+    }
+
+    // --- 3. ฟังก์ชันระบบจัดการจำนวนการส่ง ---
+    window.openQtySelector = (card) => {
+        tempCardToSelect = card;
+        document.getElementById('qty-selector').style.display = 'block';
+        document.getElementById('send-qty').max = card.qty;
+        document.getElementById('send-qty').value = 1;
+        document.getElementById('max-label').innerText = `(คุณมีทั้งหมด ${card.qty} ใบ)`;
+    };
+
+    window.closeQty = () => {
+        document.getElementById('qty-selector').style.display = 'none';
+    };
+
+    window.confirmSend = () => {
+        const qtyToSend = parseInt(document.getElementById('send-qty').value);
+        if(qtyToSend <= 0 || qtyToSend > tempCardToSelect.qty) {
+            alert("ระบุจำนวนไม่ถูกต้อง");
+            return;
+        }
+
+        if(confirm(`ยืนยันการส่ง ${tempCardToSelect.name} จำนวน ${qtyToSend} ใบ?`)) {
+            // อัปเดตขึ้น Firebase
+            update(ref(db, 'gifts/' + roomID), { 
+                giftCard: tempCardToSelect,
+                giftQty: qtyToSend 
+            }).then(() => {
+                // หักจำนวนการ์ดออกจาก 'myCollection'
+                let allCards = JSON.parse(localStorage.getItem("myCollection")) || [];
+                let removedCount = 0;
+                
+                // ลบการ์ดตามจำนวนที่ส่ง (เริ่มลบจากท้ายเพื่อป้องกัน Index เลื่อน)
+                for (let i = allCards.length - 1; i >= 0; i--) {
+                    if (allCards[i].name === tempCardToSelect.name && allCards[i].rarity === tempCardToSelect.rarity && removedCount < qtyToSend) {
+                        allCards.splice(i, 1);
+                        removedCount++;
+                    }
+                }
+                
+                localStorage.setItem("myCollection", JSON.stringify(allCards));
+                window.closeQty();
+                setTimeout(() => location.reload(), 300);
+            });
+        }
+    };
+
+    // --- 4. ฟังก์ชันรับการ์ด (ผู้รับ) ---
+    window.claimCard = () => {
+        if(!activeCardInRoom) return;
+
+        // ดึงสมุดสะสมของผู้รับ
+        let allCards = JSON.parse(localStorage.getItem("myCollection")) || [];
+        const qtyToRec = activeCardInRoom.giftQty || 1;
+
+        // เพิ่มการ์ดเข้าสมุดตามจำนวนที่ได้รับ
+        for(let i = 0; i < qtyToRec; i++) {
+            const newEntry = { ...activeCardInRoom };
+            delete newEntry.giftQty; // ลบข้อมูลชั่วคราวออกก่อนเก็บ
+            allCards.push(newEntry);
+        }
+
+        localStorage.setItem("myCollection", JSON.stringify(allCards));
+        alert(`รับ ${activeCardInRoom.name} [x${qtyToRec}] เข้าสมุดสะสมเรียบร้อย!`);
+        
+        // ลบข้อมูลห้องหลังจบการแลกเปลี่ยน
+        remove(ref(db, 'gifts/' + roomID)).then(() => {
+            window.location.href = "collection.html"; // หรือหน้าที่คุณตั้งชื่อไว้
+        });
+    };
+
+    window.cancelSession = () => {
+        if(confirm("ต้องการยกเลิกการส่งและออกจากห้อง?")) {
+            remove(ref(db, 'gifts/' + roomID)).then(() => {
+                window.location.href = "give.html";
+            });
+        }
+    };
+</script>
+</body>
+</html>

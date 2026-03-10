@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Awakening - ปลุกพลังดาว</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: #050505; color: white; text-align: center; overflow-x: hidden; }
+        .navbar { background: rgba(15, 15, 15, 0.9); padding: 15px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .btn-back { background: #1a1a1a; color: #ffc831; border: 1px solid #ffc831; padding: 8px 15px; border-radius: 10px; text-decoration: none; font-weight: bold; }
+        .container { max-width: 600px; margin: 40px auto; padding: 20px; }
+        .evo-card-display { width: 220px; margin: 0 auto 30px auto; position: relative; border-radius: 15px; transition: 0.5s; }
+        .evo-card-display img { width: 100%; border-radius: 15px; border: 4px solid #444; }
+        
+        /* --- เอฟเฟกต์สีรุ้งสำหรับการ์ดดาวเต็ม --- */
+        @keyframes rainbow-rotate {
+            0% { border-color: #ff0000; box-shadow: 0 0 20px #ff0000; }
+            16% { border-color: #ff7f00; box-shadow: 0 0 20px #ff7f00; }
+            33% { border-color: #ffff00; box-shadow: 0 0 20px #ffff00; }
+            50% { border-color: #00ff00; box-shadow: 0 0 20px #00ff00; }
+            66% { border-color: #0000ff; box-shadow: 0 0 20px #0000ff; }
+            83% { border-color: #4b0082; box-shadow: 0 0 20px #4b0082; }
+            100% { border-color: #9400d3; box-shadow: 0 0 20px #9400d3; }
+        }
+        .rainbow-glow {
+            border: 4px solid transparent !important; /* ซ่อนขอบเดิม */
+            animation: rainbow-rotate 3s linear infinite; /* ใส่แอนิเมชั่น */
+        }
+
+        .star-container { color: #ffea00; font-size: 1.5rem; margin-top: 10px; min-height: 35px; }
+        .upgrade-panel { background: #111; padding: 25px; border-radius: 20px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .cost-info { display: flex; justify-content: space-around; margin: 20px 0; background: #000; padding: 15px; border-radius: 12px; }
+        .cost-item { font-size: 0.9rem; }
+        .cost-item b { display: block; font-size: 1.1rem; color: #00d4ff; }
+        .btn-star-upgrade { width: 100%; padding: 15px; border: none; border-radius: 12px; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: 0.3s; background: #333; color: #888; }
+        .btn-star-upgrade.active { background: linear-gradient(45deg, #ffc831, #ff9000); color: #000; box-shadow: 0 0 20px rgba(255, 200, 49, 0.4); }
+        .btn-star-upgrade.active:hover { transform: scale(1.02); }
+        .selector-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-top: 30px; max-height: 300px; overflow-y: auto; padding: 10px; background: #0a0a0a; border-radius: 10px; }
+        .small-card { cursor: pointer; border-radius: 8px; border: 2px solid transparent; opacity: 0.6; transition: 0.3s; }
+        .small-card.active { border-color: #ffc831; opacity: 1; transform: scale(1.05); }
+        .small-card img { width: 100%; border-radius: 6px; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="collection.html" class="btn-back">⬅ กลับไปที่สมุดสะสม</a>
+        <div style="color: #00d4ff;">💎 <span id="user-diamonds">0</span></div>
+    </nav>
+
+    <div class="container">
+        <h1>🌟 Star Awakening</h1>
+        <p style="color: #888;">ปลุกพลังขีดสุด (ต้องมี LV.10 และเป็นสาย EVO)</p>
+
+        <div id="evo-display-area" style="display: none;">
+            <div class="evo-card-display" id="main-card-frame">
+                <img id="selected-img" src="">
+                <div class="star-container" id="star-row"></div>
+            </div>
+
+            <div class="upgrade-panel">
+                <h2 id="card-name-display" style="margin: 0; color: #ffc831;">---</h2>
+                <p id="star-status" style="color: #888;"></p>
+
+                <div class="cost-info">
+                    <div class="cost-item">ค่าใช้จ่าย <b>💎 <span id="cost-dia">0</span></b></div>
+                    <div class="cost-item">โอกาสสำเร็จ <b>✨ <span id="success-rate">0%</span></b></div>
+                </div>
+
+                <button id="upgrade-btn" class="btn-star-upgrade" onclick="processStarUpgrade()">ปลุกพลังดาว</button>
+            </div>
+        </div>
+
+        <div id="no-cards-msg" style="margin-top: 50px; color: #555;">
+            <h3>ไม่พบการ์ดที่สามารถปลุกพลังดาวได้ในขณะนี้</h3>
+            <p>(ต้องมีการ์ด EVO เลเวล 10 อยู่ในสมุดสะสม)</p>
+        </div>
+
+        <h3 style="text-align: left; margin-top: 40px;">เลือกการ์ดที่จะปลุกพลัง:</h3>
+        <div class="selector-grid" id="selector-grid"></div>
+    </div>
+
+<script>
+    const upgradeConfigs = {
+        0: { cost: 500,  rate: 100, label: "★☆☆☆☆☆" },
+        1: { cost: 1000, rate: 80,  label: "★★☆☆☆☆" },
+        2: { cost: 2000, rate: 60,  label: "★★★☆☆☆" },
+        3: { cost: 5000, rate: 40,  label: "★★★★☆☆" },
+        4: { cost: 10000, rate: 20, label: "★★★★★☆" },
+        5: { cost: 20000, rate: 20, label: "★★★★★★" }
+    };
+
+    let selectedKey = null;
+
+    function getActiveUser() { return localStorage.getItem("registeredUser") || localStorage.getItem("currentUser") || "Guest"; }
+
+    function loadEvoCards() {
+        const data = JSON.parse(localStorage.getItem("myCollection")) || [];
+        const levels = JSON.parse(localStorage.getItem("cardLevels_Fixed")) || {};
+        const activeUser = getActiveUser();
+        const diamonds = parseInt(localStorage.getItem(`diamonds_${activeUser}`)) || 0;
+        document.getElementById("user-diamonds").innerText = diamonds.toLocaleString();
+
+        const grid = document.getElementById("selector-grid");
+        grid.innerHTML = "";
+
+        const counts = {};
+        data.forEach(card => {
+            const key = card.name + card.rarity;
+            const isEvo = card.isEvo || card.name.includes("[EVO]");
+            const lvl = levels[key] || 0;
+
+            if (isEvo && lvl >= 10 && !counts[key]) {
+                counts[key] = { ...card, key: key };
+            }
+        });
+
+        const evoList = Object.values(counts);
+
+        if (evoList.length > 0) {
+            document.getElementById("no-cards-msg").style.display = "none";
+            document.getElementById("evo-display-area").style.display = "block";
+            
+            evoList.forEach(card => {
+                const el = document.createElement("div");
+                el.className = `small-card ${selectedKey === card.key ? 'active' : ''}`;
+                el.innerHTML = `<img src="${card.img}">`;
+                el.onclick = () => selectCard(card);
+                grid.appendChild(el);
+            });
+
+            if (!selectedKey || !counts[selectedKey]) {
+                selectCard(evoList[0]);
+            } else {
+                selectCard(counts[selectedKey]);
+            }
+        } else {
+            document.getElementById("no-cards-msg").style.display = "block";
+            document.getElementById("evo-display-area").style.display = "none";
+        }
+    }
+
+    function selectCard(card) {
+        selectedKey = card.key;
+        document.getElementById("selected-img").src = card.img;
+        document.getElementById("card-name-display").innerText = card.name;
+        
+        const stars = card.stars || 0;
+        document.getElementById("star-row").innerText = "★".repeat(stars);
+
+        // --- เพิ่มเอฟเฟกต์สีรุ้งเมื่อดาวเต็ม 6 ดวง ---
+        const mainCardFrame = document.getElementById("main-card-frame");
+        if (stars === 6) {
+            mainCardFrame.classList.add("rainbow-glow");
+        } else {
+            mainCardFrame.classList.remove("rainbow-glow");
+        }
+        // -------------------------------------------
+        
+        if (stars < 6) {
+            const config = upgradeConfigs[stars];
+            document.getElementById("cost-dia").innerText = config.cost.toLocaleString();
+            document.getElementById("success-rate").innerText = config.rate + "%";
+            document.getElementById("star-status").innerText = `ปลุกพลังสู่ระดับ ${stars + 1} ดาว`;
+            
+            const activeUser = getActiveUser();
+            const diamonds = parseInt(localStorage.getItem(`diamonds_${activeUser}`)) || 0;
+            const btn = document.getElementById("upgrade-btn");
+            
+            if (diamonds >= config.cost) {
+                btn.className = "btn-star-upgrade active";
+                btn.disabled = false;
+                btn.innerText = "เริ่มการปลุกพลังดาว";
+            } else {
+                btn.className = "btn-star-upgrade";
+                btn.disabled = true;
+                btn.innerText = "เพชรไม่เพียงพอ";
+            }
+        } else {
+            document.getElementById("star-status").innerText = "ระดับดาวเต็มแล้ว (Max Star!)";
+            document.getElementById("upgrade-btn").className = "btn-star-upgrade";
+            document.getElementById("upgrade-btn").disabled = true;
+            document.getElementById("upgrade-btn").innerText = "พลังสูงสุดแล้ว";
+        }
+
+        document.querySelectorAll(".small-card").forEach(el => {
+            el.classList.toggle("active", el.querySelector("img").src === card.img);
+        });
+    }
+
+    function processStarUpgrade() {
+        const activeUser = getActiveUser();
+        let data = JSON.parse(localStorage.getItem("myCollection")) || [];
+        let diamonds = parseInt(localStorage.getItem(`diamonds_${activeUser}`)) || 0;
+
+        const targetCard = data.find(c => (c.name + c.rarity) === selectedKey);
+        if (!targetCard) return;
+
+        const currentStars = targetCard.stars || 0;
+        const config = upgradeConfigs[currentStars];
+
+        if (diamonds < config.cost) return alert("เพชรไม่พอ!");
+
+        if (confirm(`ใช้ ${config.cost} 💎 เพื่อลุ้นปลุกพลังดาว?\n(โอกาสสำเร็จ ${config.rate}%)`)) {
+            diamonds -= config.cost;
+            localStorage.setItem(`diamonds_${activeUser}`, diamonds);
+            
+            const roll = Math.random() * 100;
+            if (roll <= config.rate) {
+                data.forEach(card => {
+                    if ((card.name + card.rarity) === selectedKey) {
+                        card.stars = (card.stars || 0) + 1;
+                    }
+                });
+                localStorage.setItem("myCollection", JSON.stringify(data));
+                alert("🌟 สำเร็จ! พลังดวงดาวเพิ่มขึ้นแล้ว!");
+            } else {
+                alert("❌ ล้มเหลว! พลังดวงดาวไม่เสถียร (เสียเพชรแต่ดาวไม่เพิ่ม)");
+            }
+            
+            loadEvoCards(); 
+        }
+    }
+
+    window.onload = loadEvoCards;
+</script>
+</body>
+</html>

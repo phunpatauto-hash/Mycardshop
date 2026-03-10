@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>แลกโค้ดรับรางวัล</title>
+    <style>
+        body { font-family: 'Kanit', sans-serif; background: #121212; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background: #1e1e1e; padding: 30px; border-radius: 15px; text-align: center; border: 1px solid #333; width: 300px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; background: #333; color: white; text-align: center; }
+        button { width: 100%; padding: 10px; background: #ffc831; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #e5b32a; }
+        a { color: #888; text-decoration: none; margin-top: 15px; display: block; }
+    </style>
+</head>
+<body>
+
+    <div class="box">
+        <h2>🎫 แลกโค้ดรางวัล</h2>
+        <input type="text" id="code-input" placeholder="กรอกโค้ดที่นี่">
+        <button id="redeem-btn">ยืนยันแลกรับ</button>
+        <a href="index.html">กลับหน้าหลัก</a>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, get, update, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBx2JfaAGVB7BGRJUW6HEKJCaPNiWU6igg",
+        databaseURL: "https://test-3aad7-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "test-3aad7",
+        appId: "1:519483707112:web:0e589822c23e27bb51035d"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    document.getElementById("redeem-btn").onclick = async () => {
+        const inputCode = document.getElementById("code-input").value.trim().toUpperCase();
+        const user = localStorage.getItem("registeredUser") || localStorage.getItem("currentUser");
+
+        if (!user) return alert("กรุณาล็อกอินก่อนครับ!");
+        if (!inputCode) return alert("กรุณากรอกโค้ด!");
+
+        const codeMasterRef = ref(db, `codes/${inputCode}`);
+        const userUsedRef = ref(db, `users/${user}/redeemedCodes/${inputCode}`);
+
+        try {
+            // 1. เช็คว่าโค้ดมีอยู่จริงในระบบ Admin หรือไม่
+            const codeSnap = await get(codeMasterRef);
+            if (!codeSnap.exists()) {
+                return alert("❌ โค้ดไม่ถูกต้อง หรือไม่มีอยู่จริงครับ");
+            }
+
+            // 2. เช็คว่าผู้ใช้นี้เคยใช้โค้ดนี้ไปหรือยัง
+            const usedSnap = await get(userUsedRef);
+            if (usedSnap.exists()) {
+                return alert("⚠️ คุณใช้โค้ดนี้ไปแล้วครับ!");
+            }
+
+            // 3. ดึงข้อมูลรางวัล (รองรับทั้งแต้มและเพชร)
+            const rewardData = codeSnap.val();
+            const rewardPoints = rewardData.rewardPoints || 0;
+            const rewardDiamonds = rewardData.rewardDiamonds || 0;
+
+            // 4. อัปเดตข้อมูล (ให้แต้ม + ให้เพชร + บันทึกว่าใช้แล้ว + นับสถิติการใช้)
+            const updates = {};
+            updates[`users/${user}/points`] = increment(rewardPoints);
+            updates[`users/${user}/diamonds`] = increment(rewardDiamonds);
+            updates[`users/${user}/redeemedCodes/${inputCode}`] = true;
+            updates[`codes/${inputCode}/usedCount`] = increment(1); 
+
+            await update(ref(db), updates);
+            
+            alert(`🎉 ยินดีด้วย! คุณได้รับ:\n🪙 ${rewardPoints} แต้ม\n💎 ${rewardDiamonds} เพชร`);
+            window.location.href = "index.html";
+
+        } catch (e) {
+            console.error(e);
+            alert("เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่");
+        }
+    };
+</script>
+</body>
+</html>

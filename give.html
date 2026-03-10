@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gift Center - My Collection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Style หลัก (คุมโทนเดียวกับหน้าสมุดสะสม) --- */
+        * { box-sizing: border-box; }
+        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: #050505; color: white; text-align: center; }
+
+        .navbar { background: rgba(15, 15, 15, 0.9); padding: 15px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(10px); }
+        .btn-back { color: #ffc831; text-decoration: none; font-size: 0.85rem; border: 1px solid #ffc831; padding: 5px 12px; border-radius: 8px; }
+
+        .container { max-width: 900px; margin: 20px auto; padding: 0 20px; }
+
+        /* ส่วนแสดงชื่อและปุ่มหลัก */
+        .lobby-header { background: linear-gradient(145deg, #111, #080808); padding: 30px; border-radius: 25px; border: 1px solid #222; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .user-name-display { font-size: 1.8rem; font-weight: bold; color: #ffc831; margin-bottom: 20px; text-shadow: 0 0 10px rgba(255, 200, 49, 0.3); }
+        
+        .action-group { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+        .btn-main { flex: 1; min-width: 200px; padding: 18px; border-radius: 15px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.3s; border: none; font-family: 'Kanit'; }
+        
+        .btn-give { background: linear-gradient(45deg, #ffc831, #ff9000); color: #000; box-shadow: 0 5px 15px rgba(255, 200, 49, 0.2); }
+        .btn-receive { background: rgba(255, 255, 255, 0.05); color: #ffc831; border: 1px solid #ffc831; }
+        .btn-main:hover { transform: translateY(-3px); filter: brightness(1.2); }
+
+        /* ส่วนแสดงการ์ดในสมุดเรา (Preview) */
+        .section-title { text-align: left; color: #888; font-size: 0.9rem; margin: 0 0 15px 15px; text-transform: uppercase; letter-spacing: 1px; }
+        .collection-preview { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 20px; border: 1px solid #1a1a1a; max-height: 450px; overflow-y: auto; }
+        
+        .mini-card { background: #111; border-radius: 10px; border: 1px solid #333; overflow: hidden; position: relative; transition: 0.3s; }
+        .mini-card img { width: 100%; display: block; filter: grayscale(0.3); transition: 0.3s; }
+        .mini-card:hover img { filter: grayscale(0); }
+        .card-qty { position: absolute; bottom: 5px; right: 5px; background: rgba(0,0,0,0.8); color: #ffc831; font-size: 0.7rem; padding: 1px 6px; border-radius: 4px; border: 1px solid #333; }
+
+        /* Scrollbar Style */
+        .collection-preview::-webkit-scrollbar { width: 5px; }
+        .collection-preview::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="collection.html" class="btn-back">⬅ กลับสมุดสะสม</a>
+        <div style="font-size: 0.9rem; color: #666;">GIFT LOBBY</div>
+    </nav>
+
+    <div class="container">
+        <div class="lobby-header">
+            <div class="user-name-display" id="my-name">Collector: Loading...</div>
+            
+            <div class="action-group">
+                <button href="give-session.html"class="btn-main btn-give" onclick="handleAction('sender')">🎁 ส่งการ์ดให้เพื่อน</button>
+                <button href="give-session.html"class="btn-main btn-receive" onclick="handleAction('receiver')">📥 รับการ์ดจากเพื่อน</button>
+            </div>
+        </div>
+
+        <div class="section-title">การ์ดในสมุดของคุณ (เลือกส่งได้)</div>
+        <div id="my-collection-list" class="collection-preview">
+            </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    // --- Firebase Config (ใช้ตัวเดิมของคุณ) ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyBx2JfaAGVB7BGRJUW6HEKJCaPNiWU6igg",
+        authDomain: "test-3aad7.firebaseapp.com",
+        databaseURL: "https://test-3aad7-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "test-3aad7",
+        appId: "1:519483707112:web:0e589822c23e27bb51035d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // --- ฟังก์ชันหลัก handleAction ---
+    window.handleAction = async (role) => {
+        const currentUser = localStorage.getItem("registeredUser") || "Guest";
+        
+        if (currentUser === "Guest") {
+            alert("⚠️ กรุณาเข้าสู่ระบบก่อนทำรายการ!");
+            return;
+        }
+
+        if (role === 'sender') {
+            // 1. กรณีผู้ส่ง: สร้างรหัส 6 หลักอัตโนมัติ
+            const roomID = Math.floor(100000 + Math.random() * 900000).toString();
+            
+            // สร้างห้องใน Firebase
+            try {
+                await set(ref(db, 'gifts/' + roomID), {
+                    sender: currentUser,
+                    status: "waiting",
+                    timestamp: Date.now()
+                });
+                
+                // เก็บข้อมูลเข้า Session และไปหน้า Session
+                sessionStorage.setItem("roomID", roomID);
+                sessionStorage.setItem("myRole", "sender");
+                sessionStorage.setItem("myName", currentUser);
+                
+                alert(`🎁 สร้างห้องสำเร็จ! รหัสของคุณคือ: ${roomID}\nส่งรหัสนี้ให้เพื่อนเพื่อมารับการ์ด`);
+                window.location.href = "give-session.html";
+            } catch (error) {
+                alert("เกิดข้อผิดพลาดในการสร้างห้อง");
+            }
+
+        } else if (role === 'receiver') {
+            // 2. กรณีผู้รับ: ให้กรอกรหัสจากเพื่อน
+            const inputID = prompt("📥 กรุณากรอกรหัส 6 หลักที่ได้รับจากเพื่อน:");
+            
+            if (!inputID) return; // กดยกเลิก
+
+            // ตรวจสอบว่ามีห้องนี้จริงไหมใน Firebase
+            const roomRef = ref(db, 'gifts/' + inputID);
+            const snapshot = await get(roomRef);
+
+            if (snapshot.exists()) {
+                sessionStorage.setItem("roomID", inputID);
+                sessionStorage.setItem("myRole", "receiver");
+                sessionStorage.setItem("myName", currentUser);
+                window.location.href = "give-session.html";
+            } else {
+                alert("❌ ไม่พบรหัสนี้ หรือห้องถูกปิดไปแล้ว");
+            }
+        }
+    };
+</script>
+</body>
+</html>

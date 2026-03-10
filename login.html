@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>เข้าสู่ระบบ - Mycard Game</title>
+    <style>
+        body { font-family: 'Kanit', sans-serif; background: #121212; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; color: white; }
+        .card { background: #1e1e1e; padding: 2.5rem; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 350px; text-align: center; border: 1px solid #333; }
+        h2 { color: #ffc831; margin-bottom: 1.5rem; }
+        input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #333; border-radius: 8px; box-sizing: border-box; background: #000; color: white; outline: none; }
+        input:focus { border-color: #ffc831; }
+        .btn { width: 100%; padding: 12px; background: #ffc831; color: black; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: bold; transition: 0.3s; }
+        .btn:hover { background: white; transform: translateY(-2px); }
+        p a { color: #888; text-decoration: none; font-size: 0.9rem; }
+        p a:hover { color: #ffc831; }
+        
+        /* Modal Style */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8); justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-content {
+            background: #222; padding: 25px; border-radius: 12px; width: 300px; text-align: center; border: 1px solid #ff4747;
+        }
+        .btn-close { background: #444; color: white; border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>LOGIN</h2>
+    <input type="text" id="username" placeholder="ชื่อผู้ใช้">
+    <input type="password" id="password" placeholder="รหัสผ่าน">
+    <button class="btn" onclick="checkLogin()">เข้าสู่ระบบ</button>
+    <p><a href="registe.html">ยังไม่มีบัญชี? สมัครสมาชิกที่นี่</a></p>
+</div>
+
+<div class="modal-overlay" id="errorModal">
+    <div class="modal-content">
+        <h3 style="color: #ff4747;">แจ้งเตือน</h3>
+        <p id="errorText" style="color: #ccc;"></p>
+        <button class="btn-close" onclick="closeModal()">ตกลง</button>
+    </div>
+</div>
+
+<script>
+    function checkLogin() {
+        const userField = document.getElementById('username').value.trim();
+        const passField = document.getElementById('password').value.trim();
+        const modal = document.getElementById('errorModal');
+        const errorText = document.getElementById('errorText');
+
+        // 1. ดึงรายการผู้ใช้จากฐานข้อมูลจำลอง (localStorage)
+        const userList = JSON.parse(localStorage.getItem("userList")) || [];
+
+        if (userField === "" || passField === "") {
+            errorText.innerText = "กรุณากรอกข้อมูลให้ครบถ้วน";
+            modal.style.display = "flex";
+            return;
+        }
+
+        // 2. ค้นหาผู้ใช้ที่ข้อมูลตรงกัน
+        const foundUser = userList.find(u => u.username === userField && u.password === passField);
+
+        if (foundUser) {
+            // --- ส่วนที่เพิ่มเพื่อระบบจดจำชื่อ ---
+            
+            // เก็บชื่อไว้ใน Key ต่างๆ เพื่อให้หน้า Home และหน้า Collection ดึงไปใช้ได้ทันที
+            localStorage.setItem("registeredUser", foundUser.username); // สำหรับหน้าแรกเดิม
+            localStorage.setItem("currentUser", foundUser.username);     // สำหรับระบบ Session ใหม่
+            localStorage.setItem("username", foundUser.username);        // สำหรับหน้าสมุดสะสม
+            
+            // เช็คแต้ม (ถ้าเป็นคนเก่าให้ใช้แต้มเดิม ถ้าคนใหม่เอี่ยมให้ 86500)
+            if (!localStorage.getItem("userPoints")) {
+                localStorage.setItem("userPoints", 86500);
+            }
+
+            alert("ยินดีต้อนรับกลับมา! " + foundUser.username);
+            window.location.href = "index.html";
+        } else {
+            errorText.innerText = "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง";
+            modal.style.display = "flex";
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('errorModal').style.display = "none";
+    }
+
+    // กด Enter เพื่อ Login ได้เลย
+    document.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            checkLogin();
+        }
+    });
+</script>
+</body>
+</html>
