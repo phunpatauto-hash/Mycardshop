@@ -2,22 +2,22 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>สมัครสมาชิก - Mycard Game</title>
+    <title>สมัครสมาชิก - MyCard Game</title>
     <style>
-        body { font-family: 'Kanit', sans-serif; background: #0a0a0a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        body { font-family: sans-serif; background: #0a0a0a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
         .signup-box { background: #161616; padding: 30px; border-radius: 20px; width: 320px; border: 1px solid #333; text-align: center; }
         input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #444; background: #222; color: white; }
-        button { width: 100%; padding: 12px; background: #ffc831; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        button { width: 100%; padding: 12px; background: #ffc831; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; color: #000; }
     </style>
 </head>
 <body>
 
 <div class="signup-box">
-    <h2 style="color: #ffc831;">สร้างบัญชีใหม่</h2>
-    <input type="email" id="email" placeholder="อีเมล (เช่น test@gmail.com)">
+    <h2 style="color: #ffc831;">สมัครสมาชิก</h2>
+    <input type="text" id="username" placeholder="ตั้งชื่อผู้ใช้ (ภาษาอังกฤษ)">
     <input type="password" id="password" placeholder="รหัสผ่าน (6 ตัวขึ้นไป)">
-    <button onclick="handleSignUp()">สมัครสมาชิก</button>
-    <p style="font-size: 0.8rem; color: #888; cursor: pointer;" onclick="location.href='login.html'">มีบัญชีแล้ว? เข้าสู่ระบบ</p>
+    <button onclick="handleSignUp()">สมัครสมาชิกเลย!</button>
+    <p style="font-size: 0.8rem; color: #888; cursor: pointer; margin-top: 15px;" onclick="location.href='login.html'">มีบัญชีแล้ว? เข้าสู่ระบบ</p>
 </div>
 
 <script type="module">
@@ -25,7 +25,6 @@
     import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // ใช้ข้อมูลจากรูป Project Settings ของคุณ
     const firebaseConfig = {
         apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
         authDomain: "sign-up-73f99.firebaseapp.com",
@@ -40,26 +39,32 @@
     const db = getFirestore(app);
 
     window.handleSignUp = async () => {
-        const email = document.getElementById("email").value;
+        const userField = document.getElementById("username").value.trim();
         const password = document.getElementById("password").value;
 
+        if(!userField || password.length < 6) {
+            alert("กรุณากรอกชื่อและรหัสผ่านให้ครบ (6 ตัวขึ้นไป)");
+            return;
+        }
+
+        // แก้ตรงนี้ให้เป็น @card.com เหมือนหน้า Login ครับ
+        const fakeEmail = userField + "@card.com";
+
         try {
-            // 1. สร้างบัญชีใน Firebase Auth
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const userCredential = await createUserWithEmailAndPassword(auth, fakeEmail, password);
             const user = userCredential.user;
 
-            // 2. สร้างฐานข้อมูลเริ่มต้นให้ผู้ใช้ใหม่ใน Firestore
             await setDoc(doc(db, "users", user.uid), {
-                email: email,
-                points: 1000, // แถมพอยท์เริ่มเล่น
-                myCollection: [], // คลังการ์ดว่างเปล่า
-                featuredCard: null
+                username: userField,
+                points: 500, 
+                myCollection: [],
+                featuredCard: null // เพิ่มไว้สำหรับเก็บการ์ดที่จะโชว์หน้าโปรไฟล์
             });
 
-            alert("สมัครสมาชิกสำเร็จ!");
-            window.location.href = "profile.html";
+            alert("สมัครสำเร็จ! ยินดีต้อนรับคุณ " + userField);
+            window.location.href = "login.html"; // สมัครเสร็จแล้วให้ไปหน้า Login
         } catch (error) {
-            alert("ผิดพลาด: " + error.message);
+            alert("สมัครไม่สำเร็จ: " + error.message);
         }
     };
 </script>
