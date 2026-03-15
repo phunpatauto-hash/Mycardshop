@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>เข้าสู่ระบบ - Mycard Game</title>
+    <style>
+        body { font-family: sans-serif; background: #000; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-box { background: #1a1a1a; padding: 30px; border-radius: 15px; width: 300px; text-align: center; border: 1px solid #333; }
+        input { width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #444; background: #222; color: white; }
+        button { width: 100%; padding: 10px; background: #ffc831; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        .link { font-size: 0.8rem; color: #888; margin-top: 15px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="login-box">
+    <h2>เข้าสู่ระบบ</h2>
+    <input type="email" id="email" placeholder="อีเมล">
+    <input type="password" id="password" placeholder="รหัสผ่าน">
+    <button onclick="handleLogin()">เข้าสู่ระบบ</button>
+    <div class="link" onclick="location.href='signup.html'">ยังไม่มีบัญชี? สมัครสมาชิกที่นี่</div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    // ใช้กุญแจโปรเจกต์ของคุณ
+    const firebaseConfig = {
+        apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
+        authDomain: "sign-up-73f99.firebaseapp.com",
+        projectId: "sign-up-73f99",
+        storageBucket: "sign-up-73f99.appspot.com",
+        messagingSenderId: "916335559099",
+        appId: "1:916335559099:web:3a8ed896ba26e38991849e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.handleLogin = async () => {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            alert("เข้าสู่ระบบสำเร็จ!");
+            window.location.href = "profile.html"; // ไปหน้าคลังการ์ดที่คุณสร้างไว้
+        } catch (error) {
+            alert("ข้อผิดพลาด: " + error.message);
+        }
+    };
+</script>
+
+</body>
+</html>
