@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MY COLLECTION - Professional UI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Style หลักคงเดิม --- */
+        * { box-sizing: border-box; }
+        body { font-family: 'Kanit', sans-serif; margin: 0; background: radial-gradient(circle at center, #1a1a2e 0%, #050505 100%); color: white; text-align: center; overflow-x: hidden; min-height: 100vh; }
+        
+        .navbar { background-color: rgba(10, 10, 15, 0.8); padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,200,49,0.2); position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(15px); }
+        .user-name-tag { color: #ffc831; font-weight: bold; font-size: 1rem; }
+        .nav-buttons { display: flex; gap: 10px; }
+        .btn-nav { background: rgba(255,255,255,0.05); color: #ccc; border: 1px solid rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 12px; text-decoration: none; font-size: 0.8rem; font-weight: bold; transition: 0.3s; cursor: pointer; }
+        .btn-nav:hover, .btn-nav.active { background: #ffc831; color: #000; box-shadow: 0 0 15px rgba(255,200,49,0.4); }
+        .btn-nav.primary { background: #ffc831; color: #000; border: none; }
+        
+        .wallet-display { display: flex; gap: 12px; }
+        .wallet-box { background: rgba(0, 0, 0, 0.3); padding: 6px 15px; border-radius: 20px; border: 1px solid #333; display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 0.9rem; }
+        .star-box { border-color: #4facfe; color: #4facfe; } /* สไตล์สีดวงดาว */
+
+        /* --- ส่วนอื่นๆ ของ UI --- */
+        .filter-bar { max-width: 1200px; margin: 20px auto; padding: 0 20px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+        .filter-btn { padding: 8px 18px; border-radius: 20px; border: 1px solid #333; background: #111; color: #888; cursor: pointer; font-weight: bold; transition: 0.3s; font-size: 0.8rem; }
+        .filter-btn.active { border-color: #ffc831; color: #ffc831; background: rgba(255, 200, 49, 0.1); }
+
+        .progress-section { max-width: 1200px; margin: 10px auto; padding: 0 20px; text-align: left; }
+        .progress-bar-bg { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 8px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #ffc831, #ff8c00); width: 0%; transition: 1s; box-shadow: 0 0 10px #ffc831; }
+
+        .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+        .collection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 25px; }
+        
+        .col-card { background: rgba(255, 255, 255, 0.03); border-radius: 18px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); position: relative; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; backdrop-filter: blur(5px); }
+        .col-card:hover { transform: translateY(-10px) rotate(1deg); z-index: 10; }
+        .col-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; }
+
+        /* Rarity Styles */
+        .rarity-u { border: 2px solid #ffffff; }
+        .rarity-r { border: 2px solid #4ade80; }
+        .rarity-sr { border: 2px solid #00e5ff; box-shadow: 0 0 15px rgba(0, 229, 255, 0.2); }
+        .rarity-ssr { border: 2px solid #ffc831; box-shadow: 0 0 20px rgba(255, 200, 49, 0.4); animation: card-glow 3s infinite alternate; }
+        .rarity-exr { border: 2px solid #ff0055; box-shadow: 0 0 15px rgba(255, 0, 85, 0.3); }
+        .rarity-sec { border: 2px solid #a020f0; box-shadow: 0 0 15px rgba(160, 32, 240, 0.3); }
+
+        @keyframes card-glow {
+            from { filter: brightness(1); }
+            to { filter: brightness(1.2); box-shadow: 0 0 30px rgba(255, 200, 49, 0.6); }
+        }
+        
+        .card-info { padding: 12px; text-align: left; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); position: absolute; bottom: 0; width: 100%; }
+        .card-rarity { font-size: 0.65rem; font-weight: 800; color: #ffc831; }
+        .card-name { font-size: 0.85rem; font-weight: bold; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        .qty-badge { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: #ffc831; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; border: 1px solid #ffc831; z-index: 5; }
+        .lvl-badge { position: absolute; bottom: 55px; right: 10px; background: #fff; color: #000; font-size: 0.65rem; font-weight: 900; padding: 2px 6px; border-radius: 5px; z-index: 5; }
+
+        /* Modal Styles */
+        .modal { display: none; position: fixed; z-index: 2000; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(15px); justify-content: center; align-items: center; padding: 20px; }
+        .modal-container { position: relative; width: 100%; max-width: 380px; transition: 0.3s; }
+        .modal-content { background: #111; border-radius: 25px; overflow: hidden; border: 1px solid #333; position: relative; }
+        #modalImg { width: 100%; display: block; border-bottom: 3px solid #ffc831; }
+        
+        .btn-upgrade { background: linear-gradient(45deg, #ff0055, #ff8c00); color: white; border: none; width: 100%; padding: 16px; border-radius: 15px; font-weight: bold; margin-bottom: 10px; cursor: pointer; display: none; transition: 0.3s; box-shadow: 0 4px 15px rgba(255, 0, 85, 0.3); }
+        .btn-upgrade:hover { transform: scale(1.02); }
+        .btn-delete { background: rgba(255, 68, 68, 0.1); color: #ff4444; border: 1px solid #ff4444; padding: 12px; border-radius: 12px; font-weight: bold; margin-bottom: 10px; cursor: pointer; transition: 0.3s; }
+        .btn-delete:hover { background: #ff4444; color: white; }
+        .btn-delete-all { background: rgba(255, 68, 68, 0.2); border-color: #ff4444; }
+        
+        .upgrade-anim { animation: successFlash 0.6s ease-out; }
+        @keyframes successFlash {
+            0% { filter: brightness(1); transform: scale(1); }
+            50% { filter: brightness(1.8); transform: scale(1.05); }
+            100% { filter: brightness(1); transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="user-info">
+            <span class="user-name-tag" id="display-username">Loading...</span>
+            <div class="nav-buttons" style="margin-top: 5px;">
+                <a href="index.html" class="btn-nav">เมนูหลัก</a>
+                <a href="Banner Selection.html" class="btn-nav primary">สุ่มการ์ด</a>
+            </div>
+        </div>
+        <div class="wallet-display">
+            <div class="wallet-box" style="border-color: #ffc831;">🪙 <span id="nav-points">0</span></div>
+            <div class="wallet-box" style="border-color: #00d4ff;">💎 <span id="nav-diamonds">0</span></div>
+            <div class="wallet-box star-box">⭐ <span id="nav-stars">0</span></div> </div>
+    </nav>
+
+    <div class="progress-section">
+        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: bold;">
+            <span>คอลเลกชันสะสม (<span id="current-filter-label" style="color:#ffc831">ALL</span>)</span>
+            <span id="collection-count">0 / 0 แบบ</span>
+        </div>
+        <div class="progress-bar-bg"><div id="progress-fill" class="progress-fill"></div></div>
+    </div>
+
+    <div class="filter-bar" id="filter-bar">
+        <button class="filter-btn active" onclick="setFilter('ALL')">ALL</button>
+        <button class="filter-btn" onclick="setFilter('EXR')">EXR</button>
+        <button class="filter-btn" onclick="setFilter('SEC')">SEC</button>
+        <button class="filter-btn" onclick="setFilter('SSR')">SSR</button>
+        <button class="filter-btn" onclick="setFilter('SR')">SR</button>
+        <button class="filter-btn" onclick="setFilter('R')">R</button>
+        <button class="filter-btn" onclick="setFilter('U')">U</button>
+        <button class="filter-btn" onclick="setFilter('C')">C</button>
+    </div>
+
+    <div class="container">
+        <div id="grid" class="collection-grid">
+            <p>กำลังเตรียมแกลเลอรี...</p>
+        </div>
+    </div>
+
+    <div id="cardModal" class="modal" onclick="closeModal()">
+        <div class="modal-container" id="modalContainer" onclick="event.stopPropagation()">
+            <div class="modal-content">
+                <img id="modalImg" src="">
+                <div style="padding: 25px; text-align: left;">
+                    <h2 id="modalName" style="margin:0; color:#ffc831; font-size: 1.6rem;">Card Name</h2>
+                    <p id="modalRarity" style="color:#00e5ff; font-weight: bold; margin: 5px 0 10px;"></p>
+                    <p id="modalLvl" style="color:#fff; font-size: 1rem; margin-bottom: 15px; font-weight: bold;">LV. 1</p>
+                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; border: 1px solid #333; margin-bottom: 20px;">
+                        <p id="modalSource" style="margin:0 0 5px 0; font-size: 0.85rem; color: #ffc831; font-weight: bold;"></p>
+                        <p id="modalQty" style="margin:0; font-size: 0.9rem; color: #ccc;"></p>
+                    </div>
+                    <button id="upgradeBtn" class="btn-upgrade">✨ อัปเกรดเลเวล (ใช้ 5 ใบ | +100 Pass EXP)</button>
+                    <div style="display: flex; gap: 10px;">
+                        <button id="deleteBtn" class="btn-delete" style="flex: 1;">🗑️ ลบ 1 ใบ (+50 🪙)</button>
+                        <button id="deleteAllBtn" class="btn-delete btn-delete-all" style="flex: 1;">🗑️ ลบทั้งหมด</button>
+                    </div>
+                    <button class="btn-nav primary" style="width:100%; padding: 15px; font-size: 1rem;" onclick="closeModal()">กลับไปยังแกลเลอรี</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
+        authDomain: "sign-up-73f99.firebaseapp.com",
+        projectId: "sign-up-73f99",
+        storageBucket: "sign-up-73f99.appspot.com",
+        messagingSenderId: "916335559099",
+        appId: "1:916335559099:web:3a8ed896ba26e38991849e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUserData = null;
+    let currentUID = null;
+    let currentFilter = 'ALL';
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUID = user.uid;
+            onSnapshot(doc(db, "users", user.uid), (docSnap) => {
+                if (docSnap.exists()) {
+                    currentUserData = docSnap.data();
+                    updateUI();
+                }
+            });
+        } else { window.location.href = 'login.html'; }
+    });
+
+    window.setFilter = (rarity) => {
+        currentFilter = rarity;
+        document.getElementById("current-filter-label").innerText = rarity;
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.innerText === rarity);
+        });
+        updateUI();
+    };
+
+    function updateUI() {
+        if (!currentUserData) return;
+        const data = currentUserData;
+        document.getElementById("display-username").innerText = "Collector: " + (data.username || "Unknown");
+        document.getElementById("nav-points").innerText = (data.points || 0).toLocaleString();
+        document.getElementById("nav-diamonds").innerText = (data.diamonds || 0).toLocaleString();
+        document.getElementById("nav-stars").innerText = (data.stars || 0).toLocaleString(); // Sync ข้อมูลดาว
+        renderCollection(data.collection || []);
+    }
+
+    function renderCollection(collection) {
+        const grid = document.getElementById("grid");
+        grid.innerHTML = "";
+        const stacked = {};
+
+        collection.forEach((card) => {
+            const cleanName = card.name ? card.name.trim() : "Unknown";
+            const cleanRarity = card.rarity ? card.rarity.trim().toUpperCase() : 'C';
+            const key = cleanName + "_" + cleanRarity;
+            const imgUrl = card.image || card.img;
+
+            if (!stacked[key]) {
+                stacked[key] = { ...card, name: cleanName, rarity: cleanRarity, qty: 1, image: imgUrl, level: card.level || 1 };
+            } else {
+                stacked[key].qty++;
+                if ((card.level || 1) > stacked[key].level) stacked[key].level = card.level;
+            }
+        });
+
+        let cards = Object.values(stacked).reverse();
+        const totalTypes = cards.length;
+        if (currentFilter !== 'ALL') cards = cards.filter(c => c.rarity === currentFilter);
+
+        document.getElementById("collection-count").innerText = `${cards.length} / ${totalTypes} แบบ`;
+        document.getElementById("progress-fill").style.width = (totalTypes > 0 ? (cards.length / totalTypes * 100) : 0) + "%";
+
+        if (cards.length === 0) {
+            grid.innerHTML = `<p style="grid-column: 1/-1; opacity: 0.5;">ไม่พบการ์ดในหมวดหมู่ ${currentFilter}</p>`;
+            return;
+        }
+
+        cards.forEach(card => {
+            const cardEl = document.createElement("div");
+            cardEl.className = `col-card rarity-${card.rarity.toLowerCase()}`;
+            cardEl.onclick = () => openModal(card);
+            cardEl.innerHTML = `
+                ${card.qty > 1 ? `<div class="qty-badge">x${card.qty}</div>` : ''}
+                <div class="lvl-badge">LV.${card.level}</div>
+                <img src="${card.image}" onerror="this.src='https://via.placeholder.com/150x225?text=No+Image'">
+                <div class="card-info">
+                    <div class="card-rarity">${card.rarity}</div>
+                    <div class="card-name">${card.name}</div>
+                </div>
+            `;
+            grid.appendChild(cardEl);
+        });
+    }
+
+    window.openModal = (card) => {
+        document.getElementById("modalImg").src = card.image;
+        document.getElementById("modalName").innerText = card.name;
+        document.getElementById("modalRarity").innerText = `GRADE: ${card.rarity}`;
+        document.getElementById("modalLvl").innerText = `LV. ${card.level}`;
+        document.getElementById("modalQty").innerText = `มีการ์ดที่ซ้ำกัน: ${card.qty} ใบ`;
+        document.getElementById("modalSource").innerText = `แหล่งที่มา: ${card.source || 'สุ่มการ์ด / อื่นๆ'}`;
+
+        const upBtn = document.getElementById("upgradeBtn");
+        if (card.qty >= 5) {
+            upBtn.style.display = "block";
+            upBtn.onclick = () => upgradeCard(card.name, card.rarity);
+        } else { upBtn.style.display = "none"; }
+
+        document.getElementById("deleteBtn").onclick = () => deleteCard(card.name, card.rarity);
+        document.getElementById("deleteAllBtn").onclick = () => deleteAllCards(card.name, card.rarity, card.qty);
+        document.getElementById("cardModal").style.display = "flex";
+    };
+
+    async function deleteCard(cardName, cardRarity) {
+        if (!confirm(`ต้องการลบ 1 ใบเพื่อรับ 50 🪙?`)) return;
+        let newCollection = [...currentUserData.collection];
+        const index = newCollection.findIndex(c => c.name.trim() === cardName && (c.rarity || 'C').trim().toUpperCase() === cardRarity);
+        if (index !== -1) {
+            newCollection.splice(index, 1);
+            await updateDoc(doc(db, "users", currentUID), { collection: newCollection, points: increment(50) });
+            closeModal();
+        }
+    }
+
+    async function deleteAllCards(cardName, cardRarity, quantity) {
+        if (!confirm(`ลบทั้งหมด ${quantity} ใบ เพื่อรับ ${(quantity*50).toLocaleString()} 🪙?`)) return;
+        let newCollection = currentUserData.collection.filter(c => !(c.name.trim() === cardName && (c.rarity || 'C').trim().toUpperCase() === cardRarity));
+        await updateDoc(doc(db, "users", currentUID), { collection: newCollection, points: increment(quantity * 50) });
+        closeModal();
+    }
+
+    async function upgradeCard(cardName, cardRarity) {
+        if (!confirm(`อัปเกรดเลเวลโดยใช้การ์ด 5 ใบ? (จะได้รับ 100 Pass EXP)`)) return;
+        const container = document.getElementById("modalContainer");
+        let newCollection = [...currentUserData.collection];
+        const cardsOfType = newCollection.filter(c => c.name.trim() === cardName && (c.rarity || 'C').trim().toUpperCase() === cardRarity);
+        const currentMaxLevel = Math.max(...cardsOfType.map(c => c.level || 1));
+        const targetLevel = currentMaxLevel + 1;
+
+        let countRemoved = 0;
+        newCollection = newCollection.filter(card => {
+            if (countRemoved < 5 && card.name.trim() === cardName && (card.rarity || 'C').trim().toUpperCase() === cardRarity) {
+                countRemoved++; return false;
+            }
+            return true;
+        });
+
+        const upgradedCard = { ...cardsOfType[0], level: targetLevel, receivedAt: new Date().toISOString() };
+        newCollection.push(upgradedCard);
+
+        try {
+            container.classList.add("upgrade-anim");
+            await updateDoc(doc(db, "users", currentUID), { collection: newCollection, passExp: increment(100) });
+            setTimeout(() => {
+                container.classList.remove("upgrade-anim");
+                closeModal();
+            }, 600);
+        } catch (e) { alert(e.message); }
+    }
+
+    window.closeModal = () => { document.getElementById("cardModal").style.display = "none"; };
+</script>
+</body>
+</html>
