@@ -21,7 +21,7 @@
         .wallet-display { display: flex; gap: 12px; align-items: center; }
         .wallet-box { background: rgba(0, 0, 0, 0.3); padding: 6px 15px; border-radius: 20px; border: 1px solid #333; display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 0.9rem; }
         
-        /* --- Leaderboard Popup (Tournament Style) --- */
+        /* --- Leaderboard Popup --- */
         .lb-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2500; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(15px); }
         .lb-content { background: #1a1a2e; border-radius: 25px; max-width: 500px; width: 100%; overflow: hidden; border: 2px solid #ffc831; box-shadow: 0 0 40px rgba(255, 200, 49, 0.2); }
         .lb-header { background: linear-gradient(90deg, #1a1a2e, #302b63); padding: 15px 20px; border-bottom: 2px solid #ffc831; display: flex; justify-content: space-between; align-items: center; }
@@ -32,7 +32,6 @@
         .lb-table th { color: #ffc831; padding: 10px; border-bottom: 2px solid rgba(255,255,255,0.1); font-size: 0.85rem; text-transform: uppercase; }
         .lb-table td { padding: 15px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         
-        /* ตกแต่ง Rank พิเศษ */
         .rank-medal { font-size: 1.3rem; }
         .p-count-tag { background: #ffc831; color: #000; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; margin-right: 5px; box-shadow: 0 0 8px #ffc831; }
         .btn-lb-open { background: rgba(0, 212, 255, 0.1); color: #00d4ff; border: 1px solid #00d4ff; padding: 6px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.3s; }
@@ -47,7 +46,6 @@
         .filter-btn:active { transform: translateY(0px); box-shadow: 0 1px 0 #000; }
         .filter-btn.active { background: rgba(255, 255, 255, 0.1); transform: translateY(0px); box-shadow: 0 0 15px currentColor; }
         
-        /* ปุ่มจัดการแบบกลุ่ม */
         .btn-mass-upgrade { background: linear-gradient(45deg, #00d4ff, #0055ff); color: white; border: none; padding: 8px 20px; border-radius: 25px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3); }
         .btn-mass-sell { background: linear-gradient(45deg, #ff8c00, #ff4444); color: white; border: none; padding: 8px 20px; border-radius: 25px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(255, 68, 68, 0.3); margin-left: 5px; }
         .btn-mass-upgrade:hover, .btn-mass-sell:hover { transform: scale(1.05); filter: brightness(1.2); }
@@ -182,7 +180,6 @@
     let userCards = [];
     let currentFilter = 'ALL';
 
-    // --- ระบบ Leaderboard (Tournament Version) ---
     async function updateLeaderboard() {
         const lbBody = document.getElementById("lb-body");
         try {
@@ -194,36 +191,23 @@
                 const pCount = cards.filter(c => (c.rarity || '').toUpperCase() === 'P').length;
                 if (pCount > 0) leaderboardData.push({ username: data.username || "Unknown Participant", pCount: pCount });
             });
-            
             leaderboardData.sort((a, b) => b.pCount - a.pCount);
-            
             lbBody.innerHTML = leaderboardData.slice(0, 10).map((user, index) => {
                 let rankDisplay = index + 1;
-                let rankClass = "";
-                // ใส่เหรียญรางวัลให้ Top 3
-                if (index === 0) { rankDisplay = "🥇"; rankClass = "rank-medal"; }
-                else if (index === 1) { rankDisplay = "🥈"; rankClass = "rank-medal"; }
-                else if (index === 2) { rankDisplay = "🥉"; rankClass = "rank-medal"; }
-
-                return `
-                    <tr style="background: rgba(255,255,255,${index % 2 === 0 ? '0.02' : '0'});">
-                        <td class="${rankClass}" style="font-weight: bold;">${rankDisplay}</td>
-                        <td style="color: ${index < 3 ? '#fff' : '#ccc'}">${user.username}</td>
-                        <td style="text-align: right; font-weight: bold; color: #ffc831;">
-                            <span class="p-count-tag">P</span> ${user.pCount.toLocaleString()}
-                        </td>
-                    </tr>
-                `;
+                let rankClass = index < 3 ? "rank-medal" : "";
+                if (index === 0) rankDisplay = "🥇";
+                else if (index === 1) rankDisplay = "🥈";
+                else if (index === 2) rankDisplay = "🥉";
+                return `<tr style="background: rgba(255,255,255,${index % 2 === 0 ? '0.02' : '0'});">
+                    <td class="${rankClass}" style="font-weight: bold;">${rankDisplay}</td>
+                    <td style="color: ${index < 3 ? '#fff' : '#ccc'}">${user.username}</td>
+                    <td style="text-align: right; font-weight: bold; color: #ffc831;"><span class="p-count-tag">P</span> ${user.pCount.toLocaleString()}</td>
+                </tr>`;
             }).join('') || "<tr><td colspan='3' style='padding:20px;'>ยังไม่มีผู้เข้าแข่งขันในสนามนี้</td></tr>";
-        } catch (e) { 
-            lbBody.innerHTML = "<tr><td colspan='3'>Error loading arena data...</td></tr>"; 
-        }
+        } catch (e) { lbBody.innerHTML = "<tr><td colspan='3'>Error loading arena data...</td></tr>"; }
     }
 
-    window.openLeaderboard = () => {
-        updateLeaderboard();
-        document.getElementById("lbModal").style.display = "flex";
-    };
+    window.openLeaderboard = () => { updateLeaderboard(); document.getElementById("lbModal").style.display = "flex"; };
     window.closeLeaderboard = () => document.getElementById("lbModal").style.display = "none";
 
     function getCardPrice(rarity) {
@@ -251,9 +235,7 @@
     window.setFilter = (f) => {
         currentFilter = f;
         document.getElementById("filter-label").innerText = f;
-        document.querySelectorAll('.filter-btn').forEach(b => {
-            b.classList.toggle('active', b.innerText === f);
-        });
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.innerText === f));
         renderCards();
     };
 
@@ -264,22 +246,35 @@
         
         userCards.forEach(c => {
             const rarity = (c.rarity || 'C').toUpperCase();
-            const key = `${c.name}_${rarity}_LV${c.level || 1}`;
+            const key = `${c.name}_${rarity}`;
             if(!stacked[key]) {
                 stacked[key] = { ...c, rarity: rarity, qty: 1, level: c.level || 1, img: c.img || c.image };
             } else {
                 stacked[key].qty++;
+                if((c.level || 1) > stacked[key].level) stacked[key].level = c.level;
             }
         });
 
+        // ระบบเรียงลำดับตามระดับที่ต้องการ
+        const rarityOrder = { 
+            'EXR': 1, 'SEC': 2, 'SUR': 3, 'SSR': 4, 
+            'UR': 5, 'SR': 6, 'R': 7, 'U': 8, 'C': 9, 'P': 10 
+        };
+
         let displayList = Object.values(stacked);
+        
+        // Sorting Logic: ระดับการ์ด > เลเวลการ์ด > ชื่อการ์ด
+        displayList.sort((a, b) => {
+            const orderA = rarityOrder[a.rarity] || 99;
+            const orderB = rarityOrder[b.rarity] || 99;
+            if (orderA !== orderB) return orderA - orderB;
+            if (b.level !== a.level) return b.level - a.level;
+            return a.name.localeCompare(b.name);
+        });
+
         const totalTypes = displayList.length;
-
-        const hasUpgradable = displayList.some(c => c.qty >= 5 && c.level < 20);
-        document.getElementById("massUpgradeBtn").disabled = !hasUpgradable;
-
-        const hasDuplicates = userCards.length > totalTypes;
-        document.getElementById("massSellBtn").disabled = !hasDuplicates;
+        document.getElementById("massUpgradeBtn").disabled = !displayList.some(c => c.qty >= 5 && c.level < 20);
+        document.getElementById("massSellBtn").disabled = userCards.length <= totalTypes;
 
         if (currentFilter !== 'ALL') displayList = displayList.filter(c => c.rarity === currentFilter);
         
@@ -295,7 +290,6 @@
         });
     }
 
-    // --- อัปเกรดด่วน ---
     window.handleMassUpgrade = async () => {
         if(!confirm("ต้องการอัปเกรดการ์ดทั้งหมดที่ซ้ำเกิน 5 ใบใช่หรือไม่?")) return;
         let tempCollection = [...userCards];
@@ -311,15 +305,18 @@
             });
             for(const key in counts) {
                 const indices = counts[key];
-                const firstCard = tempCollection[indices[0]];
-                if(indices.length >= 5 && (firstCard.level || 1) < 20) {
-                    const currentLvl = firstCard.level || 1;
-                    const toDelete = indices.slice(0, 5).sort((a,b) => b-a);
-                    toDelete.forEach(idx => tempCollection.splice(idx, 1));
-                    tempCollection.push({ ...firstCard, level: currentLvl + 1 });
-                    upgradedInThisTurn = true;
-                    totalUpgraded++;
-                    break;
+                if(indices.length >= 5) {
+                    let highestLvl = 0;
+                    indices.forEach(idx => { if((tempCollection[idx].level || 1) > highestLvl) highestLvl = tempCollection[idx].level || 1; });
+                    if(highestLvl < 20) {
+                        const toDelete = indices.slice(0, 5).sort((a,b) => b-a);
+                        const baseCard = { ...tempCollection[toDelete[0]] };
+                        toDelete.forEach(idx => tempCollection.splice(idx, 1));
+                        tempCollection.push({ ...baseCard, level: highestLvl + 1 });
+                        upgradedInThisTurn = true;
+                        totalUpgraded++;
+                        break;
+                    }
                 }
             }
             if(!upgradedInThisTurn) continueLoop = false;
@@ -330,26 +327,22 @@
         }
     };
 
-    // --- ขายซ้ำ ---
     window.handleMassSell = async () => {
-        if(!confirm("ต้องการขายการ์ดที่ซ้ำทั้งหมด (เก็บไว้แบบละ 1 ใบ) ใช่หรือไม่?")) return;
+        if(!confirm("ต้องการขายการ์ดที่ซ้ำทั้งหมด (เก็บใบที่เลเวลสูงสุดไว้) ใช่หรือไม่?")) return;
         let totalGoldGain = 0;
-        const newCollection = [];
-        const seen = {};
+        const bestCards = {};
         userCards.forEach(c => {
-            const key = `${c.name}_${(c.rarity||'C').toUpperCase()}_LV${c.level || 1}`;
-            if (!seen[key]) {
-                newCollection.push(c);
-                seen[key] = true;
+            const key = `${c.name}_${(c.rarity||'C').toUpperCase()}`;
+            if(!bestCards[key] || (c.level || 1) > (bestCards[key].level || 1)) {
+                if(bestCards[key]) totalGoldGain += getCardPrice(bestCards[key].rarity || 'C');
+                bestCards[key] = c;
             } else {
                 totalGoldGain += getCardPrice(c.rarity || 'C');
             }
         });
         if (totalGoldGain > 0) {
-            try {
-                await updateDoc(doc(db, "users", currentUID), { collection: newCollection, points: increment(totalGoldGain) });
-                alert(`ขายสำเร็จ! ได้รับเงินคืนทั้งหมด ${totalGoldGain.toLocaleString()} 🪙`);
-            } catch (e) { alert("เกิดข้อผิดพลาดในการขาย"); }
+            await updateDoc(doc(db, "users", currentUID), { collection: Object.values(bestCards), points: increment(totalGoldGain) });
+            alert(`ขายสำเร็จ! ได้รับเงินคืน ${totalGoldGain.toLocaleString()} 🪙`);
         } else { alert("ไม่มีการ์ดซ้ำ"); }
     };
 
@@ -365,35 +358,37 @@
         const upBtn = document.getElementById("upgradeBtn");
         upBtn.disabled = card.qty < 5 || card.level >= 20;
         upBtn.innerText = card.level >= 20 ? "⭐ MAX LEVEL" : (card.qty < 5 ? `ขาดอีก ${5-card.qty} ใบ` : "✨ อัปเกรด (ใช้ 5 ใบ)");
-        const sellPrice = getCardPrice(card.rarity);
         const delBtn = document.getElementById("deleteBtn");
-        delBtn.innerText = `🗑️ ย่อยการ์ดนี้เพื่อรับ ${sellPrice.toLocaleString()} 🪙`;
+        delBtn.innerText = `🗑️ ย่อยการ์ดนี้เพื่อรับ ${getCardPrice(card.rarity).toLocaleString()} 🪙`;
         upBtn.onclick = () => handleUpgrade(card);
         delBtn.onclick = () => handleDelete(card);
         document.getElementById("cardModal").style.display = "flex";
     };
 
     async function handleUpgrade(card) {
-        if(!confirm("ยืนยันการอัปเกรด?")) return;
-        let count = 0;
-        const newCollection = [];
-        let upgraded = false;
-        for (let c of userCards) {
-            if (!upgraded && c.name === card.name && (c.rarity || 'C').toUpperCase() === card.rarity && count < 5) {
-                count++;
-                if (count === 5) { newCollection.push({ ...c, level: (card.level || 1) + 1 }); upgraded = true; }
-            } else { newCollection.push(c); }
-        }
-        await updateDoc(doc(db, "users", currentUID), { collection: newCollection });
+        if(!confirm("ยืนยันการอัปเกรดโดยใช้การ์ดชื่อเดียวกัน 5 ใบ?")) return;
+        const targetRarity = card.rarity.toUpperCase();
+        const materials = userCards.filter(c => c.name === card.name && (c.rarity || 'C').toUpperCase() === targetRarity);
+        if (materials.length < 5) return;
+        let highestLvl = 0;
+        materials.forEach(m => { if((m.level || 1) > highestLvl) highestLvl = m.level; });
+        let removed = 0;
+        const newCol = userCards.filter(c => {
+            if (removed < 5 && c.name === card.name && (c.rarity || 'C').toUpperCase() === targetRarity) { removed++; return false; }
+            return true;
+        });
+        newCol.push({ ...card, level: highestLvl + 1 });
+        await updateDoc(doc(db, "users", currentUID), { collection: newCol });
         document.getElementById("cardModal").style.display = "none";
     }
 
     async function handleDelete(card) {
         const sellPrice = getCardPrice(card.rarity);
-        if(!confirm(`ยืนยันการย่อยการ์ด ${card.name}?\nได้รับ ${sellPrice.toLocaleString()} 🪙`)) return;
+        if(!confirm(`ย่อยการ์ด ${card.name} รับ ${sellPrice.toLocaleString()} 🪙?`)) return;
         let removed = false;
         const newCol = userCards.filter(c => {
-            if(!removed && c.name === card.name && (c.rarity || 'C').toUpperCase() === card.rarity) { removed = true; return false; } return true;
+            if(!removed && c.name === card.name && (c.rarity || 'C').toUpperCase() === card.rarity && (c.level || 1) === card.level) { removed = true; return false; }
+            return true;
         });
         if (removed) {
             await updateDoc(doc(db, "users", currentUID), { collection: newCol, points: increment(sellPrice) });
