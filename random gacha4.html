@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Gacha System - ตู้ที่ 4 (Ultimate Edition)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Style หลักคงเดิม แต่เพิ่มสีสำหรับระดับ R และ SUR --- */
+        .modal-card-img { width: 45px; height: 65px; object-fit: cover; border-radius: 5px; border: 1px solid #444; display: block; }
+        #rate-list-body tr { border-bottom: 1px solid #222; }
+        #rate-list-body td { padding: 10px 5px; vertical-align: middle; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: #050505; color: white; text-align: center; overflow-x: hidden; }
+        .navbar { background-color: rgba(15, 15, 15, 0.9); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; }
+        .nav-left { display: flex; align-items: center; gap: 15px; }
+        .btn-nav { background: #1a1a1a; color: #ffc831; border: 1px solid #ffc831; padding: 8px 16px; border-radius: 10px; text-decoration: none; font-size: 0.9rem; font-weight: bold; transition: 0.3s; cursor: pointer; }
+        .btn-nav:hover { background: #ffc831; color: #000; }
+        .points-box { background: #000; color: #ffc831; border: 1px solid #ffc831; padding: 8px 20px; border-radius: 25px; font-weight: bold; }
+        .diamond-box { background: #000; color: #00d4ff; border: 1px solid #00d4ff; padding: 8px 20px; border-radius: 25px; font-weight: bold; margin-left: 10px; }
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .main-layout { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; align-items: flex-start; }
+        .gacha-box { flex: 2; background-color: #111; border-radius: 30px; padding: 30px; border: 1px solid #ffc831; min-height: 500px; position: relative; background-image: radial-gradient(circle at center, #1a0e00 0%, #050505 100%); }
+        
+        /* สี Rarity ใหม่ */
+        .color-exr { color: #00d4ff; text-shadow: 0 0 5px #00d4ff; }
+        .color-sec { color: #a020f0; text-shadow: 0 0 5px #a020f0; }
+        .color-sur { color: #ff00aa; text-shadow: 0 0 5px #ff00aa; }
+        .color-ssr { color: #ff4444; }
+        .color-r { color: #0070dd; }
+        
+        /* หลอด Pity 4 ระดับ */
+        .pity-area { max-width: 500px; margin: 0 auto 20px auto; display: flex; flex-direction: column; gap: 8px; }
+        .pity-container { background: #1a1a1a; height: 8px; border-radius: 10px; border: 1px solid #333; overflow: hidden; position: relative; }
+        .bar-exr { height: 100%; background: linear-gradient(90deg, #fff, #00d4ff); width: 0%; transition: 0.5s; }
+        .bar-sec { height: 100%; background: linear-gradient(90deg, #a020f0, #ff00ff); width: 0%; transition: 0.5s; }
+        .bar-sur { height: 100%; background: linear-gradient(90deg, #ff00aa, #ff80df); width: 0%; transition: 0.5s; }
+        .bar-ssr { height: 100%; background: linear-gradient(90deg, #ff4444, #ffbb00); width: 0%; transition: 0.5s; }
+        
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .card { width: 130px; position: relative; perspective: 1000px; }
+        .card-inner { width: 100%; aspect-ratio: 2/3; position: relative; transform-style: preserve-3d; transition: transform 0.8s; transform: rotateY(180deg); }
+        .card.revealed .card-inner { transform: rotateY(0deg); }
+        .card-front, .card-back { width: 100%; height: 100%; position: absolute; backface-visibility: hidden; border-radius: 12px; border: 2px solid #333; overflow: hidden; }
+        .card-back { background: #222; transform: rotateY(180deg); }
+        .card-front img { width: 100%; height: 100%; object-fit: cover; }
+        .btn-pull { padding: 12px 25px; border-radius: 15px; font-weight: bold; cursor: pointer; border: none; background: #ffc831; color: #000; margin: 5px; }
+    </style>
+</head>
+<body id="body-main">
+
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="index.html" class="btn-nav">🏠 เมนูหลัก</a>
+            <a href="collection.html" class="btn-nav">📖 สะสม</a>
+        </div>
+        <div>
+            <span class="points-box">🪙 <span id="balance">0</span></span>
+            <span class="diamond-box">💎 <span id="user-diamonds">0</span></span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="main-layout">
+            <div class="gacha-box">
+                <h2 style="color: #ffc831;">ตู้สุ่มที่ 4: THE ULTIMATE GOLD</h2>
+                
+                <div class="pity-area">
+                    <div style="font-size:0.7rem;">EXR Pity: <span id="txt-exr">0/1000</span></div>
+                    <div class="pity-container"><div id="bar-exr" class="bar-exr"></div></div>
+                    
+                    <div style="font-size:0.7rem;">SEC Pity: <span id="txt-sec">0/600</span></div>
+                    <div class="pity-container"><div id="bar-sec" class="bar-sec"></div></div>
+
+                    <div style="font-size:0.7rem;">SUR Pity: <span id="txt-sur">0/400</span></div>
+                    <div class="pity-container"><div id="bar-sur" class="bar-sur"></div></div>
+
+                    <div style="font-size:0.7rem;">SSR Pity: <span id="txt-ssr">0/200</span></div>
+                    <div class="pity-container"><div id="bar-ssr" class="bar-ssr"></div></div>
+                </div>
+
+                <div id="display" class="card-grid"></div>
+                
+                <button id="pull-5" class="btn-pull" onclick="pull(5)">สุ่ม 5 (100)</button>
+                <button id="pull-10" class="btn-pull" style="background:#ff00ff; color:white;" onclick="pull(10)">สุ่ม 10 (500)</button>
+                <button id="pull-50" class="btn-pull" style="background:#00d4ff; color:white;" onclick="pull(50)">สุ่ม 50 (1000)</button>
+            </div>
+
+            <div style="flex:0.7; background:#111; padding:20px; border-radius:20px; border:1px solid #333;">
+                <h4 style="color:#ffc831;">เรทตู้ที่ 4</h4>
+                <div style="text-align:left; font-size:0.8rem;">
+                    <p class="color-exr">EXR: 0.1%</p>
+                    <p class="color-sec">SEC: 1.5%</p>
+                    <p class="color-sur">SUR: 4.0%</p>
+                    <p class="color-ssr">SSR: 7.0%</p>
+                    <p class="color-r">R: 25.0%</p>
+                    <p>U/C: 62.4%</p>
+                    <p>P: 0.01%</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, updateDoc, arrayUnion, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = { /* ใส่ Config ของคุณตรงนี้ */ };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let userData = null;
+    let isPulling = false;
+
+    // รายการการ์ดตู้ 4
+    const allCards = [
+        { id: 401, rarity: "EXR", name: "Ultimate Dragon", rate: 0.1, img: "URL" },
+        { id: 402, rarity: "SEC", name: "Shadow King", rate: 1.5, img: "URL" },
+        { id: 403, rarity: "SUR", name: "Super Ultra Warrior", rate: 4.0, img: "URL" },
+        { id: 404, rarity: "SSR", name: "Red Phoenix", rate: 7.0, img: "URL" },
+        { id: 405, rarity: "R", name: "Blue Knight", rate: 25.0, img: "URL" },
+        { id: 406, rarity: "U", name: "Common Slime", rate: 62.4, img: "URL" }
+    ];
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            onSnapshot(doc(db, "users", user.uid), (snap) => {
+                if (snap.exists()) {
+                    userData = snap.data();
+                    updateUI();
+                }
+            });
+        }
+    });
+
+    function updateUI() {
+        if (!userData) return;
+        document.getElementById("balance").innerText = (userData.points || 0).toLocaleString();
+        document.getElementById("user-diamonds").innerText = (userData.diamonds || 0).toLocaleString();
+
+        const p = {
+            ssr: userData.pitySSR4 || 0,
+            sur: userData.pitySUR4 || 0,
+            sec: userData.pitySEC4 || 0,
+            exr: userData.pityEXR4 || 0
+        };
+
+        document.getElementById("bar-exr").style.width = (p.exr / 1000 * 100) + "%";
+        document.getElementById("txt-exr").innerText = `${p.exr}/1000`;
+        document.getElementById("bar-sec").style.width = (p.sec / 600 * 100) + "%";
+        document.getElementById("txt-sec").innerText = `${p.sec}/600`;
+        document.getElementById("bar-sur").style.width = (p.sur / 400 * 100) + "%";
+        document.getElementById("txt-sur").innerText = `${p.sur}/400`;
+        document.getElementById("bar-ssr").style.width = (p.ssr / 200 * 100) + "%";
+        document.getElementById("txt-ssr").innerText = `${p.ssr}/200`;
+    }
+
+    window.pull = async (amount) => {
+        if (isPulling || userData.points < (amount === 5 ? 100 : amount === 10 ? 500 : 1000)) return;
+        isPulling = true;
+        
+        const display = document.getElementById("display");
+        display.innerHTML = "";
+        
+        let pSSR = userData.pitySSR4 || 0;
+        let pSUR = userData.pitySUR4 || 0;
+        let pSEC = userData.pitySEC4 || 0;
+        let pEXR = userData.pityEXR4 || 0;
+        let results = [];
+
+        for (let i = 0; i < amount; i++) {
+            pSSR++; pSUR++; pSEC++; pEXR++;
+            let win = null;
+
+            // Check Pity Order
+            if (pEXR >= 1000) { win = getByRarity("EXR"); pEXR=0; pSEC=0; pSUR=0; pSSR=0; }
+            else if (pSEC >= 600) { win = getByRarity("SEC"); pSEC=0; pSUR=0; pSSR=0; }
+            else if (pSUR >= 400) { win = getByRarity("SUR"); pSUR=0; pSSR=0; }
+            else if (pSSR >= 200) { win = getByRarity("SSR"); pSSR=0; }
+            else {
+                let r = Math.random() * 100, curr = 0;
+                for (const c of allCards) {
+                    curr += c.rate;
+                    if (r <= curr) { win = c; break; }
+                }
+            }
+
+            // Reset Pity if lucky
+            if (win.rarity === "EXR") { pEXR=0; pSEC=0; pSUR=0; pSSR=0; }
+            else if (win.rarity === "SEC") { pSEC=0; pSUR=0; pSSR=0; }
+            else if (win.rarity === "SUR") { pSUR=0; pSSR=0; }
+            else if (win.rarity === "SSR") { pSSR=0; }
+
+            results.push({ ...win, obtainedDate: Date.now(), source: "Gacha ตู้ที่ 4" });
+            
+            // Create Card Element... (เหมือนตู้ 1)
+            const cardEl = document.createElement("div");
+            cardEl.className = "card";
+            cardEl.innerHTML = `<div class="card-inner"><div class="card-front"><img src="${win.img}"></div><div class="card-back"></div></div>`;
+            display.appendChild(cardEl);
+            setTimeout(() => cardEl.classList.add("revealed"), i * 100);
+        }
+
+        await updateDoc(doc(db, "users", auth.currentUser.uid), {
+            points: increment(-(amount === 5 ? 100 : amount === 10 ? 500 : 1000)),
+            pitySSR4: pSSR,
+            pitySUR4: pSUR,
+            pitySEC4: pSEC,
+            pityEXR4: pEXR,
+            collection: arrayUnion(...results)
+        });
+        isPulling = false;
+    };
+
+    function getByRarity(rare) {
+        const pool = allCards.filter(c => c.rarity === rare);
+        return pool[Math.floor(Math.random() * pool.length)];
+    }
+</script>
+</body>
+</html>

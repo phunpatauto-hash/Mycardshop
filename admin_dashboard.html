@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin - Ultimate Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* --- Style เดิม --- */
+        body { font-family: 'Kanit', sans-serif; background: #0a0a0a; color: white; margin: 0; padding: 20px; }
+        .admin-container { max-width: 1300px; margin: 0 auto; }
+        .card { background: #161616; padding: 25px; border-radius: 15px; border: 1px solid #333; margin-bottom: 25px; position: relative; overflow: hidden; }
+        .card::before { content: ""; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: #ffc831; }
+        
+        h2 { color: #ffc831; margin-top: 0; font-size: 1.3rem; display: flex; align-items: center; gap: 10px; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-box { background: linear-gradient(145deg, #1e1e1e, #111); padding: 20px; border-radius: 12px; border: 1px solid #333; text-align: center; }
+        .stat-val { font-size: 1.8rem; font-weight: 800; color: #ffc831; display: block; }
+        .stat-label { color: #888; font-size: 0.8rem; text-transform: uppercase; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #222; }
+        th { color: #ffc831; background: #0d0d0d; font-weight: 400; }
+        tr:hover { background: rgba(255, 200, 49, 0.02); }
+
+        input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #111; color: white; margin-bottom: 10px; font-family: 'Kanit'; }
+        label { font-size: 0.8rem; color: #888; display: block; margin-bottom: 5px; margin-top: 5px; }
+        
+        .btn { border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; }
+        .btn-green { background: #2ed573; color: #000; width: 100%; padding: 15px; font-size: 1rem; justify-content: center; }
+        .btn-red { background: #ff4757; color: white; }
+        .btn-blue { background: #1e90ff; color: white; } /* สำหรับพอยท์ */
+        .btn-diamond { background: #00d2d3; color: white; } /* ปุ่มเพชรใหม่ */
+        .btn-purple { background: #a55eea; color: white; }
+        .btn-star { background: #4facfe; color: white; }
+        .btn-orange { background: #ffa502; color: white; }
+        .btn-gray { background: #2f3542; color: white; }
+        
+        .badge { padding: 2px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; }
+        .badge-premium { background: #ffc831; color: black; }
+        .badge-super { background: #ff00ff; color: white; }
+        .badge-new { background: #ff4757; color: white; }
+        .badge-update { background: #ffa502; color: white; }
+
+        .reward-tag { display: inline-block; background: #222; padding: 2px 6px; border-radius: 4px; margin: 2px; border: 1px solid #333; font-size: 0.75rem; }
+        .search-input { border-left: 3px solid #ffc831 !important; font-size: 1rem; }
+    </style>
+</head>
+<body>
+
+<div class="admin-container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <div>
+            <h1 style="margin:0; font-size: 2rem; color: #ffc831;">SUPER ADMIN <span style="font-weight: 300; color: #fff;">DASHBOARD</span></h1>
+            <p style="color: #666; margin: 0;">ระบบจัดการข้อมูลผู้ใช้ ไอเทม และข่าวสาร (Diamond System Enabled)</p>
+        </div>
+        <a href="index.html" class="btn btn-gray"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-box"><span class="stat-label">Total Survivors</span><span id="stat-users" class="stat-val">0</span></div>
+        <div class="stat-box"><span class="stat-label">Active Reward Codes</span><span id="stat-codes" class="stat-val">0</span></div>
+        <div class="stat-box"><span class="stat-label">Premium Users</span><span id="stat-premium" class="stat-val">0</span></div>
+    </div>
+
+    <div class="card" style="border-left: 4px solid #ff4757;">
+        <h2><i class="fas fa-bullhorn"></i> MANAGE SYSTEM ANNOUNCEMENT (จัดการประกาศ)</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+            <div>
+                <label>TOPIC (หัวข้อประกาศ)</label>
+                <input type="text" id="news-title" placeholder="กิจกรรมใหม่ประจำสัปดาห์...">
+            </div>
+            <div>
+                <label>DISPLAY DATE (วันที่แสดง)</label>
+                <input type="text" id="news-date" placeholder="21 มี.ค. 2026">
+            </div>
+            <div>
+                <label>BADGE TYPE</label>
+                <select id="news-badge">
+                    <option value="badge-new">NEW (สีแดง)</option>
+                    <option value="badge-update">UPDATE (สีส้ม)</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn btn-green" id="post-news-btn" style="background: #ff4757; color: white;">
+            <i class="fas fa-paper-plane"></i> PUBLISH NEWS
+        </button>
+        <table style="margin-top: 20px;">
+            <tbody id="news-table-body"></tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2><i class="fas fa-ticket-alt"></i> GENERATE REDEEM CODE</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+            <div class="input-group">
+                <label>CODE NAME</label>
+                <input type="text" id="new-code" placeholder="STARGIFT2026">
+                <label>OBTAINED FROM</label>
+                <input type="text" id="obtained-from" placeholder="ระบุที่มา">
+            </div>
+            <div class="input-group">
+                <label>REWARDS</label>
+                <div style="display: flex; gap: 5px;">
+                    <input type="number" id="reward-points" placeholder="🪙 Gold">
+                    <input type="number" id="reward-diamonds" placeholder="💎 Diamond">
+                    <input type="number" id="reward-stars" placeholder="⭐ Star">
+                </div>
+                <label>MAX USES (0 = Unlimited)</label>
+                <input type="number" id="max-use" value="0">
+            </div>
+            <div class="input-group">
+                <label>SPECIAL CARD</label>
+                <input type="text" id="reward-card-name" placeholder="ชื่อการ์ด">
+                <select id="reward-card-rarity">
+                    <option value="">-- No Card --</option>
+                    <option value="SSR">SSR</option>
+                    <option value="SEC">SEC</option>
+                    <option value="EXR">EXR</option>
+                </select>
+                <input type="text" id="reward-card-img" placeholder="รูป URL">
+            </div>
+        </div>
+        <button class="btn btn-green" id="create-btn"><i class="fas fa-plus-circle"></i> PUBLISH CODE TO SYSTEM</button>
+    </div>
+
+    <div class="card">
+        <h2><i class="fas fa-users-cog"></i> USER MANAGEMENT</h2>
+        <input type="text" id="user-search" class="search-input" placeholder="ค้นหาชื่อ..." onkeyup="filterUsers()">
+        <div style="overflow-x: auto;">
+            <table id="user-table">
+                <thead>
+                    <tr>
+                        <th>Identity</th>
+                        <th>Pass Status</th>
+                        <th>Economy</th>
+                        <th>Battle Progress</th>
+                        <th>Operations</th>
+                    </tr>
+                </thead>
+                <tbody id="user-table-body">
+                    <tr><td colspan="5" style="text-align:center; padding: 40px;">Initializing system...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2><i class="fas fa-list-ul"></i> ACTIVE CODES REGISTRY</h2>
+        <div style="overflow-x: auto;">
+            <table id="code-table">
+                <tbody id="code-table-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, doc, setDoc, addDoc, onSnapshot, updateDoc, deleteDoc, increment, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
+        authDomain: "sign-up-73f99.firebaseapp.com",
+        projectId: "sign-up-73f99",
+        storageBucket: "sign-up-73f99.appspot.com",
+        messagingSenderId: "916335559099",
+        appId: "1:916335559099:web:3a8ed896ba26e38991849e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // --- News Logic ---
+    document.getElementById("post-news-btn").onclick = async () => {
+        const title = document.getElementById("news-title").value.trim();
+        const date = document.getElementById("news-date").value.trim();
+        const badge = document.getElementById("news-badge").value;
+        if(!title || !date) return alert("กรุณาระบุหัวข้อและวันที่");
+        await addDoc(collection(db, "news"), {
+            title, date, badgeClass: badge,
+            badgeText: badge === 'badge-new' ? 'New' : 'Update',
+            createdAt: new Date()
+        });
+        document.getElementById("news-title").value = "";
+        alert("ลงประกาศแล้ว!");
+    };
+
+    onSnapshot(query(collection(db, "news"), orderBy("createdAt", "desc")), (snap) => {
+        const body = document.getElementById("news-table-body");
+        body.innerHTML = "";
+        snap.forEach(d => {
+            const n = d.data();
+            body.innerHTML += `<tr><td>${n.date}</td><td><b>${n.title}</b></td><td><span class="badge ${n.badgeClass}">${n.badgeText}</span></td><td><button class="btn btn-red" onclick="deleteItem('news', '${d.id}')">ลบ</button></td></tr>`;
+        });
+    });
+
+    // --- Code Logic ---
+    document.getElementById("create-btn").onclick = async () => {
+        const codeName = document.getElementById("new-code").value.trim().toUpperCase();
+        if(!codeName) return alert("ระบุชื่อโค้ด");
+        await setDoc(doc(db, "codes", codeName), {
+            rewardPoints: parseInt(document.getElementById("reward-points").value) || 0,
+            rewardDiamonds: parseInt(document.getElementById("reward-diamonds").value) || 0,
+            rewardStars: parseInt(document.getElementById("reward-stars").value) || 0,
+            maxUse: parseInt(document.getElementById("max-use").value) || 0,
+            usedCount: 0,
+            obtainedFrom: document.getElementById("obtained-from").value || "System",
+            rewardCard: document.getElementById("reward-card-name").value ? {
+                name: document.getElementById("reward-card-name").value,
+                rarity: document.getElementById("reward-card-rarity").value,
+                img: document.getElementById("reward-card-img").value,
+                level: 1
+            } : null
+        });
+        alert(`โค้ด ${codeName} สำเร็จ!`);
+    };
+
+    // --- User Management (เพิ่มระบบเพชรที่นี่) ---
+    onSnapshot(collection(db, "users"), (snap) => {
+        document.getElementById("stat-users").innerText = snap.size;
+        let premiumCount = 0;
+        const body = document.getElementById("user-table-body");
+        body.innerHTML = "";
+        snap.forEach(d => {
+            const user = d.data();
+            const uid = d.id;
+            if(user.isPremiumUser) premiumCount++;
+            body.innerHTML += `
+                <tr>
+                    <td><b>${user.username || 'Ghost'}</b><br><small>${uid.substring(0,8)}</small></td>
+                    <td>${user.isPremiumUser ? '<span class="badge badge-premium">PREMIUM</span>' : '-'}</td>
+                    <td>
+                        <span class="reward-tag">🪙 ${(user.points||0).toLocaleString()}</span><br>
+                        <span class="reward-tag">💎 ${(user.diamonds||0).toLocaleString()}</span><br>
+                        <span class="reward-tag" style="color:#4facfe">⭐ ${(user.stars||0).toLocaleString()}</span>
+                    </td>
+                    <td><span style="color:#ffc831">LV.${calculateLevel(user.passExp || 0)}</span></td>
+                    <td>
+                        <div style="display:flex; flex-wrap:wrap; gap:5px;">
+                            <button class="btn btn-blue" title="+/- Gold" onclick="editVal('${uid}', 'points', '🪙 Gold')"><i class="fas fa-coins"></i></button>
+                            <button class="btn btn-diamond" title="+/- Diamond" onclick="editVal('${uid}', 'diamonds', '💎 Diamond')"><i class="fas fa-gem"></i></button>
+                            <button class="btn btn-star" title="+/- Star" onclick="editVal('${uid}', 'stars', '⭐ Star')"><i class="fas fa-star"></i></button>
+                            <button class="btn btn-orange" title="Reset" onclick="resetEconomy('${uid}', '${user.username}')"><i class="fas fa-undo"></i></button>
+                            <button class="btn btn-red" onclick="deleteItem('users', '${uid}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>`;
+        });
+        document.getElementById("stat-premium").innerText = premiumCount;
+    });
+
+    // --- Codes Table ---
+    onSnapshot(collection(db, "codes"), (snap) => {
+        document.getElementById("stat-codes").innerText = snap.size;
+        const body = document.getElementById("code-table-body");
+        body.innerHTML = "";
+        snap.forEach(d => {
+            const c = d.data();
+            body.innerHTML += `<tr><td><b>${d.id}</b></td><td>🪙${c.rewardPoints} 💎${c.rewardDiamonds}</td><td>${c.usedCount}/${c.maxUse}</td><td><button class="btn btn-red" onclick="deleteItem('codes', '${d.id}')">ลบ</button></td></tr>`;
+        });
+    });
+
+    // --- Helper Functions ---
+    function calculateLevel(exp) {
+        let lv = 1; let remaining = exp;
+        while(true) {
+            let req = Math.floor(50 * Math.pow(1.2, lv - 1));
+            if(remaining >= req && lv < 50) { remaining -= req; lv++; } else break;
+        }
+        return lv;
+    }
+
+    window.editVal = async (uid, field, label) => {
+        const val = prompt(`ระบุจำนวนที่ต้องการเพิ่ม/ลด ให้ผู้ใช้ (${label})\n(เช่น 100 หรือ -100)`);
+        if(val) await updateDoc(doc(db, "users", uid), { [field]: increment(parseInt(val)) });
+    };
+
+    window.resetEconomy = async (uid, username) => {
+        if(confirm(`รีเซ็ตค่าเงินของ ${username}?`)) {
+            await updateDoc(doc(db, "users", uid), { points: 0, diamonds: 0, stars: 0 });
+            alert("รีเซ็ตเรียบร้อย!");
+        }
+    };
+
+    window.deleteItem = async (col, id) => {
+        if(confirm(`ลบ ${id}?`)) await deleteDoc(doc(db, col, id));
+    };
+
+    window.filterUsers = () => {
+        const input = document.getElementById('user-search').value.toLowerCase();
+        const rows = document.getElementById('user-table-body').getElementsByTagName('tr');
+        for (let row of rows) {
+            const name = row.getElementsByTagName('td')[0].innerText.toLowerCase();
+            row.style.display = name.includes(input) ? "" : "none";
+        }
+    };
+</script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GACHA SELECTION - เลือกตู้สุ่ม</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* ... ส่วน CSS เดิมของคุณ (คงไว้เหมือนเดิมทั้งหมด) ... */
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Kanit', sans-serif; 
+            margin: 0; 
+            background-color: #0a0a0a; 
+            color: white; 
+            min-height: 100vh;
+            background-image: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
+        }
+        .navbar { 
+            background: rgba(15, 15, 15, 0.85); 
+            padding: 0 40px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid rgba(255,200,49,0.2); 
+            backdrop-filter: blur(15px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: 70px;
+        }
+        .btn-nav { 
+            background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.1); 
+            padding: 8px 18px; border-radius: 50px; text-decoration: none; 
+            font-size: 0.85rem; transition: 0.3s; 
+            display: flex; align-items: center; gap: 8px;
+        }
+        .btn-nav:hover { background: #ffc831; color: #000; border-color: #ffc831; transform: scale(1.05); }
+        .announcement-container { max-width: 1200px; margin: 25px auto 0; padding: 0 20px; }
+        .announcement-board { background: rgba(255, 200, 49, 0.05); border: 1px solid rgba(255, 200, 49, 0.2); border-left: 5px solid #ffc831; border-radius: 15px; padding: 15px 25px; display: flex; align-items: center; gap: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .ann-title { background: #ffc831; color: #000; padding: 5px 15px; border-radius: 50px; font-weight: 800; font-size: 0.75rem; white-space: nowrap; animation: pulse 2s infinite; }
+        .ann-text { color: #eee; font-size: 0.9rem; white-space: nowrap; overflow: hidden; width: 100%; }
+        .marquee { display: inline-block; padding-left: 100%; animation: marquee 25s linear infinite; }
+        @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 200, 49, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(255, 200, 49, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 200, 49, 0); } }
+        .container { max-width: 1200px; margin: auto; padding: 40px 20px 80px; text-align: center; }
+        h1 { font-size: 2.8rem; font-weight: 800; color: #fff; margin-bottom: 10px; letter-spacing: -1px; }
+        h1 span { color: #ffc831; }
+        .subtitle { color: rgba(255,255,255,0.5); margin-bottom: 50px; font-size: 1rem; }
+        .banner-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 35px; }
+        .banner-item { position: relative; background: #151515; border-radius: 30px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); transition: 0.4s cubic-bezier(0.2, 1, 0.3, 1); text-decoration: none; display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        .banner-item:hover { transform: translateY(-15px) scale(1.02); border-color: #ffc831; box-shadow: 0 30px 60px rgba(255,200,49,0.1); }
+        .banner-img-wrapper { width: 100%; height: 240px; position: relative; overflow: hidden; }
+        .banner-img { width: 100%; height: 100%; object-fit: cover; transition: 0.8s; }
+        .banner-item:hover .banner-img { transform: scale(1.1) rotate(1deg); }
+        .banner-img-wrapper::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 60%; background: linear-gradient(to top, #151515, transparent); }
+        .banner-content { padding: 30px; text-align: left; }
+        .banner-type { position: absolute; top: 25px; left: 25px; padding: 6px 16px; border-radius: 10px; font-size: 0.7rem; font-weight: 800; z-index: 10; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
+        .type-standard { background: linear-gradient(135deg, #ffc831, #ff9f00); color: #000; }
+        .type-event { background: linear-gradient(135deg, #00d4ff, #005f7a); color: #fff; }
+        .banner-title { font-size: 1.5rem; margin: 0 0 12px 0; color: #fff; font-weight: 700; }
+        .banner-desc { color: rgba(255,255,255,0.4); font-size: 0.9rem; line-height: 1.6; margin-bottom: 25px; min-height: 50px; }
+        .banner-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
+        .price-tag { color: #ffc831; font-weight: 800; font-size: 1.2rem; }
+        .pity-info { color: rgba(255,255,255,0.3); font-size: 0.7rem; font-weight: 400; text-align: right; }
+        .banner-item::before { content: ""; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent); transition: 0.5s; z-index: 5; }
+        .banner-item:hover::before { left: 150%; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="btn-nav"><i class="fas fa-arrow-left"></i> กลับไปหน้าหลัก</a>
+        <div style="color: #ffc831; font-weight: 800; letter-spacing: 4px; font-size: 1.4rem; text-shadow: 0 0 20px rgba(255,200,49,0.4);">GACHA CENTER</div>
+        <div style="width: 150px; text-align: right;">
+            <i class="fas fa-coins" style="color: #ffc831;"></i> <span id="nav-points">0</span>
+        </div> 
+    </nav>
+
+    <div class="announcement-container">
+        <div class="announcement-board">
+            <div class="ann-title"><i class="fas fa-star"></i> กิจกรรมใหม่</div>
+            <div class="ann-text">
+                <span class="marquee">🔥 กิจกรรมตามล่า 3 หมี! การ์ดระดับ P สุดน่ารัก: Snapdragon, Cream Ferret, และ Icicle Yeti สามารถสุ่มได้ในตู้ทั่วไปแล้ววันนี้! ระยะเวลากิจกรรม 30 วันเท่านั้น รีบสะสมให้ครบนะทุกคน!</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>เลือกตู้ <span>เสี่ยงโชค</span></h1>
+        <p class="subtitle">เลือกตู้ที่คุณต้องการเพื่อค้นหาการ์ดระดับ EXR และ SEC ในตำนาน</p>
+        <div class="banner-grid">
+            <a href="random gacha.html" class="banner-item">
+                <span class="banner-type type-standard">Special Rate Up</span>
+                <div class="banner-img-wrapper"><img src="https://cookierunbraverse.com/data/en_storage/eXN_QVTcLFL7hr0_HG0jVg.webp" class="banner-img"></div>
+                <div class="banner-content">
+                    <h3 class="banner-title">The Awakened One of Truth</h3>
+                    <p class="banner-desc">Cookie Pure Vanilla ผู้ตื่นรู้แห่งความจริง และการเผชิญหน้ากับความเท็จของ Shadow Milk</p>
+                    <div class="banner-footer">
+                        <span class="price-tag">🪙 500 <small style="font-size: 0.7rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
+                        <div class="pity-info">การันตี EXR ที่ 900 รอบ<br>การันตี SEC ที่ 550 รอบ</div>
+                    </div>
+                </div>
+            </a>
+            <a href="random gacha2.html" class="banner-item">
+                <span class="banner-type type-event">Dark Cacao</span>
+                <div class="banner-img-wrapper"><img src="https://cookierunbraverse.com/data/en_storage/-UZDTp8mPp0-5ubqd_qcIg.webp" class="banner-img"></div>
+                <div class="banner-content">
+                    <h3 class="banner-title">Shadows of the Battle</h3>
+                    <p class="banner-desc">ร่วมต่อสู้ไปกับ Dark Cacao และสีสันแห่งการนองเลือด ตู้เริ่มต้นสำหรับนักสะสม</p>
+                    <div class="banner-footer">
+                        <span class="price-tag">🪙 100 <small style="font-size: 0.7rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
+                        <div class="pity-info">การันตี SSR ที่ 100 รอบ<br>เหมาะสำหรับผู้เริ่มต้น</div>
+                    </div>
+                </div>
+            </a>
+            <a href="random gacha3.html" class="banner-item">
+                <span class="banner-type type-event" style="background: linear-gradient(135deg, #ff4757, #ff6b81);">New Arena</span>
+                <div class="banner-img-wrapper"><img src="https://cookierunbraverse.com/data/en_storage/DNtDIrN3TmeWtjC_LAFoiA.webp" class="banner-img"></div>
+                <div class="banner-content">
+                    <h3 class="banner-title">Arena of Glory</h3>
+                    <p class="banner-desc">ศึกประชันความกล้าหาญใน Arena of Glory! ค้นหาแชมเปี้ยนที่จะมาเสริมทัพของคุณ</p>
+                    <div class="banner-footer">
+                        <span class="price-tag">🪙 500 <small style="font-size: 0.7rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
+                        <div class="pity-info">การันตี EXR ที่ 900 รอบ<br>การันตี SEC ที่ 550 รอบ</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
+            authDomain: "sign-up-73f99.firebaseapp.com",
+            projectId: "sign-up-73f99",
+            storageBucket: "sign-up-73f99.appspot.com",
+            messagingSenderId: "916335559099",
+            appId: "1:916335559099:web:3a8ed896ba26e38991849e"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // ติดตามสถานะการเข้าสู่ระบบ
+        onAuthStateChanged(auth, (user) => {
+            const pointsElement = document.getElementById("nav-points");
+            if (user) {
+                // เชื่อมต่อข้อมูลจาก Collection "users" ตาม UID
+                onSnapshot(doc(db, "users", user.uid), (snap) => {
+                    if (snap.exists()) {
+                        const userData = snap.data();
+                        // ตรวจสอบว่าใช้ชื่อ field 'points' หรือ 'point' (ดึงมาแสดงผล)
+                        const currentPoints = userData.points || userData.point || 0;
+                        pointsElement.innerText = currentPoints.toLocaleString();
+                    } else {
+                        console.log("No such document!");
+                        pointsElement.innerText = "0";
+                    }
+                }, (error) => {
+                    console.error("Error fetching points:", error);
+                    pointsElement.innerText = "Error";
+                });
+            } else {
+                // ถ้ายังไม่ได้ Login
+                pointsElement.innerText = "Guest";
+            }
+        });
+    </script>
+</body>
+</html>

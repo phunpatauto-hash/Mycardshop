@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แลกโค้ดรับรางวัล - My Card Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Kanit', sans-serif; background: #121212; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background: #1e1e1e; padding: 30px; border-radius: 15px; text-align: center; border: 1px solid #333; width: 320px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        h2 { color: #ffc831; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; margin: 15px 0; border-radius: 8px; border: 1px solid #444; background: #222; color: #ffc831; text-align: center; font-size: 1.1rem; font-weight: bold; box-sizing: border-box; }
+        input:focus { outline: 2px solid #ffc831; border-color: transparent; }
+        button { width: 100%; padding: 12px; background: #ffc831; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 1rem; color: #111; }
+        button:hover { background: #e5b32a; transform: translateY(-2px); }
+        button:disabled { background: #555; cursor: not-allowed; }
+        a { color: #888; text-decoration: none; margin-top: 20px; display: block; font-size: 0.9rem; }
+        a:hover { color: #ffc831; }
+    </style>
+</head>
+<body>
+
+    <div class="box">
+        <h2>🎫 แลกโค้ดรางวัล</h2>
+        <p style="font-size: 0.8rem; color: #aaa;">กรอกโค้ดเพื่อรับพอยท์ เพชร และการ์ดฟรี</p>
+        <input type="text" id="code-input" placeholder="ตัวอย่าง: GIFT2026" maxlength="20">
+        <button id="redeem-btn">ยืนยันแลกรับ</button>
+        <a href="index.html">← กลับหน้าหลัก</a>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, updateDoc, increment, setDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
+        authDomain: "sign-up-73f99.firebaseapp.com",
+        projectId: "sign-up-73f99",
+        storageBucket: "sign-up-73f99.appspot.com",
+        messagingSenderId: "916335559099",
+        appId: "1:916335559099:web:3a8ed896ba26e38991849e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    let currentUserId = null;
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUserId = user.uid;
+        } else {
+            window.location.href = "login.html";
+        }
+    });
+
+    document.getElementById("redeem-btn").onclick = async () => {
+        const btn = document.getElementById("redeem-btn");
+        const inputCode = document.getElementById("code-input").value.trim().toUpperCase();
+
+        if (!currentUserId) return alert("❌ กรุณาล็อกอินก่อนแลกโค้ด!");
+        if (!inputCode) return alert("❌ กรุณากรอกโค้ด!");
+
+        btn.disabled = true;
+        btn.innerText = "กำลังตรวจสอบ...";
+
+        try {
+            // 1. ตรวจสอบโค้ดในระบบ
+            const codeRef = doc(db, "codes", inputCode);
+            const codeSnap = await getDoc(codeRef);
+
+            if (!codeSnap.exists()) {
+                throw new Error("ไม่พบโค้ดนี้ในระบบ หรือโค้ดหมดอายุแล้ว");
+            }
+
+            const codeData = codeSnap.data();
+
+            // 2. ตรวจสอบการใช้งาน (Limit)
+            if (codeData.maxUse !== 0 && codeData.usedCount >= codeData.maxUse) {
+                throw new Error("ขออภัย โค้ดนี้ถูกใช้งานครบตามจำนวนที่กำหนดแล้ว");
+            }
+
+            // 3. ตรวจสอบว่าผู้ใช้เคยใช้โค้ดนี้หรือยัง
+            const historyRef = doc(db, "users", currentUserId, "used_codes", inputCode);
+            const historySnap = await getDoc(historyRef);
+
+            if (historySnap.exists()) {
+                throw new Error("คุณเคยแลกโค้ดนี้ไปแล้ว!");
+            }
+
+            // 4. เตรียมข้อมูลอัปเดตผู้ใช้
+            const userRef = doc(db, "users", currentUserId);
+            const userUpdate = {
+                points: increment(codeData.rewardPoints || 0),
+                diamonds: increment(codeData.rewardDiamonds || 0),
+                stars: increment(codeData.rewardStars || 0)
+            };
+
+            // 5. ถ้ามีของรางวัลเป็น "การ์ด" ให้เพิ่มลงในสมุดสะสม
+            let cardAlertMsg = "";
+            if (codeData.rewardCard && codeData.rewardCard.name) {
+                const newCard = {
+                    ...codeData.rewardCard,
+                    obtainedFrom: codeData.obtainedFrom || "Redeem Code: " + inputCode,
+                    obtainedDate: new Date().toISOString()
+                };
+                userUpdate.collection = arrayUnion(newCard); // เพิ่มเข้าอาเรย์ทันที
+                cardAlertMsg = `\n🎴 ได้รับการ์ด: ${codeData.rewardCard.name} (${codeData.rewardCard.rarity})`;
+            }
+
+            // 6. บันทึกข้อมูลลง Database
+            await updateDoc(userRef, userUpdate); // อัปเดตเงินและการ์ด
+            await updateDoc(codeRef, { usedCount: increment(1) }); // เพิ่มจำนวนครั้งที่โค้ดถูกใช้
+            await setDoc(historyRef, { redeemedAt: new Date().toISOString() }); // บันทึกประวัติกันใช้ซ้ำ
+
+            // 7. แจ้งผลสำเร็จ
+            alert(`🎉 แลกโค้ดสำเร็จ!\n🪙 ${codeData.rewardPoints} พอยท์\n💎 ${codeData.rewardDiamonds} เพชร\n⭐ ${codeData.rewardStars} ดาว${cardAlertMsg}`);
+            window.location.href = "index.html";
+
+        } catch (e) {
+            alert("❌ " + e.message);
+            btn.disabled = false;
+            btn.innerText = "ยืนยันแลกรับ";
+        }
+    };
+</script>
+</body>
+</html>

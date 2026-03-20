@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>โปรไฟล์ & คลังการ์ด - Ultimate Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* --- CSS Global & Background --- */
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Kanit', sans-serif; 
+            background: #0d0d10; 
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 200, 49, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 229, 255, 0.08) 0%, transparent 40%),
+                url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+            color: white; margin: 0; padding: 20px; min-height: 100vh;
+        }
+        
+        .container { max-width: 1000px; margin: auto; opacity: 0; transform: translateY(20px); transition: 1.2s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .container.show { opacity: 1; transform: translateY(0); }
+
+        /* Navbar */
+        .nav-bar { display: flex; justify-content: space-between; margin-bottom: 25px; align-items: center; gap: 10px; }
+        .btn-nav { 
+            background: rgba(255,255,255,0.05); color: #efefef; border: 1px solid rgba(255,255,255,0.1); 
+            padding: 12px 20px; border-radius: 16px; cursor: pointer; font-family: 'Kanit'; 
+            transition: 0.4s; text-decoration: none; font-size: 0.9rem; font-weight: bold; 
+            display: flex; align-items: center; gap: 8px; backdrop-filter: blur(15px);
+        }
+        .btn-nav:hover { background: #ffc831; color: #000; border-color: #ffc831; transform: translateY(-3px); box-shadow: 0 10px 25px rgba(255, 200, 49, 0.3); }
+        
+        /* Profile Section */
+        .profile-card { 
+            background: linear-gradient(165deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
+            padding: 40px; border-radius: 40px; border: 1px solid rgba(255,255,255,0.1); 
+            margin-bottom: 30px; position: relative; overflow: hidden;
+            display: flex; flex-wrap: wrap; gap: 40px; align-items: center;
+            box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .profile-main { display: flex; align-items: center; gap: 30px; flex: 1; min-width: 320px; }
+        .pfp-wrapper { position: relative; }
+        .profile-pic-container { 
+            width: 150px; height: 150px; border-radius: 40px; 
+            border: 4px solid #ffc831; overflow: hidden; flex-shrink: 0; 
+            background: #1a1a1e; box-shadow: 0 0 40px rgba(255,200,49,0.2);
+            transform: rotate(-3deg); transition: 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .profile-pic-container:hover { transform: rotate(0deg) scale(1.08); }
+        .profile-pic-container img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .profile-info h1 { margin: 0; font-size: 2.6rem; font-weight: 800; letter-spacing: -1px; background: linear-gradient(135deg, #fff 30%, #ffc831); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .wallet-stats { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; }
+        .stat-item { 
+            background: rgba(0,0,0,0.3); padding: 10px 20px; border-radius: 15px; 
+            font-size: 1rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.08);
+            display: flex; align-items: center; gap: 10px; transition: 0.3s;
+        }
+        .stat-item:hover { background: rgba(255,255,255,0.05); transform: scale(1.05); }
+
+        /* Progress Bar */
+        .collection-progress { width: 100%; margin-top: 25px; background: rgba(255,255,255,0.05); height: 8px; border-radius: 10px; overflow: hidden; position: relative; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #ffc831, #ff8c00); width: 0%; transition: 1.5s ease-out; box-shadow: 0 0 15px rgba(255,200,49,0.5); }
+
+        /* Featured Display Case */
+        .display-case { position: relative; perspective: 1000px; padding: 10px; }
+        .featured-card-box { 
+            width: 220px; height: 310px; background: #111; border-radius: 25px; 
+            display: flex; align-items: center; justify-content: center;
+            position: relative; border: 2px solid #333; overflow: hidden;
+            transition: 0.5s; transform-style: preserve-3d;
+            animation: floating 4s ease-in-out infinite;
+        }
+        @keyframes floating { 0%, 100% { transform: translateY(0) rotateX(2deg); } 50% { transform: translateY(-15px) rotateX(-2deg); } }
+        
+        .featured-card-box img { width: 100%; height: 100%; object-fit: cover; }
+        .featured-card-box::after {
+            content: ""; position: absolute; inset: 0;
+            background: linear-gradient(125deg, transparent 40%, rgba(255,255,255,0.1) 50%, transparent 60%);
+            background-size: 200% 200%; animation: holo-shine 4s infinite;
+        }
+        @keyframes holo-shine { 0% { background-position: 200% 200%; } 100% { background-position: -200% -200%; } }
+        
+        /* Rare Glow Effects */
+        .glow-ssr { border-color: #ffc831; box-shadow: 0 0 50px rgba(255, 200, 49, 0.4); }
+        .glow-exr { 
+            border-color: #ff0055; 
+            box-shadow: 0 0 60px rgba(255, 0, 85, 0.5);
+            animation: rainbow-glow 3s infinite linear, floating 4s ease-in-out infinite;
+        }
+
+        /* Collection Grid */
+        .collection-section { 
+            background: rgba(255,255,255,0.03); padding: 35px; border-radius: 40px; 
+            border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(10px);
+        }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        
+        .collection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; }
+        
+        .item-card { 
+            background: rgba(255,255,255,0.03); border-radius: 22px; padding: 10px; 
+            text-align: center; border: 1px solid rgba(255,255,255,0.05); 
+            cursor: pointer; position: relative; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .item-card:hover { transform: translateY(-12px) scale(1.05); border-color: #ffc831; background: rgba(255,255,255,0.08); }
+        .item-card img { width: 100%; border-radius: 16px; aspect-ratio: 2/3; object-fit: cover; margin-bottom: 10px; }
+        
+        .card-name-label { font-size: 0.9rem; font-weight: 600; color: #fff; margin-bottom: 8px; }
+        .rarity-badge { font-size: 0.75rem; padding: 4px 12px; border-radius: 10px; font-weight: 900; }
+        
+        /* Rarity Theme */
+        .rarity-EXR { background: linear-gradient(45deg, #ff0055, #ffcc00); color: white; box-shadow: 0 4px 12px rgba(255,0,85,0.3); }
+        .rarity-SSR { background: #ffc831; color: black; }
+        .rarity-SR { background: #00e5ff; color: black; }
+
+        .count-tag { 
+            position: absolute; top: -8px; right: -8px; background: #ffc831; color: #000; 
+            min-width: 28px; height: 28px; border-radius: 10px; font-size: 0.8rem; font-weight: 800; 
+            display: flex; align-items: center; justify-content: center; z-index: 5; border: 2px solid #0d0d10;
+        }
+
+        #auth-loader { position: fixed; inset: 0; background: #0d0d10; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body>
+
+<div id="auth-loader">
+    <div class="loader-ring"></div>
+    <p style="color:#ffc831; margin-top:20px; font-weight: bold; letter-spacing: 3px; font-size: 0.8rem;">INITIALIZING INTERFACE...</p>
+</div>
+
+<div class="container" id="main-content">
+    <div class="nav-bar">
+        <a href="index.html" class="btn-nav"><i class="fas fa-arrow-left"></i> หน้าหลัก</a>
+        <span style="font-size: 0.75rem; letter-spacing: 4px; color: #444; font-weight: 900; text-transform: uppercase;">User Profile System v2.0</span>
+        <button onclick="logout()" class="btn-nav" style="color: #ff5e5e;"><i class="fas fa-power-off"></i></button>
+    </div>
+
+    <div class="profile-card">
+        <div class="profile-main">
+            <div class="pfp-wrapper">
+                <div class="profile-pic-container">
+                    <img id="pfp-display" src="" alt="Profile">
+                </div>
+            </div>
+            <div class="profile-info">
+                <h1 id="display-name">LOADING...</h1>
+                <div class="wallet-stats">
+                    <div class="stat-item" style="color: #ffc831;">🪙 <span id="p-points">0</span></div>
+                    <div class="stat-item" style="color: #00e5ff;">💎 <span id="p-diamonds">0</span></div>
+                    <div class="stat-item" style="color: #4facfe;">⭐ <span id="p-stars">0</span></div>
+                </div>
+                
+                <div style="margin-top:25px;">
+                    <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:8px; color:#888;">
+                        <span>COLLECTION PROGRESS</span>
+                        <span id="progress-percent">0%</span>
+                    </div>
+                    <div class="collection-progress">
+                        <div id="progress-bar" class="progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="display-case">
+            <div id="featured-slot" class="featured-card-box">
+                <div style="color: #222; text-align:center;">
+                    <i class="fas fa-crown" style="font-size: 2.5rem; margin-bottom: 15px;"></i><br>
+                    <small style="letter-spacing:2px;">NO FEATURED</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="collection-section">
+        <div class="section-header">
+            <h2 style="margin:0; font-size: 1.4rem; letter-spacing: 1px;"><i class="fas fa-th-large" style="color:#ffc831; margin-right:10px;"></i> MY COLLECTION</h2>
+            <div id="card-count-label" style="background: #ffc831; color: #000; padding: 6px 16px; border-radius: 12px; font-weight: 900; font-size: 0.85rem; box-shadow: 0 4px 15px rgba(255,200,49,0.3);">
+                0 CARDS
+            </div>
+        </div>
+        <div class="collection-grid" id="collection-list"></div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
+        authDomain: "sign-up-73f99.firebaseapp.com",
+        projectId: "sign-up-73f99",
+        storageBucket: "sign-up-73f99.appspot.com",
+        messagingSenderId: "916335559099",
+        appId: "1:916335559099:web:3a8ed896ba26e38991849e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUserUID = null;
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUserUID = user.uid;
+            onSnapshot(doc(db, "users", user.uid), (docSnap) => {
+                if (docSnap.exists()) {
+                    renderPage(docSnap.data());
+                    document.getElementById("auth-loader").style.display = "none";
+                    document.getElementById("main-content").classList.add("show");
+                }
+            });
+        } else {
+            window.location.href = "login.html";
+        }
+    });
+
+    function renderPage(data) {
+        document.getElementById("display-name").innerText = data.username?.toUpperCase() || "UNKNOWN";
+        document.getElementById("p-points").innerText = (data.points || 0).toLocaleString();
+        document.getElementById("p-diamonds").innerText = (data.diamonds || 0).toLocaleString();
+        document.getElementById("p-stars").innerText = (data.stars || 0).toLocaleString();
+        document.getElementById("pfp-display").src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.username}&backgroundColor=ffc831`;
+        
+        // Progress Calculation (Assume max 100 for demo)
+        const totalOwned = data.collection?.length || 0;
+        const target = 100; 
+        const percent = Math.min((totalOwned / target) * 100, 100).toFixed(0);
+        document.getElementById("progress-bar").style.width = percent + "%";
+        document.getElementById("progress-percent").innerText = percent + "%";
+
+        const slot = document.getElementById("featured-slot");
+        if (data.featuredCard) {
+            slot.innerHTML = `<img src="${data.featuredCard.img}" class="main-card-img">`;
+            let rarityClass = "";
+            if(data.featuredCard.rarity === 'SSR') rarityClass = "glow-ssr";
+            if(data.featuredCard.rarity === 'EXR') rarityClass = "glow-exr";
+            slot.className = `featured-card-box ${rarityClass}`;
+        }
+
+        const list = document.getElementById("collection-list");
+        const rawCards = data.collection || [];
+        document.getElementById("card-count-label").innerText = `${rawCards.length} CARDS`;
+
+        if (rawCards.length === 0) {
+            list.innerHTML = `<div style='grid-column:1/-1; text-align:center; padding:60px; color:#333;'>
+                <i class='fas fa-ghost' style='font-size:3.5rem; margin-bottom:20px;'></i><br>
+                <span style="font-weight:bold; letter-spacing:1px;">NO DATA FOUND</span>
+            </div>`;
+            return;
+        }
+
+        const cardMap = {};
+        rawCards.forEach(card => {
+            const key = card.name + "_" + card.rarity;
+            if (cardMap[key]) { cardMap[key].count += 1; } 
+            else { cardMap[key] = { ...card, count: 1 }; }
+        });
+
+        const sortedCards = Object.values(cardMap).sort((a, b) => {
+            const order = { 'EXR': 0, 'SSR': 1, 'SR': 2, 'R': 3, 'U': 4 };
+            return (order[a.rarity] || 99) - (order[b.rarity] || 99);
+        });
+
+        list.innerHTML = sortedCards.map((card) => `
+            <div class="item-card" onclick="setFeatured('${card.img}', '${card.rarity}')">
+                ${card.count > 1 ? `<div class="count-tag">${card.count}</div>` : ''}
+                <img src="${card.img}" onerror="this.src='https://via.placeholder.com/150x225?text=ERROR'">
+                <div class="card-name-label">${card.name}</div>
+                <div class="rarity-badge rarity-${card.rarity}">${card.rarity}</div>
+            </div>
+        `).join('');
+    }
+
+    window.setFeatured = async (img, rarity) => {
+        if (!currentUserUID) return;
+        try {
+            await updateDoc(doc(db, "users", currentUserUID), {
+                featuredCard: { img, rarity }
+            });
+        } catch (e) { console.error("Error updating featured card:", e); }
+    };
+
+    window.logout = () => {
+        if(confirm("ต้องการออกจากระบบใช่หรือไม่?")) {
+            signOut(auth).then(() => window.location.href = "login.html");
+        }
+    };
+</script>
+
+</body>
+</html>

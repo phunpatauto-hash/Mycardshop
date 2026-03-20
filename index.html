@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>หน้าหลัก - My card game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* --- Style พื้นฐาน --- */
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Kanit', sans-serif; 
+            margin: 0; 
+            background-color: #0f0f0f; 
+            color: white; 
+            line-height: 1.6;
+        }
+        
+        /* --- แถบแจ้งเตือนเกิน 100M --- */
+        .limit-warning { 
+            background: linear-gradient(90deg, #ff4757, #ff6b81);
+            color: white; text-align: center; padding: 12px 20px; font-weight: 400; display: none; 
+            font-size: 0.85rem; position: sticky; top: 70px; z-index: 999; backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        /* --- Navbar --- */
+        .navbar { 
+            background: rgba(30, 30, 30, 0.8); 
+            backdrop-filter: blur(15px);
+            padding: 0 50px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            border-bottom: 1px solid rgba(255,255,255,0.05); 
+            height: 75px; 
+        }
+        .navbar .logo { font-size: 1.6rem; font-weight: 700; color: #ffc831; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-links { list-style: none; display: flex; gap: 25px; margin: 0; align-items: center; }
+        .nav-links a { color: rgba(255,255,255,0.8); text-decoration: none; transition: 0.3s; font-size: 0.95rem; font-weight: 400; }
+        .nav-links a:hover { color: #ffc831; }
+        
+        .profile-link { 
+            text-decoration: none; display: flex; align-items: center; gap: 12px;
+            transition: 0.3s; padding: 6px 18px; border-radius: 50px; 
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 200, 49, 0.2); cursor: pointer; 
+            user-select: none; /* ป้องกันการคลุมดำเวลาคลิกค้าง */
+        }
+        .profile-link:hover { background: rgba(255, 200, 49, 0.1); border-color: #ffc831; }
+        .nav-avatar { width: 35px; height: 35px; border-radius: 12px; border: 2px solid #ffc831; object-fit: cover; background: #222; }
+        
+        .currency-display { display: flex; gap: 12px; font-size: 0.85rem; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 12px; }
+        .point-text { color: #ffc831; font-weight: bold; }
+        .diamond-text { color: #00e5ff; font-weight: bold; }
+        .star-text { color: #4facfe; font-weight: bold; }
+
+        .btn-blue { 
+            background: linear-gradient(135deg, #2b52ff, #1a36b1); 
+            padding: 10px 22px; border-radius: 12px; font-weight: 600; cursor: pointer; 
+            border: none; color: white; text-decoration: none; transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(43, 82, 255, 0.3);
+        }
+        .btn-blue:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(43, 82, 255, 0.4); }
+        
+        /* --- Hero Section --- */
+        .hero { 
+            height: 450px; display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            color: white; text-align: center; background-size: cover; background-position: center; 
+            animation: bgSlide 20s infinite alternate; position: relative; overflow: hidden;
+        }
+        .hero::before { 
+            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
+            background: linear-gradient(to bottom, rgba(15,15,15,0.4), #0f0f0f); z-index: 1; 
+        }
+        .hero h1 { position: relative; z-index: 2; font-size: 3.5rem; margin: 0; font-weight: 800; letter-spacing: -1px; text-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .hero p { position: relative; z-index: 2; font-size: 1.1rem; color: rgba(255,255,255,0.7); max-width: 600px; margin-top: 10px; }
+        
+        @keyframes bgSlide { 
+            0% { background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREnu2Z4qwDqG2AuWKYP5_GkyFt5wG7MMtRYA&s'); } 
+            50% { background-image: url('https://www.devsisters.com/_next/image?url=https%3A%2F%2Fdevsisters-branding-devhome-prod-files.s3.ap-northeast-1.amazonaws.com%2Fdata%2Fstory%2Fen%2F5%2F659f8f341c9ca.png&w=750&q=75'); } 
+            100% { background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQTSW3gxddPaBTmeJHmgKHBybpemXlbk6AFxbhHarSmzBoGW3DPynaJywMIsiT-XkRTtGg&usqp=CAU'); } 
+        }
+
+        /* --- Container & Components --- */
+        .container { max-width: 1140px; margin: 0 auto; padding: 40px 20px; }
+        h2 { border-left: 6px solid #ffc831; padding-left: 18px; margin: 40px 0 25px 0; font-size: 1.5rem; letter-spacing: 0.5px; }
+        
+        .daily-reward { 
+            background: linear-gradient(135deg, #1a1a1a 0%, #222 100%); 
+            padding: 40px; border-radius: 24px; border: 1px solid rgba(79, 172, 254, 0.3); 
+            text-align: center; margin-bottom: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+        .btn-spin { 
+            background: linear-gradient(135deg, #4facfe, #00f2fe); 
+            color: white; padding: 14px 40px; border-radius: 50px; border: none; 
+            font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: 0.3s; 
+            box-shadow: 0 10px 25px rgba(79, 172, 254, 0.4);
+        }
+        .btn-spin:hover:not(:disabled) { transform: scale(1.05); filter: brightness(1.1); }
+        .btn-spin:disabled { opacity: 0.6; cursor: not-allowed; background: #333; box-shadow: none; }
+        
+        .quick-gacha-banner { 
+            background: linear-gradient(135deg, #00e5ff, #ffe600); 
+            border-radius: 20px; padding: 35px 45px; display: flex; justify-content: space-between; 
+            align-items: center; margin-bottom: 30px; color: #000; cursor: pointer; 
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+        .quick-gacha-banner:hover { transform: translateY(-8px); filter: saturate(1.2); }
+        .banner-btn { background: #000; color: #fff; padding: 12px 30px; border-radius: 50px; font-weight: 700; font-size: 0.9rem; }
+        
+        /* --- News Section --- */
+        .news-list { display: flex; flex-direction: column; gap: 15px; }
+        .news-item { 
+            background: #1a1a1a; border-radius: 18px; padding: 22px; 
+            display: flex; align-items: center; gap: 20px; transition: 0.3s; 
+            border: 1px solid rgba(255,255,255,0.05); cursor: pointer; 
+        }
+        .news-item:hover { background: #222; border-color: #ffc831; transform: translateX(12px); }
+        .news-date { color: #666; font-size: 0.85rem; min-width: 110px; font-weight: 300; }
+        .news-badge { padding: 5px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.5px; }
+        .badge-new { background: #ff4757; color: white; }
+        .badge-update { background: transparent; color: #ffc831; border: 1.5px solid #ffc831; }
+        .news-title { flex-grow: 1; font-weight: 500; font-size: 1rem; color: rgba(255,255,255,0.9); }
+
+        /* --- Grid --- */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .card { 
+            background: #1a1a1a; border-radius: 20px; overflow: hidden; 
+            border: 1px solid rgba(255,255,255,0.05); transition: 0.3s;
+        }
+        .card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.2); }
+        .card-img { width: 100%; height: 220px; object-fit: cover; filter: grayscale(20%); transition: 0.5s; }
+        .card:hover .card-img { filter: grayscale(0%); transform: scale(1.05); }
+
+        /* --- Admin Login Popup --- */
+        .admin-modal {
+            display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); align-items: center; justify-content: center;
+        }
+        .modal-content {
+            background: #1a1a1a; padding: 30px; border-radius: 20px; border: 1px solid #ffc831;
+            width: 90%; max-width: 400px; text-align: center; box-shadow: 0 0 30px rgba(255,200,49,0.2);
+        }
+        .modal-content h3 { color: #ffc831; margin-top: 0; }
+        .modal-content input {
+            width: 100%; padding: 12px; margin: 20px 0; border-radius: 10px; border: 1px solid #333;
+            background: #0f0f0f; color: white; text-align: center; font-family: 'Kanit';
+        }
+        .modal-btns { display: flex; gap: 10px; }
+        .btn-modal { flex: 1; padding: 10px; border-radius: 10px; border: none; cursor: pointer; font-family: 'Kanit'; font-weight: 600; }
+        .btn-confirm { background: #ffc831; color: #000; }
+        .btn-cancel { background: #333; color: #fff; }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 0 20px; }
+            .hero h1 { font-size: 2.2rem; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="money-limit-warning" class="limit-warning">
+        <i class="fas fa-exclamation-triangle"></i> 
+        ขณะนี้ <span id="limit-type-text">ยอดเงิน</span> ของคุณเกิน <b>100,000,000</b> แล้ว! กรุณาใช้จ่ายออกบ้างเพื่อความเสถียรของระบบ
+    </div>
+
+    <nav class="navbar">
+        <div class="logo">Mycard</div>
+        <ul class="nav-links">
+            <li><a href="index.html">หน้าแรก</a></li>
+            <li><a href="collection.html">สมุดสะสม</a></li>
+            <li id="redeem-tab" style="display: none;"><a href="redeem.html" style="color: #ffc831;">แลกโค้ด</a></li>
+            <li>
+                <div class="profile-link" id="profile-container" style="display: none;">
+                    <img src="" id="nav-avatar-img" class="nav-avatar">
+                    <div>
+                        <div id="user-display" style="color: #fff; font-weight: 700; font-size: 0.85rem; line-height: 1;"></div>
+                        <div class="currency-display">
+                            <span class="point-text">🪙 <span id="user-points">0</span></span>
+                            <span class="diamond-text">💎 <span id="user-diamonds">0</span></span>
+                            <span class="star-text">⭐ <span id="user-stars">0</span></span> 
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li><a href="login.html" id="auth-btn" class="btn-blue">เข้าสู่ระบบ</a></li>
+            <li id="reg-item"><a href="signup.html" style="opacity: 0.7;">สมัครสมาชิก</a></li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <h1 id="welcome-text">ยินดีต้อนรับ</h1>
+        <p>สัมผัสประสบการณ์การสะสมการ์ดระดับพรีเมียม พร้อมระบบ Battle Pass และกิจกรรมลุ้นรับการ์ด SSR ระดับตำนานได้ทุกวัน!</p>
+    </header>
+
+    <main class="container">
+        <div class="daily-reward" id="daily-section">
+            <h3 style="margin-top:0; font-size: 1.4rem;">🎁 เช็คอินรายวัน (Premium Plus)</h3>
+            <p style="color: rgba(255,255,255,0.5); font-size: 0.95rem; margin-bottom: 25px;">รับพอยท์ เพชร และ <span style="color:#4facfe; font-weight: bold;">ดวงดาว ⭐</span> เพื่อปลดล็อกรางวัลใน Pass!</p>
+            <button id="spin-btn" class="btn-spin">กดสุ่มรับรางวัลรายวัน!</button>
+        </div>
+
+        <div class="quick-gacha-banner" onclick="window.location.href='Banner Selection.html'">
+            <div>
+                <h3 style="margin:0; font-size: 1.5rem;">🎰 สุ่มการ์ดนำโชค</h3>
+                <p style="margin:5px 0 0 0; opacity:0.7">ใช้พอยท์สะสมเพื่อออกตามหาการ์ดในฝันของคุณ!</p>
+            </div>
+            <span class="banner-btn">ไปหน้าสุ่มการ์ด <i class="fas fa-chevron-right" style="margin-left:8px;"></i></span>
+        </div>
+
+        <div class="quick-gacha-banner" style="background: linear-gradient(135deg, #4facfe, #00f2fe);" onclick="window.location.href='Pass (Battle Pass).html'">
+            <div>
+                <h3 style="margin:0; font-size: 1.5rem;">🏆 Battle Pass System</h3>
+                <p style="margin:5px 0 0 0; opacity:0.7; color: #000;">สะสมดวงดาวเพื่อเลื่อนขั้นและรับรางวัล Limited!</p>
+            </div>
+            <span class="banner-btn" style="background: #fff; color: #000;">ไปที่หน้า Pass <i class="fas fa-chevron-right" style="margin-left:8px;"></i></span>
+        </div>
+
+        <h2>การ์ดที่กำลังจะมาเร็วๆนี้</h2>
+        <div class="grid">
+            <div class="card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRapA_9lF4_S2ZmdrmfEsY1UbKiMtnWJFXww&s" class="card-img">
+                <div style="padding:25px;">
+                    <h3 style="margin:0 0 10px 0;">Battle of Talingchan</h3>
+                    <p style="color: #666; margin:0; font-size: 0.9rem;">เตรียมพบกับตำนานบทใหม่ เร็วๆ นี้</p>
+                </div>
+            </div>
+        </div>
+
+        <section class="news-section">
+            <h2>ข่าวสารและอัปเดต</h2>
+            <div class="news-list" id="news-container">
+                <p style="text-align: center; color: #666; padding: 40px;">กำลังโหลดข่าวสารล่าสุด...</p>
+            </div>
+        </section>
+    </main>
+
+    <div id="adminModal" class="admin-modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-user-shield"></i> Admin Verification</h3>
+            <p style="font-size: 0.8rem; color: #888;">เฉพาะแอดมินเท่านั้น กรุณาระบุรหัสผ่าน</p>
+            <input type="password" id="adminPassword" placeholder="รหัสผ่านแอดมิน">
+            <div class="modal-btns">
+                <button class="btn-modal btn-cancel" onclick="document.getElementById('adminModal').style.display='none'">ยกเลิก</button>
+                <button class="btn-modal btn-confirm" id="confirmAdminBtn">ยืนยัน</button>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, updateDoc, increment, collection, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
+        authDomain: "sign-up-73f99.firebaseapp.com",
+        projectId: "sign-up-73f99",
+        storageBucket: "sign-up-73f99.appspot.com",
+        messagingSenderId: "916335559099",
+        appId: "1:916335559099:web:3a8ed896ba26e38991849e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // --- News Logic ---
+    const newsContainer = document.getElementById("news-container");
+    const newsQuery = query(collection(db, "news"), orderBy("createdAt", "desc"));
+    onSnapshot(newsQuery, (snapshot) => {
+        newsContainer.innerHTML = "";
+        if (snapshot.empty) {
+            newsContainer.innerHTML = `<p style="text-align: center; color: #666; padding: 20px;">ยังไม่มีประกาศในขณะนี้</p>`;
+            return;
+        }
+        snapshot.forEach((doc) => {
+            const news = doc.data();
+            newsContainer.innerHTML += `
+                <div class="news-item" onclick="if('${news.link || ''}' !== '') window.location.href='${news.link}'">
+                    <span class="news-date">${news.date || '---'}</span>
+                    <span class="news-badge ${news.badgeClass || 'badge-new'}">${news.badgeText || 'New'}</span>
+                    <span class="news-title">${news.title}</span>
+                    <span class="news-arrow"><i class="fas fa-arrow-right"></i></span>
+                </div>`;
+        });
+    });
+
+    // --- Auth Logic ---
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            const userRef = doc(db, "users", user.uid);
+            onSnapshot(userRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    showLoggedInUI(docSnap.data(), user.uid);
+                    checkDailyRewardStatus(docSnap.data());
+                }
+            });
+        } else {
+            showLoggedOutUI();
+        }
+    });
+
+    function showLoggedInUI(data, uid) {
+        const MAX_VAL = 100000000;
+        document.getElementById("profile-container").style.display = "flex";
+        document.getElementById("user-display").innerText = data.username;
+        document.getElementById("user-points").innerText = (data.points || 0).toLocaleString();
+        document.getElementById("user-diamonds").innerText = (data.diamonds || 0).toLocaleString();
+        document.getElementById("user-stars").innerText = (data.stars || 0).toLocaleString();
+
+        // Warning Bar
+        const pointsOver = (data.points || 0) > MAX_VAL;
+        const diamondsOver = (data.diamonds || 0) > MAX_VAL;
+        const warningBar = document.getElementById("money-limit-warning");
+        if (pointsOver || diamondsOver) {
+            warningBar.style.display = "block";
+            document.getElementById("limit-type-text").innerText = (pointsOver && diamondsOver) ? "พอยท์และเพชร" : pointsOver ? "พอยท์" : "เพชร";
+        } else {
+            warningBar.style.display = "none";
+        }
+
+        document.getElementById("nav-avatar-img").src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.username}`;
+        const authBtn = document.getElementById("auth-btn");
+        authBtn.innerText = "ออกจากระบบ";
+        authBtn.style.background = "#333";
+        authBtn.onclick = () => signOut(auth).then(() => location.reload());
+
+        document.getElementById("reg-item").style.display = "none";
+        document.getElementById("redeem-tab").style.display = "block";
+        document.getElementById("daily-section").style.display = "block";
+        document.getElementById("welcome-text").innerText = "ยินดีต้อนรับคุณ " + data.username;
+
+        // Daily Reward
+        document.getElementById("spin-btn").onclick = async () => {
+            const luckyPoint = Math.floor(Math.random() * 500) + 100;
+            const luckyDiamond = Math.random() > 0.8 ? 5 : 0; 
+            const luckyStar = Math.random() > 0.6 ? Math.floor(Math.random() * 2) + 1 : 0;
+            await updateDoc(doc(db, "users", uid), {
+                points: increment(((data.points || 0) >= MAX_VAL) ? 0 : luckyPoint),
+                diamonds: increment(((data.diamonds || 0) >= MAX_VAL) ? 0 : luckyDiamond),
+                stars: increment(luckyStar),
+                lastClaimDate: new Date().toDateString()
+            });
+            alert(`เช็คอินสำเร็จ! คุณได้รับ ${luckyPoint} 🪙 ${luckyDiamond > 0 ? ', ' + luckyDiamond + ' 💎' : ''} ${luckyStar > 0 ? 'และ ' + luckyStar + ' ⭐' : ''}`);
+        };
+    }
+
+    function showLoggedOutUI() {
+        document.getElementById("money-limit-warning").style.display = "none";
+        document.getElementById("profile-container").style.display = "none";
+        document.getElementById("auth-btn").innerText = "เข้าสู่ระบบ";
+        document.getElementById("auth-btn").onclick = () => window.location.href='login.html';
+        document.getElementById("reg-item").style.display = "block";
+        document.getElementById("daily-section").style.display = "none";
+    }
+
+    function checkDailyRewardStatus(data) {
+        const today = new Date().toDateString();
+        const btn = document.getElementById("spin-btn");
+        if (data.lastClaimDate === today) {
+            btn.disabled = true;
+            btn.innerText = "รับรางวัลวันนี้ไปแล้ว ✓";
+        } else {
+            btn.disabled = false;
+            btn.innerText = "กดสุ่มรับรางวัลรายวัน!";
+        }
+    }
+
+    // --- ระบบทางลัดแอดมิน (Hold 5 Seconds / Normal Click for Profile) ---
+    let pressTimer;
+    let isLongPress = false; // ตรวจสอบว่าเป็นกดค้างหรือไม่
+    const profileBtn = document.getElementById("profile-container");
+    const adminModal = document.getElementById("adminModal");
+    const adminPassInput = document.getElementById("adminPassword");
+    const confirmBtn = document.getElementById("confirmAdminBtn");
+
+    const ADMIN_SECRET = "135679"; // รหัสผ่านเข้าหน้าแอดมิน
+
+    function startPress() {
+        isLongPress = false; // รีเซ็ตสถานะ
+        pressTimer = window.setTimeout(() => {
+            isLongPress = true; // เมื่อค้างครบ 5 วินาที
+            adminModal.style.display = "flex";
+            adminPassInput.focus();
+        }, 5000); 
+    }
+
+    function endPress() {
+        clearTimeout(pressTimer);
+        // ถ้าปล่อยมือแล้วไม่ใช่การกดค้าง (คลิกปกติ) ให้ไปหน้า profile
+        if (!isLongPress) {
+            window.location.href = "profile.html";
+        }
+    }
+
+    // สำหรับ Desktop
+    profileBtn.addEventListener("mousedown", startPress);
+    profileBtn.addEventListener("mouseup", endPress);
+    profileBtn.addEventListener("mouseleave", () => clearTimeout(pressTimer));
+
+    // สำหรับ Mobile
+    profileBtn.addEventListener("touchstart", (e) => {
+        startPress();
+    });
+    profileBtn.addEventListener("touchend", endPress);
+
+    // ตรวจสอบรหัสผ่าน
+    confirmBtn.onclick = () => {
+        if (adminPassInput.value === ADMIN_SECRET) {
+            window.location.href = 'admin_dashboard.html'; 
+        } else {
+            alert("รหัสผ่านไม่ถูกต้อง!");
+            adminPassInput.value = "";
+        }
+    };
+
+    adminPassInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") confirmBtn.click();
+    });
+
+</script>
+</body>
+</html>

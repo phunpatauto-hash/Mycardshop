@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BATTLE PASS - COLLECTION SYSTEM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* CSS ทั้งหมดคงเดิม */
+        * { box-sizing: border-box; }
+        body { font-family: 'Kanit', sans-serif; margin: 0; background: #08080a; color: white; min-height: 100vh; overflow-x: hidden; }
+        .navbar { padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; background: #000; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 100; }
+        .btn-home { background: #333; border: 1px solid #444; color: #fff; padding: 5px 12px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
+        .currency-bar { background: rgba(255, 255, 255, 0.05); padding: 6px 15px; border-radius: 20px; display: flex; align-items: center; gap: 15px; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .container { padding: 20px 0 140px 0; }
+        .xp-container { max-width: 600px; margin: 0 auto 30px; padding: 0 20px; }
+        .xp-info { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: bold; font-size: 0.9rem; color: #ffc831; }
+        .xp-bar-bg { width: 100%; height: 12px; background: #222; border-radius: 10px; border: 1px solid #333; overflow: hidden; position: relative; }
+        .xp-bar-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #ffc831, #ff8c00); transition: width 0.5s ease; box-shadow: 0 0 10px rgba(255, 200, 49, 0.5); }
+        .season-timer { background: rgba(255, 200, 49, 0.1); border: 1px solid #ffc831; color: #ffc831; padding: 5px 15px; border-radius: 8px; font-size: 0.8rem; display: inline-block; margin-bottom: 10px; font-weight: bold; }
+        .pass-system { display: flex; flex-direction: column; gap: 15px; padding-bottom: 20px; overflow-x: auto; scroll-behavior: smooth; }
+        .pass-row { display: flex; gap: 12px; align-items: center; padding: 10px 40px; min-width: max-content; }
+        .track-label { position: sticky; left: 0; z-index: 20; min-width: 150px; height: 185px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: 800; border-radius: 12px; border: 2px solid #333; background: #0d0d10; box-shadow: 10px 0 20px rgba(0,0,0,0.8); }
+        .btn-info-track { position: absolute; top: 8px; right: 8px; background: none; border: 1px solid currentColor; width: 20px; height: 20px; border-radius: 50%; font-size: 11px; color: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0.7; transition: 0.3s; font-family: serif; font-style: italic; font-weight: bold; }
+        .reward-card { width: 135px; height: 185px; background: #151518; border: 1px solid #333; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 12px 8px; position: relative; overflow: hidden; flex-shrink: 0; transition: 0.4s; }
+        .reward-img { width: 100%; height: 100px; object-fit: contain; filter: grayscale(1) opacity(0.3); z-index: 2; transition: 0.5s; }
+        .lv-badge { position: absolute; top: 5px; left: 5px; font-size: 0.6rem; background: rgba(0,0,0,0.6); padding: 2px 6px; border-radius: 10px; color: #aaa; border: 1px solid #333; z-index: 5; }
+        .is-unlocked .reward-img { filter: grayscale(0) opacity(1); transform: scale(1.1); }
+        .is-claimed::after { content: "CLAIMED"; position: absolute; inset: 0; background: rgba(0,0,0,0.85); color: #2ed573; display: flex; align-items: center; justify-content: center; font-weight: 900; z-index: 10; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+        .modal-content { background: #111; border: 2px solid #333; border-radius: 15px; width: 95%; max-width: 450px; padding: 30px; position: relative; text-align: center; }
+        .summary-box { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 15px; margin-top: 15px; border-left: 4px solid currentColor; text-align: left; font-size: 0.9rem; }
+        .action-bar { position: fixed; bottom: 0; width: 100%; background: #0d0d10; padding: 20px 50px; display: flex; justify-content: space-between; border-top: 1px solid #333; z-index: 1000; }
+        .btn-claim { background: #2ed573; color: black; border: none; padding: 12px 40px; border-radius: 10px; font-weight: 900; cursor: pointer; transition: 0.3s; }
+        .btn-claim:disabled { background: #333; color: #666; cursor: not-allowed; }
+        
+        .btn-buy-pass { border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; font-family: 'Kanit'; }
+        .btn-premium { background: #ffc831; color: #000; }
+        .btn-super { background: #ff00ff; color: #fff; }
+        .btn-buy-pass:hover { transform: scale(1.05); opacity: 0.9; }
+    </style>
+</head>
+<body>
+
+    <div id="info-modal" class="modal" onclick="this.style.display='none'">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div id="modal-header" style="font-size: 1.8rem; font-weight: 900; margin-bottom: 15px;">TITLE</div>
+            <div id="modal-text">Description...</div>
+            <button style="background:#333; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; width:100%; margin-top:20px; font-weight:bold;" onclick="document.getElementById('info-modal').style.display='none'">รับทราบ</button>
+        </div>
+    </div>
+
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="index.html" class="btn-home"><i class="fas fa-home"></i> หน้าหลัก</a>
+        </div>
+        <div class="currency-bar">
+            <div class="curr-item">🪙 <span id="pts">0</span></div>
+            <div class="curr-item">💎 <span id="dia">0</span></div>
+            <div class="curr-item">⭐ <span id="star">0</span></div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header-info" style="text-align: center; margin-bottom: 20px;">
+            <div class="season-timer" id="season-countdown">กำลังคำนวณเวลา...</div>
+            <h1 style="font-size: 2.2rem; font-weight: 900; color: #ffc831; margin: 0;">BATTLE PASS</h1>
+        </div>
+
+        <div class="xp-container">
+            <div class="xp-info">
+                <span id="lv-display">LEVEL 1</span>
+                <span id="xp-text">0 / 50 XP</span>
+            </div>
+            <div class="xp-bar-bg">
+                <div class="xp-bar-fill" id="xp-fill"></div>
+            </div>
+            <p id="next-reward-info" style="font-size: 0.75rem; color: #666; margin-top: 5px; text-align: center;">อีกนิดเดียวจะปลดล็อกเลเวลถัดไป!</p>
+        </div>
+
+        <div class="pass-system">
+            <div class="pass-row" id="lv-header" style="padding-left: 190px; color:#444;"></div>
+            <div class="pass-row" id="super-track"><div class="track-label" style="color:#ff00ff; border-color:#ff00ff;"><button class="btn-info-track" onclick="showPassInfo('super')">i</button>SUPER+</div></div>
+            <div class="pass-row" id="premium-track"><div class="track-label" style="color:#ffc831; border-color:#ffc831;"><button class="btn-info-track" onclick="showPassInfo('premium')">i</button>PREMIUM</div></div>
+            <div class="pass-row" id="free-track"><div class="track-label" style="color:#888; border-color:#888;"><button class="btn-info-track" onclick="showPassInfo('free')">i</button>FREE</div></div>
+        </div>
+    </div>
+
+    <div class="action-bar">
+        <div id="buy-container"></div>
+        <button class="btn-claim" id="claim-btn" disabled>รับรางวัลที่มีสิทธิ์</button>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
+        authDomain: "sign-up-73f99.firebaseapp.com",
+        projectId: "sign-up-73f99",
+        storageBucket: "sign-up-73f99.appspot.com",
+        messagingSenderId: "916335559099",
+        appId: "1:916335559099:web:3a8ed896ba26e38991849e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const PRICE_PREMIUM = 1000;
+    const PRICE_SUPER = 2500;
+    const XP_PER_EXTRA_STAR = 1000;
+
+    const imgAssets = {
+        coin: "https://cdn-icons-png.flaticon.com/512/2311/2311904.png",
+        diamond: "https://cdn-icons-png.flaticon.com/512/2532/2532847.png",
+        cardSR: "https://cookierunbraverse.com/data/en_storage/9dSROSHeCW45pKTUSOYTCQ.webp",
+        cardSSR: "https://cookierunbraverse.com/data/en_storage/Zjseu_FlFypzT3-hXxMdBA.webp",
+        cardUltimate: "https://cookierunbraverse.com/data/en_storage/9xGtHu8TqLH6eMRVCj0rBg.webp"
+    };
+
+    const passData = [];
+    for(let i=1; i<=50; i++) {
+        let freeReward = (i % 10 === 0) ? { id: `f${i}`, name: 'Hollyberry Cookie', amount: 1, img: imgAssets.cardSR } : 
+                         (i % 10 === 2) ? { id: `f${i}`, name: 'Diamonds', amount: 100, img: imgAssets.diamond } : 
+                         { id: `f${i}`, name: 'Gold', amount: i*1000, img: imgAssets.coin };
+
+        passData.push({
+            lv: i,
+            free: freeReward,
+            premium: (i % 5 === 0) ? { id: `p${i}`, name: 'Hollyberry Cookie', amount: 1, img: imgAssets.cardSSR } : { id: `p${i}`, name: 'Gems', amount: 500, img: imgAssets.diamond },
+            super: (i === 1 || i % 5 === 0) ? { id: `s${i}`, name: 'Apple Faerie Cookie', amount: 1, img: imgAssets.cardUltimate } : { id: `s${i}`, name: 'Diamonds', amount: 2500, img: imgAssets.diamond }
+        });
+    }
+
+    // --- ส่วนใหม่: คำนวณวันรีเซ็ตซีซั่นถัดไป (วันที่ 1 ของเดือนหน้า) ---
+    function getNextResetTime() {
+        const now = new Date();
+        return new Date(now.getFullYear(), now.getMonth() + 1, 1, 0, 0, 0).getTime();
+    }
+
+    function getXpRequiredForLevel(lv) {
+        if (lv >= 50) return XP_PER_EXTRA_STAR;
+        return Math.floor(Math.min(50 * Math.pow(1.2, lv - 1), 20000));
+    }
+
+    function calculateLevelProgress(totalExp) {
+        let lv = 1;
+        let remainingExp = totalExp;
+        while (lv < 50) {
+            let req = getXpRequiredForLevel(lv);
+            if (remainingExp >= req) {
+                remainingExp -= req;
+                lv++;
+            } else break;
+        }
+        let extraStarsAvailable = 0;
+        if (lv >= 50) {
+            extraStarsAvailable = Math.floor(remainingExp / XP_PER_EXTRA_STAR);
+            remainingExp = remainingExp % XP_PER_EXTRA_STAR; 
+        }
+        return { lv, currentXp: remainingExp, reqXp: getXpRequiredForLevel(lv), extraStars: extraStarsAvailable };
+    }
+
+    function startSeasonCountdown() {
+        const timerEl = document.getElementById("season-countdown");
+        const update = () => {
+            const now = Date.now();
+            const diff = getNextResetTime() - now;
+            if (diff <= 0) {
+                timerEl.innerText = "กำลังรีเซ็ตซีซั่นใหม่...";
+                location.reload(); 
+                return;
+            }
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const m = Math.floor((diff / (1000 * 60)) % 60);
+            timerEl.innerText = `จบซีซั่นเดือนนี้ใน: ${d}วัน ${h}ชม. ${m}นาที`;
+        };
+        setInterval(update, 60000);
+        update();
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const userRef = doc(db, "users", user.uid);
+            const snap = await getDoc(userRef);
+            if (snap.exists()) {
+                const data = snap.data();
+                const now = new Date();
+                const currentMonthKey = `${now.getFullYear()}-${now.getMonth()}`;
+
+                // ถ้า Key ของเดือนไม่ตรงกัน ให้รีเซ็ตค่าทันที
+                if (data.lastResetMonth !== currentMonthKey) {
+                    await updateDoc(userRef, { 
+                        passExp: 0, 
+                        claimedRewards: [], 
+                        lastResetMonth: currentMonthKey 
+                    });
+                }
+                startSeasonCountdown();
+            }
+            onSnapshot(userRef, (doc) => {
+                if (doc.exists()) renderUI(doc.data());
+            });
+        }
+    });
+
+    function renderUI(data) {
+        document.getElementById("pts").innerText = (data.points || 0).toLocaleString();
+        document.getElementById("dia").innerText = (data.diamonds || 0).toLocaleString();
+        document.getElementById("star").innerText = (data.stars || 0).toLocaleString();
+
+        const prog = calculateLevelProgress(data.passExp || 0);
+        const percent = (prog.currentXp / prog.reqXp) * 100;
+        
+        if (prog.lv >= 50) {
+            document.getElementById("lv-display").innerText = "LEVEL MAX (50+)";
+            document.getElementById("xp-text").innerText = `Progress ดาว: ${Math.floor(prog.currentXp).toLocaleString()} / ${prog.reqXp.toLocaleString()} XP`;
+            document.getElementById("next-reward-info").innerHTML = prog.extraStars > 0 ? 
+                `<b style="color:#ffc831">คุณมี ⭐ ${prog.extraStars} ดวงที่ยังไม่ได้กดรับ!</b>` : 
+                "เก็บ XP ต่อเพื่อรับหน่วยเงินดาว";
+        } else {
+            document.getElementById("lv-display").innerText = `LEVEL ${prog.lv}`;
+            document.getElementById("xp-text").innerText = `${Math.floor(prog.currentXp).toLocaleString()} / ${Math.floor(prog.reqXp).toLocaleString()} XP`;
+            document.getElementById("next-reward-info").innerText = "อีกนิดเดียวจะปลดล็อกเลเวลถัดไป!";
+        }
+        
+        document.getElementById("xp-fill").style.width = `${percent}%`;
+
+        const buyContainer = document.getElementById("buy-container");
+        buyContainer.innerHTML = '';
+        if (!data.isPremiumUser) {
+            buyContainer.innerHTML = `<button class="btn-buy-pass btn-premium" id="buy-premium">🔓 ปลดล็อก PREMIUM (${PRICE_PREMIUM} 💎)</button>`;
+            document.getElementById("buy-premium").onclick = () => processBuyPass('premium');
+        } else if (!data.isSuperUser) {
+            buyContainer.innerHTML = `<button class="btn-buy-pass btn-super" id="buy-super">✨ ปลดล็อก SUPER+ (${PRICE_SUPER} 💎)</button>`;
+            document.getElementById("buy-super").onclick = () => processBuyPass('super');
+        } else {
+            buyContainer.innerHTML = `<span style="color:#2ed573; font-weight:bold;"><i class="fas fa-check-circle"></i> ปลดล็อกขั้นสูงสุดแล้ว</span>`;
+        }
+
+        const claimed = data.claimedRewards || [];
+        ["super", "premium", "free"].forEach(track => {
+            const row = document.getElementById(`${track}-track`);
+            const label = row.querySelector('.track-label');
+            row.innerHTML = ''; row.appendChild(label);
+            
+            passData.forEach(item => {
+                const reward = item[track];
+                const isOwned = track === 'free' ? true : (track === 'premium' ? data.isPremiumUser : data.isSuperUser);
+                const unlocked = prog.lv >= item.lv && isOwned;
+                const isClaimed = claimed.includes(reward.id);
+                
+                const card = document.createElement("div");
+                card.className = `reward-card ${unlocked ? 'is-unlocked' : ''} ${isClaimed ? 'is-claimed' : ''}`;
+                card.innerHTML = `<div class="lv-badge">LV.${item.lv}</div><div class="reward-name" style="font-size:0.7rem;">${reward.name}</div><img src="${reward.img}" class="reward-img"><div class="reward-val">${reward.amount.toLocaleString()}</div>`;
+                row.appendChild(card);
+            });
+        });
+
+        const canClaimRewards = passData.some(item => {
+            if (prog.lv < item.lv) return false;
+            if (!claimed.includes(item.free.id)) return true;
+            if (data.isPremiumUser && !claimed.includes(item.premium.id)) return true;
+            if (data.isSuperUser && !claimed.includes(item.super.id)) return true;
+            return false;
+        });
+        
+        document.getElementById("claim-btn").disabled = !(canClaimRewards || prog.extraStars > 0);
+    }
+
+    async function processBuyPass(type) {
+        const user = auth.currentUser;
+        if (!user) return alert("กรุณาเข้าสู่ระบบ");
+        const userRef = doc(db, "users", user.uid);
+        const snap = await getDoc(userRef);
+        const data = snap.data();
+        const gems = data.diamonds || 0;
+
+        if (type === 'premium') {
+            if (gems < PRICE_PREMIUM) return alert("เพชรไม่พอ!");
+            if (confirm(`คุณต้องการซื้อ PREMIUM PASS ในราคา ${PRICE_PREMIUM} 💎 ใช่หรือไม่?`)) {
+                await updateDoc(userRef, { diamonds: gems - PRICE_PREMIUM, isPremiumUser: true });
+                alert("ซื้อสำเร็จ!");
+            }
+        } else if (type === 'super') {
+            if (!data.isPremiumUser) return alert("ต้องซื้อ PREMIUM ก่อนถึงจะซื้อ SUPER+ ได้");
+            if (gems < PRICE_SUPER) return alert("เพชรไม่พอ!");
+            if (confirm(`คุณต้องการซื้อ SUPER+ PASS ในราคา ${PRICE_SUPER} 💎 ใช่หรือไม่?`)) {
+                await updateDoc(userRef, { diamonds: gems - PRICE_SUPER, isSuperUser: true });
+                alert("ซื้อสำเร็จ!");
+            }
+        }
+    }
+
+    window.showPassInfo = function(type) {
+        const modal = document.getElementById('info-modal');
+        const header = document.getElementById('modal-header');
+        const text = document.getElementById('modal-text');
+        let totalGold = 0, totalDia = 0, totalCards = { SR: 0, SSR: 0, Ultimate: 0 };
+        passData.forEach(item => {
+            const r = item[type];
+            if (r.name === 'Gold') totalGold += r.amount;
+            if (r.name === 'Diamonds' || r.name === 'Gems') totalDia += r.amount;
+            if (r.name === 'Hollyberry Cookie' && type === 'free') totalCards.SR += 1;
+            if (r.name === 'Hollyberry Cookie' && type === 'premium') totalCards.SSR += 1;
+            if (r.name === 'Apple Faerie Cookie') totalCards.Ultimate += 1;
+        });
+        const info = { super: { title: "SUPER+ PASS", color: "#ff00ff" }, premium: { title: "PREMIUM PASS", color: "#ffc831" }, free: { title: "FREE PASS", color: "#888" } };
+        header.innerText = info[type].title;
+        header.style.color = info[type].color;
+        text.innerHTML = `<div class="summary-box" style="border-color:${info[type].color}"><b>🎁 รางวัลรวมเมื่อถึง LV.50:</b><br>🪙 ทอง: ${totalGold.toLocaleString()}<br>💎 เพชรรวม: ${totalDia.toLocaleString()}<br>🎴 SR: ${totalCards.SR} | SSR: ${totalCards.SSR} | 🌟: ${totalCards.Ultimate}<hr style="border:0; border-top:1px solid #333; margin:10px 0;"><small>* เมื่อถึงเลเวล 50 ทุก 1,000 XP จะแลกได้ 1 ดาว ⭐</small></div>`;
+        modal.style.display = 'flex';
+    };
+
+    document.getElementById("claim-btn").addEventListener("click", async () => {
+        const user = auth.currentUser;
+        if (!user) return alert("กรุณาเข้าสู่ระบบก่อนรับรางวัล");
+        const userRef = doc(db, "users", user.uid);
+        const snap = await getDoc(userRef);
+        if (!snap.exists()) return;
+
+        const data = snap.data();
+        const prog = calculateLevelProgress(data.passExp || 0);
+        const claimed = data.claimedRewards || [];
+        const currentCollection = data.collection || []; 
+        
+        let addPoints = 0, addDiamonds = 0, addStars = 0;
+        let newCardsForCollection = []; 
+        let newlyClaimedIds = [];
+        let expToDeduct = 0;
+
+        passData.forEach(item => {
+            if (prog.lv < item.lv) return;
+            const tracks = [
+                { type: 'free', active: true },
+                { type: 'premium', active: data.isPremiumUser },
+                { type: 'super', active: data.isSuperUser }
+            ];
+            
+            tracks.forEach(track => {
+                const reward = item[track.type];
+                if (track.active && !claimed.includes(reward.id)) {
+                    if (reward.name === 'Gold') addPoints += reward.amount;
+                    else if (reward.name === 'Diamonds' || reward.name === 'Gems') addDiamonds += reward.amount;
+                    else if (reward.name === 'Stars') addStars += reward.amount;
+                    else {
+                        let rarity = 'C';
+                        if (track.type === 'free' && reward.img === imgAssets.cardSR) rarity = 'SR';
+                        if (track.type === 'premium') rarity = 'SSR';
+                        if (track.type === 'super') rarity = 'P';
+
+                        newCardsForCollection.push({
+                            id: reward.id, name: reward.name, img: reward.img,
+                            rarity: rarity, level: 1, obtainedFrom: `PASS LV.${item.lv}`, date: Date.now()
+                        });
+                    }
+                    newlyClaimedIds.push(reward.id);
+                }
+            });
+        });
+
+        if (prog.lv >= 50 && prog.extraStars > 0) {
+            addStars += prog.extraStars;
+            expToDeduct = prog.extraStars * XP_PER_EXTRA_STAR;
+        }
+
+        if (newlyClaimedIds.length > 0 || addStars > 0) {
+            try {
+                const btn = document.getElementById("claim-btn");
+                btn.disabled = true; 
+                btn.innerText = "กำลังรับรางวัล...";
+
+                await updateDoc(userRef, {
+                    points: (data.points || 0) + addPoints,
+                    diamonds: (data.diamonds || 0) + addDiamonds,
+                    stars: (data.stars || 0) + addStars,
+                    passExp: (data.passExp || 0) - expToDeduct,
+                    claimedRewards: [...claimed, ...newlyClaimedIds],
+                    collection: [...currentCollection, ...newCardsForCollection]
+                });
+
+                alert(`รับรางวัลสำเร็จ!${addStars > 0 ? `\nได้รับเพิ่ม ⭐ ${addStars} ดาว` : ''}`);
+            } catch (e) { 
+                alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล"); 
+            } finally { 
+                btn.innerText = "รับรางวัลที่มีสิทธิ์"; 
+            }
+        }
+    });
+</script>
+</body>
+</html>
