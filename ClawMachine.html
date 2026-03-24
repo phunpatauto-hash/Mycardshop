@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUCKY CLAW - ตู้คีบลุ้นโชค</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --machine-color: #ff4757;
+            --glass-color: rgba(255, 255, 255, 0.15);
+        }
+        body {
+            font-family: 'Kanit', sans-serif;
+            margin: 0;
+            background: #1a1a2e;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- UI Header --- */
+        .header {
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.5);
+        }
+        .wallet { display: flex; gap: 15px; }
+        .wallet-item { background: #000; padding: 5px 15px; border-radius: 20px; border: 1px solid #ffc831; font-weight: bold; }
+
+        /* --- Machine Structure --- */
+        .machine-container {
+            position: relative;
+            width: 320px;
+            height: 450px;
+            background: var(--machine-color);
+            border: 8px solid #2f3542;
+            border-radius: 20px 20px 0 0;
+            margin-top: 50px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+
+        /* Glass Area */
+        .glass-area {
+            position: absolute;
+            top: 20px;
+            left: 15px;
+            right: 15px;
+            height: 280px;
+            background: linear-gradient(to bottom, #2f3542, #1e2124);
+            border: 4px solid #1e2124;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        /* The Claw (ขาคีบ) */
+        .claw-rail {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: #57606f;
+        }
+        .claw-mechanism {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 40px;
+            transition: left 0.5s ease;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+        .claw-string {
+            width: 4px;
+            height: 20px;
+            background: #ced4da;
+            margin: 0 auto;
+            transition: height 1s ease;
+        }
+        .claw-hand {
+            width: 40px;
+            height: 30px;
+            background: #f1f2f6;
+            border-radius: 5px;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+        }
+        .claw-finger {
+            width: 8px;
+            height: 20px;
+            background: #a4b0be;
+            border-radius: 5px;
+            transition: transform 0.3s;
+        }
+        .claw-hand.closed .left-f { transform: rotate(30deg); }
+        .claw-hand.closed .right-f { transform: rotate(-30deg); }
+
+        /* Items in Machine */
+        .items-pile {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 60px;
+            display: flex;
+            justify-content: space-around;
+            padding: 0 10px;
+        }
+        .capsule {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff9f43, #ff6b6b);
+            border: 2px solid rgba(255,255,255,0.3);
+            cursor: pointer;
+        }
+
+        /* Control Panel */
+        .controls {
+            width: 320px;
+            background: #2f3542;
+            padding: 20px;
+            border-radius: 0 0 20px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .btn-push {
+            background: #ff4757;
+            border: none;
+            padding: 15px;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 5px 0 #c0392b;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .btn-push:active { transform: translateY(3px); box-shadow: 0 2px 0 #c0392b; }
+        .btn-push:disabled { background: #57606f; box-shadow: none; cursor: not-allowed; }
+
+        /* Result Popup */
+        .result-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .result-card {
+            width: 200px;
+            border-radius: 15px;
+            border: 4px solid #ffc831;
+            box-shadow: 0 0 30px #ffc831;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <a href="Collection.html" style="color: white; text-decoration: none;">⬅️ กลับคอลเลกชัน</a>
+        <div class="wallet">
+            <div class="wallet-item">💎 <span id="user-diamonds">0</span></div>
+        </div>
+    </div>
+
+    <h2 style="color: #ffc831; text-shadow: 0 0 10px #ffc831;">🕹️ Gacha Claw Machine</h2>
+    <p style="font-size: 0.8rem; margin: -10px 0 20px;">ใช้ 100 💎 ต่อการคีบ 1 ครั้ง</p>
+
+    <div class="machine-container">
+        <div class="glass-area">
+            <div class="claw-rail"></div>
+            <div id="claw" class="claw-mechanism">
+                <div id="claw-string" class="claw-string"></div>
+                <div id="claw-hand" class="claw-hand">
+                    <div class="claw-finger left-f"></div>
+                    <div class="claw-finger right-f"></div>
+                </div>
+            </div>
+
+            <div class="items-pile">
+                <div class="capsule" style="background: #1e90ff;"></div>
+                <div class="capsule" style="background: #ff4757; transform: translateY(-5px);"></div>
+                <div class="capsule" style="background: #2ed573;"></div>
+                <div class="capsule" style="background: #ffa502; transform: translateY(-8px);"></div>
+                <div class="capsule" style="background: #eccc68;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button id="startBtn" class="btn-push" onclick="startClaw()">คีบเลย!</button>
+        <div style="text-align: center; font-size: 0.7rem; color: #ced4da;">ลุ้นรับการ์ดหายากระดับ EXR - SUR!</div>
+    </div>
+
+    <div id="resultOverlay" class="result-overlay">
+        <h1 style="color: #ffc831;">ยินดีด้วย!</h1>
+        <img id="resultImg" src="" class="result-card">
+        <h3 id="resultName">Card Name</h3>
+        <p id="resultRarity" style="font-weight: bold;">RARITY</p>
+        <button onclick="closeResult()" style="padding: 10px 30px; border-radius: 20px; border: none; background: #2ed573; color: white; cursor: pointer;">เก็บเข้าคลัง</button>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, onSnapshot, updateDoc, arrayUnion, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
+        authDomain: "sign-up-73f99.firebaseapp.com",
+        projectId: "sign-up-73f99",
+        storageBucket: "sign-up-73f99.appspot.com",
+        messagingSenderId: "916335559099",
+        appId: "1:916335559099:web:3a8ed896ba26e38991849e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    let currentUID = null;
+    let userDiamonds = 0;
+    const CLAW_COST = 100;
+
+    // --- ข้อมูลการ์ดในตู้นี้ (ตัวอย่าง) ---
+    const clawPool = [
+        { name: "Mega Charizard", rarity: "EXR", img: "https://images.pokemontcg.io/xy12/13_hires.png" },
+        { name: "Golden Pikachu", rarity: "SUR", img: "https://images.pokemontcg.io/base1/58_hires.png" },
+        { name: "Ancient Dragon", rarity: "SEC", img: "https://images.pokemontcg.io/sm12/236_hires.png" }
+    ];
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUID = user.uid;
+            onSnapshot(doc(db, "users", user.uid), (snap) => {
+                if (snap.exists()) {
+                    userDiamonds = snap.data().diamonds || 0;
+                    document.getElementById("user-diamonds").innerText = userDiamonds.toLocaleString();
+                }
+            });
+        } else { window.location.href = 'login.html'; }
+    });
+
+    window.startClaw = async () => {
+        if (userDiamonds < CLAW_COST) return alert("เพชรไม่พอ!");
+
+        const btn = document.getElementById("startBtn");
+        const claw = document.getElementById("claw");
+        const clawString = document.getElementById("claw-string");
+        const clawHand = document.getElementById("claw-hand");
+
+        btn.disabled = true;
+
+        // 1. เลื่อนไปสุ่มตำแหน่ง (ซ้าย/ขวา)
+        const randomPos = Math.floor(Math.random() * 80) + 10;
+        claw.style.left = randomPos + "%";
+
+        setTimeout(() => {
+            // 2. ปล่อยสายคีบลงมา
+            clawString.style.height = "200px";
+
+            setTimeout(async () => {
+                // 3. หนีบขาคีบ
+                clawHand.classList.add("closed");
+                
+                // สุ่มการ์ดรอไว้เลย
+                const winCard = clawPool[Math.floor(Math.random() * clawPool.length)];
+
+                setTimeout(() => {
+                    // 4. ดึงกลับขึ้นไป
+                    clawString.style.height = "20px";
+                    
+                    setTimeout(() => {
+                        // 5. เลื่อนกลับมาตรงกลาง (ช่องปล่อย)
+                        claw.style.left = "50%";
+                        
+                        setTimeout(() => {
+                            // 6. ปล่อยของ
+                            clawHand.classList.remove("closed");
+                            showResult(winCard);
+                        }, 600);
+                    }, 1000);
+                }, 500);
+            }, 1000);
+        }, 600);
+    };
+
+    async function showResult(card) {
+        // หักเงินและเพิ่มการ์ดลง Firebase
+        await updateDoc(doc(db, "users", currentUID), {
+            diamonds: increment(-CLAW_COST),
+            collection: arrayUnion({
+                ...card,
+                level: 1,
+                stars: 0,
+                obtainedDate: new Date().toISOString()
+            })
+        });
+
+        document.getElementById("resultImg").src = card.img;
+        document.getElementById("resultName").innerText = card.name;
+        document.getElementById("resultRarity").innerText = "Grade: " + card.rarity;
+        document.getElementById("resultOverlay").style.display = "flex";
+    }
+
+    window.closeResult = () => {
+        document.getElementById("resultOverlay").style.display = "none";
+        document.getElementById("startBtn").disabled = false;
+    };
+</script>
+</body>
+</html>
