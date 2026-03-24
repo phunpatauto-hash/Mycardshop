@@ -3,326 +3,356 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LUCKY CLAW - ตู้คีบลุ้นโชค</title>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <title>PREMIUM CLAW MACHINE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Kanit:wght@300;400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --machine-color: #ff4757;
-            --glass-color: rgba(255, 255, 255, 0.15);
+            --primary: #00d2ff;
+            --secondary: #3a7bd5;
+            --neon: #00f2ff;
+            --machine-body: #1e272e;
         }
+
         body {
             font-family: 'Kanit', sans-serif;
             margin: 0;
-            background: #1a1a2e;
+            background: #0f0f1a;
             color: white;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            overflow-x: hidden;
         }
 
-        /* --- UI Header --- */
-        .header {
+        /* --- Header & Stats --- */
+        .top-bar {
             width: 100%;
-            padding: 20px;
+            padding: 15px 25px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            box-sizing: border-box;
         }
-        .wallet { display: flex; gap: 15px; }
-        .wallet-item { background: #000; padding: 5px 15px; border-radius: 20px; border: 1px solid #ffc831; font-weight: bold; }
 
-        /* --- Machine Structure --- */
-        .machine-container {
+        .diamond-display {
+            background: rgba(0, 210, 255, 0.1);
+            padding: 5px 15px;
+            border-radius: 50px;
+            border: 1px solid var(--primary);
+            box-shadow: 0 0 10px rgba(0, 210, 255, 0.3);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* --- The Machine --- */
+        .arcade-cabinet {
             position: relative;
-            width: 320px;
-            height: 450px;
-            background: var(--machine-color);
-            border: 8px solid #2f3542;
-            border-radius: 20px 20px 0 0;
-            margin-top: 50px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            width: 340px;
+            margin-top: 30px;
+        }
+
+        /* ส่วนหัวตู้ */
+        .machine-marquee {
+            height: 50px;
+            background: var(--machine-body);
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 4px solid #3d4e5d;
+            border-bottom: none;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 2px;
+            color: var(--neon);
+            text-shadow: 0 0 10px var(--neon);
+        }
+
+        /* ตัวตู้กระจก */
+        .main-frame {
+            position: relative;
+            height: 380px;
+            background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+            border: 6px solid #3d4e5d;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
             overflow: hidden;
         }
 
-        /* Glass Area */
-        .glass-area {
+        /* แสงนีออนข้างตู้ */
+        .main-frame::before, .main-frame::after {
+            content: '';
             position: absolute;
-            top: 20px;
-            left: 15px;
-            right: 15px;
-            height: 280px;
-            background: linear-gradient(to bottom, #2f3542, #1e2124);
-            border: 4px solid #1e2124;
-            border-radius: 10px;
-            overflow: hidden;
+            top: 0; bottom: 0; width: 2px;
+            background: var(--neon);
+            box-shadow: 0 0 15px var(--neon);
+            z-index: 5;
         }
+        .main-frame::after { right: 0; }
 
-        /* The Claw (ขาคีบ) */
-        .claw-rail {
+        /* --- ขาคีบ (The Claw) --- */
+        .claw-system {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: #57606f;
-        }
-        .claw-mechanism {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            width: 40px;
-            transition: left 0.5s ease;
+            top: 0; left: 50%;
+            width: 50px;
             transform: translateX(-50%);
+            transition: left 0.8s cubic-bezier(0.45, 0.05, 0.55, 0.95);
             z-index: 10;
         }
-        .claw-string {
-            width: 4px;
-            height: 20px;
-            background: #ced4da;
-            margin: 0 auto;
-            transition: height 1s ease;
-        }
-        .claw-hand {
-            width: 40px;
+
+        .rope {
+            width: 2px;
             height: 30px;
-            background: #f1f2f6;
-            border-radius: 5px;
-            position: relative;
-            display: flex;
-            justify-content: space-between;
+            background: #94a3b8;
+            margin: 0 auto;
+            transition: height 1s ease-in-out;
+            box-shadow: 0 0 5px rgba(255,255,255,0.3);
         }
-        .claw-finger {
-            width: 8px;
+
+        .claw-base {
+            width: 44px;
             height: 20px;
-            background: #a4b0be;
-            border-radius: 5px;
+            background: #cbd5e1;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .arm {
+            position: absolute;
+            top: 10px;
+            width: 6px;
+            height: 25px;
+            background: #94a3b8;
+            border-radius: 10px;
             transition: transform 0.3s;
         }
-        .claw-hand.closed .left-f { transform: rotate(30deg); }
-        .claw-hand.closed .right-f { transform: rotate(-30deg); }
+        .arm.left { left: 5px; transform-origin: top right; }
+        .arm.right { right: 5px; transform-origin: top left; }
 
-        /* Items in Machine */
-        .items-pile {
+        /* ท่าทางหนีบ */
+        .claw-system.closing .left { transform: rotate(35deg); }
+        .claw-system.closing .right { transform: rotate(-35deg); }
+
+        /* --- Items --- */
+        .prize-floor {
             position: absolute;
-            bottom: 0;
+            bottom: -5px;
             width: 100%;
             height: 60px;
             display: flex;
-            justify-content: space-around;
-            padding: 0 10px;
-        }
-        .capsule {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #ff9f43, #ff6b6b);
-            border: 2px solid rgba(255,255,255,0.3);
-            cursor: pointer;
+            justify-content: center;
+            gap: 10px;
+            filter: drop-shadow(0 -5px 10px rgba(0,0,0,0.5));
         }
 
-        /* Control Panel */
-        .controls {
-            width: 320px;
-            background: #2f3542;
-            padding: 20px;
+        .capsule {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #ff4757, #b33939);
+            border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: 2px 5px 10px rgba(0,0,0,0.4);
+        }
+
+        /* --- แผงควบคุม (Control Panel) --- */
+        .panel {
+            background: #2d3436;
+            padding: 25px;
             border-radius: 0 0 20px 20px;
+            border: 4px solid #3d4e5d;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             display: flex;
             flex-direction: column;
+            align-items: center;
             gap: 15px;
         }
-        .btn-push {
-            background: #ff4757;
-            border: none;
-            padding: 15px;
+
+        .btn-claw {
+            width: 90px;
+            height: 90px;
             border-radius: 50%;
-            width: 80px;
-            height: 80px;
-            margin: 0 auto;
+            background: radial-gradient(circle, #ff4757 0%, #c0392b 100%);
+            border: none;
+            border-bottom: 6px solid #8d1d12;
             color: white;
+            font-family: 'Orbitron', sans-serif;
             font-weight: bold;
-            box-shadow: 0 5px 0 #c0392b;
+            font-size: 1.1rem;
             cursor: pointer;
             transition: 0.1s;
+            box-shadow: 0 0 20px rgba(255, 71, 87, 0.4);
         }
-        .btn-push:active { transform: translateY(3px); box-shadow: 0 2px 0 #c0392b; }
-        .btn-push:disabled { background: #57606f; box-shadow: none; cursor: not-allowed; }
 
-        /* Result Popup */
-        .result-overlay {
+        .btn-claw:active {
+            transform: translateY(4px);
+            border-bottom-width: 2px;
+            box-shadow: 0 0 10px rgba(255, 71, 87, 0.6);
+        }
+
+        .btn-claw:disabled {
+            background: #636e72;
+            border-bottom-color: #2d3436;
+            box-shadow: none;
+            opacity: 0.6;
+        }
+
+        /* --- Winner Popup --- */
+        .modal {
             display: none;
             position: fixed;
             inset: 0;
             background: rgba(0,0,0,0.9);
-            z-index: 1000;
-            flex-direction: column;
+            z-index: 100;
             justify-content: center;
             align-items: center;
-            text-align: center;
+            backdrop-filter: blur(8px);
         }
-        .result-card {
-            width: 200px;
-            border-radius: 15px;
-            border: 4px solid #ffc831;
-            box-shadow: 0 0 30px #ffc831;
-            margin-bottom: 20px;
+
+        .card-container {
+            position: relative;
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 20px;
+            border: 2px solid var(--neon);
+            text-align: center;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <a href="Collection.html" style="color: white; text-decoration: none;">⬅️ กลับคอลเลกชัน</a>
-        <div class="wallet">
-            <div class="wallet-item">💎 <span id="user-diamonds">0</span></div>
-        </div>
+    <div class="top-bar">
+        <a href="index.html" style="color: #94a3b8; text-decoration: none;">⇠ BACK</a>
+        <div class="diamond-display">💎 <span id="user-diamonds">0</span></div>
     </div>
 
-    <h2 style="color: #ffc831; text-shadow: 0 0 10px #ffc831;">🕹️ Gacha Claw Machine</h2>
-    <p style="font-size: 0.8rem; margin: -10px 0 20px;">ใช้ 100 💎 ต่อการคีบ 1 ครั้ง</p>
-
-    <div class="machine-container">
-        <div class="glass-area">
-            <div class="claw-rail"></div>
-            <div id="claw" class="claw-mechanism">
-                <div id="claw-string" class="claw-string"></div>
-                <div id="claw-hand" class="claw-hand">
-                    <div class="claw-finger left-f"></div>
-                    <div class="claw-finger right-f"></div>
+    <div class="arcade-cabinet">
+        <div class="machine-marquee">LUCKY CLAW</div>
+        
+        <div class="main-frame">
+            <div id="clawSystem" class="claw-system">
+                <div id="rope" class="rope"></div>
+                <div class="claw-base">
+                    <div class="arm left"></div>
+                    <div class="arm right"></div>
                 </div>
             </div>
 
-            <div class="items-pile">
-                <div class="capsule" style="background: #1e90ff;"></div>
-                <div class="capsule" style="background: #ff4757; transform: translateY(-5px);"></div>
-                <div class="capsule" style="background: #2ed573;"></div>
-                <div class="capsule" style="background: #ffa502; transform: translateY(-8px);"></div>
-                <div class="capsule" style="background: #eccc68;"></div>
+            <div class="prize-floor">
+                <div class="capsule" style="background: radial-gradient(circle at 30% 30%, #00d2ff, #3a7bd5);"></div>
+                <div class="capsule" style="transform: translateY(-8px); filter: hue-rotate(45deg);"></div>
+                <div class="capsule" style="transform: translateY(-4px); filter: hue-rotate(150deg);"></div>
+                <div class="capsule" style="filter: hue-rotate(280deg);"></div>
+                <div class="capsule" style="transform: translateY(-6px);"></div>
             </div>
+        </div>
+
+        <div class="panel">
+            <button id="grabBtn" class="btn-claw" onclick="startPlay()">GRAB!</button>
+            <span style="font-size: 0.7rem; color: #94a3b8; text-transform: uppercase;">Cost: 100 Diamonds</span>
         </div>
     </div>
 
-    <div class="controls">
-        <button id="startBtn" class="btn-push" onclick="startClaw()">คีบเลย!</button>
-        <div style="text-align: center; font-size: 0.7rem; color: #ced4da;">ลุ้นรับการ์ดหายากระดับ EXR - SUR!</div>
-    </div>
-
-    <div id="resultOverlay" class="result-overlay">
-        <h1 style="color: #ffc831;">ยินดีด้วย!</h1>
-        <img id="resultImg" src="" class="result-card">
-        <h3 id="resultName">Card Name</h3>
-        <p id="resultRarity" style="font-weight: bold;">RARITY</p>
-        <button onclick="closeResult()" style="padding: 10px 30px; border-radius: 20px; border: none; background: #2ed573; color: white; cursor: pointer;">เก็บเข้าคลัง</button>
+    <div id="winModal" class="modal">
+        <div class="card-container">
+            <h2 style="margin: 0; color: var(--neon);">CONGRATULATIONS!</h2>
+            <p id="cardRarity" style="font-weight: bold; margin: 10px 0;"></p>
+            <img id="cardImg" src="" style="width: 200px; border-radius: 10px; margin: 15px 0; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
+            <h3 id="cardName" style="margin: 0;"></h3>
+            <button onclick="closeWin()" style="margin-top: 20px; background: var(--primary); border: none; padding: 10px 30px; border-radius: 50px; color: white; font-weight: bold; cursor: pointer;">COLLECT</button>
+        </div>
     </div>
 
 <script type="module">
+    // --- ตั้งค่า Firebase เหมือนเดิม ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, onSnapshot, updateDoc, arrayUnion, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
-        authDomain: "sign-up-73f99.firebaseapp.com",
-        projectId: "sign-up-73f99",
-        storageBucket: "sign-up-73f99.appspot.com",
-        messagingSenderId: "916335559099",
-        appId: "1:916335559099:web:3a8ed896ba26e38991849e"
-    };
-
+    const firebaseConfig = { /* ใส่ Config ของคุณตรงนี้ */ };
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
 
     let currentUID = null;
-    let userDiamonds = 0;
-    const CLAW_COST = 100;
-
-    // --- ข้อมูลการ์ดในตู้นี้ (ตัวอย่าง) ---
-    const clawPool = [
-        { name: "Mega Charizard", rarity: "EXR", img: "https://images.pokemontcg.io/xy12/13_hires.png" },
-        { name: "Golden Pikachu", rarity: "SUR", img: "https://images.pokemontcg.io/base1/58_hires.png" },
-        { name: "Ancient Dragon", rarity: "SEC", img: "https://images.pokemontcg.io/sm12/236_hires.png" }
-    ];
+    let diamonds = 0;
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
             currentUID = user.uid;
             onSnapshot(doc(db, "users", user.uid), (snap) => {
-                if (snap.exists()) {
-                    userDiamonds = snap.data().diamonds || 0;
-                    document.getElementById("user-diamonds").innerText = userDiamonds.toLocaleString();
-                }
+                diamonds = snap.data()?.diamonds || 0;
+                document.getElementById('user-diamonds').innerText = diamonds.toLocaleString();
             });
-        } else { window.location.href = 'login.html'; }
+        }
     });
 
-    window.startClaw = async () => {
-        if (userDiamonds < CLAW_COST) return alert("เพชรไม่พอ!");
+    window.startPlay = async () => {
+        if (diamonds < 100) return alert("เพชรไม่พอ!");
 
-        const btn = document.getElementById("startBtn");
-        const claw = document.getElementById("claw");
-        const clawString = document.getElementById("claw-string");
-        const clawHand = document.getElementById("claw-hand");
-
+        const btn = document.getElementById('grabBtn');
+        const claw = document.getElementById('clawSystem');
+        const rope = document.getElementById('rope');
+        
         btn.disabled = true;
 
-        // 1. เลื่อนไปสุ่มตำแหน่ง (ซ้าย/ขวา)
-        const randomPos = Math.floor(Math.random() * 80) + 10;
-        claw.style.left = randomPos + "%";
+        // 1. สุ่มเลื่อนซ้ายขวา
+        const targetX = Math.floor(Math.random() * 70) + 15;
+        claw.style.left = targetX + "%";
 
         setTimeout(() => {
-            // 2. ปล่อยสายคีบลงมา
-            clawString.style.height = "200px";
+            // 2. ปล่อยเชือกลง
+            rope.style.height = "260px";
 
-            setTimeout(async () => {
+            setTimeout(() => {
                 // 3. หนีบขาคีบ
-                clawHand.classList.add("closed");
-                
-                // สุ่มการ์ดรอไว้เลย
-                const winCard = clawPool[Math.floor(Math.random() * clawPool.length)];
+                claw.classList.add('closing');
 
                 setTimeout(() => {
-                    // 4. ดึงกลับขึ้นไป
-                    clawString.style.height = "20px";
-                    
+                    // 4. ดึงขึ้น
+                    rope.style.height = "30px";
+
                     setTimeout(() => {
-                        // 5. เลื่อนกลับมาตรงกลาง (ช่องปล่อย)
+                        // 5. กลับไปจุดปล่อย
                         claw.style.left = "50%";
                         
                         setTimeout(() => {
-                            // 6. ปล่อยของ
-                            clawHand.classList.remove("closed");
-                            showResult(winCard);
-                        }, 600);
+                            // 6. คลายขาคีบและโชว์ผล
+                            claw.classList.remove('closing');
+                            getResult();
+                        }, 800);
                     }, 1000);
-                }, 500);
+                }, 600);
             }, 1000);
-        }, 600);
+        }, 800);
     };
 
-    async function showResult(card) {
-        // หักเงินและเพิ่มการ์ดลง Firebase
+    async function getResult() {
+        const pool = [
+            { name: "Mewtwo GX", rarity: "SUR", img: "https://images.pokemontcg.io/sm36/78_hires.png" },
+            { name: "Lucario EX", rarity: "EXR", img: "https://images.pokemontcg.io/xy3/54_hires.png" }
+        ];
+        const card = pool[Math.floor(Math.random() * pool.length)];
+
+        // Update Firebase
         await updateDoc(doc(db, "users", currentUID), {
-            diamonds: increment(-CLAW_COST),
-            collection: arrayUnion({
-                ...card,
-                level: 1,
-                stars: 0,
-                obtainedDate: new Date().toISOString()
-            })
+            diamonds: increment(-100),
+            collection: arrayUnion({ ...card, date: new Date().toISOString() })
         });
 
-        document.getElementById("resultImg").src = card.img;
-        document.getElementById("resultName").innerText = card.name;
-        document.getElementById("resultRarity").innerText = "Grade: " + card.rarity;
-        document.getElementById("resultOverlay").style.display = "flex";
+        document.getElementById('cardImg').src = card.img;
+        document.getElementById('cardName').innerText = card.name;
+        document.getElementById('cardRarity').innerText = card.rarity;
+        document.getElementById('winModal').style.display = "flex";
     }
 
-    window.closeResult = () => {
-        document.getElementById("resultOverlay").style.display = "none";
-        document.getElementById("startBtn").disabled = false;
+    window.closeWin = () => {
+        document.getElementById('winModal').style.display = "none";
+        document.getElementById('grabBtn').disabled = false;
     };
 </script>
 </body>
