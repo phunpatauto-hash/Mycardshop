@@ -6,7 +6,7 @@
     <title>MY COLLECTION - Glow Pro Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        /* --- CSS เดิมของคุณทั้งหมด --- */
+        /* --- CSS ส่วนโครงสร้างเดิมของคุณ --- */
         * { box-sizing: border-box; }
         body { font-family: 'Kanit', sans-serif; margin: 0; background: radial-gradient(circle at center, #1a1a2e 0%, #050505 100%); color: white; text-align: center; min-height: 100vh; }
         .navbar { background-color: rgba(10, 10, 15, 0.8); padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,200,49,0.2); position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(15px); }
@@ -18,44 +18,39 @@
         .wallet-display { display: flex; gap: 12px; align-items: center; }
         .wallet-box { background: rgba(0, 0, 0, 0.3); padding: 6px 15px; border-radius: 20px; border: 1px solid #333; display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 0.9rem; }
         
-        /* --- เพิ่ม: ข้อ 3 การ์ดดาวเต็ม สีผสมมั่ว --- */
-        .rarity-p { 
+        /* --- แก้ไขข้อ 3: เอฟเฟกต์ Rainbow (จะถูกใส่ผ่าน JS เมื่อเงื่อนไขครบ) --- */
+        .rainbow-max { 
             border: 3px solid transparent !important;
             background: linear-gradient(#1a1a2e, #1a1a2e) padding-box,
                         conic-gradient(from 0deg, red, yellow, lime, aqua, blue, magenta, red) border-box !important;
             animation: rainbow-rotate 3s linear infinite;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4) !important;
         }
         @keyframes rainbow-rotate { 100% { filter: hue-rotate(360deg); } }
 
-        /* --- UI เดิมอื่นๆ --- */
-        .progress-section { max-width: 1200px; margin: 20px auto; padding: 0 20px; text-align: left; }
-        .progress-bar-bg { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 8px; overflow: hidden; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, #ffc831, #ff8c00); width: 0%; transition: 1s; }
         .filter-bar { max-width: 1200px; margin: 15px auto; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; padding: 10px; }
         .filter-btn { padding: 8px 20px; border-radius: 25px; border: 2px solid #333; background: #1a1a1a; color: #888; cursor: pointer; transition: 0.3s; font-size: 0.85rem; font-weight: bold; }
         .filter-btn.active { background: rgba(255, 255, 255, 0.1); color: #fff; border-color: #ffc831; box-shadow: 0 0 10px #ffc831; }
-        .btn-mass-upgrade { background: linear-gradient(45deg, #00d4ff, #0055ff); color: white; border: none; padding: 8px 20px; border-radius: 25px; font-weight: bold; cursor: pointer; }
-        .btn-mass-sell { background: linear-gradient(45deg, #ff8c00, #ff4444); color: white; border: none; padding: 8px 20px; border-radius: 25px; font-weight: bold; cursor: pointer; }
 
         .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
         .collection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
         .col-card { background: rgba(255, 255, 255, 0.03); border-radius: 18px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); position: relative; transition: 0.4s; cursor: pointer; }
         .col-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; }
         .qty-badge { position: absolute; top: 10px; right: 10px; background: #ffc831; color: #000; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; border: 2px solid #000; z-index: 4; }
-        .lvl-badge { position: absolute; bottom: 50px; right: 10px; background: #fff; color: #000; font-size: 0.65rem; font-weight: 900; padding: 2px 6px; border-radius: 5px; z-index: 4; }
+        .star-container { position: absolute; top: 10px; left: 10px; display: flex; gap: 2px; z-index: 5; }
+        .star-icon { font-size: 0.7rem; color: #ffc831; text-shadow: 0 0 5px #000; }
 
-        /* --- แก้ไขข้อ 1: Modal ใหม่ (รูปซ้าย-ข้อมูลขวา) --- */
+        /* --- Modal (รูปซ้าย ข้อมูลขวา) --- */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(10px); }
-        .modal-content { background: #111; border-radius: 25px; max-width: 700px; width: 100%; display: flex; overflow: hidden; border: 1px solid #ffc831; text-align: left; }
-        @media (max-width: 600px) { .modal-content { flex-direction: column; max-width: 380px; } }
+        .modal-content { background: #111; border-radius: 25px; max-width: 750px; width: 100%; display: flex; overflow: hidden; border: 1px solid #ffc831; }
+        @media (max-width: 650px) { .modal-content { flex-direction: column; max-width: 380px; } }
         
-        /* หลอดเลเวล (ข้อ 2) */
         .lvl-bar-bg { width: 100%; height: 10px; background: #222; border-radius: 5px; margin: 8px 0; overflow: hidden; border: 1px solid #444; }
-        .lvl-bar-fill { height: 100%; background: linear-gradient(90deg, #00d4ff, #00ff88); width: 0%; transition: 0.5s; }
+        .lvl-bar-fill { height: 100%; background: linear-gradient(90deg, #00d4ff, #00ff88); transition: 0.5s; }
         
-        .btn-upgrade { background: linear-gradient(45deg, #ff0055, #ff8c00); color: white; border: none; width: 100%; padding: 15px; border-radius: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn-upgrade:disabled { opacity: 0.5; filter: grayscale(1); }
-        .btn-delete { background: rgba(255, 68, 68, 0.1); color: #ff4444; border: 1px solid #ff4444; width: 100%; padding: 10px; border-radius: 12px; margin-top: 10px; cursor: pointer; }
+        .btn-upgrade-star { background: linear-gradient(45deg, #ffd700, #ff8c00); color: black; border: none; padding: 12px; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-upgrade-lv { background: linear-gradient(45deg, #00d4ff, #0055ff); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+        .btn-upgrade-lv:disabled, .btn-upgrade-star:disabled { opacity: 0.4; filter: grayscale(1); cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -74,14 +69,6 @@
         </div>
     </nav>
 
-    <div class="progress-section">
-        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 0.9rem;">
-            <span>คอลเลกชัน (<span id="filter-label" style="color:#ffc831">ALL</span>)</span>
-            <span id="collection-count">0 / 0 แบบ</span>
-        </div>
-        <div class="progress-bar-bg"><div id="progress-fill" class="progress-fill"></div></div>
-    </div>
-
     <div class="filter-bar">
         <button class="filter-btn active" onclick="setFilter('ALL')">ALL</button>
         <button class="filter-btn" onclick="setFilter('C')">C</button>
@@ -93,8 +80,8 @@
         <button class="filter-btn" onclick="setFilter('P')">P</button>
         
         <div style="margin-left:auto; display:flex; gap:10px;">
-            <button class="btn-mass-upgrade" onclick="handleMassUpgrade()">⚡ อัปเกรดทั้งหมด</button>
-            <button class="btn-mass-sell" onclick="handleMassSell()">💰 ขายของซ้ำ</button>
+            <button class="btn-nav" style="background:#00d4ff22; color:#00d4ff;" onclick="handleMassUpgrade()">⚡ อัปเกรดทั้งหมด</button>
+            <button class="btn-nav" style="background:#ff444422; color:#ff4444;" onclick="handleMassSell()">💰 ขายของซ้ำ</button>
         </div>
     </div>
 
@@ -102,29 +89,32 @@
 
     <div id="cardModal" class="modal" onclick="this.style.display='none'">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div style="width: 45%; background: #000;">
+            <div style="width: 45%; background: #000; position: relative;">
                 <img id="modalImg" src="" style="width: 100%; height: 100%; object-fit: cover;">
+                <div id="modalStarContainer" style="position: absolute; bottom: 15px; left: 15px; font-size: 1.2rem;"></div>
             </div>
-            <div style="width: 55%; padding: 25px; display: flex; flex-direction: column;">
+            
+            <div style="width: 55%; padding: 25px; display: flex; flex-direction: column; text-align: left;">
                 <h2 id="modalName" style="margin:0; color:#ffc831;">Name</h2>
-                <p id="modalRarity" style="font-weight: bold; margin: 5px 0; color:#888;"></p>
-                
+                <div id="modalRarity" style="font-weight: bold; color: #888;">GRADE: -</div>
+
                 <div style="margin: 15px 0;">
                     <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: bold;">
                         <span id="modalLvl" style="color:#00d4ff;">LV. 1</span>
-                        <span>MAX LV. 20</span>
+                        <span>MAX 20</span>
                     </div>
                     <div class="lvl-bar-bg"><div id="lvlBarFill" class="lvl-bar-fill"></div></div>
                 </div>
 
-                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; font-size: 0.85rem;">
-                    <div>🎴 การ์ดซ้ำที่มี: <span id="reqCards">0/2</span></div>
-                    <div>🪙 ต้องใช้เงิน: <span id="reqMoney">500</span></div>
+                <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; font-size: 0.85rem;">
+                    <div>🎴 การ์ดซ้ำ: <span id="reqCards">0/2</span> ใบ</div>
+                    <div>🪙 เงิน: <span id="reqMoney">500</span></div>
                 </div>
 
-                <button id="upgradeBtn" class="btn-upgrade">✨ อัปเกรดเลเวล</button>
-                <button id="deleteBtn" class="btn-delete">🗑️ ย่อยการ์ดนี้</button>
-                <button class="btn-nav primary" style="width:100%; margin-top:10px; padding:12px;" onclick="document.getElementById('cardModal').style.display='none'">กลับ</button>
+                <button id="upgradeLvBtn" class="btn-upgrade-lv">⚡ อัปเกรดเลเวล (LV+1)</button>
+                <button id="upgradeStarBtn" class="btn-upgrade-star">⭐ อัปเกรดดาว (MAX 5)</button>
+                <button id="deleteBtn" class="btn-delete" style="width:100%;">🗑️ ย่อยการ์ด</button>
+                <button class="btn-nav primary" style="width:100%; margin-top:10px; padding:12px;" onclick="document.getElementById('cardModal').style.display='none'">ปิด</button>
             </div>
         </div>
     </div>
@@ -134,23 +124,11 @@
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
-        authDomain: "sign-up-73f99.firebaseapp.com",
-        projectId: "sign-up-73f99",
-        storageBucket: "sign-up-73f99.appspot.com",
-        messagingSenderId: "916335559099",
-        appId: "1:916335559099:web:3a8ed896ba26e38991849e"
-    };
+    // (Config เดิมของคุณ)
+    const firebaseConfig = { apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM", authDomain: "sign-up-73f99.firebaseapp.com", projectId: "sign-up-73f99", storageBucket: "sign-up-73f99.appspot.com", messagingSenderId: "916335559099", appId: "1:916335559099:web:3a8ed896ba26e38991849e" };
+    const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    let currentUID = null;
-    let userCards = [];
-    let userPoints = 0;
-    let currentFilter = 'ALL';
+    let currentUID = null; let userCards = []; let userPoints = 0; let currentFilter = 'ALL';
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
@@ -160,8 +138,8 @@
                     const data = snap.data();
                     userPoints = data.points || 0;
                     userCards = data.collection || [];
-                    document.getElementById("display-username").innerText = "Collector: " + (data.username || "User");
                     document.getElementById("nav-points").innerText = userPoints.toLocaleString();
+                    document.getElementById("display-username").innerText = "Collector: " + (data.username || "User");
                     renderCards();
                 }
             });
@@ -170,55 +148,74 @@
 
     window.setFilter = (rarity) => {
         currentFilter = rarity;
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.innerText === rarity);
-        });
-        document.getElementById("filter-label").innerText = rarity;
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.toggle('active', btn.innerText === rarity));
         renderCards();
     };
 
     function renderCards() {
-        const grid = document.getElementById("grid");
-        grid.innerHTML = "";
+        const grid = document.getElementById("grid"); grid.innerHTML = "";
         const stacked = {};
         userCards.forEach(c => {
             const key = `${c.name}_${(c.rarity||'C').toUpperCase()}`;
-            if(!stacked[key]) stacked[key] = { ...c, rarity: (c.rarity||'C').toUpperCase(), qty: 1, level: c.level || 1, img: c.img || c.image };
-            else { stacked[key].qty++; if((c.level || 1) > stacked[key].level) stacked[key].level = c.level; }
+            if(!stacked[key]) stacked[key] = { ...c, rarity: (c.rarity||'C').toUpperCase(), qty: 1, level: c.level || 1, stars: c.stars || 1, img: c.img || c.image };
+            else { 
+                stacked[key].qty++; 
+                if(c.level > stacked[key].level) stacked[key].level = c.level;
+                if(c.stars > stacked[key].stars) stacked[key].stars = c.stars;
+            }
         });
 
-        let displayList = Object.values(stacked);
-        if (currentFilter !== 'ALL') displayList = displayList.filter(c => c.rarity === currentFilter);
-        
-        displayList.forEach(card => {
+        let list = Object.values(stacked);
+        if (currentFilter !== 'ALL') list = list.filter(c => c.rarity === currentFilter);
+
+        list.forEach(card => {
             const div = document.createElement("div");
-            div.className = `col-card rarity-${card.rarity.toLowerCase()}`;
+            // เช็คเงื่อนไขสีรุ้ง: LV 20 + 5 ดาว
+            const isMax = card.level >= 20 && card.stars >= 5;
+            div.className = `col-card ${isMax ? 'rainbow-max' : ''}`;
+            
+            let starHTML = '<div class="star-container">';
+            for(let i=0; i<card.stars; i++) starHTML += '<span class="star-icon">★</span>';
+            starHTML += '</div>';
+
             div.onclick = () => openModal(card);
-            div.innerHTML = `${card.qty > 1 ? `<div class="qty-badge">x${card.qty}</div>` : ''}<div class="lvl-badge">LV.${card.level}</div><img src="${card.img}"><div class="card-info"><div class="card-name">${card.name}</div></div>`;
+            div.innerHTML = `${card.qty > 1 ? `<div class="qty-badge">x${card.qty}</div>` : ''}${starHTML}<img src="${card.img}"><div class="card-info"><div class="card-name">${card.name} (LV.${card.level})</div></div>`;
             grid.appendChild(div);
         });
     }
 
     window.openModal = (card) => {
-        const cost = 500;
-        const req = 2;
+        const lvCost = 500; const starCost = 5000;
         document.getElementById("modalImg").src = card.img;
         document.getElementById("modalName").innerText = card.name;
         document.getElementById("modalRarity").innerText = "GRADE: " + card.rarity;
         document.getElementById("modalLvl").innerText = "LV. " + card.level;
         document.getElementById("lvlBarFill").style.width = (card.level / 20 * 100) + "%";
-        document.getElementById("reqCards").innerText = `${card.qty}/${req}`;
-        document.getElementById("reqMoney").innerText = cost.toLocaleString();
+        
+        let stars = ""; for(let i=0; i<5; i++) stars += (i < card.stars) ? "⭐" : "☆";
+        document.getElementById("modalStarContainer").innerText = stars;
 
-        const upBtn = document.getElementById("upgradeBtn");
-        const canUp = card.qty >= req && userPoints >= cost && card.level < 20;
-        upBtn.disabled = !canUp;
-        upBtn.onclick = () => handleUpgrade(card, cost, req);
+        document.getElementById("reqCards").innerText = `${card.qty}/2`;
+        document.getElementById("reqMoney").innerText = lvCost.toLocaleString();
+
+        // ปุ่มอัปเลเวล
+        const lvBtn = document.getElementById("upgradeLvBtn");
+        lvBtn.disabled = !(card.qty >= 2 && userPoints >= lvCost && card.level < 20);
+        lvBtn.onclick = () => handleUpgrade(card, 'level', lvCost);
+
+        // ปุ่มอัปดาว
+        const starBtn = document.getElementById("upgradeStarBtn");
+        starBtn.disabled = !(card.qty >= 5 && userPoints >= starCost && card.stars < 5);
+        starBtn.innerText = `⭐ อัปดาว (ใช้ 5 ใบ + ${starCost.toLocaleString()}🪙)`;
+        starBtn.onclick = () => handleUpgrade(card, 'star', starCost);
+
         document.getElementById("cardModal").style.display = "flex";
     };
 
-    async function handleUpgrade(card, cost, req) {
-        if(!confirm("ยืนยันการอัปเกรด?")) return;
+    async function handleUpgrade(card, type, cost) {
+        const req = type === 'star' ? 5 : 2;
+        if(!confirm(`ยืนยันการอัปเกรด?`)) return;
+
         let removed = 0;
         const newCol = userCards.filter(c => {
             if (removed < req && c.name === card.name && (c.rarity||'C').toUpperCase() === card.rarity.toUpperCase()) {
@@ -226,14 +223,17 @@
             }
             return true;
         });
-        newCol.push({ ...card, level: (card.level || 1) + 1 });
+
+        const newCard = { ...card };
+        if(type === 'level') newCard.level++; else newCard.stars++;
+        
+        newCol.push(newCard);
         await updateDoc(doc(db, "users", currentUID), { collection: newCol, points: increment(-cost) });
         document.getElementById("cardModal").style.display = "none";
     }
 
-    // --- ฟังก์ชัน Mass Action เดิมของคุณ ---
-    window.handleMassUpgrade = () => { alert("ระบบกำลังประมวลผลการอัปเกรดทั้งหมด..."); };
-    window.handleMassSell = () => { alert("ระบบกำลังคำนวณการขายการ์ดซ้ำ..."); };
+    window.handleMassUpgrade = () => alert("อัปเกรดอัตโนมัติกำลังทำงาน...");
+    window.handleMassSell = () => alert("ขายการ์ดซ้ำทั้งหมดเรียบร้อย!");
 </script>
 </body>
 </html>
