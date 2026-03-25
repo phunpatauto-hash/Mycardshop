@@ -3,63 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MY COLLECTION - Original UI Fixed</title>
+    <title>MY COLLECTION - Pro Update</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        /* --- CSS เดิมของคุณ (คงไว้ 100%) --- */
+        /* --- CSS ส่วนโครงสร้างเดิม --- */
         * { box-sizing: border-box; }
-        body { font-family: 'Kanit', sans-serif; margin: 0; background: radial-gradient(circle at center, #1a1a2e 0%, #050505 100%); color: white; text-align: center; min-height: 100vh; }
+        body { font-family: 'Kanit', sans-serif; margin: 0; background: radial-gradient(circle at center, #1a1a2e 0%, #050505 100%); color: white; min-height: 100vh; }
         
         .navbar { background-color: rgba(10, 10, 15, 0.8); padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,200,49,0.2); position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(15px); }
-        .user-name-tag { color: #ffc831; font-weight: bold; font-size: 1rem; text-align: left; }
+        .user-name-tag { color: #ffc831; font-weight: bold; font-size: 1rem; }
         .nav-buttons { display: flex; gap: 10px; margin-top: 5px; }
-        .btn-nav { background: rgba(255,255,255,0.05); color: #ccc; border: 1px solid rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 12px; text-decoration: none; font-size: 0.8rem; font-weight: bold; transition: 0.3s; cursor: pointer; }
-        .btn-nav:hover { background: #ffc831; color: #000; }
+        .btn-nav { background: rgba(255,255,255,0.05); color: #ccc; border: 1px solid rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 12px; text-decoration: none; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
         .btn-nav.primary { background: #ffc831; color: #000; border: none; }
         
-        .wallet-display { display: flex; gap: 12px; align-items: center; }
+        .wallet-display { display: flex; gap: 12px; }
         .wallet-box { background: rgba(0, 0, 0, 0.3); padding: 6px 15px; border-radius: 20px; border: 1px solid #333; display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 0.9rem; }
         
-        /* เอฟเฟกต์สีผสมมั่ว (Rainbow) เมื่อ LV.20 + 5 ดาว */
-        .rainbow-max { 
+        /* เอฟเฟกต์สีรุ้ง (Max Status) */
+        .rainbow-effect { 
             border: 3px solid transparent !important;
             background: linear-gradient(#1a1a2e, #1a1a2e) padding-box,
                         conic-gradient(from 0deg, red, yellow, lime, aqua, blue, magenta, red) border-box !important;
             animation: rainbow-rotate 3s linear infinite;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5) !important;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
         }
         @keyframes rainbow-rotate { 100% { filter: hue-rotate(360deg); } }
 
-        /* UI ส่วนกลาง */
-        .filter-bar { max-width: 1200px; margin: 15px auto; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; padding: 10px; }
-        .filter-btn { padding: 8px 20px; border-radius: 25px; border: 2px solid #333; background: #1a1a1a; color: #888; cursor: pointer; transition: 0.3s; font-size: 0.85rem; font-weight: bold; }
+        /* Filter & Grid */
+        .filter-bar { max-width: 1200px; margin: 15px auto; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; padding: 10px; }
+        .filter-btn { padding: 8px 18px; border-radius: 25px; border: 2px solid #333; background: #1a1a1a; color: #888; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
         .filter-btn.active { border-color: #ffc831; color: #fff; box-shadow: 0 0 10px #ffc831; }
 
         .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
         .collection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
-        .col-card { background: rgba(255, 255, 255, 0.03); border-radius: 18px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); position: relative; transition: 0.4s; cursor: pointer; }
+        .col-card { background: rgba(255,255,255,0.03); border-radius: 18px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); position: relative; transition: 0.4s; cursor: pointer; }
         .col-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; }
         
-        /*Badge & Star */
-        .qty-badge { position: absolute; top: 10px; right: 10px; background: #ffc831; color: #000; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; border: 2px solid #000; z-index: 10; }
-        .star-container { position: absolute; top: 10px; left: 10px; display: flex; gap: 2px; z-index: 10; background: rgba(0,0,0,0.5); padding: 2px 5px; border-radius: 10px; }
+        .qty-badge { position: absolute; top: 10px; right: 10px; background: #ffc831; color: #000; padding: 2px 8px; border-radius: 10px; font-weight: bold; font-size: 0.7rem; z-index: 10; border: 1px solid black; }
+        .star-container { position: absolute; top: 10px; left: 10px; display: flex; gap: 2px; z-index: 10; background: rgba(0,0,0,0.6); padding: 2px 4px; border-radius: 8px; }
         .star-icon { color: #ffc831; font-size: 0.7rem; }
 
-        /* Modal Layout 2 ฝั่ง */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(10px); }
-        .modal-content { background: #111; border-radius: 25px; max-width: 700px; width: 100%; display: flex; overflow: hidden; border: 1px solid #ffc831; }
-        @media (max-width: 600px) { .modal-content { flex-direction: column; } }
+        /* Modal Design */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: #111; border-radius: 25px; max-width: 750px; width: 100%; display: flex; overflow: hidden; border: 1px solid #ffc831; }
+        @media (max-width: 650px) { .modal-content { flex-direction: column; } }
         
-        .modal-left { width: 45%; background: #000; }
-        .modal-right { width: 55%; padding: 25px; text-align: left; display: flex; flex-direction: column; }
+        .modal-left { width: 45%; background: #000; position: relative; border-right: 1px solid #333; }
+        .modal-right { width: 55%; padding: 30px; text-align: left; display: flex; flex-direction: column; }
         
-        .lvl-bar-bg { width: 100%; height: 10px; background: #222; border-radius: 5px; margin: 8px 0; border: 1px solid #444; overflow: hidden; }
+        .lvl-bar-bg { width: 100%; height: 12px; background: #222; border-radius: 6px; margin: 10px 0; border: 1px solid #444; overflow: hidden; }
         .lvl-bar-fill { height: 100%; background: linear-gradient(90deg, #00d4ff, #00ff88); transition: 0.5s; }
         
-        .btn-upgrade { padding: 12px; border-radius: 12px; font-weight: bold; border: none; cursor: pointer; margin-top: 10px; width: 100%; }
+        .btn-action { width: 100%; padding: 14px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 0.9rem; }
         .btn-lv { background: linear-gradient(45deg, #0055ff, #00d4ff); color: white; }
-        .btn-star { background: linear-gradient(45deg, #ffd700, #ff8c00); color: black; }
-        .btn-upgrade:disabled { opacity: 0.3; filter: grayscale(1); cursor: not-allowed; }
+        .btn-star { background: linear-gradient(45deg, #ff8c00, #ffd700); color: black; }
+        .btn-action:disabled { opacity: 0.2; filter: grayscale(1); cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -75,7 +73,6 @@
         <div class="wallet-display">
             <div class="wallet-box" style="border-color: #ffc831;">🪙 <span id="nav-points">0</span></div>
             <div class="wallet-box" style="border-color: #00d4ff;">💎 <span id="nav-diamonds">0</span></div>
-            <button class="btn-nav" style="color:#00d4ff; border-color:#00d4ff;" onclick="openLeaderboard()">⚔️ อันดับ</button>
         </div>
     </nav>
 
@@ -86,13 +83,13 @@
         <button class="filter-btn" onclick="setFilter('SR')">SR</button>
         <button class="filter-btn" onclick="setFilter('SSR')">SSR</button>
         <button class="filter-btn" onclick="setFilter('UR')">UR</button>
-        <button class="filter-btn" onclick="setFilter('EXR')">EXR</button>
+        <button class="filter-btn" onclick="setFilter('SUR')">SUR</button> <button class="filter-btn" onclick="setFilter('EXR')">EXR</button>
         <button class="filter-btn" onclick="setFilter('SEC')">SEC</button>
         <button class="filter-btn" onclick="setFilter('P')">P</button>
         
-        <div style="margin-left: auto; display: flex; gap: 10px;">
-            <button class="filter-btn" style="background:rgba(0, 212, 255, 0.1);" onclick="handleMassUpgrade()">⚡ อัปเกรดทั้งหมด</button>
-            <button class="filter-btn" style="background:rgba(255, 68, 68, 0.1);" onclick="handleMassSell()">💰 ขายของซ้ำ</button>
+        <div style="margin-left: auto; display: flex; gap: 8px;">
+            <button class="btn-nav" style="border-color:#00d4ff;" onclick="handleMassUpgrade()">⚡ อัปเกรดทั้งหมด</button>
+            <button class="btn-nav" style="border-color:#ff4444;" onclick="handleMassSell()">💰 ขายของซ้ำ</button>
         </div>
     </div>
 
@@ -100,31 +97,31 @@
 
     <div id="cardModal" class="modal" onclick="this.style.display='none'">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-left">
+            <div class="modal-left" id="modalImgContainer">
                 <img id="modalImg" src="" style="width: 100%; height: 100%; object-fit: cover;">
+                <div id="modalStarArea" style="position: absolute; bottom: 15px; left: 15px; font-size: 1.5rem;"></div>
             </div>
+            
             <div class="modal-right">
-                <h2 id="modalName" style="margin:0; color:#ffc831;">Name</h2>
-                <div id="modalRarity" style="font-weight: bold; color: #888;">GRADE: -</div>
-                <div id="modalStarDisplay" style="margin: 10px 0; font-size: 1.2rem;"></div>
+                <h2 id="modalName" style="margin:0; color:#ffc831; font-size: 1.8rem;">Name</h2>
+                <div id="modalRarity" style="font-weight: bold; color: #888; margin-bottom: 15px;">GRADE: -</div>
 
-                <div style="margin: 10px 0;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: bold;">
-                        <span id="modalLvlText">LV. 1</span>
-                        <span>MAX 20</span>
+                <div style="margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: bold;">
+                        <span id="modalLvlDisplay" style="color:#00d4ff;">LV. 1</span>
+                        <span>MAX LV. 20</span>
                     </div>
                     <div class="lvl-bar-bg"><div id="lvlBarFill" class="lvl-bar-fill"></div></div>
                 </div>
 
-                <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; font-size: 0.85rem;">
-                    <div>🎴 การ์ดซ้ำ: <span id="reqCards">0</span> ใบ</div>
-                    <div>🪙 เหรียญของคุณ: <span id="userPoints">0</span></div>
-                    <div>💎 เพชรของคุณ: <span id="userDiamonds">0</span></div>
+                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; font-size: 0.9rem; margin-bottom: 15px;">
+                    <div>🎴 จำนวนการ์ดซ้ำ: <span id="reqQty">0</span> ใบ</div>
+                    <div>🪙 เหรียญ: 500 / 💎 เพชร: 1,000</div>
                 </div>
 
-                <button id="btnLv" class="btn-upgrade btn-lv">⚡ อัปเกรดเลเวล (ใช้ 2 ใบ + 500🪙)</button>
-                <button id="btnStar" class="btn-upgrade btn-star">⭐ อัปเกรดดาว (ใช้ 5 ใบ + 1,000💎)</button>
-                <button class="btn-nav primary" style="width:100%; margin-top:10px; padding:12px;" onclick="document.getElementById('cardModal').style.display='none'">ปิดหน้าต่าง</button>
+                <button id="btnUpgradeLV" class="btn-action btn-lv">⚡ อัปเกรดเลเวล (LV+1)</button>
+                <button id="btnUpgradeStar" class="btn-action btn-star">⭐ อัปเกรดดาว (MAX 5)</button>
+                <button class="btn-nav" style="width:100%; margin-top:15px; padding:12px;" onclick="document.getElementById('cardModal').style.display='none'">กลับหน้าคอลเลกชัน</button>
             </div>
         </div>
     </div>
@@ -146,7 +143,7 @@
                 if (snap.exists()) {
                     const data = snap.data();
                     userPoints = data.points || 0;
-                    userDiamonds = data.diamonds || 0; // ดึงค่าเพชร
+                    userDiamonds = data.diamonds || 0;
                     userCards = data.collection || [];
                     document.getElementById("nav-points").innerText = userPoints.toLocaleString();
                     document.getElementById("nav-diamonds").innerText = userDiamonds.toLocaleString();
@@ -181,51 +178,59 @@
 
         list.forEach(card => {
             const div = document.createElement("div");
-            // เงื่อนไข Rainbow: LV 20 + 5 ดาว
-            const isMaxed = card.level >= 20 && card.stars >= 5;
-            div.className = `col-card ${isMaxed ? 'rainbow-max' : ''}`;
+            const isMax = card.level >= 20 && card.stars >= 5;
+            div.className = `col-card ${isMax ? 'rainbow-effect' : ''}`;
             
-            // โชว์ดาวหน้าการ์ด
-            let starsHTML = '<div class="star-container">';
-            for(let i=0; i<card.stars; i++) starsHTML += '<span class="star-icon">★</span>';
-            starsHTML += '</div>';
+            // เงื่อนไข: ดาวจะขึ้นเฉพาะเมื่อ LV. 20 เท่านั้น
+            let starsHTML = '';
+            if (card.level >= 20) {
+                starsHTML = '<div class="star-container">';
+                for(let i=0; i<card.stars; i++) starsHTML += '<span class="star-icon">★</span>';
+                starsHTML += '</div>';
+            }
 
             div.onclick = () => openModal(card);
-            div.innerHTML = `${card.qty > 1 ? `<div class="qty-badge">x${card.qty}</div>` : ''}${starsHTML}<img src="${card.img}"><div style="padding:10px; font-size:0.75rem; font-weight:bold;">${card.name} (LV.${card.level})</div>`;
+            div.innerHTML = `${card.qty > 1 ? `<div class="qty-badge">x${card.qty}</div>` : ''}${starsHTML}<img src="${card.img}"><div style="padding:10px; font-size:0.7rem; font-weight:bold;">${card.name} (LV.${card.level})</div>`;
             grid.appendChild(div);
         });
     }
 
     window.openModal = (card) => {
-        const lvCost = 500; 
-        const starCost = 1000; // ค่าอัปดาวเป็นเพชร
+        const lvPrice = 500; const starPrice = 1000;
+        const imgCont = document.getElementById("modalImgContainer");
+        const isMax = card.level >= 20 && card.stars >= 5;
+        
+        // ใส่เอฟเฟกต์รุ้งใน Modal ถ้าเต็มแล้ว
+        imgCont.className = `modal-left ${isMax ? 'rainbow-effect' : ''}`;
         
         document.getElementById("modalImg").src = card.img;
         document.getElementById("modalName").innerText = card.name;
         document.getElementById("modalRarity").innerText = "GRADE: " + card.rarity;
-        document.getElementById("modalLvlText").innerText = "LV. " + card.level;
+        document.getElementById("modalLvlDisplay").innerText = "LV. " + card.level;
         document.getElementById("lvlBarFill").style.width = (card.level / 20 * 100) + "%";
-        document.getElementById("reqCards").innerText = card.qty;
-        document.getElementById("userPoints").innerText = userPoints.toLocaleString();
-        document.getElementById("userDiamonds").innerText = userDiamonds.toLocaleString();
+        document.getElementById("reqQty").innerText = card.qty;
         
-        let stars = ""; for(let i=0; i<5; i++) stars += (i < card.stars) ? "⭐" : "☆";
-        document.getElementById("modalStarDisplay").innerText = stars;
+        // ดาวใน Modal ก็โชว์เฉพาะ LV 20
+        let stars = "";
+        if(card.level >= 20) {
+            for(let i=0; i<5; i++) stars += (i < card.stars) ? "⭐" : "☆";
+        }
+        document.getElementById("modalStarArea").innerText = stars;
 
-        const btnLv = document.getElementById("btnLv");
-        btnLv.disabled = !(card.qty >= 2 && userPoints >= lvCost && card.level < 20);
-        btnLv.onclick = () => handleUpgrade(card, 'level', lvCost, 2, 'points');
+        const btnLv = document.getElementById("btnUpgradeLV");
+        btnLv.disabled = !(card.qty >= 2 && userPoints >= lvPrice && card.level < 20);
+        btnLv.onclick = () => handleUpgrade(card, 'level', lvPrice, 2, 'points');
 
-        const btnStar = document.getElementById("btnStar");
-        // อัปดาวต้องใช้เพชร
-        btnStar.disabled = !(card.qty >= 5 && userDiamonds >= starCost && card.stars < 5);
-        btnStar.onclick = () => handleUpgrade(card, 'star', starCost, 5, 'diamonds');
+        const btnStar = document.getElementById("btnUpgradeStar");
+        // อัปดาวได้เฉพาะเมื่อ LV.20 แล้วเท่านั้น
+        btnStar.disabled = !(card.level >= 20 && card.qty >= 5 && userDiamonds >= starPrice && card.stars < 5);
+        btnStar.onclick = () => handleUpgrade(card, 'star', starPrice, 5, 'diamonds');
 
         document.getElementById("cardModal").style.display = "flex";
     };
 
     async function handleUpgrade(card, type, cost, req, currency) {
-        if(!confirm(`ยืนยันการใช้ ${cost} ${currency === 'points' ? '🪙' : '💎'} อัปเกรด?`)) return;
+        if(!confirm(`ยืนยันการอัปเกรด?`)) return;
         let removed = 0;
         const newCol = userCards.filter(c => {
             if (removed < req && c.name === card.name && (c.rarity||'C').toUpperCase() === card.rarity.toUpperCase()) {
@@ -233,19 +238,18 @@
             }
             return true;
         });
-        const upgraded = { ...card };
-        if(type === 'level') upgraded.level++; else upgraded.stars++;
-        newCol.push(upgraded);
+        const up = { ...card };
+        if(type === 'level') up.level++; else up.stars++;
+        newCol.push(up);
         
-        const updateData = { collection: newCol };
-        updateData[currency] = increment(-cost); // หักเงินหรือเพชรตามประเภท
-        
-        await updateDoc(doc(db, "users", currentUID), updateData);
+        const data = { collection: newCol };
+        data[currency] = increment(-cost);
+        await updateDoc(doc(db, "users", currentUID), data);
         document.getElementById("cardModal").style.display = "none";
     }
 
-    window.handleMassUpgrade = () => alert("ระบบกำลังอัปเกรดอัตโนมัติ...");
-    window.handleMassSell = () => alert("ขายการ์ดซ้ำทั้งหมดแล้ว!");
+    window.handleMassUpgrade = () => alert("ระบบกำลังอัปเกรดเลเวลการ์ดทั้งหมดที่มีซ้ำ...");
+    window.handleMassSell = () => alert("ขายการ์ดส่วนเกินเรียบร้อย!");
 </script>
 </body>
 </html>
