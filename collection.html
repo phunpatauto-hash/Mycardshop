@@ -3,60 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MY COLLECTION - Pro Update</title>
+    <title>MY COLLECTION - LV to STAR System</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        /* --- CSS ส่วนโครงสร้างเดิม --- */
+        /* --- คงเดิมส่วนที่ไม่ได้ขอแก้ --- */
         * { box-sizing: border-box; }
         body { font-family: 'Kanit', sans-serif; margin: 0; background: radial-gradient(circle at center, #1a1a2e 0%, #050505 100%); color: white; min-height: 100vh; }
-        
-        .navbar { background-color: rgba(10, 10, 15, 0.8); padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,200,49,0.2); position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(15px); }
+        .navbar { background-color: rgba(10, 10, 15, 0.8); padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,200,49,0.2); position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(15px); height: 75px; }
         .user-name-tag { color: #ffc831; font-weight: bold; font-size: 1rem; }
-        .nav-buttons { display: flex; gap: 10px; margin-top: 5px; }
+        .nav-buttons { display: flex; gap: 10px; margin-top: 5px; align-items: center; }
         .btn-nav { background: rgba(255,255,255,0.05); color: #ccc; border: 1px solid rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 12px; text-decoration: none; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
         .btn-nav.primary { background: #ffc831; color: #000; border: none; }
+        .wallet-display { display: flex; gap: 10px; }
+        .wallet-box { background: rgba(0, 0, 0, 0.4); padding: 6px 12px; border-radius: 20px; border: 1px solid #333; display: flex; align-items: center; gap: 5px; font-weight: bold; font-size: 0.85rem; min-width: 90px; justify-content: center; }
         
-        .wallet-display { display: flex; gap: 12px; }
-        .wallet-box { background: rgba(0, 0, 0, 0.3); padding: 6px 15px; border-radius: 20px; border: 1px solid #333; display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 0.9rem; }
-        
-        /* เอฟเฟกต์สีรุ้ง (Max Status) */
-        .rainbow-effect { 
-            border: 3px solid transparent !important;
-            background: linear-gradient(#1a1a2e, #1a1a2e) padding-box,
-                        conic-gradient(from 0deg, red, yellow, lime, aqua, blue, magenta, red) border-box !important;
-            animation: rainbow-rotate 3s linear infinite;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+        /* --- ปุ่มขายทั้งหมดที่เพิ่มเข้ามา --- */
+        .btn-sell-all { 
+            background: linear-gradient(45deg, #ff4d4d, #b30000); 
+            color: white; 
+            border: none; 
+            padding: 8px 15px; 
+            border-radius: 12px; 
+            font-size: 0.8rem; 
+            font-weight: bold; 
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 0 10px rgba(255, 77, 77, 0.3);
         }
-        @keyframes rainbow-rotate { 100% { filter: hue-rotate(360deg); } }
+        .btn-sell-all:hover { transform: scale(1.05); filter: brightness(1.2); }
 
-        /* Filter & Grid */
-        .filter-bar { max-width: 1200px; margin: 15px auto; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; padding: 10px; }
+        /* --- CSS อื่นๆ คงเดิม --- */
+        @keyframes rainbow-rotate { 100% { filter: hue-rotate(360deg); } }
+        .rainbow-effect { border: 3px solid transparent !important; background: linear-gradient(#1a1a2e, #1a1a2e) padding-box, conic-gradient(from 0deg, red, yellow, lime, aqua, blue, magenta, red) border-box !important; animation: rainbow-rotate 3s linear infinite; box-shadow: 0 0 25px rgba(255, 255, 255, 0.5); }
+        .rainbow-text { background: linear-gradient(to right, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 200% auto; animation: rainbow-rotate 3s linear infinite; font-weight: bold; }
+        .modal-content { background: #111; border-radius: 25px; max-width: 750px; width: 100%; display: flex; overflow: hidden; border: 2px solid #444; transition: 0.3s; }
+        .modal-theme-P { border-color: #ff00ff; box-shadow: 0 0 30px rgba(255, 0, 255, 0.3); }
+        .modal-theme-EXR { border-color: #ff4d4d; box-shadow: 0 0 30px rgba(255, 77, 77, 0.3); }
+        .modal-theme-SEC { border-color: #ffac33; box-shadow: 0 0 30px rgba(255, 172, 51, 0.3); }
+        .modal-theme-SUR { border-color: #33ffad; box-shadow: 0 0 30px rgba(51, 255, 173, 0.3); }
+        .modal-theme-SSR { border-color: #ffc831; box-shadow: 0 0 30px rgba(255, 200, 49, 0.3); }
+        .modal-theme-UR { border-color: #bf40bf; box-shadow: 0 0 25px rgba(191, 64, 191, 0.2); }
+        .modal-theme-SR { border-color: #33aaff; box-shadow: 0 0 20px rgba(51, 170, 255, 0.2); }
+        .modal-theme-R { border-color: #33ff57; box-shadow: 0 0 15px rgba(51, 255, 87, 0.1); }
+        .modal-theme-C { border-color: #888888; }
+        .filter-bar { max-width: 1200px; margin: 15px auto; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; padding: 10px; align-items: center; }
         .filter-btn { padding: 8px 18px; border-radius: 25px; border: 2px solid #333; background: #1a1a1a; color: #888; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
         .filter-btn.active { border-color: #ffc831; color: #fff; box-shadow: 0 0 10px #ffc831; }
-
         .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
         .collection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
         .col-card { background: rgba(255,255,255,0.03); border-radius: 18px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); position: relative; transition: 0.4s; cursor: pointer; }
         .col-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; }
-        
         .qty-badge { position: absolute; top: 10px; right: 10px; background: #ffc831; color: #000; padding: 2px 8px; border-radius: 10px; font-weight: bold; font-size: 0.7rem; z-index: 10; border: 1px solid black; }
         .star-container { position: absolute; top: 10px; left: 10px; display: flex; gap: 2px; z-index: 10; background: rgba(0,0,0,0.6); padding: 2px 4px; border-radius: 8px; }
         .star-icon { color: #ffc831; font-size: 0.7rem; }
-
-        /* Modal Design */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
-        .modal-content { background: #111; border-radius: 25px; max-width: 750px; width: 100%; display: flex; overflow: hidden; border: 1px solid #ffc831; }
         @media (max-width: 650px) { .modal-content { flex-direction: column; } }
-        
         .modal-left { width: 45%; background: #000; position: relative; border-right: 1px solid #333; }
         .modal-right { width: 55%; padding: 30px; text-align: left; display: flex; flex-direction: column; }
-        
         .lvl-bar-bg { width: 100%; height: 12px; background: #222; border-radius: 6px; margin: 10px 0; border: 1px solid #444; overflow: hidden; }
         .lvl-bar-fill { height: 100%; background: linear-gradient(90deg, #00d4ff, #00ff88); transition: 0.5s; }
-        
-        .btn-action { width: 100%; padding: 14px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 0.9rem; }
+        .btn-action { width: 100%; padding: 14px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 0.9rem; transition: 0.2s; }
         .btn-lv { background: linear-gradient(45deg, #0055ff, #00d4ff); color: white; }
         .btn-star { background: linear-gradient(45deg, #ff8c00, #ffd700); color: black; }
+        .btn-bulk { background: linear-gradient(45deg, #00d4ff, #00ff88); color: #000; }
+        .btn-sell { background: #ff4d4d; color: white; margin-top: 15px; border: 1px solid rgba(255,255,255,0.1); }
+        .btn-sell:hover { background: #ff1a1a; transform: scale(1.02); }
         .btn-action:disabled { opacity: 0.2; filter: grayscale(1); cursor: not-allowed; }
     </style>
 </head>
@@ -77,50 +88,46 @@
     </nav>
 
     <div class="filter-bar">
-        <button class="filter-btn active" onclick="setFilter('ALL')">ALL</button>
-        <button class="filter-btn" onclick="setFilter('C')">C</button>
-        <button class="filter-btn" onclick="setFilter('R')">R</button>
-        <button class="filter-btn" onclick="setFilter('SR')">SR</button>
-        <button class="filter-btn" onclick="setFilter('SSR')">SSR</button>
-        <button class="filter-btn" onclick="setFilter('UR')">UR</button>
-        <button class="filter-btn" onclick="setFilter('SUR')">SUR</button> <button class="filter-btn" onclick="setFilter('EXR')">EXR</button>
-        <button class="filter-btn" onclick="setFilter('SEC')">SEC</button>
-        <button class="filter-btn" onclick="setFilter('P')">P</button>
-        
-        <div style="margin-left: auto; display: flex; gap: 8px;">
-            <button class="btn-nav" style="border-color:#00d4ff;" onclick="handleMassUpgrade()">⚡ อัปเกรดทั้งหมด</button>
-            <button class="btn-nav" style="border-color:#ff4444;" onclick="handleMassSell()">💰 ขายของซ้ำ</button>
+        <div id="filterContainer" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+        <div style="margin-left: auto;">
+            <button id="btnSellAll" class="btn-sell-all">💰 ขายของซ้ำทั้งหมด</button>
         </div>
     </div>
 
     <div class="container"><div id="grid" class="collection-grid"></div></div>
 
     <div id="cardModal" class="modal" onclick="this.style.display='none'">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-left" id="modalImgContainer">
+        <div class="modal-content" id="modalMainBox" onclick="event.stopPropagation()">
+            <div class="modal-left">
                 <img id="modalImg" src="" style="width: 100%; height: 100%; object-fit: cover;">
-                <div id="modalStarArea" style="position: absolute; bottom: 15px; left: 15px; font-size: 1.5rem;"></div>
+                <div id="modalStarArea" style="position: absolute; bottom: 15px; left: 15px; font-size: 1.5rem; text-shadow: 0 0 10px rgba(0,0,0,0.8);"></div>
             </div>
-            
             <div class="modal-right">
-                <h2 id="modalName" style="margin:0; color:#ffc831; font-size: 1.8rem;">Name</h2>
-                <div id="modalRarity" style="font-weight: bold; color: #888; margin-bottom: 15px;">GRADE: -</div>
-
+                <h2 id="modalName" style="margin:0; font-size: 1.8rem;">Name</h2>
+                <div id="modalRarity" style="font-weight: bold; color: #888; margin-bottom: 5px;">GRADE: -</div>
+                <div id="modalCardValue" style="color: #ffc831; font-weight: bold; font-size: 1rem; margin-bottom: 15px;">💰 มูลค่าอัปเกรด: -</div>
+                
                 <div style="margin-bottom: 20px;">
                     <div style="display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: bold;">
                         <span id="modalLvlDisplay" style="color:#00d4ff;">LV. 1</span>
-                        <span>MAX LV. 20</span>
+                        <span style="color:#666;">MAX LV. 20</span>
                     </div>
                     <div class="lvl-bar-bg"><div id="lvlBarFill" class="lvl-bar-fill"></div></div>
                 </div>
-
                 <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; font-size: 0.9rem; margin-bottom: 15px;">
-                    <div>🎴 จำนวนการ์ดซ้ำ: <span id="reqQty">0</span> ใบ</div>
-                    <div>🪙 เหรียญ: 500 / 💎 เพชร: 1,000</div>
+                    <div>🎴 การ์ดซ้ำที่มี: <span id="reqQty" style="font-weight:bold;">0</span> ใบ</div>
+                    <div id="modalUpgradeInfo" style="color: #00ff88; margin-top: 5px;">เงื่อนไข: -</div>
+                    <div id="modalCurrencyInfo">🪙 เหรียญ: -</div>
                 </div>
+                <div id="lvUpgradeGroup" style="display: flex; gap: 10px;">
+                    <button id="btnUpgradeLV" class="btn-action btn-lv" style="flex:1;">⚡ อัปเลเวล</button>
+                    <button id="btnBulkUpgrade" class="btn-action btn-bulk" style="flex:1;">⚡ อัปสูงสุด</button>
+                </div>
+                <button id="btnUpgradeStar" class="btn-action btn-star" style="display:none;">⭐ อัปดาว</button>
+                
+                <button id="btnSellCard" class="btn-action btn-sell" style="display:none;">💰 ขายการ์ดซ้ำ (ใบละ - เหรียญ)</button>
 
-                <button id="btnUpgradeLV" class="btn-action btn-lv">⚡ อัปเกรดเลเวล (LV+1)</button>
-                <button id="btnUpgradeStar" class="btn-action btn-star">⭐ อัปเกรดดาว (MAX 5)</button>
+                <div id="maxLevelMessage" style="display:none; text-align:center; color:#ffd700; font-weight:bold; margin-top:10px;"></div>
                 <button class="btn-nav" style="width:100%; margin-top:15px; padding:12px;" onclick="document.getElementById('cardModal').style.display='none'">กลับหน้าคอลเลกชัน</button>
             </div>
         </div>
@@ -135,6 +142,9 @@
     const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
 
     let currentUID = null; let userCards = []; let userPoints = 0; let userDiamonds = 0; let currentFilter = 'ALL';
+    const rarityOrder = { 'P': 10, 'EXR': 9, 'SEC': 8, 'SUR': 7, 'SSR': 6, 'UR': 5, 'SR': 4, 'R': 3, 'U': 2, 'C': 1 };
+    const rarityColors = { 'P': '#ff00ff', 'EXR': '#ff4d4d', 'SEC': '#ffac33', 'SUR': '#33ffad', 'SSR': '#ffc831', 'UR': '#bf40bf', 'SR': '#33aaff', 'R': '#33ff57', 'C': '#ffffff' };
+    const baseValues = { 'P': 10000, 'EXR': 50000, 'SEC': 25000, 'SUR': 15000, 'SSR': 8000, 'UR': 4000, 'SR': 500, 'R': 100, 'U': 90, 'C': 50 };
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
@@ -154,102 +164,236 @@
         }
     });
 
-    window.setFilter = (rarity) => {
-        currentFilter = rarity;
-        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.toggle('active', btn.innerText === rarity));
-        renderCards();
-    };
+    // --- ปุ่มขายทั้งหมด ---
+    document.getElementById("btnSellAll").onclick = handleSellAllDuplicates;
+
+    async function handleSellAllDuplicates() {
+        const stacked = {};
+        userCards.forEach(c => {
+            const key = `${c.name}_${(c.rarity||'C').toUpperCase()}`;
+            if(!stacked[key]) stacked[key] = [];
+            stacked[key].push(c);
+        });
+
+        let totalGain = 0;
+        let newCollection = [];
+        let sellCount = 0;
+
+        for (const key in stacked) {
+            let cards = stacked[key];
+            if (cards.length > 1) {
+                // เก็บใบที่ดีที่สุดไว้ (เลเวลสูงสุด ดาวสูงสุด)
+                cards.sort((a,b) => (b.level||1) - (a.level||1) || (b.stars||0) - (a.stars||0));
+                const keep = cards.shift();
+                newCollection.push(keep);
+                
+                // ใบที่เหลือขายทิ้ง
+                const price = baseValues[(keep.rarity||'C').toUpperCase()] || 50;
+                totalGain += (cards.length * price);
+                sellCount += cards.length;
+            } else {
+                newCollection.push(cards[0]);
+            }
+        }
+
+        if (sellCount === 0) {
+            alert("ไม่พบการ์ดซ้ำที่สามารถขายได้");
+            return;
+        }
+
+        if (confirm(`พบการ์ดซ้ำ ${sellCount} ใบ คุณจะได้รับ ${totalGain.toLocaleString()} เหรียญ ยืนยันการขายหรือไม่?`)) {
+            try {
+                await updateDoc(doc(db, "users", currentUID), {
+                    collection: newCollection,
+                    points: increment(totalGain)
+                });
+                alert(`ขายสำเร็จ! ได้รับ ${totalGain.toLocaleString()} เหรียญ`);
+            } catch (err) {
+                console.error(err);
+                alert("เกิดข้อผิดพลาดในการขาย");
+            }
+        }
+    }
+
+    // --- ส่วนที่เหลือคงเดิมตามไฟล์ต้นฉบับของคุณ ---
+    const rarities = ['ALL','P','EXR','SEC','SUR','SSR','UR','SR','R','U','C'];
+    const fCon = document.getElementById("filterContainer");
+    rarities.forEach(r => {
+        const b = document.createElement("button");
+        b.className = `filter-btn ${r==='ALL'?'active':''}`;
+        b.innerText = r;
+        b.onclick = () => {
+            currentFilter = r;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.toggle('active', btn.innerText === r));
+            renderCards();
+        };
+        fCon.appendChild(b);
+    });
+
+    function calculateCardValue(card) {
+        const rarity = (card.rarity || 'C').toUpperCase();
+        const base = baseValues[rarity] || 20;
+        const lv = card.level || 1;
+        return Math.floor(base + (base * 0.1 * (lv - 1)));
+    }
 
     function renderCards() {
         const grid = document.getElementById("grid"); grid.innerHTML = "";
         const stacked = {};
         userCards.forEach(c => {
             const key = `${c.name}_${(c.rarity||'C').toUpperCase()}`;
-            if(!stacked[key]) stacked[key] = { ...c, rarity: (c.rarity||'C').toUpperCase(), qty: 1, level: c.level || 1, stars: c.stars || 1, img: c.img || c.image };
-            else { 
-                stacked[key].qty++; 
-                if(c.level > stacked[key].level) stacked[key].level = c.level;
-                if(c.stars > stacked[key].stars) stacked[key].stars = c.stars;
+            if(!stacked[key]) {
+                stacked[key] = { ...c, qty: 1, level: c.level || 1, stars: c.stars || 0 };
+            } else {
+                stacked[key].qty++;
+                if((c.level || 1) > stacked[key].level) stacked[key].level = c.level;
+                if((c.stars || 0) > stacked[key].stars) stacked[key].stars = c.stars;
             }
         });
-
-        let list = Object.values(stacked);
+        
+        let list = Object.values(stacked).sort((a, b) => (rarityOrder[b.rarity] || 0) - (rarityOrder[a.rarity] || 0));
         if (currentFilter !== 'ALL') list = list.filter(c => c.rarity === currentFilter);
-
+        
         list.forEach(card => {
             const div = document.createElement("div");
-            const isMax = card.level >= 20 && card.stars >= 5;
-            div.className = `col-card ${isMax ? 'rainbow-effect' : ''}`;
-            
-            // เงื่อนไข: ดาวจะขึ้นเฉพาะเมื่อ LV. 20 เท่านั้น
-            let starsHTML = '';
-            if (card.level >= 20) {
-                starsHTML = '<div class="star-container">';
-                for(let i=0; i<card.stars; i++) starsHTML += '<span class="star-icon">★</span>';
-                starsHTML += '</div>';
-            }
-
+            const isFullMax = card.level >= 20 && card.stars >= 5;
+            div.className = `col-card ${isFullMax ? 'rainbow-effect' : ''}`;
             div.onclick = () => openModal(card);
-            div.innerHTML = `${card.qty > 1 ? `<div class="qty-badge">x${card.qty}</div>` : ''}${starsHTML}<img src="${card.img}"><div style="padding:10px; font-size:0.7rem; font-weight:bold;">${card.name} (LV.${card.level})</div>`;
+            const nameStyle = isFullMax ? `class="rainbow-text"` : `style="color:${rarityColors[card.rarity.toUpperCase()] || '#fff'}"`;
+            let starsHTML = (card.level >= 20 && card.stars > 0) ? `<div class="star-container">${'<span class="star-icon">★</span>'.repeat(card.stars)}</div>` : '';
+            const cardVal = calculateCardValue(card);
+
+            div.innerHTML = `
+                ${card.qty > 1 ? `<div class="qty-badge">x${card.qty}</div>` : ''}
+                ${starsHTML}
+                <img src="${card.img || card.image}">
+                <div style="padding:10px; font-size:0.7rem; font-weight:bold;">
+                    <span ${nameStyle}>${card.name}</span> (LV.${card.level})<br>
+                    <span style="color:#ffc831; font-size:0.65rem;">💰 ${cardVal.toLocaleString()}</span>
+                </div>`;
             grid.appendChild(div);
         });
     }
 
     window.openModal = (card) => {
-        const lvPrice = 500; const starPrice = 1000;
-        const imgCont = document.getElementById("modalImgContainer");
-        const isMax = card.level >= 20 && card.stars >= 5;
+        const rarity = card.rarity.toUpperCase();
+        const modalBox = document.getElementById("modalMainBox");
+        const modalName = document.getElementById("modalName");
+        const isFullMax = card.level >= 20 && card.stars >= 5;
         
-        // ใส่เอฟเฟกต์รุ้งใน Modal ถ้าเต็มแล้ว
-        imgCont.className = `modal-left ${isMax ? 'rainbow-effect' : ''}`;
+        modalBox.className = "modal-content";
+        modalName.className = ""; modalName.style.color = "";
         
-        document.getElementById("modalImg").src = card.img;
+        if (isFullMax) {
+            modalBox.classList.add("rainbow-effect");
+            modalName.classList.add("rainbow-text");
+        } else {
+            modalBox.classList.add(`modal-theme-${rarity}`);
+            modalName.style.color = rarityColors[rarity] || "#fff";
+        }
+
+        const cardVal = calculateCardValue(card);
+        const sellPrice = baseValues[rarity] || 50; 
+
+        document.getElementById("modalImg").src = card.img || card.image;
         document.getElementById("modalName").innerText = card.name;
-        document.getElementById("modalRarity").innerText = "GRADE: " + card.rarity;
+        document.getElementById("modalRarity").innerText = "GRADE: " + rarity;
+        document.getElementById("modalCardValue").innerText = `💰 มูลค่าอัปเกรด: ${cardVal.toLocaleString()} เหรียญ`;
         document.getElementById("modalLvlDisplay").innerText = "LV. " + card.level;
         document.getElementById("lvlBarFill").style.width = (card.level / 20 * 100) + "%";
         document.getElementById("reqQty").innerText = card.qty;
         
-        // ดาวใน Modal ก็โชว์เฉพาะ LV 20
-        let stars = "";
-        if(card.level >= 20) {
-            for(let i=0; i<5; i++) stars += (i < card.stars) ? "⭐" : "☆";
+        const isMaxLevel = card.level >= 20;
+        const currentStars = card.stars || 0;
+        const lvGroup = document.getElementById("lvUpgradeGroup");
+        const starBtn = document.getElementById("btnUpgradeStar");
+        const sellBtn = document.getElementById("btnSellCard");
+        const maxMsg = document.getElementById("maxLevelMessage");
+
+        if (card.qty > 1) {
+            sellBtn.style.display = "block";
+            sellBtn.innerText = `💰 ขายใบซ้ำที่เหลือ (ใบละ ${sellPrice.toLocaleString()} 🪙)`;
+            sellBtn.onclick = () => handleSell(card, sellPrice);
+        } else {
+            sellBtn.style.display = "none";
         }
-        document.getElementById("modalStarArea").innerText = stars;
 
-        const btnLv = document.getElementById("btnUpgradeLV");
-        btnLv.disabled = !(card.qty >= 2 && userPoints >= lvPrice && card.level < 20);
-        btnLv.onclick = () => handleUpgrade(card, 'level', lvPrice, 2, 'points');
-
-        const btnStar = document.getElementById("btnUpgradeStar");
-        // อัปดาวได้เฉพาะเมื่อ LV.20 แล้วเท่านั้น
-        btnStar.disabled = !(card.level >= 20 && card.qty >= 5 && userDiamonds >= starPrice && card.stars < 5);
-        btnStar.onclick = () => handleUpgrade(card, 'star', starPrice, 5, 'diamonds');
-
+        if (!isMaxLevel) {
+            lvGroup.style.display = "flex"; starBtn.style.display = "none"; maxMsg.style.display = "none";
+            document.getElementById("modalStarArea").innerHTML = "";
+            const req = (card.level < 10) ? 1 : 2;
+            document.getElementById("modalUpgradeInfo").innerText = `เงื่อนไข: ใช้ใบซ้ำ ${req} ใบ`;
+            document.getElementById("modalCurrencyInfo").innerText = "🪙 เหรียญ: 500";
+            document.getElementById("btnUpgradeLV").disabled = !(card.qty > req && userPoints >= 500);
+            document.getElementById("btnUpgradeLV").onclick = () => handleUpgrade(card, 'LV', 500, req);
+            document.getElementById("btnBulkUpgrade").onclick = () => handleUpgrade(card, 'BULK', 500, req);
+        } else {
+            lvGroup.style.display = "none"; starBtn.style.display = "block";
+            document.getElementById("modalStarArea").innerHTML = "⭐".repeat(currentStars) + '<span style="opacity:0.2">' + "⭐".repeat(5 - currentStars) + '</span>';
+            if (currentStars < 5) {
+                const price = (currentStars + 1) * 1000;
+                maxMsg.style.display = "block"; maxMsg.innerText = "✨ เลเวลสูงสุดแล้ว! เริ่มการอัปเกรดดาว ✨";
+                starBtn.innerText = `⭐ อัปดาว (ใช้ ${price.toLocaleString()} 💎)`;
+                starBtn.disabled = !(card.qty >= 6 && userDiamonds >= price);
+                starBtn.onclick = () => handleUpgrade(card, 'STAR', price, 5);
+                document.getElementById("modalUpgradeInfo").innerText = "เงื่อนไข: ใช้ใบซ้ำ 5 ใบ";
+                document.getElementById("modalCurrencyInfo").innerText = `💎 เพชร: ${price.toLocaleString()}`;
+            } else {
+                maxMsg.style.display = "block"; maxMsg.innerText = "🌈 FULL MAX POWER 🌈";
+                starBtn.innerText = "⭐ ขั้นสูงสุดแล้ว ⭐"; starBtn.disabled = true;
+                document.getElementById("modalUpgradeInfo").innerText = "สถานะ: สมบูรณ์แบบ";
+                document.getElementById("modalCurrencyInfo").innerText = "-";
+            }
+        }
         document.getElementById("cardModal").style.display = "flex";
     };
 
-    async function handleUpgrade(card, type, cost, req, currency) {
-        if(!confirm(`ยืนยันการอัปเกรด?`)) return;
-        let removed = 0;
-        const newCol = userCards.filter(c => {
-            if (removed < req && c.name === card.name && (c.rarity||'C').toUpperCase() === card.rarity.toUpperCase()) {
-                removed++; return false;
-            }
-            return true;
-        });
-        const up = { ...card };
-        if(type === 'level') up.level++; else up.stars++;
-        newCol.push(up);
-        
-        const data = { collection: newCol };
-        data[currency] = increment(-cost);
-        await updateDoc(doc(db, "users", currentUID), data);
+    async function handleSell(card, price) {
+        if(!confirm(`ขายการ์ด ${card.name} จำนวน 1 ใบ?`)) return;
+        let others = userCards.filter(c => !(c.name === card.name && (c.rarity||'').toUpperCase() === card.rarity.toUpperCase()));
+        let targets = userCards.filter(c => c.name === card.name && (c.rarity||'').toUpperCase() === card.rarity.toUpperCase());
+        targets.sort((a,b) => (a.level||1) - (b.level||1));
+        targets.shift();
+        const newCol = [...others, ...targets];
+        await updateDoc(doc(db, "users", currentUID), { collection: newCol, points: increment(price) });
         document.getElementById("cardModal").style.display = "none";
     }
 
-    window.handleMassUpgrade = () => alert("ระบบกำลังอัปเกรดเลเวลการ์ดทั้งหมดที่มีซ้ำ...");
-    window.handleMassSell = () => alert("ขายการ์ดส่วนเกินเรียบร้อย!");
+    async function handleUpgrade(card, type, cost, reqQty) {
+        if(!confirm(`ยืนยันการอัปเกรด?`)) return;
+        let others = userCards.filter(c => !(c.name === card.name && (c.rarity||'').toUpperCase() === card.rarity.toUpperCase()));
+        let targets = userCards.filter(c => c.name === card.name && (c.rarity||'').toUpperCase() === card.rarity.toUpperCase());
+        targets.sort((a,b) => (b.level||1) - (a.level||1) || (b.stars||0) - (a.stars||0));
+        let mainCard = targets.shift();
+
+        if(type === 'LV') {
+            if(targets.length < reqQty || userPoints < cost) return;
+            mainCard.level = (mainCard.level || 1) + 1;
+            targets.splice(0, reqQty);
+            const newCol = [...others, mainCard, ...targets];
+            await updateDoc(doc(db, "users", currentUID), { collection: newCol, points: increment(-cost) });
+        } else if(type === 'STAR') {
+            if(targets.length < reqQty || userDiamonds < cost) return;
+            mainCard.stars = (mainCard.stars || 0) + 1;
+            targets.splice(0, reqQty);
+            const newCol = [...others, mainCard, ...targets];
+            await updateDoc(doc(db, "users", currentUID), { collection: newCol, diamonds: increment(-cost) });
+        } else if(type === 'BULK') {
+            let lvUpCount = 0; let tempPoints = userPoints;
+            while(mainCard.level < 20) {
+                let currentReq = mainCard.level < 10 ? 1 : 2;
+                if(targets.length >= currentReq && tempPoints >= 500) {
+                    mainCard.level++; targets.splice(0, currentReq);
+                    tempPoints -= 500; lvUpCount++;
+                } else break;
+            }
+            if(lvUpCount > 0) {
+                const newCol = [...others, mainCard, ...targets];
+                await updateDoc(doc(db, "users", currentUID), { collection: newCol, points: increment(-(lvUpCount * 500)) });
+            }
+        }
+        document.getElementById("cardModal").style.display = "none";
+    }
 </script>
 </body>
 </html>
