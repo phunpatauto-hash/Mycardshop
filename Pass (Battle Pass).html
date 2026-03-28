@@ -7,58 +7,62 @@
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* --- CSS เดิมของคุณ (ห้ามแก้) --- */
         * { box-sizing: border-box; }
         body { font-family: 'Kanit', sans-serif; margin: 0; background: #08080a; color: white; min-height: 100vh; overflow-x: hidden; }
-        
-        /* Navbar & Stats */
         .navbar { padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; background: #000; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 100; }
         .btn-home { background: #333; border: 1px solid #444; color: #fff; padding: 5px 12px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
         .currency-bar { background: rgba(255, 255, 255, 0.05); padding: 6px 15px; border-radius: 20px; display: flex; align-items: center; gap: 15px; border: 1px solid rgba(255, 255, 255, 0.1); }
-        
         .container { padding: 20px 0 140px 0; }
-        
-        /* Progress Bar */
         .xp-container { max-width: 600px; margin: 0 auto 30px; padding: 0 20px; }
         .xp-info { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: bold; font-size: 0.9rem; color: #ffc831; }
         .xp-bar-bg { width: 100%; height: 12px; background: #222; border-radius: 10px; border: 1px solid #333; overflow: hidden; position: relative; }
         .xp-bar-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #ffc831, #ff8c00); transition: width 0.5s ease; box-shadow: 0 0 10px rgba(255, 200, 49, 0.5); }
-        
-        /* Pass System Layout */
         .pass-system { display: flex; flex-direction: column; gap: 15px; padding-bottom: 20px; overflow-x: auto; scroll-behavior: smooth; }
         .pass-row { display: flex; gap: 12px; align-items: center; padding: 10px 40px; min-width: max-content; }
         .track-label { position: sticky; left: 0; z-index: 20; min-width: 150px; height: 185px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: 800; border-radius: 12px; border: 2px solid #333; background: #0d0d10; box-shadow: 10px 0 20px rgba(0,0,0,0.8); }
-        
-        .reward-card { width: 135px; height: 185px; background: #151518; border: 1px solid #333; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 12px 8px; position: relative; overflow: hidden; flex-shrink: 0; transition: 0.4s; }
+        .reward-card { width: 135px; height: 185px; background: #151518; border: 1px solid #333; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 12px 8px; position: relative; overflow: hidden; flex-shrink: 0; transition: 0.4s; cursor: pointer; }
         .reward-img { width: 100%; height: 100px; object-fit: contain; filter: grayscale(1) opacity(0.3); z-index: 2; transition: 0.5s; }
         .lv-badge { position: absolute; top: 5px; left: 5px; background: rgba(0,0,0,0.5); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; }
         .is-unlocked .reward-img { filter: grayscale(0) opacity(1); transform: scale(1.1); }
         .is-claimed::after { content: "CLAIMED"; position: absolute; inset: 0; background: rgba(0,0,0,0.85); color: #2ed573; display: flex; align-items: center; justify-content: center; font-weight: 900; z-index: 10; }
-        
-        /* --- New Purchase Modal --- */
         .buy-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 3000; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
         .buy-modal-content { width: 90%; max-width: 800px; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; position: relative; }
         .close-buy { position: absolute; top: -50px; right: 0; color: white; font-size: 2rem; cursor: pointer; }
-        
         .pass-option-card { background: #1a1a1e; border: 2px solid #333; border-radius: 20px; padding: 30px; width: 340px; text-align: center; transition: 0.3s; position: relative; overflow: hidden; }
         .pass-option-card:hover { transform: translateY(-10px); border-color: #555; }
         .pass-option-card.premium { border-color: #ffc831; box-shadow: 0 0 30px rgba(255, 200, 49, 0.2); }
         .pass-option-card.super { border-color: #ff00ff; box-shadow: 0 0 30px rgba(255, 0, 255, 0.2); }
-
         .pass-option-card h2 { margin: 0 0 15px 0; font-size: 1.8rem; }
         .benefit-list { text-align: left; margin: 20px 0; font-size: 0.9rem; list-style: none; padding: 0; }
         .benefit-list li { margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
         .benefit-list i { color: #2ed573; }
-
         .btn-confirm-buy { width: 100%; padding: 15px; border-radius: 10px; border: none; font-weight: 900; cursor: pointer; font-family: 'Kanit'; font-size: 1.1rem; }
-        
-        /* Action Bar */
         .action-bar { position: fixed; bottom: 0; width: 100%; background: #0d0d10; padding: 20px 50px; display: flex; justify-content: space-between; border-top: 1px solid #333; z-index: 1000; }
         .btn-unlock-pass { background: linear-gradient(135deg, #ffc831, #ff00ff); color: black; border: none; padding: 12px 25px; border-radius: 10px; font-weight: 900; cursor: pointer; display: flex; align-items: center; gap: 10px; }
         .btn-claim { background: #2ed573; color: black; border: none; padding: 12px 40px; border-radius: 10px; font-weight: 900; cursor: pointer; transition: 0.3s; }
         .btn-claim:disabled { background: #333; color: #666; cursor: not-allowed; }
+
+        /* --- ส่วนที่เพิ่มใหม่: CSS ของ Modal ดูรายละเอียดรางวัล --- */
+        .detail-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+        .detail-content { background: #1a1a1e; border: 1px solid #444; border-radius: 20px; padding: 40px; width: 90%; max-width: 400px; text-align: center; position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
+
+    <div id="reward-detail-modal" class="detail-modal" onclick="closeRewardDetail()">
+        <div class="detail-content" onclick="event.stopPropagation()">
+            <span style="position:absolute; top:15px; right:20px; font-size:2rem; cursor:pointer; color:#666;" onclick="closeRewardDetail()">&times;</span>
+            <div id="detail-tag" style="display:inline-block; padding:4px 15px; border-radius:20px; font-size:0.8rem; font-weight:bold; margin-bottom:20px;"></div>
+            <img id="detail-img" src="" style="width:180px; height:180px; object-fit:contain; margin-bottom:20px;">
+            <h2 id="detail-name" style="margin:0; color:#ffc831; font-size:1.8rem;"></h2>
+            <div id="detail-amount" style="font-size:1.4rem; font-weight:bold; margin-bottom:20px;"></div>
+            <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:12px; font-size:0.9rem; color:#aaa;">
+                <i class="fas fa-lock-open"></i> ปลดล็อกเมื่อถึง <span id="detail-lv" style="color:white; font-weight:bold;"></span>
+            </div>
+            <button class="btn-claim" style="width:100%; margin-top:20px;" onclick="closeRewardDetail()">ตกลง</button>
+        </div>
+    </div>
 
     <div id="buy-pass-modal" class="buy-modal">
         <div class="buy-modal-content">
@@ -102,7 +106,7 @@
     <div class="container">
         <div class="header-info" style="text-align: center; margin-bottom: 20px;">
             <div id="season-countdown" style="color:#ffc831; font-size:0.9rem; margin-bottom:10px; font-weight: bold;"></div>
-            <h1 style="font-size: 2.2rem; font-weight: 900; color: #ffc831; margin: 0;">BATTLE PASS SS1 สถานที่แห่งความสงบสุข</h1>
+            <h1 style="font-size: 2.2rem; font-weight: 900; color: #ffc831; margin: 0;">BATTLE PASS SS1</h1>
         </div>
 
         <div class="xp-container">
@@ -173,53 +177,63 @@
     window.openBuyModal = () => document.getElementById('buy-pass-modal').style.display = 'flex';
     window.closeBuyModal = () => document.getElementById('buy-pass-modal').style.display = 'none';
 
+    /* ฟังก์ชันเปิดรายละเอียด (i) */
+    window.openRewardDetail = (name, amount, img, lv, track) => {
+        document.getElementById('detail-img').src = img;
+        document.getElementById('detail-name').innerText = name;
+        document.getElementById('detail-amount').innerText = `จำนวน: ${amount.toLocaleString()}`;
+        document.getElementById('detail-lv').innerText = `LEVEL ${lv}`;
+        const tag = document.getElementById('detail-tag');
+        tag.innerText = track.toUpperCase() + " REWARD";
+        if(track === 'super') { tag.style.background = "#ff00ff"; tag.style.color = "white"; }
+        else if(track === 'premium') { tag.style.background = "#ffc831"; tag.style.color = "black"; }
+        else { tag.style.background = "#888"; tag.style.color = "white"; }
+        document.getElementById('reward-detail-modal').style.display = 'flex';
+    };
+    window.closeRewardDetail = () => document.getElementById('reward-detail-modal').style.display = 'none';
+
     function calculateLevelProgress(totalExp) {
-        let lv = 1; let remainingExp = totalExp;
+        let lv = 1; 
+        let remainingExp = totalExp;
+        let stars = 0;
         while (lv < 50) {
             let req = Math.floor(Math.min(50 * Math.pow(1.2, lv - 1), 20000));
-            if (remainingExp >= req) { remainingExp -= req; lv++; } else break;
+            if (remainingExp >= req) {
+                remainingExp -= req;
+                lv++;
+            } else { break; }
         }
-        return { lv, currentXp: remainingExp, reqXp: Math.floor(Math.min(50 * Math.pow(1.2, lv - 1), 20000)) };
+        if (lv === 50) {
+            stars = Math.floor(remainingExp / 1000);
+            remainingExp = remainingExp % 1000;
+            return { lv, currentXp: remainingExp, reqXp: 1000, stars, isMax: true };
+        }
+        return { lv, currentXp: remainingExp, reqXp: Math.floor(Math.min(50 * Math.pow(1.2, lv - 1), 20000)), stars: 0, isMax: false };
     }
 
-    // --- ระบบนับเวลาสิ้นเดือนและรีเซ็ต ---
     function getEndOfMonth() {
         const now = new Date();
-        // วันที่ 0 ของเดือนหน้า คือวันสุดท้ายของเดือนนี้
         return new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59).getTime();
     }
 
     async function handleSeasonTimer(uid) {
         const timerEl = document.getElementById("season-countdown");
-        
         const update = async () => {
             const now = new Date().getTime();
             const target = getEndOfMonth();
             const diff = target - now;
-
             if (diff <= 0) {
-                // หมดเดือน: รีเซ็ตข้อมูล
                 const userRef = doc(db, "users", uid);
-                await updateDoc(userRef, {
-                    passExp: 0,
-                    isPremiumUser: false,
-                    isSuperUser: false,
-                    claimedRewards: [],
-                    xpMultiplier: 1,
-                    lastSeasonReset: new Date().getMonth() // บันทึกเดือนที่รีเซ็ตล่าสุด
-                });
+                await updateDoc(userRef, { passExp: 0, isPremiumUser: false, isSuperUser: false, claimedRewards: [], xpMultiplier: 1 });
                 return;
             }
-
             const d = Math.floor(diff / (1000 * 60 * 60 * 24));
             const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const s = Math.floor((diff % (1000 * 60)) / 1000);
             timerEl.innerHTML = `<i class="fas fa-history"></i> สิ้นสุดซีซั่นใน: ${d}วัน ${h}ชม. ${m}นาที ${s}วิ.`;
         };
-
-        setInterval(update, 1000);
-        update();
+        setInterval(update, 1000); update();
     }
 
     onAuthStateChanged(auth, async (user) => {
@@ -233,13 +247,28 @@
     function renderUI(data) {
         document.getElementById("pts").innerText = (data.points || 0).toLocaleString();
         document.getElementById("dia").innerText = (data.diamonds || 0).toLocaleString();
-        document.getElementById("star").innerText = (data.stars || 0).toLocaleString();
-
         const prog = calculateLevelProgress(data.passExp || 0);
-        document.getElementById("lv-display").innerText = `LEVEL ${prog.lv}`;
-        document.getElementById("xp-text").innerText = `${Math.floor(prog.currentXp).toLocaleString()} / ${prog.reqXp.toLocaleString()} XP`;
-        document.getElementById("xp-fill").style.width = `${(prog.currentXp / prog.reqXp) * 100}%`;
+        const totalStars = (data.stars || 0) + prog.stars;
+        document.getElementById("star").innerText = totalStars.toLocaleString();
 
+        const lvDisplay = document.getElementById("lv-display");
+        const xpText = document.getElementById("xp-text");
+        const xpFill = document.getElementById("xp-fill");
+
+        if (prog.isMax) {
+            lvDisplay.innerText = `LEVEL MAX (STAR: ${prog.stars})`;
+            lvDisplay.style.color = "#00d4ff";
+            xpText.innerText = `${Math.floor(prog.currentXp).toLocaleString()} / 1,000 XP (ถัดไป: +1 ⭐)`;
+            xpFill.style.background = "linear-gradient(90deg, #00d4ff, #0056ff)";
+        } else {
+            lvDisplay.innerText = `LEVEL ${prog.lv}`;
+            lvDisplay.style.color = "#ffc831";
+            xpText.innerText = `${Math.floor(prog.currentXp).toLocaleString()} / ${prog.reqXp.toLocaleString()} XP`;
+            xpFill.style.background = "linear-gradient(90deg, #ffc831, #ff8c00)";
+        }
+        xpFill.style.width = `${(prog.currentXp / prog.reqXp) * 100}%`;
+
+        /* จัดการปุ่มซื้อ (ตัว i อยู่ซ้าย) */
         const btnShop = document.getElementById("btn-open-shop");
         if(data.isSuperUser) {
             btnShop.style.background = "#2ed573";
@@ -256,15 +285,17 @@
             const row = document.getElementById(`${track}-track`);
             const label = row.querySelector('.track-label');
             row.innerHTML = ''; row.appendChild(label);
-            
             passData.forEach(item => {
                 const reward = item[track];
                 const isOwned = track === 'free' ? true : (track === 'premium' ? data.isPremiumUser : data.isSuperUser);
                 const unlocked = prog.lv >= item.lv && isOwned;
                 const isClaimed = claimed.includes(reward.id);
-                
                 const card = document.createElement("div");
                 card.className = `reward-card ${unlocked ? 'is-unlocked' : ''} ${isClaimed ? 'is-claimed' : ''}`;
+                
+                /* คลิกที่การ์ดเพื่อดูรายละเอียด */
+                card.onclick = () => window.openRewardDetail(reward.name, reward.amount, reward.img, item.lv, track);
+                
                 card.innerHTML = `<div class="lv-badge">LV.${item.lv}</div><div class="reward-name" style="font-size:0.7rem;">${reward.name}</div><img src="${reward.img}" class="reward-img"><div class="reward-val">${reward.amount.toLocaleString()}</div>`;
                 row.appendChild(card);
             });
@@ -285,11 +316,11 @@
 
     async function processBuy(type) {
         const user = auth.currentUser;
+        if (!user) return;
         const userRef = doc(db, "users", user.uid);
         const snap = await getDoc(userRef);
         const data = snap.data();
         const gems = data.diamonds || 0;
-
         if (type === 'premium') {
             if (data.isPremiumUser) return alert("คุณมี Premium อยู่แล้ว");
             if (gems < PRICE_PREMIUM) return alert("เพชรไม่พอ!");
@@ -298,19 +329,10 @@
         } else {
             if (data.isSuperUser) return alert("คุณเป็น Super+ อยู่แล้ว");
             if (gems < PRICE_SUPER) return alert("เพชรไม่พอ!");
-            
             let addedExp = 0;
             let tempLv = calculateLevelProgress(data.passExp || 0).lv;
-            for(let i=0; i<20; i++) {
-                addedExp += Math.floor(Math.min(50 * Math.pow(1.2, (tempLv + i) - 1), 20000));
-            }
-
-            await updateDoc(userRef, { 
-                diamonds: gems - PRICE_SUPER, 
-                isPremiumUser: true, 
-                isSuperUser: true,
-                passExp: (data.passExp || 0) + addedExp 
-            });
+            for(let i=0; i<20; i++) { addedExp += Math.floor(Math.min(50 * Math.pow(1.2, (tempLv + i) - 1), 20000)); }
+            await updateDoc(userRef, { diamonds: gems - PRICE_SUPER, isPremiumUser: true, isSuperUser: true, passExp: (data.passExp || 0) + addedExp });
             alert("ยินดีด้วย! ปลดล็อก 20 เลเวลทันที!");
         }
         closeBuyModal();
@@ -318,21 +340,16 @@
 
     document.getElementById("claim-btn").onclick = async () => {
         const user = auth.currentUser;
+        if (!user) return;
         const userRef = doc(db, "users", user.uid);
         const snap = await getDoc(userRef);
         const data = snap.data();
         const prog = calculateLevelProgress(data.passExp || 0);
         const claimed = data.claimedRewards || [];
-        
         let addPoints = 0, addDiamonds = 0, newlyClaimed = [];
-
         passData.forEach(item => {
             if (prog.lv < item.lv) return;
-            const tracks = [
-                { type: 'free', active: true },
-                { type: 'premium', active: data.isPremiumUser },
-                { type: 'super', active: data.isSuperUser }
-            ];
+            const tracks = [{ type: 'free', active: true }, { type: 'premium', active: data.isPremiumUser }, { type: 'super', active: data.isSuperUser }];
             tracks.forEach(t => {
                 const r = item[t.type];
                 if (t.active && !claimed.includes(r.id)) {
@@ -342,13 +359,8 @@
                 }
             });
         });
-
         if (newlyClaimed.length > 0) {
-            await updateDoc(userRef, {
-                points: (data.points || 0) + addPoints,
-                diamonds: (data.diamonds || 0) + addDiamonds,
-                claimedRewards: [...claimed, ...newlyClaimed]
-            });
+            await updateDoc(userRef, { points: (data.points || 0) + addPoints, diamonds: (data.diamonds || 0) + addDiamonds, claimedRewards: [...claimed, ...newlyClaimed] });
             alert("รับรางวัลสำเร็จ!");
         }
     };
