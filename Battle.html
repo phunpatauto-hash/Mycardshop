@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CARD BATTLE - Arena</title>
+    <title>CARD BATTLE - Rank Arena</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         body { 
@@ -18,11 +18,24 @@
         }
         .container { max-width: 1000px; margin: 20px auto; padding: 20px; text-align: center; }
         
+        /* Rank System Display */
+        .rank-card {
+            background: rgba(255, 255, 255, 0.05); padding: 20px;
+            border-radius: 20px; border: 1px solid rgba(255, 200, 49, 0.3);
+            display: flex; align-items: center; gap: 20px; margin-bottom: 30px; text-align: left;
+        }
+        .rank-icon { font-size: 3.5rem; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); }
+        .rank-info { flex: 1; }
+        .rank-name { font-size: 1.5rem; font-weight: bold; color: #ffc831; letter-spacing: 1px; }
+        .trophy-count { color: #fff; font-size: 1.1rem; margin-top: 5px; }
+        .rank-progress-bg { width: 100%; height: 10px; background: #222; border-radius: 10px; margin-top: 12px; overflow: hidden; border: 1px solid #333; }
+        .rank-progress-fill { height: 100%; background: linear-gradient(90deg, #ffc831, #ff9000); width: 0%; transition: 1s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
+
         /* Battle Arena */
         .arena { 
             display: flex; justify-content: space-around; align-items: center; 
-            background: rgba(255,255,255,0.05); padding: 40px; border-radius: 30px;
-            border: 2px solid rgba(255,200,49,0.2); margin-bottom: 30px;
+            background: rgba(255,255,255,0.03); padding: 40px; border-radius: 30px;
+            border: 2px solid rgba(255,200,49,0.1); margin-bottom: 30px;
             min-height: 300px; position: relative;
         }
         .side { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 15px; }
@@ -37,8 +50,7 @@
         .card-active { border: 2px solid #ffc831; box-shadow: 0 0 15px #ffc831; overflow: hidden; }
         .card-active img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Stats Display */
-        .stat-box { font-size: 1.2rem; font-weight: bold; margin-top: 10px; }
+        .stat-box { font-size: 1rem; font-weight: bold; margin-top: 10px; color: #ccc; }
         .hp-bar-bg { width: 200px; height: 15px; background: #333; border-radius: 10px; overflow: hidden; margin: 5px 0; border: 1px solid #555; }
         .hp-bar-fill { height: 100%; background: #00ff88; width: 100%; transition: 0.5s; }
 
@@ -46,7 +58,7 @@
         .selection-list { 
             display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); 
             gap: 15px; background: rgba(0,0,0,0.3); padding: 20px; border-radius: 20px;
-            max-height: 400px; overflow-y: auto; border: 1px solid #333;
+            max-height: 350px; overflow-y: auto; border: 1px solid #333;
         }
         .select-card { 
             cursor: pointer; border-radius: 10px; overflow: hidden; border: 2px solid transparent; 
@@ -54,14 +66,16 @@
         }
         .select-card:hover { border-color: #ffc831; transform: scale(1.05); }
         .select-card img { width: 100%; display: block; }
-        .select-card .info { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.7); font-size: 0.7rem; padding: 2px; }
+        .select-card .info { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.8); font-size: 0.7rem; padding: 4px 0; }
 
         .btn-battle { 
             background: linear-gradient(45deg, #ffc831, #ff9000); color: #000; 
-            padding: 15px 40px; border-radius: 30px; border: none; font-weight: bold;
+            padding: 15px 50px; border-radius: 30px; border: none; font-weight: bold;
             font-size: 1.2rem; cursor: pointer; margin-top: 20px; transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 200, 49, 0.3);
         }
-        .btn-battle:disabled { background: #444; color: #888; cursor: not-allowed; }
+        .btn-battle:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(255, 200, 49, 0.4); }
+        .btn-battle:disabled { background: #444; color: #888; cursor: not-allowed; box-shadow: none; }
 
         /* Animation */
         @keyframes attack-player { 0% { transform: translateX(0); } 50% { transform: translateX(50px); } 100% { transform: translateX(0); } }
@@ -80,11 +94,22 @@
     </nav>
 
     <div class="container">
-        <h2 id="battle-status">เลือกการ์ดของคุณเพื่อเริ่มการต่อสู้!</h2>
+        <div class="rank-card">
+            <div id="rank-emoji" class="rank-icon">🥉</div>
+            <div class="rank-info">
+                <div id="rank-name" class="rank-name">BRONZE I</div>
+                <div class="trophy-count">🏆 <span id="current-trophies">0</span> / <span id="next-rank-at">200</span></div>
+                <div class="rank-progress-bg">
+                    <div id="rank-progress" class="rank-progress-fill"></div>
+                </div>
+            </div>
+        </div>
+
+        <h2 id="battle-status" style="margin-bottom: 25px; color: #ffc831;">เลือกการ์ดของคุณเพื่อเริ่มการต่อสู้!</h2>
         
         <div class="arena">
             <div class="side" id="player-side">
-                <div class="stat-box">พลังงานชีวิต (PLAYER)</div>
+                <div class="stat-box">HP (PLAYER)</div>
                 <div class="hp-bar-bg"><div id="p-hp" class="hp-bar-fill"></div></div>
                 <div id="p-slot" class="card-slot">?</div>
                 <div id="p-power" style="color: #00d4ff; font-weight: bold;">ATK: 0</div>
@@ -93,7 +118,7 @@
             <div class="vs-badge">VS</div>
 
             <div class="side" id="enemy-side">
-                <div class="stat-box">พลังงานชีวิต (ENEMY)</div>
+                <div class="stat-box">HP (ENEMY)</div>
                 <div class="hp-bar-bg"><div id="e-hp" class="hp-bar-fill" style="background: #ff4d4d;"></div></div>
                 <div id="e-slot" class="card-slot">?</div>
                 <div id="e-power" style="color: #ff4d4d; font-weight: bold;">ATK: 0</div>
@@ -102,7 +127,7 @@
 
         <button id="startBtn" class="btn-battle" disabled>⚔️ เริ่มการต่อสู้!</button>
 
-        <h3 style="margin-top: 40px; text-align: left;">🎴 เลือกการ์ดของคุณ</h3>
+        <h3 style="margin-top: 40px; text-align: left; color: #ffc831;">🎴 การ์ดที่คุณครอบครอง</h3>
         <div id="selection" class="selection-list"></div>
     </div>
 
@@ -124,7 +149,17 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    let userCards = [], currentUID = null;
+    // ระดับแรงค์
+    const RANKS = [
+        { name: "BRONZE", min: 0, icon: "🥉", color: "#cd7f32" },
+        { name: "SILVER", min: 200, icon: "🥈", color: "#c0c0c0" },
+        { name: "GOLD", min: 500, icon: "🥇", color: "#ffd700" },
+        { name: "PLATINUM", min: 1000, icon: "💎", color: "#e5e4e2" },
+        { name: "DIAMOND", min: 2000, icon: "💠", color: "#b9f2ff" },
+        { name: "GRANDMASTER", min: 4000, icon: "👑", color: "#ff00ff" }
+    ];
+
+    let userCards = [], currentUID = null, userTrophies = 0;
     let selectedCard = null;
     let isBattling = false;
 
@@ -133,31 +168,50 @@
             currentUID = user.uid;
             onSnapshot(doc(db, "users", user.uid), (snap) => {
                 if (snap.exists()) {
-                    userCards = snap.data().collection || [];
+                    const data = snap.data();
+                    userCards = data.collection || [];
+                    userTrophies = data.trophies || 0;
+                    updateRankUI(userTrophies);
                     renderSelection();
                 }
             });
         } else { window.location.href = "login.html"; }
     });
 
+    function updateRankUI(trophies) {
+        let currentRank = RANKS[0];
+        let nextRank = RANKS[1];
+
+        for (let i = 0; i < RANKS.length; i++) {
+            if (trophies >= RANKS[i].min) {
+                currentRank = RANKS[i];
+                nextRank = RANKS[i+1] || { min: trophies + 1000 }; 
+            }
+        }
+
+        document.getElementById("rank-emoji").innerText = currentRank.icon;
+        document.getElementById("rank-name").innerText = currentRank.name;
+        document.getElementById("rank-name").style.color = currentRank.color;
+        document.getElementById("current-trophies").innerText = trophies;
+        document.getElementById("next-rank-at").innerText = nextRank.min;
+
+        const range = nextRank.min - currentRank.min;
+        const progress = ((trophies - currentRank.min) / range) * 100;
+        document.getElementById("rank-progress").style.width = Math.min(100, progress) + "%";
+    }
+
     function renderSelection() {
         const container = document.getElementById("selection");
         container.innerHTML = "";
-        
-        // กรองการ์ดที่ซ้ำให้เหลือใบที่โหดที่สุดโชว์พอ
         const seen = {};
         userCards.forEach(c => {
             const key = c.name + (c.rarity || 'C');
             if (!seen[key] || (c.level > seen[key].level)) seen[key] = c;
         });
-
         Object.values(seen).forEach(card => {
             const div = document.createElement("div");
             div.className = "select-card";
-            div.innerHTML = `
-                <img src="${card.img || card.image}">
-                <div class="info">LV.${card.level || 1} | ${card.rarity}</div>
-            `;
+            div.innerHTML = `<img src="${card.img || card.image}"><div class="info">LV.${card.level || 1} | ${card.rarity}</div>`;
             div.onclick = () => selectMyCard(card);
             container.appendChild(div);
         });
@@ -169,13 +223,9 @@
         const slot = document.getElementById("p-slot");
         slot.innerHTML = `<img src="${card.img || card.image}">`;
         slot.classList.add("card-active");
-        
-        // คำนวณพลัง ATK: (Base 100) + (LV * 50) + (Stars * 200)
         const atk = 100 + ((card.level || 1) * 50) + ((card.stars || 0) * 200);
         document.getElementById("p-power").innerText = `ATK: ${atk}`;
         document.getElementById("startBtn").disabled = false;
-        
-        // สุ่มการ์ดศัตรูมาหลอกๆ
         setupEnemy();
     }
 
@@ -204,7 +254,6 @@
         const status = document.getElementById("battle-status");
 
         const fight = setInterval(async () => {
-            // Player Attack
             document.getElementById("p-slot").classList.add("animate-atk-p");
             eHP -= Math.floor(pAtk / 10);
             document.getElementById("e-hp").style.width = Math.max(0, eHP) + "%";
@@ -212,14 +261,18 @@
 
             if (eHP <= 0) {
                 clearInterval(fight);
-                status.innerText = "🎉 คุณชนะ! ได้รับ 500 🪙";
-                await updateDoc(doc(db, "users", currentUID), { points: increment(500) });
+                const winPoints = 500;
+                const winTrophies = 25;
+                status.innerText = `🎉 ชนะ! +${winPoints} 🪙 | +${winTrophies} 🏆`;
+                await updateDoc(doc(db, "users", currentUID), { 
+                    points: increment(winPoints),
+                    trophies: increment(winTrophies)
+                });
                 endBattle();
                 return;
             }
 
-            // Enemy Attack
-            setTimeout(() => {
+            setTimeout(async () => {
                 document.getElementById("e-slot").classList.add("animate-atk-e");
                 pHP -= Math.floor(enemyAtk / 10);
                 document.getElementById("p-hp").style.width = Math.max(0, pHP) + "%";
@@ -227,7 +280,11 @@
 
                 if (pHP <= 0) {
                     clearInterval(fight);
-                    status.innerText = "💀 คุณแพ้! พยายามใหม่อีกครั้ง";
+                    const loseTrophy = userTrophies > 200 ? -10 : 0;
+                    status.innerText = `💀 แพ้! ${loseTrophy !== 0 ? loseTrophy + ' 🏆' : ''}`;
+                    if(loseTrophy !== 0) {
+                        await updateDoc(doc(db, "users", currentUID), { trophies: increment(loseTrophy) });
+                    }
                     endBattle();
                 }
             }, 500);
