@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CARD BATTLE - Arena</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Kanit', sans-serif; margin: 0; 
+            background: radial-gradient(circle at top, #1a1a2e 0%, #050505 100%); 
+            color: white; min-height: 100vh; overflow-x: hidden;
+        }
+        .navbar { 
+            background: rgba(10, 10, 15, 0.9); padding: 15px 25px; 
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid #ffc831; backdrop-filter: blur(10px);
+        }
+        .container { max-width: 1000px; margin: 20px auto; padding: 20px; text-align: center; }
+        
+        /* Battle Arena */
+        .arena { 
+            display: flex; justify-content: space-around; align-items: center; 
+            background: rgba(255,255,255,0.05); padding: 40px; border-radius: 30px;
+            border: 2px solid rgba(255,200,49,0.2); margin-bottom: 30px;
+            min-height: 300px; position: relative;
+        }
+        .side { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .vs-badge { font-size: 3rem; font-weight: 900; color: #ff4d4d; text-shadow: 0 0 20px #ff4d4d; }
+        
+        /* Card Slot */
+        .card-slot { 
+            width: 150px; aspect-ratio: 2/3; background: rgba(0,0,0,0.5); 
+            border: 2px dashed #444; border-radius: 15px; display: flex;
+            justify-content: center; align-items: center; transition: 0.3s;
+        }
+        .card-active { border: 2px solid #ffc831; box-shadow: 0 0 15px #ffc831; overflow: hidden; }
+        .card-active img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Stats Display */
+        .stat-box { font-size: 1.2rem; font-weight: bold; margin-top: 10px; }
+        .hp-bar-bg { width: 200px; height: 15px; background: #333; border-radius: 10px; overflow: hidden; margin: 5px 0; border: 1px solid #555; }
+        .hp-bar-fill { height: 100%; background: #00ff88; width: 100%; transition: 0.5s; }
+
+        /* Selection List */
+        .selection-list { 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); 
+            gap: 15px; background: rgba(0,0,0,0.3); padding: 20px; border-radius: 20px;
+            max-height: 400px; overflow-y: auto; border: 1px solid #333;
+        }
+        .select-card { 
+            cursor: pointer; border-radius: 10px; overflow: hidden; border: 2px solid transparent; 
+            transition: 0.2s; position: relative;
+        }
+        .select-card:hover { border-color: #ffc831; transform: scale(1.05); }
+        .select-card img { width: 100%; display: block; }
+        .select-card .info { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.7); font-size: 0.7rem; padding: 2px; }
+
+        .btn-battle { 
+            background: linear-gradient(45deg, #ffc831, #ff9000); color: #000; 
+            padding: 15px 40px; border-radius: 30px; border: none; font-weight: bold;
+            font-size: 1.2rem; cursor: pointer; margin-top: 20px; transition: 0.3s;
+        }
+        .btn-battle:disabled { background: #444; color: #888; cursor: not-allowed; }
+
+        /* Animation */
+        @keyframes attack-player { 0% { transform: translateX(0); } 50% { transform: translateX(50px); } 100% { transform: translateX(0); } }
+        @keyframes attack-enemy { 0% { transform: translateX(0); } 50% { transform: translateX(-50px); } 100% { transform: translateX(0); } }
+        .animate-atk-p { animation: attack-player 0.3s; }
+        .animate-atk-e { animation: attack-enemy 0.3s; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div style="font-weight: bold; color: #ffc831; font-size: 1.2rem;">⚔️ CARD ARENA</div>
+        <div>
+            <a href="Collection.html" style="color: white; text-decoration: none; font-weight: bold;">🔙 กลับหน้าคอลเลกชัน</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2 id="battle-status">เลือกการ์ดของคุณเพื่อเริ่มการต่อสู้!</h2>
+        
+        <div class="arena">
+            <div class="side" id="player-side">
+                <div class="stat-box">พลังงานชีวิต (PLAYER)</div>
+                <div class="hp-bar-bg"><div id="p-hp" class="hp-bar-fill"></div></div>
+                <div id="p-slot" class="card-slot">?</div>
+                <div id="p-power" style="color: #00d4ff; font-weight: bold;">ATK: 0</div>
+            </div>
+
+            <div class="vs-badge">VS</div>
+
+            <div class="side" id="enemy-side">
+                <div class="stat-box">พลังงานชีวิต (ENEMY)</div>
+                <div class="hp-bar-bg"><div id="e-hp" class="hp-bar-fill" style="background: #ff4d4d;"></div></div>
+                <div id="e-slot" class="card-slot">?</div>
+                <div id="e-power" style="color: #ff4d4d; font-weight: bold;">ATK: 0</div>
+            </div>
+        </div>
+
+        <button id="startBtn" class="btn-battle" disabled>⚔️ เริ่มการต่อสู้!</button>
+
+        <h3 style="margin-top: 40px; text-align: left;">🎴 เลือกการ์ดของคุณ</h3>
+        <div id="selection" class="selection-list"></div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = { 
+        apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM", 
+        authDomain: "sign-up-73f99.firebaseapp.com", 
+        projectId: "sign-up-73f99", 
+        storageBucket: "sign-up-73f99.appspot.com", 
+        messagingSenderId: "916335559099", 
+        appId: "1:916335559099:web:3a8ed896ba26e38991849e" 
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let userCards = [], currentUID = null;
+    let selectedCard = null;
+    let isBattling = false;
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUID = user.uid;
+            onSnapshot(doc(db, "users", user.uid), (snap) => {
+                if (snap.exists()) {
+                    userCards = snap.data().collection || [];
+                    renderSelection();
+                }
+            });
+        } else { window.location.href = "login.html"; }
+    });
+
+    function renderSelection() {
+        const container = document.getElementById("selection");
+        container.innerHTML = "";
+        
+        // กรองการ์ดที่ซ้ำให้เหลือใบที่โหดที่สุดโชว์พอ
+        const seen = {};
+        userCards.forEach(c => {
+            const key = c.name + (c.rarity || 'C');
+            if (!seen[key] || (c.level > seen[key].level)) seen[key] = c;
+        });
+
+        Object.values(seen).forEach(card => {
+            const div = document.createElement("div");
+            div.className = "select-card";
+            div.innerHTML = `
+                <img src="${card.img || card.image}">
+                <div class="info">LV.${card.level || 1} | ${card.rarity}</div>
+            `;
+            div.onclick = () => selectMyCard(card);
+            container.appendChild(div);
+        });
+    }
+
+    function selectMyCard(card) {
+        if (isBattling) return;
+        selectedCard = card;
+        const slot = document.getElementById("p-slot");
+        slot.innerHTML = `<img src="${card.img || card.image}">`;
+        slot.classList.add("card-active");
+        
+        // คำนวณพลัง ATK: (Base 100) + (LV * 50) + (Stars * 200)
+        const atk = 100 + ((card.level || 1) * 50) + ((card.stars || 0) * 200);
+        document.getElementById("p-power").innerText = `ATK: ${atk}`;
+        document.getElementById("startBtn").disabled = false;
+        
+        // สุ่มการ์ดศัตรูมาหลอกๆ
+        setupEnemy();
+    }
+
+    let enemyAtk = 0;
+    function setupEnemy() {
+        const enemies = [
+            { name: "บอสเงา", img: "https://via.placeholder.com/150/000000/FFFFFF?text=BOSS", atk: 500 },
+            { name: "มังกรไฟ", img: "https://via.placeholder.com/150/FF4500/FFFFFF?text=DRAGON", atk: 1200 },
+            { name: "สไลม์เทพ", img: "https://via.placeholder.com/150/00FF88/000000?text=SLIME", atk: 300 }
+        ];
+        const randomEnemy = enemies[Math.floor(Math.random() * enemies.length)];
+        const slot = document.getElementById("e-slot");
+        slot.innerHTML = `<img src="${randomEnemy.img}">`;
+        slot.classList.add("card-active");
+        enemyAtk = randomEnemy.atk;
+        document.getElementById("e-power").innerText = `ATK: ${enemyAtk}`;
+    }
+
+    document.getElementById("startBtn").onclick = async () => {
+        if (!selectedCard || isBattling) return;
+        isBattling = true;
+        document.getElementById("startBtn").disabled = true;
+        
+        let pHP = 100, eHP = 100;
+        const pAtk = 100 + ((selectedCard.level || 1) * 50) + ((selectedCard.stars || 0) * 200);
+        const status = document.getElementById("battle-status");
+
+        const fight = setInterval(async () => {
+            // Player Attack
+            document.getElementById("p-slot").classList.add("animate-atk-p");
+            eHP -= Math.floor(pAtk / 10);
+            document.getElementById("e-hp").style.width = Math.max(0, eHP) + "%";
+            setTimeout(() => document.getElementById("p-slot").classList.remove("animate-atk-p"), 300);
+
+            if (eHP <= 0) {
+                clearInterval(fight);
+                status.innerText = "🎉 คุณชนะ! ได้รับ 500 🪙";
+                await updateDoc(doc(db, "users", currentUID), { points: increment(500) });
+                endBattle();
+                return;
+            }
+
+            // Enemy Attack
+            setTimeout(() => {
+                document.getElementById("e-slot").classList.add("animate-atk-e");
+                pHP -= Math.floor(enemyAtk / 10);
+                document.getElementById("p-hp").style.width = Math.max(0, pHP) + "%";
+                setTimeout(() => document.getElementById("e-slot").classList.remove("animate-atk-e"), 300);
+
+                if (pHP <= 0) {
+                    clearInterval(fight);
+                    status.innerText = "💀 คุณแพ้! พยายามใหม่อีกครั้ง";
+                    endBattle();
+                }
+            }, 500);
+
+        }, 1000);
+    };
+
+    function endBattle() {
+        isBattling = false;
+        setTimeout(() => {
+            document.getElementById("p-hp").style.width = "100%";
+            document.getElementById("e-hp").style.width = "100%";
+            document.getElementById("startBtn").disabled = false;
+        }, 3000);
+    }
+</script>
+</body>
+</html>
