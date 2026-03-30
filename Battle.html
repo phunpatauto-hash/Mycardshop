@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CARD ARENA PRO - Battle System v4</title>
+    <title>CARD ARENA PRO - Ultimate Battle System</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         body { 
@@ -39,18 +39,20 @@
         .tab { flex: 1; min-width: 80px; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid #333; color: #888; cursor: pointer; border-radius: 10px; transition: 0.3s; font-weight: bold; text-align: center;}
         .tab.active { background: #ffc831; color: black; border-color: #ffc831; }
 
-        /* Cards */
-        .mini-card { width: 85px; aspect-ratio: 2/3; background: #1a1a1a; border-radius: 8px; border: 1px solid #444; overflow: hidden; position: relative; transition: 0.3s; }
+        /* Cards & Logic Visuals */
+        .card-row { display: flex; gap: 10px; margin: 15px 0; justify-content: center; flex-wrap: wrap; }
+        .mini-card { width: 85px; aspect-ratio: 2/3; background: #1a1a1a; border-radius: 8px; border: 1px solid #444; overflow: hidden; position: relative; transition: 0.3s; cursor: pointer; }
         .mini-card img { width: 100%; height: 100%; object-fit: cover; }
-        .rarity-exr { border: 2px solid #ff00ff; box-shadow: 0 0 10px #ff00ff; }
-        .exr-badge { position: absolute; top: 0; left: 0; background: #ff00ff; color: white; font-size: 0.5rem; padding: 1px 3px; font-weight: bold; }
+        .rarity-exr { border: 2px solid #ff00ff !important; box-shadow: 0 0 10px #ff00ff; }
+        .exr-badge { position: absolute; top: 0; left: 0; background: #ff00ff; color: white; font-size: 0.5rem; padding: 1px 3px; font-weight: bold; z-index: 2; }
         
         .stat-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; padding: 2px; font-size: 0.6rem; }
         .lv-badge { position: absolute; top: 2px; right: 2px; background: #ffc831; color: black; font-size: 0.6rem; padding: 1px 4px; border-radius: 3px; font-weight: bold; }
+        .selected-glow { border: 2px solid #ffc831 !important; box-shadow: 0 0 15px #ffc831; opacity: 0.5; }
 
         .opponent-card { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px; margin-bottom: 12px; border: 1px solid #222; }
         .btn-action { background: linear-gradient(45deg, #ffc831, #ff9000); color: black; border: none; padding: 12px 25px; border-radius: 20px; font-weight: bold; cursor: pointer; }
-        .btn-action:disabled { background: #444; color: #888; }
+        .btn-action:disabled { background: #444; color: #888; cursor: not-allowed; }
 
         #view-battle, #view-leaderboard, #view-history, #view-prep, #view-defense { display: none; }
     </style>
@@ -65,7 +67,7 @@
     <div id="rankModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="toggleRankModal(false)">&times;</span>
-            <h3 style="color: #ffc831; text-align: center; margin-bottom: 20px;">🎖️ ระดับแรงค์ทั้งหมด</h3>
+            <h3 style="color: #ffc831; text-align: center; margin-bottom: 20px;">🎖️ ระดับแรงค์ที่กำหนด</h3>
             <div id="rank-info-list"></div>
         </div>
     </div>
@@ -92,31 +94,42 @@
         <div id="view-lobby"><div id="lobby-list"></div></div>
 
         <div id="view-history">
-            <h3 style="color:#ffc831;">🕒 ประวัติการต่อสู้ (รวมป้องกันบ้าน)</h3>
+            <h3 style="color:#ffc831;">🕒 ประวัติการต่อสู้ (รวมบันทึกเฝ้าบ้าน)</h3>
             <div id="history-list"></div>
         </div>
 
         <div id="view-prep">
-            <div style="text-align: center;"><div id="prep-slots" class="card-row"></div><button class="btn-action" id="go-battle-btn" disabled>⚔️ เริ่มเลย</button></div>
-            <div id="prep-selection" class="card-row" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:20px;"></div>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h3 style="color:#ff4d4d;">🚩 ทีมบุก (ห้ามใช้ตัวซ้ำกัน)</h3>
+                <div id="prep-slots" class="card-row">
+                    <div class="mini-card"></div><div class="mini-card"></div><div class="mini-card"></div><div class="mini-card"></div><div class="mini-card"></div>
+                </div>
+                <button class="btn-action" id="go-battle-btn" disabled>⚔️ เริ่มลานประลอง</button>
+            </div>
+            <h4 style="color:#ffc831;">🎴 เลือกการ์ดเข้าทีมบุก</h4>
+            <div id="prep-selection" class="card-row"></div>
         </div>
 
         <div id="view-battle">
-            <div style="background: rgba(0,0,0,0.4); padding: 20px; border-radius: 20px;">
-                <div id="e-battle-cards" style="display:flex; justify-content:center; gap:10px;"></div>
-                <h2 style="text-align:center; color:#ffc831;">VS</h2>
-                <div id="p-battle-cards" style="display:flex; justify-content:center; gap:10px;"></div>
-                <h3 id="battle-log" style="text-align:center; margin-top:20px;">...</h3>
-                <button id="run-battle-btn" class="btn-action" style="display:block; margin:auto;">ลุย!</button>
+            <div style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 30px; border: 1px solid #333;">
+                <div id="enemy-side"><div id="e-battle-cards" class="card-row"></div></div>
+                <h2 style="text-align:center; color:#ffc831; font-size: 2rem;">VS</h2>
+                <div id="player-side"><div id="p-battle-cards" class="card-row"></div></div>
             </div>
+            <h3 id="battle-log" style="text-align: center; color: #ffc831; margin-top: 25px;">เตรียมพร้อม...</h3>
+            <button id="run-battle-btn" class="btn-action" style="display: block; margin: 20px auto;">ลุยเลย!</button>
         </div>
 
         <div id="view-defense">
-             <div id="defense-slots" style="display:flex; justify-content:center; gap:10px; margin-bottom:20px;">
-                <div class="mini-card"></div><div class="mini-card"></div><div class="mini-card"></div><div class="mini-card"></div><div class="mini-card"></div>
+             <div style="text-align: center; margin-bottom: 20px;">
+                <h3 style="color:#00ff88;">🛡️ ทีมป้องกันบ้าน</h3>
+                <div id="defense-slots" class="card-row">
+                    <div class="mini-card"></div><div class="mini-card"></div><div class="mini-card"></div><div class="mini-card"></div><div class="mini-card"></div>
+                </div>
+                <button class="btn-action" style="width:100%" onclick="saveDefenseToDB()">💾 บันทึกทีมเฝ้าบ้าน</button>
              </div>
-             <button class="btn-action" style="width:100%" onclick="saveDefense()">💾 บันทึกการป้องกัน</button>
-             <div id="defense-pool" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:20px;"></div>
+             <h4 style="color:#ffc831;">🎴 เลือกการ์ดป้องกัน</h4>
+             <div id="defense-pool" class="card-row"></div>
         </div>
     </div>
 
@@ -138,7 +151,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // --- อัปเดตตาราง Rank ใหม่ตามโจทย์ ---
+    // --- แรงค์ใหม่ Master, Super Master, Superstar ---
     const RANKS = [
         { name: "BRONZE", min: 0, icon: "🥉", color: "#cd7f32" },
         { name: "SILVER", min: 200, icon: "🥈", color: "#c0c0c0" },
@@ -150,42 +163,23 @@
         { name: "SUPERSTAR", min: 3000, icon: "🌟", color: "#ffff00" }
     ];
 
-    let myData = null, tempAttackTeam = [], targetOpponent = null;
+    let myData = null, tempAttackTeam = [], tempDefenseTeam = [], targetOpponent = null;
 
-    window.toggleRankModal = (show) => {
-        const modal = document.getElementById("rankModal");
-        modal.style.display = show ? "block" : "none";
-        if(show) {
-            document.getElementById("rank-info-list").innerHTML = RANKS.map(r => `
-                <div class="rank-list-item">
-                    <b style="color:${r.color}">${r.icon} ${r.name}</b>
-                    <span>🏆 ${r.min}+</span>
-                </div>
-            `).join('');
-        }
-    };
-
-    // --- แก้ไข Logic พลังการ์ด (EXR ได้โบนัสหลักร้อย) ---
+    // --- Logic พลังการ์ด (EXR โบนัสเริ่มต้นหลักร้อย) ---
     function getStats(c) {
-        let baseHp = 200 + (c.level * 40);
-        let baseAtk = 60 + (c.level * 12);
-        
-        // ถ้าเป็นการ์ดระดับ EXR ให้เพิ่มพลังเริ่มต้น
-        if(c.rarity === "EXR") {
-            baseHp += 500; // เพิ่มหลักร้อย
-            baseAtk += 150; 
-        }
-        return { hp: baseHp, atk: baseAtk };
+        let hp = 200 + (c.level * 40);
+        let atk = 60 + (c.level * 12);
+        if(c.rarity === "EXR") { hp += 500; atk += 150; }
+        return { hp, atk };
     }
 
-    function createCardHTML(c, hide = false) {
+    function createCardHTML(c, hide = false, isSelected = false) {
         if(!c || hide) return `<div class="mini-card" style="background:#222"></div>`;
         const s = getStats(c);
-        const isEXR = c.rarity === "EXR";
         return `
-            <div class="mini-card ${isEXR ? 'rarity-exr' : ''}">
+            <div class="mini-card ${c.rarity === 'EXR' ? 'rarity-exr' : ''} ${isSelected ? 'selected-glow' : ''}">
                 <img src="${c.img || c.image}">
-                ${isEXR ? '<div class="exr-badge">EXR</div>' : ''}
+                ${c.rarity === 'EXR' ? '<div class="exr-badge">EXR</div>' : ''}
                 <div class="lv-badge">Lv.${c.level}</div>
                 <div class="stat-overlay">
                     <span style="color:#00ff88">❤️ ${s.hp}</span>
@@ -194,27 +188,119 @@
             </div>`;
     }
 
+    // --- ฟังก์ชันป้องกันการเลือกซ้ำ (Unique Name Logic) ---
+    function handleSelection(card, type) {
+        let team = type === 'attack' ? tempAttackTeam : tempDefenseTeam;
+        const index = team.findIndex(t => t.name === card.name);
+
+        if(index > -1) {
+            team.splice(index, 1); // ถ้ามีอยู่แล้วให้เอาออก
+        } else {
+            if(team.length >= 5) return alert("ทีมเต็มแล้ว!");
+            team.push(card); // ถ้ายังไม่มีให้เพิ่มเข้า
+        }
+
+        if(type === 'attack') { renderPrepUI(); } else { renderDefenseUI(); }
+        renderPools();
+    }
+
     onAuthStateChanged(auth, user => {
         if(user) {
             onSnapshot(doc(db, "users", user.uid), snap => {
                 myData = snap.data();
+                tempDefenseTeam = myData.defenseTeam || [];
                 document.getElementById("user-points").innerText = `🪙 ${myData.points || 0}`;
                 document.getElementById("user-trophies-val").innerText = myData.trophies || 0;
                 updateRankHeader(myData.trophies || 0);
                 renderPools();
+                renderDefenseUI();
             });
         }
     });
 
     function updateRankHeader(trophies) {
-        let currentRank = RANKS.findLast(r => trophies >= r.min) || RANKS[0];
-        let nextRank = RANKS[RANKS.indexOf(currentRank) + 1] || { min: trophies + 500 };
-        document.getElementById("rank-icon").innerText = currentRank.icon;
-        document.getElementById("rank-name").innerText = currentRank.name;
-        document.getElementById("rank-name").style.color = currentRank.color;
-        const progress = ((trophies - currentRank.min) / (nextRank.min - currentRank.min)) * 100;
+        let current = RANKS.findLast(r => trophies >= r.min) || RANKS[0];
+        let next = RANKS[RANKS.indexOf(current) + 1] || { min: trophies + 100 };
+        document.getElementById("rank-icon").innerText = current.icon;
+        document.getElementById("rank-name").innerText = current.name;
+        document.getElementById("rank-name").style.color = current.color;
+        const progress = ((trophies - current.min) / (next.min - current.min)) * 100;
         document.getElementById("rank-progress").style.width = Math.min(100, progress) + "%";
     }
+
+    function renderPools() {
+        const pPool = document.getElementById("prep-selection");
+        const dPool = document.getElementById("defense-pool");
+        pPool.innerHTML = ""; dPool.innerHTML = "";
+        
+        // กรองการ์ดโชว์เฉพาะใบเลเวลสูงสุดต่อหนึ่งชื่อ
+        const unique = {};
+        (myData.collection || []).forEach(c => { if(!unique[c.name] || c.level > unique[c.name].level) unique[c.name] = c; });
+
+        Object.values(unique).forEach(c => {
+            const isAtk = tempAttackTeam.some(t => t.name === c.name);
+            const isDef = tempDefenseTeam.some(t => t.name === c.name);
+
+            const pEl = document.createElement("div"); 
+            pEl.innerHTML = createCardHTML(c, false, isAtk);
+            pEl.onclick = () => handleSelection(c, 'attack');
+            pPool.appendChild(pEl);
+
+            const dEl = document.createElement("div"); 
+            dEl.innerHTML = createCardHTML(c, false, isDef);
+            dEl.onclick = () => handleSelection(c, 'defense');
+            dPool.appendChild(dEl);
+        });
+    }
+
+    function renderPrepUI() {
+        const slots = document.getElementById("prep-slots").children;
+        for(let i=0; i<5; i++) slots[i].innerHTML = tempAttackTeam[i] ? createCardHTML(tempAttackTeam[i]) : "";
+        document.getElementById("go-battle-btn").disabled = tempAttackTeam.length < 5;
+    }
+
+    function renderDefenseUI() {
+        const slots = document.getElementById("defense-slots").children;
+        for(let i=0; i<5; i++) slots[i].innerHTML = tempDefenseTeam[i] ? createCardHTML(tempDefenseTeam[i]) : "";
+    }
+
+    window.saveDefenseToDB = async () => {
+        if(tempDefenseTeam.length < 5) return alert("ต้องมีทีมป้องกัน 5 ใบ!");
+        await updateDoc(doc(db, "users", auth.currentUser.uid), { defenseTeam: tempDefenseTeam });
+        alert("บันทึกทีมป้องกันสำเร็จ!");
+    };
+
+    // --- ระบบการต่อสู้ และ บันทึกประวัติแบบ 2 ทาง ---
+    document.getElementById("run-battle-btn").onclick = async () => {
+        document.getElementById("run-battle-btn").style.display = "none";
+        const log = document.getElementById("battle-log");
+        let pPwr = tempAttackTeam.reduce((s, c) => s + getStats(c).hp + getStats(c).atk, 0);
+        let ePwr = targetOpponent.defenseTeam.reduce((s, c) => s + getStats(c).hp + getStats(c).atk, 0);
+
+        const win = pPwr >= ePwr;
+        const pTrophy = win ? 50 : -25;
+        const eTrophy = win ? -25 : 50;
+
+        // ป้องกันถ้วยติดลบ
+        const myNewTrophies = Math.max(0, (myData.trophies || 0) + pTrophy);
+        const oppNewTrophies = Math.max(0, (targetOpponent.trophies || 0) + eTrophy);
+
+        log.innerText = win ? "🎉 ชนะการท้าดวล!" : "💀 พ่ายแพ้...";
+
+        // อัปเดตฝั่งเรา
+        await updateDoc(doc(db, "users", auth.currentUser.uid), { trophies: myNewTrophies, points: increment(win ? 100 : 20) });
+        await addDoc(collection(db, "users", auth.currentUser.uid, "logs"), {
+            type: "attack", oppName: targetOpponent.username, win: win, trophyChange: pTrophy, time: serverTimestamp()
+        });
+
+        // อัปเดตฝั่งคู่ต่อสู้ (แม้เขาแพ้เราก็นับเป็น Defense Log ให้เขา)
+        await updateDoc(doc(db, "users", targetOpponent.id), { trophies: oppNewTrophies });
+        await addDoc(collection(db, "users", targetOpponent.id, "logs"), {
+            type: "defense", oppName: myData.username, win: !win, trophyChange: eTrophy, time: serverTimestamp()
+        });
+
+        setTimeout(() => showView('history'), 2500);
+    };
 
     window.showView = (v) => {
         ["view-lobby", "view-defense", "view-battle", "view-history", "view-prep"].forEach(id => {
@@ -223,75 +309,54 @@
         });
         document.getElementById(`view-${v}`).style.display = 'block';
         if(v === 'history') loadHistory();
+        if(v === 'lobby') loadLobby();
     };
 
-    // --- แก้ไขระบบประวัติ (บันทึกใครมาตีเรา) ---
     async function loadHistory() {
         const list = document.getElementById("history-list");
-        list.innerHTML = "กำลังโหลด...";
-        const snap = await getDocs(query(collection(db, "users", auth.currentUser.uid, "logs"), orderBy("time", "desc"), limit(15)));
-        list.innerHTML = snap.empty ? "ไม่มีประวัติการต่อสู้" : "";
+        const snap = await getDocs(query(collection(db, "users", auth.currentUser.uid, "logs"), orderBy("time", "desc"), limit(10)));
+        list.innerHTML = snap.empty ? "ไม่มีประวัติ" : "";
         snap.forEach(d => {
             const l = d.data();
-            const type = l.type === "defense" ? "🛡️ ป้องกันบ้าน" : "⚔️ บุกโจมตี";
-            const resColor = l.win ? "#00ff88" : "#ff4d4d";
-            list.appendChild(Object.assign(document.createElement("div"), {
-                className: "opponent-card",
-                innerHTML: `
-                    <div style="display:flex; justify-content:space-between;">
-                        <span>${type} <b>${l.win ? 'สำเร็จ' : 'ล้มเหลว'}</b></span>
-                        <span style="color:${resColor}">${l.trophyChange >= 0 ? '+' : ''}${l.trophyChange} 🏆</span>
-                    </div>
-                    <div style="font-size:0.8rem; color:#888;">คู่แข่ง: ${l.oppName} | เมื่อ: ${l.time?.toDate().toLocaleString() || 'เพิ่งเมื่อครู่'}</div>
-                `
-            }));
+            list.innerHTML += `<div class="opponent-card" style="border-left:5px solid ${l.win ? '#00ff88' : '#ff4d4d'}">
+                <b>${l.type === 'defense' ? '🛡️ ป้องกัน' : '⚔️ บุก'} ${l.win ? 'ชนะ' : 'แพ้'}</b> vs ${l.oppName}
+                <span style="float:right">${l.trophyChange >= 0 ? '+' : ''}${l.trophyChange} 🏆</span>
+            </div>`;
         });
     }
 
-    document.getElementById("run-battle-btn").onclick = async () => {
-        document.getElementById("run-battle-btn").style.display = "none";
-        const log = document.getElementById("battle-log");
-        let pTotal = tempAttackTeam.reduce((s, c) => s + getStats(c).hp + getStats(c).atk, 0);
-        let eTotal = targetOpponent.defenseTeam.reduce((s, c) => s + getStats(c).hp + getStats(c).atk, 0);
-
-        const win = pTotal >= eTotal;
-        const pTrophyChange = win ? 50 : -25;
-        const eTrophyChange = win ? -25 : 50;
-
-        // --- Logic หักถ้วยรางวัลแบบไม่ให้ติดลบ ---
-        let newMyTrophies = Math.max(0, (myData.trophies || 0) + pTrophyChange);
-        let newOppTrophies = Math.max(0, (targetOpponent.trophies || 0) + eTrophyChange);
-
-        log.innerText = win ? "🎉 คุณชนะ!" : "💀 คุณแพ้!";
-        
-        // บันทึกฝั่งเรา (Attack)
-        await updateDoc(doc(db, "users", auth.currentUser.uid), { trophies: newMyTrophies, points: increment(win ? 100 : 20) });
-        await addDoc(collection(db, "users", auth.currentUser.uid, "logs"), {
-            type: "attack", oppName: targetOpponent.username, win: win, trophyChange: pTrophyChange, time: serverTimestamp()
+    async function loadLobby() {
+        const snap = await getDocs(query(collection(db, "users"), limit(10)));
+        const list = document.getElementById("lobby-list");
+        list.innerHTML = "";
+        snap.forEach(d => {
+            if(d.id === auth.currentUser.uid) return;
+            const u = d.data();
+            if(!u.defenseTeam || u.defenseTeam.length < 5) return;
+            const div = document.createElement("div");
+            div.className = "opponent-card";
+            div.innerHTML = `<div><b>${u.username}</b> 🏆 ${u.trophies || 0}</div>
+                             <button class="btn-action" onclick="goToPrep('${d.id}')">ท้าดวล</button>`;
+            list.appendChild(div);
         });
+    }
 
-        // บันทึกฝั่งคู่ต่อสู้ (Defense - คนมาตีบ้านเราแม้แพ้ก็นับ)
-        await updateDoc(doc(db, "users", targetOpponent.id), { trophies: newOppTrophies });
-        await addDoc(collection(db, "users", targetOpponent.id, "logs"), {
-            type: "defense", oppName: myData.username, win: !win, trophyChange: eTrophyChange, time: serverTimestamp()
-        });
-
-        setTimeout(() => showView('history'), 2000);
+    window.goToPrep = async (id) => {
+        const snap = await getDoc(doc(db, "users", id));
+        targetOpponent = { id, ...snap.data() };
+        tempAttackTeam = [];
+        renderPrepUI();
+        showView('prep');
     };
 
-    // ฟังก์ชันย่อยสำหรับ UI (ย่อจากของเดิม)
-    function renderPools() {
-        const pPool = document.getElementById("prep-selection");
-        const dPool = document.getElementById("defense-pool");
-        pPool.innerHTML = ""; dPool.innerHTML = "";
-        (myData.collection || []).forEach(c => {
-            const el = document.createElement("div"); el.innerHTML = createCardHTML(c);
-            el.onclick = () => { /* Logic เลือกการ์ดเข้าทีม */ };
-            pPool.appendChild(el.cloneNode(true)); dPool.appendChild(el.cloneNode(true));
-        });
-    }
-    
-    // ... ฟังก์ชันอื่นๆ เช่น loadLobby, goToPrep, saveDefense ยังคงทำงานเหมือนเดิม ...
+    window.toggleRankModal = (show) => {
+        document.getElementById("rankModal").style.display = show ? "block" : "none";
+        if(show) {
+            document.getElementById("rank-info-list").innerHTML = RANKS.map(r => `
+                <div class="rank-list-item"><b style="color:${r.color}">${r.icon} ${r.name}</b> <span>${r.min}+</span></div>
+            `).join('');
+        }
+    };
 </script>
 </body>
 </html>
