@@ -14,12 +14,37 @@
         .navbar { background: rgba(10, 10, 15, 0.9); padding: 15px 25px; border-bottom: 2px solid #ffc831; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(10px); sticky; top: 0; z-index: 100; }
         .container { max-width: 1000px; margin: auto; padding: 20px; }
         
-        /* Rank UI */
-        .rank-status { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; border: 1px solid rgba(255,200,49,0.3); margin-bottom: 20px; display: flex; align-items: center; gap: 15px; }
+        /* Rank UI - Added Clickable */
+        .rank-status { 
+            background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; 
+            border: 1px solid rgba(255,200,49,0.3); margin-bottom: 20px; 
+            display: flex; align-items: center; gap: 15px; cursor: pointer;
+            transition: 0.3s;
+        }
+        .rank-status:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
         .rank-icon { font-size: 2.5rem; }
         .progress-container { flex: 1; }
         .progress-bar { width: 100%; height: 8px; background: #222; border-radius: 4px; margin-top: 5px; overflow: hidden; }
         .progress-fill { height: 100%; background: linear-gradient(90deg, #ffc831, #ff9000); width: 0%; transition: 1s; }
+
+        /* Modal Style for Rank Info */
+        .modal {
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background: #1a1a2e; margin: 10% auto; padding: 25px; border: 2px solid #ffc831;
+            width: 80%; max-width: 500px; border-radius: 20px; position: relative;
+            animation: slideUp 0.4s ease-out;
+        }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .close-modal { position: absolute; right: 20px; top: 15px; font-size: 1.5rem; cursor: pointer; color: #ffc831; }
+        
+        .rank-list-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .rank-list-item:last-child { border: none; }
 
         /* Tabs */
         .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
@@ -57,8 +82,18 @@
         <div id="user-points" style="font-size: 0.9rem; color: #aaa;">🪙 0</div>
     </nav>
 
+    <div id="rankModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="toggleRankModal(false)">&times;</span>
+            <h3 style="color: #ffc831; text-align: center; margin-bottom: 20px;">🎖️ ระดับแรงค์และรางวัล</h3>
+            <div id="rank-info-list">
+                </div>
+            <p style="font-size: 0.7rem; color: #888; text-align: center; margin-top: 15px;">สะสมถ้วยรางวัลจากการชนะการดวลเพื่อเลื่อนขั้น!</p>
+        </div>
+    </div>
+
     <div class="container">
-        <div class="rank-status">
+        <div class="rank-status" onclick="toggleRankModal(true)">
             <div id="rank-icon" class="rank-icon">🥉</div>
             <div class="progress-container">
                 <div style="display:flex; justify-content:space-between; font-size: 0.8rem;">
@@ -141,7 +176,37 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    const RANKS = [
+        { name: "BRONZE", min: 0, icon: "🥉", color: "#cd7f32", reward: "100 🪙" },
+        { name: "SILVER", min: 200, icon: "🥈", color: "#c0c0c0", reward: "300 🪙" },
+        { name: "GOLD", min: 500, icon: "🥇", color: "#ffd700", reward: "500 🪙" },
+        { name: "PLATINUM", min: 1000, icon: "💎", color: "#e5e4e2", reward: "1,000 🪙" },
+        { name: "DIAMOND", min: 2000, icon: "💠", color: "#b9f2ff", reward: "2,500 🪙" }
+    ];
+
     let myData = null, tempAttackTeam = [], targetOpponent = null;
+
+    // --- Rank Modal Functions ---
+    window.toggleRankModal = (show) => {
+        const modal = document.getElementById("rankModal");
+        modal.style.display = show ? "block" : "none";
+        if(show) {
+            const list = document.getElementById("rank-info-list");
+            list.innerHTML = RANKS.map(r => `
+                <div class="rank-list-item" style="border-left: 4px solid ${r.color}; margin-bottom: 8px; padding-left: 15px; background: rgba(255,255,255,0.02);">
+                    <div>
+                        <span style="font-size: 1.2rem;">${r.icon}</span> 
+                        <b style="color: ${r.color}">${r.name}</b><br>
+                        <small style="color: #888;">ต้องการ 🏆 ${r.min}+</small>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="font-size: 0.7rem; color: #ffc831;">รางวัลขั้นถัดไป:</span><br>
+                        <b>${r.reward}</b>
+                    </div>
+                </div>
+            `).join('');
+        }
+    };
 
     window.showView = (v) => {
         ["view-lobby", "view-defense", "view-battle", "view-leaderboard", "view-history", "view-prep"].forEach(id => {
@@ -162,10 +227,23 @@
                 myData = snap.data();
                 document.getElementById("user-points").innerText = `🪙 ${myData.points || 0}`;
                 document.getElementById("user-trophies-val").innerText = myData.trophies || 0;
+                updateRankHeader(myData.trophies || 0);
                 renderPools();
             });
         }
     });
+
+    function updateRankHeader(trophies) {
+        let currentRank = RANKS.findLast(r => trophies >= r.min) || RANKS[0];
+        let nextRank = RANKS[RANKS.indexOf(currentRank) + 1] || { min: trophies + 100 };
+        
+        document.getElementById("rank-icon").innerText = currentRank.icon;
+        document.getElementById("rank-name").innerText = currentRank.name;
+        document.getElementById("rank-name").style.color = currentRank.color;
+        
+        const progress = ((trophies - currentRank.min) / (nextRank.min - currentRank.min)) * 100;
+        document.getElementById("rank-progress").style.width = Math.min(100, progress) + "%";
+    }
 
     function getStats(c) {
         return { hp: 200 + (c.level * 40), atk: 60 + (c.level * 12) };
@@ -185,7 +263,6 @@
             </div>`;
     }
 
-    // --- Render Pools ---
     function renderPools() {
         const unique = {};
         (myData.collection || []).forEach(c => { if(!unique[c.name] || c.level > unique[c.name].level) unique[c.name] = c; });
@@ -199,7 +276,6 @@
             const cardEl = document.createElement("div");
             cardEl.innerHTML = createCardHTML(c);
             
-            // สำหรับหน้าจัดทีมป้องกัน
             const dClone = cardEl.cloneNode(true);
             dClone.onclick = () => {
                 let current = myData.defenseTeam || [];
@@ -208,7 +284,6 @@
             };
             dPool.appendChild(dClone);
 
-            // สำหรับหน้าจัดทีมบุก (Preparation)
             const pClone = cardEl.cloneNode(true);
             pClone.onclick = () => {
                 if(tempAttackTeam.length < 5) tempAttackTeam.push(c); else tempAttackTeam = [];
@@ -217,7 +292,6 @@
             pPool.appendChild(pClone);
         });
 
-        // Render Defense Slots
         const dSlots = document.getElementById("defense-slots").children;
         for(let i=0; i<5; i++) dSlots[i].innerHTML = (myData.defenseTeam && myData.defenseTeam[i]) ? createCardHTML(myData.defenseTeam[i]) : "";
     }
@@ -228,9 +302,8 @@
         document.getElementById("go-battle-btn").disabled = tempAttackTeam.length < 5;
     }
 
-    // --- Lobby & PvP Flow ---
     async function loadLobby() {
-        const snap = await getDocs(query(collection(db, "users"), limit(10)));
+        const snap = await getDocs(query(collection(db, "users"), limit(15)));
         const list = document.getElementById("lobby-list");
         list.innerHTML = "";
         snap.forEach(d => {
@@ -266,13 +339,9 @@
         const pSide = document.getElementById("p-battle-cards");
         const eSide = document.getElementById("e-battle-cards");
         pSide.innerHTML = ""; eSide.innerHTML = "";
-        
         document.getElementById("opp-name-display").innerText = `${targetOpponent.username} (DEFENDERS)`;
-        document.getElementById("battle-log").innerText = "ศัตรูกำลังตั้งแนวรับ...";
-        
         tempAttackTeam.forEach(c => pSide.innerHTML += createCardHTML(c));
         targetOpponent.defenseTeam.forEach(() => eSide.innerHTML += createCardHTML({}, true));
-        
         document.getElementById("run-battle-btn").style.display = "block";
     };
 
@@ -280,37 +349,36 @@
         document.getElementById("run-battle-btn").style.display = "none";
         const log = document.getElementById("battle-log");
         const eCardsUI = document.getElementById("e-battle-cards").children;
-
         let pTotal = tempAttackTeam.reduce((s, c) => s + getStats(c).hp + getStats(c).atk, 0);
         let eTotal = targetOpponent.defenseTeam.reduce((s, c) => s + getStats(c).hp + getStats(c).atk, 0);
 
-        // ค่อยๆ หงายการ์ด
         for(let i=0; i<5; i++) {
             await new Promise(r => setTimeout(r, 600));
-            log.innerText = `ตรวจจับพลังใบที่ ${i+1}...`;
             eCardsUI[i].outerHTML = createCardHTML(targetOpponent.defenseTeam[i]);
         }
 
         const win = pTotal >= eTotal;
         const change = win ? 50 : -25;
-
-        log.innerText = win ? `🎉 ชนะแล้ว! +${change} 🏆` : `💀 แพ้พ่าย! ${change} 🏆`;
-        log.style.color = win ? "#00ff88" : "#ff4d4d";
-
-        // บันทึก Firebase
+        log.innerText = win ? `🎉 ชนะ! +${change} 🏆` : `💀 แพ้! ${change} 🏆`;
+        
         await updateDoc(doc(db, "users", auth.currentUser.uid), { trophies: increment(change), points: increment(win ? 100 : 20) });
         await updateDoc(doc(db, "users", targetOpponent.id), { trophies: increment(win ? -25 : 50) });
-
-        const logData = { oppName: targetOpponent.username, win: win, trophyChange: change, time: serverTimestamp() };
-        await addDoc(collection(db, "users", auth.currentUser.uid, "logs"), logData);
-        await addDoc(collection(db, "users", targetOpponent.id, "logs"), { 
-            oppName: myData.username, win: !win, trophyChange: win ? -25 : 50, time: serverTimestamp() 
-        });
-
         setTimeout(() => showView('history'), 3000);
     };
 
-    window.saveDefense = () => alert("บันทึกทีมป้องกันอัตโนมัติเรียบร้อย!");
+    async function loadHistory() {
+        const snap = await getDocs(query(collection(db, "users", auth.currentUser.uid, "logs"), orderBy("time", "desc"), limit(10)));
+        const list = document.getElementById("history-list");
+        list.innerHTML = snap.empty ? "<p>ยังไม่มีประวัติ</p>" : "";
+        snap.forEach(d => {
+            const l = d.data();
+            list.innerHTML += `<div class="opponent-card" style="border-left: 5px solid ${l.win ? '#00ff88' : '#ff4d4d'}">
+                <b>${l.win ? '🛡️ ชนะ' : '💀 แพ้'}</b> vs ${l.oppName} <span style="float:right;">${l.trophyChange > 0 ? '+' : ''}${l.trophyChange} 🏆</span>
+            </div>`;
+        });
+    }
+
+    window.saveDefense = () => alert("ทีมป้องกันถูกบันทึกแล้ว!");
 
 </script>
 </body>
