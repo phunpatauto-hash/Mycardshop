@@ -19,7 +19,9 @@
             background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; 
             border: 1px solid rgba(255,200,49,0.3); margin-bottom: 20px; 
             display: flex; align-items: center; gap: 15px; cursor: pointer;
+            transition: 0.3s;
         }
+        .rank-status:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
         .rank-icon { font-size: 2.5rem; filter: drop-shadow(0 0 5px rgba(255,200,49,0.5)); }
         .progress-bar { width: 100%; height: 8px; background: #222; border-radius: 4px; margin-top: 5px; overflow: hidden; }
         .progress-fill { height: 100%; background: linear-gradient(90deg, #ffc831, #ff9000); width: 0%; transition: 1s; }
@@ -30,8 +32,8 @@
         .close-modal { position: absolute; right: 20px; top: 15px; font-size: 1.8rem; cursor: pointer; color: #ffc831; }
 
         /* Tabs */
-        .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
-        .tab { flex: 1; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid #333; color: #888; cursor: pointer; border-radius: 10px; font-weight: bold; text-align: center; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
+        .tab { flex: 1; min-width: 100px; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid #333; color: #888; cursor: pointer; border-radius: 10px; font-weight: bold; text-align: center; }
         .tab.active { background: #ffc831; color: black; border-color: #ffc831; }
 
         /* Cards Style */
@@ -43,15 +45,18 @@
         .lv-badge { position: absolute; top: 2px; right: 2px; background: #ffc831; color: black; font-size: 0.55rem; padding: 1px 4px; border-radius: 3px; font-weight: bold; }
         .selected-glow { border: 2px solid #ffc831 !important; box-shadow: 0 0 15px #ffc831; opacity: 0.5; }
 
-        /* Lobby Cards */
-        .opponent-card { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #333; }
+        /* Lobby & Leaderboard */
+        .opponent-card, .leader-item { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #333; }
+        .leader-item { display: flex; justify-content: space-between; align-items: center; }
         .opp-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .power-tag { background: #ff4d4d; color: white; padding: 2px 10px; border-radius: 10px; font-size: 0.8rem; font-weight: bold; }
 
         .btn-action { background: linear-gradient(45deg, #ffc831, #ff9000); color: black; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; width: 100%; }
         .btn-action:disabled { background: #444; color: #888; }
 
-        #view-history, #view-defense, #view-battle { display: none; }
+        .rank-list-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #333; }
+
+        #view-history, #view-defense, #view-battle, #view-leaderboard { display: none; }
     </style>
 </head>
 <body>
@@ -62,7 +67,7 @@
     </nav>
 
     <div class="container">
-        <div class="rank-status" onclick="toggleRankModal(true)">
+        <div class="rank-status" onclick="toggleRankInfoModal(true)">
             <div id="rank-icon" class="rank-icon">🥉</div>
             <div style="flex: 1;">
                 <div style="display:flex; justify-content:space-between; font-size: 0.8rem;">
@@ -70,16 +75,31 @@
                     <span>🏆 <span id="user-trophies-val">0</span></span>
                 </div>
                 <div class="progress-bar"><div id="rank-progress" class="progress-fill"></div></div>
+                <small style="color:#666; font-size: 0.7rem;">(แตะเพื่อดูรายละเอียดแรงค์)</small>
             </div>
         </div>
 
         <div class="tabs">
             <button class="tab active" id="tab-lobby" onclick="showView('lobby')">🏟️ ลานประลอง</button>
             <button class="tab" id="tab-defense" onclick="showView('defense')">🛡️ ป้องกันบ้าน</button>
+            <button class="tab" id="tab-leaderboard" onclick="showView('leaderboard')">🏆 อันดับ</button>
             <button class="tab" id="tab-history" onclick="showView('history')">📜 ประวัติ</button>
         </div>
 
         <div id="view-lobby"><div id="lobby-list"></div></div>
+
+        <div id="view-leaderboard">
+            <h3 style="color:#ffc831; text-align:center;">🏆 อันดับเกียรติยศ (MASTER ขึ้นไป)</h3>
+            <div id="leaderboard-list"></div>
+        </div>
+
+        <div id="rankInfoModal" class="modal">
+            <div class="modal-content" style="max-width: 400px;">
+                <span class="close-modal" onclick="toggleRankInfoModal(false)">&times;</span>
+                <h3 style="color:#ffc831; text-align:center;">🎖️ ระดับแรงค์ทั้งหมด</h3>
+                <div id="rank-info-list"></div>
+            </div>
+        </div>
 
         <div id="prepModal" class="modal">
             <div class="modal-content">
@@ -98,7 +118,7 @@
         </div>
 
         <div id="view-battle">
-            <div style="background: rgba(0,0,0,0.5); padding: 25px; border-radius: 20px; border: 1px solid #ffc831;">
+            <div style="background: rgba(0,0,0,0.5); padding: 25px; border-radius: 20px; border: 2px solid #ffc831;">
                 <div id="e-battle-cards" class="card-row"></div>
                 <h2 style="text-align:center; color:#ffc831; margin: 20px 0;">VS</h2>
                 <div id="p-battle-cards" class="card-row"></div>
@@ -127,7 +147,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, onSnapshot, updateDoc, increment, collection, query, orderBy, limit, getDocs, getDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, updateDoc, increment, collection, query, orderBy, limit, getDocs, getDoc, addDoc, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = { 
         apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM", 
@@ -197,6 +217,41 @@
         document.getElementById("rank-name").innerText = cur.name;
         document.getElementById("rank-name").style.color = cur.color;
         document.getElementById("rank-progress").style.width = Math.min(100, ((trophies - cur.min) / (nxt.min - cur.min)) * 100) + "%";
+    }
+
+    window.toggleRankInfoModal = (show) => {
+        const modal = document.getElementById("rankInfoModal");
+        const list = document.getElementById("rank-info-list");
+        modal.style.display = show ? "block" : "none";
+        if(show) {
+            list.innerHTML = RANKS.map(r => `
+                <div class="rank-list-item">
+                    <b style="color:${r.color}">${r.icon} ${r.name}</b>
+                    <span>${r.min}+ 🏆</span>
+                </div>
+            `).join('');
+        }
+    };
+
+    async function loadLeaderboard() {
+        const list = document.getElementById("leaderboard-list");
+        list.innerHTML = "กำลังโหลด...";
+        
+        // กรองเฉพาะคนที่มีถ้วยตั้งแต่ 2200 (MASTER) ขึ้นไป
+        const q = query(collection(db, "users"), where("trophies", ">=", 2200), orderBy("trophies", "desc"), limit(20));
+        const snap = await getDocs(q);
+        
+        list.innerHTML = snap.empty ? "<p style='text-align:center; color:#666;'>ยังไม่มีใครถึงระดับ MASTER</p>" : "";
+        let rank = 1;
+        snap.forEach(d => {
+            const u = d.data();
+            const rData = RANKS.findLast(r => u.trophies >= r.min) || RANKS[0];
+            list.innerHTML += `
+                <div class="leader-item">
+                    <span>#${rank++} <b>${u.username}</b> ${rData.icon}</span>
+                    <span style="color:#ffc831;">🏆 ${u.trophies}</span>
+                </div>`;
+        });
     }
 
     async function loadLobby() {
@@ -300,7 +355,6 @@
             log.innerHTML = win ? "<span style='color:#00ff88'>🎉 ชนะการต่อสู้!</span>" : "<span style='color:#ff4d4d'>💀 พ่ายแพ้แก่ศัตรู</span>";
             exitBtn.style.display = "block";
             
-            // Firebase Updates
             const pChg = win ? 50 : -25;
             const eChg = win ? -25 : 50;
             await updateDoc(doc(db, "users", auth.currentUser.uid), { trophies: Math.max(0, myData.trophies + pChg), points: increment(win ? 100 : 20) });
@@ -311,10 +365,11 @@
     };
 
     window.showView = (v) => {
-        ["view-lobby", "view-defense", "view-battle", "view-history"].forEach(id => document.getElementById(id).style.display = 'none');
+        ["view-lobby", "view-defense", "view-battle", "view-history", "view-leaderboard"].forEach(id => document.getElementById(id).style.display = 'none');
         document.getElementById(`view-${v}`).style.display = 'block';
         if(v === 'lobby') loadLobby();
         if(v === 'history') loadHistory();
+        if(v === 'leaderboard') loadLeaderboard();
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.getElementById(`tab-${v}`)?.classList.add('active');
     };
@@ -322,24 +377,4 @@
     async function loadHistory() {
         const list = document.getElementById("history-list");
         const snap = await getDocs(query(collection(db, "users", auth.currentUser.uid, "logs"), orderBy("time", "desc"), limit(10)));
-        list.innerHTML = snap.empty ? "ไม่มีข้อมูล" : "";
-        snap.forEach(d => {
-            const l = d.data();
-            list.innerHTML += `<div class="opponent-card" style="border-left:5px solid ${l.win ? '#00ff88' : '#ff4d4d'}">
-                <b>${l.type === 'attack' ? '⚔️ บุก' : '🛡️ ป้องกัน'} ${l.win ? 'ชนะ' : 'แพ้'}</b> vs ${l.oppName}
-                <span style="float:right; color:${l.trophyChange>=0?'#00ff88':'#ff4d4d'}">${l.trophyChange>=0?'+':''}${l.trophyChange} 🏆</span>
-            </div>`;
-        });
-    }
-
-    window.saveDefenseToDB = async () => {
-        if(tempDefenseTeam.length < 5) return alert("เลือกให้ครบ 5 ใบ!");
-        await updateDoc(doc(db, "users", auth.currentUser.uid), { defenseTeam: tempDefenseTeam });
-        alert("บันทึกทีมสำเร็จ!");
-    };
-    
-    // Initial Load
-    setTimeout(() => showView('lobby'), 1000);
-</script>
-</body>
-</html>
+        list.innerHTML = snap.empty ? "ไม่มีข้อมูล" 
