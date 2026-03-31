@@ -40,7 +40,7 @@
             padding: 10px 22px; border-radius: 12px; font-weight: 600; cursor: pointer; border: none; color: white; text-decoration: none;
         }
 
-        /* --- Custom Admin Popup (Middle of Screen) --- */
+        /* --- Admin Modal --- */
         .admin-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
@@ -87,11 +87,13 @@
         }
         .btn-spin:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
         
+        /* Banner Styles */
         .quick-gacha-banner { 
             background: linear-gradient(135deg, #00e5ff, #ffe600); 
             border-radius: 20px; padding: 35px 45px; display: flex; justify-content: space-between; 
-            align-items: center; margin-bottom: 30px; color: #000; cursor: pointer; transition: 0.3s;
+            align-items: center; margin-bottom: 20px; color: #000; cursor: pointer; transition: 0.3s;
         }
+        .quick-gacha-banner:hover { transform: translateY(-5px); filter: brightness(1.1); }
         .banner-btn { background: #000; color: #fff; padding: 12px 30px; border-radius: 50px; font-weight: 700; }
 
         .news-item { 
@@ -118,7 +120,6 @@
         <ul class="nav-links">
             <li><a href="index.html">หน้าแรก</a></li>
             <li><a href="collection.html">สมุดสะสม</a></li>
-            <li><a href="Battle.html">สมุดสะสม</a></li>
             <li id="redeem-tab" style="display: none;"><a href="redeem.html" style="color: #ffc831;">แลกโค้ด</a></li>
             <li>
                 <div class="profile-link" id="profile-container" style="display: none;">
@@ -158,12 +159,28 @@
             <span class="banner-btn">ไปหน้าสุ่มการ์ด <i class="fas fa-chevron-right"></i></span>
         </div>
 
+        <div class="quick-gacha-banner" style="background: linear-gradient(135deg, #00d4ff, #0055ff);" onclick="window.location.href='Exchange.html'">
+            <div>
+                <h3 style="margin:0; font-size: 1.5rem; color: white;">💎 แลกเปลี่ยนเพชร</h3>
+                <p style="margin:5px 0 0 0; opacity:0.9; color: white;">เปลี่ยนเหรียญทองให้กลายเป็นเพชรล้ำค่า</p>
+            </div>
+            <span class="banner-btn">แลกเปลี่ยนเลย <i class="fas fa-gem"></i></span>
+        </div>
+
         <div class="quick-gacha-banner" style="background: linear-gradient(135deg, #ffc831, #ff8c00);" onclick="window.location.href='Pass (Battle Pass).html'">
             <div>
                 <h3 style="margin:0; font-size: 1.5rem;">Battle Pass</h3>
                 <p style="margin:5px 0 0 0; opacity:0.7; color: #000;">ปลดล็อกของจาก Battle Pass และรับของรางวัลพิเศษมากมาย</p>
             </div>
             <span class="banner-btn">เข้าสู่ Battle Pass <i class="fas fa-chevron-right"></i></span>
+        </div>
+
+        <div class="quick-gacha-banner" style="background: linear-gradient(135deg, #e63946, #780000);" onclick="window.location.href='battle.html'">
+            <div>
+                <h3 style="margin:0; font-size: 1.5rem; color: white;">⚔️ Battle Arena</h3>
+                <p style="margin:5px 0 0 0; opacity:0.9; color: white;">เข้าสู่สนามรบ ท้าทายฝีมือเพื่อชิงอันดับหนึ่ง</p>
+            </div>
+            <span class="banner-btn">เข้าสู่การต่อสู้ <i class="fas fa-fist-raised"></i></span>
         </div>
 
         <section class="news-section">
@@ -190,13 +207,12 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // --- ระบบ Admin Hidden Login ---
+    // --- Admin System ---
     const profileContainer = document.getElementById("profile-container");
     const adminModal = document.getElementById("adminModal");
     let pressTimer;
     let isLongPress = false;
 
-    // ฟังก์ชันเปิด/ปิด Modal
     window.closeAdminModal = () => {
         adminModal.style.display = "none";
         document.getElementById("adminPass").value = "";
@@ -204,21 +220,20 @@
 
     window.checkAdminPass = () => {
         const pass = document.getElementById("adminPass").value;
-        if (pass === "135679") { // <--- เปลี่ยนรหัสผ่านที่นี่
+        if (pass === "135679") {
             window.location.href = "admin_dashboard.html";
         } else {
             alert("รหัสผ่านไม่ถูกต้อง!");
         }
     };
 
-    // ตรวจจับการกดค้าง
     const startPress = (e) => {
         isLongPress = false;
         pressTimer = setTimeout(() => {
             isLongPress = true;
             adminModal.style.display = "flex";
             document.getElementById("adminPass").focus();
-        }, 5000); // 5 วินาที
+        }, 5000);
     };
 
     const cancelPress = () => clearTimeout(pressTimer);
@@ -227,12 +242,9 @@
     profileContainer.addEventListener('touchstart', startPress);
     profileContainer.addEventListener('mouseup', cancelPress);
     profileContainer.addEventListener('touchend', cancelPress);
-    profileContainer.addEventListener('mouseleave', cancelPress);
 
     profileContainer.addEventListener('click', (e) => {
-        if (!isLongPress) {
-            window.location.href = 'profile.html';
-        }
+        if (!isLongPress) window.location.href = 'profile.html';
     });
 
     onAuthStateChanged(auth, (user) => {
@@ -273,7 +285,6 @@
         }
     });
 
-    // Load News
     const nCon = document.getElementById("news-container");
     onSnapshot(query(collection(db, "news"), orderBy("createdAt", "desc")), (snap) => {
         nCon.innerHTML = "";
