@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIAMOND EXCHANGE - ระบบแลกเปลี่ยน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Kanit', sans-serif; 
+            margin: 0; 
+            background: radial-gradient(circle at center, #1a1a2e 0%, #050505 100%); 
+            color: white; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .exchange-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 30px;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            backdrop-filter: blur(20px);
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        h1 { color: #00d4ff; margin-bottom: 30px; font-size: 2rem; }
+
+        .balance-group {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 20px;
+        }
+
+        .balance-item { display: flex; flex-direction: column; gap: 5px; }
+        .label { font-size: 0.8rem; color: #aaa; }
+        .value { font-weight: bold; font-size: 1.2rem; }
+
+        .input-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        label { display: block; margin-bottom: 10px; color: #ffc831; font-weight: bold; }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid #444;
+            border-radius: 15px;
+            color: white;
+            font-size: 1.2rem;
+            text-align: center;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus { border-color: #00d4ff; box-shadow: 0 0 10px rgba(0, 212, 255, 0.2); }
+
+        .conversion-info {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(0, 255, 136, 0.1);
+            border-radius: 15px;
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        .btn-exchange {
+            width: 100%;
+            padding: 18px;
+            border-radius: 15px;
+            border: none;
+            background: linear-gradient(45deg, #00d4ff, #0055ff);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 85, 255, 0.3);
+        }
+
+        .btn-exchange:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0, 85, 255, 0.5); }
+        .btn-exchange:disabled { background: #444; cursor: not-allowed; transform: none; }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 25px;
+            color: #aaa;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+        .back-link:hover { color: white; }
+
+    </style>
+</head>
+<body>
+
+    <div class="exchange-card">
+        <h1>💎 แลกเปลี่ยนเพชร</h1>
+
+        <div class="balance-group">
+            <div class="balance-item">
+                <span class="label">🪙 เหรียญที่มี</span>
+                <span class="value" id="current-points" style="color: #ffc831;">0</span>
+            </div>
+            <div class="balance-item">
+                <span class="label">💎 เพชรที่มี</span>
+                <span class="value" id="current-diamonds" style="color: #00d4ff;">0</span>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>ระบุจำนวนเหรียญที่ต้องการแลก (ขั้นต่ำ 1,000)</label>
+            <input type="number" id="coinInput" placeholder="ใส่จำนวนเหรียญ..." min="1000" step="1000">
+        </div>
+
+        <div class="conversion-info">
+            คุณจะได้รับ: <span id="diamondOutput">0</span> 💎
+        </div>
+
+        <button id="btnConfirm" class="btn-exchange">ยืนยันการแลกเปลี่ยน</button>
+
+        <a href="index.html" class="back-link">← กลับหน้าหลัก</a>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = { 
+        apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM", 
+        authDomain: "sign-up-73f99.firebaseapp.com", 
+        projectId: "sign-up-73f99", 
+        storageBucket: "sign-up-73f99.appspot.com", 
+        messagingSenderId: "916335559099", 
+        appId: "1:916335559099:web:3a8ed896ba26e38991849e" 
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUID = null;
+    let userPoints = 0;
+
+    const coinInput = document.getElementById('coinInput');
+    const diamondOutput = document.getElementById('diamondOutput');
+    const btnConfirm = document.getElementById('btnConfirm');
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUID = user.uid;
+            onSnapshot(doc(db, "users", user.uid), (snap) => {
+                if (snap.exists()) {
+                    const data = snap.data();
+                    userPoints = data.points || 0;
+                    document.getElementById("current-points").innerText = userPoints.toLocaleString();
+                    document.getElementById("current-diamonds").innerText = (data.diamonds || 0).toLocaleString();
+                }
+            });
+        } else { window.location.href = "login.html"; }
+    });
+
+    // คำนวณเพชรแบบ Real-time
+    coinInput.oninput = () => {
+        const coins = parseInt(coinInput.value) || 0;
+        // สูตรคือ 1000 เหรียญ = 100 เพชร (หรือ 10 เหรียญต่อ 1 เพชร)
+        const diamonds = Math.floor(coins / 10);
+        diamondOutput.innerText = diamonds.toLocaleString();
+
+        // ตรวจสอบความพร้อมของปุ่ม
+        btnConfirm.disabled = (coins < 1000 || coins > userPoints);
+    };
+
+    btnConfirm.onclick = async () => {
+        const amountToPay = parseInt(coinInput.value);
+        const diamondGain = Math.floor(amountToPay / 10);
+
+        if (amountToPay < 1000) return alert("ต้องแลกขั้นต่ำ 1,000 เหรียญ");
+        if (amountToPay > userPoints) return alert("เหรียญของคุณไม่เพียงพอ");
+
+        if (confirm(`ยืนยันการใช้ ${amountToPay.toLocaleString()} 🪙 เพื่อแลก ${diamondGain.toLocaleString()} 💎 ใช่หรือไม่?`)) {
+            try {
+                btnConfirm.disabled = true;
+                await updateDoc(doc(db, "users", currentUID), {
+                    points: increment(-amountToPay),
+                    diamonds: increment(diamondGain)
+                });
+                alert("แลกเปลี่ยนสำเร็จ!");
+                coinInput.value = "";
+                diamondOutput.innerText = "0";
+            } catch (err) {
+                console.error(err);
+                alert("เกิดข้อผิดพลาด กรุณาลองใหม่");
+                btnConfirm.disabled = false;
+            }
+        }
+    };
+</script>
+</body>
+</html>
