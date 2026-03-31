@@ -40,7 +40,7 @@
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
         <div>
             <h1 style="margin:0; font-size: 2rem; color: #ffc831;">SUPER ADMIN <span style="font-weight: 300; color: #fff;">DASHBOARD</span></h1>
-            <p style="color: #666; margin: 0;">ระบบจัดการข้อมูล (นำหน่วยเงินดาวออกแล้ว)</p>
+            <p style="color: #666; margin: 0;">ระบบจัดการข้อมูล และร้านค้าแลกการ์ด</p>
         </div>
         <a href="index.html" class="btn btn-gray"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
     </div>
@@ -49,6 +49,56 @@
         <div class="stat-box"><span class="stat-label">Total Survivors</span><span id="stat-users" class="stat-val">0</span></div>
         <div class="stat-box"><span class="stat-label">Active Reward Codes</span><span id="stat-codes" class="stat-val">0</span></div>
         <div class="stat-box"><span class="stat-label">Premium Users</span><span id="stat-premium" class="stat-val">0</span></div>
+    </div>
+
+    <div class="card" style="border-left: 4px solid #ffde59;">
+        <h2><i class="fas fa-store"></i> MANAGE EXCHANGE SHOP</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+            <div>
+                <label>CARD NAME</label>
+                <input type="text" id="shop-card-name" placeholder="เช่น Pikachu VMAX">
+            </div>
+            <div>
+                <label>PRICE (STARS ⭐)</label>
+                <input type="number" id="shop-card-price" placeholder="8">
+            </div>
+            <div>
+                <label>RARITY</label>
+                <select id="shop-card-rarity">
+                    <option value="SR">SR (เขียว)</option>
+                    <option value="SSR">SSR (แดง)</option>
+                    <option value="UR">UR (เหลือง)</option>
+                    <option value="SEC">SEC (ม่วง)</option>
+                </select>
+            </div>
+            <div>
+                <label>STOCK (0 = Unlimited)</label>
+                <input type="number" id="shop-card-stock" value="0">
+            </div>
+        </div>
+        <div style="margin-top:10px;">
+            <label>IMAGE URL</label>
+            <input type="text" id="shop-card-img" placeholder="https://...">
+        </div>
+        <button class="btn btn-green" id="add-shop-item" style="background: #ffde59; color: #000;">
+            <i class="fas fa-plus"></i> ADD TO SHOP
+        </button>
+
+        <h3 style="font-size: 0.9rem; color: #888; margin-top: 25px;">CURRENT ITEMS IN SHOP</h3>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Price</th>
+                        <th>Rarity</th>
+                        <th>Stock / Sold</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="shop-table-body"></tbody>
+            </table>
+        </div>
     </div>
 
     <div class="card" style="border-left: 4px solid #ff4757;">
@@ -101,6 +151,7 @@
                 <input type="text" id="reward-card-name" placeholder="ชื่อการ์ด">
                 <select id="reward-card-rarity">
                     <option value="">-- No Card --</option>
+                    <option value="SR">SR</option>
                     <option value="SSR">SSR</option>
                     <option value="SEC">SEC</option>
                     <option value="EXR">EXR</option>
@@ -156,7 +207,52 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // --- News Logic ---
+    // --- 🛒 Shop Management Logic ---
+    document.getElementById("add-shop-item").onclick = async () => {
+        const name = document.getElementById("shop-card-name").value.trim();
+        const price = parseInt(document.getElementById("shop-card-price").value) || 0;
+        const rarity = document.getElementById("shop-card-rarity").value;
+        const stock = parseInt(document.getElementById("shop-card-stock").value) || 0;
+        const img = document.getElementById("shop-card-img").value.trim();
+
+        if(!name || !img) return alert("กรุณากรอกชื่อการ์ดและรูปภาพ");
+
+        try {
+            await setDoc(doc(db, "exchange_shop", name), {
+                name, price, rarity, maxStock: stock, soldCount: 0, img, createdAt: new Date()
+            });
+            alert("เพิ่มสินค้าสำเร็จ!");
+            document.getElementById("shop-card-name").value = "";
+            document.getElementById("shop-card-img").value = "";
+        } catch (err) { alert("Error: " + err.message); }
+    };
+
+    onSnapshot(collection(db, "exchange_shop"), (snap) => {
+        const body = document.getElementById("shop-table-body");
+        body.innerHTML = "";
+        snap.forEach(d => {
+            const item = d.data();
+            const stockDisplay = item.maxStock === 0 ? "∞" : item.maxStock;
+            body.innerHTML += `
+                <tr>
+                    <td><img src="${item.img}" style="width:30px; height:40px; vertical-align:middle; margin-right:10px;"><b>${item.name}</b></td>
+                    <td>⭐ ${item.price}</td>
+                    <td><span class="badge" style="background:${getRarityColor(item.rarity)}; color:white;">${item.rarity}</span></td>
+                    <td>${item.soldCount} / ${stockDisplay}</td>
+                    <td><button class="btn btn-red" onclick="deleteItem('exchange_shop', '${d.id}')">ลบ</button></td>
+                </tr>`;
+        });
+    });
+
+    // แก้ไขฟังก์ชันนี้เพื่อเพิ่มสีเขียวให้ SR
+    function getRarityColor(rarity) {
+        if (rarity === 'SR') return '#2ed573'; // สีเขียว
+        if (rarity === 'SSR') return '#ff4757'; // สีแดง
+        if (rarity === 'UR') return '#ffde59'; // สีเหลือง
+        return '#b388ff'; // สีม่วงสำหรับ SEC
+    }
+
+    // --- ฟังก์ชันอื่นๆ คงเดิมตามต้นฉบับ ---
     document.getElementById("post-news-btn").onclick = async () => {
         const title = document.getElementById("news-title").value.trim();
         const date = document.getElementById("news-date").value.trim();
@@ -180,7 +276,6 @@
         });
     });
 
-    // --- Code Logic ---
     document.getElementById("create-btn").onclick = async () => {
         const codeName = document.getElementById("new-code").value.trim().toUpperCase();
         if(!codeName) return alert("ระบุชื่อโค้ด");
@@ -200,7 +295,6 @@
         alert(`โค้ด ${codeName} สำเร็จ!`);
     };
 
-    // --- User Management ---
     onSnapshot(collection(db, "users"), (snap) => {
         document.getElementById("stat-users").innerText = snap.size;
         let premiumCount = 0;
@@ -214,16 +308,13 @@
                 <tr>
                     <td><b>${user.username || 'Ghost'}</b><br><small>${uid.substring(0,8)}</small></td>
                     <td>${user.isPremiumUser ? '<span class="badge badge-premium">PREMIUM</span>' : '-'}</td>
-                    <td>
-                        <span class="reward-tag">🪙 ${(user.points||0).toLocaleString()}</span><br>
-                        <span class="reward-tag">💎 ${(user.diamonds||0).toLocaleString()}</span>
-                    </td>
+                    <td><span class="reward-tag">🪙 ${(user.points||0).toLocaleString()}</span><br><span class="reward-tag">💎 ${(user.diamonds||0).toLocaleString()}</span></td>
                     <td><span style="color:#ffc831">LV.${calculateLevel(user.passExp || 0)}</span></td>
                     <td>
                         <div style="display:flex; flex-wrap:wrap; gap:5px;">
-                            <button class="btn btn-blue" title="+/- Gold" onclick="editVal('${uid}', 'points', '🪙 Gold')"><i class="fas fa-coins"></i></button>
-                            <button class="btn btn-diamond" title="+/- Diamond" onclick="editVal('${uid}', 'diamonds', '💎 Diamond')"><i class="fas fa-gem"></i></button>
-                            <button class="btn btn-orange" title="Reset" onclick="resetEconomy('${uid}', '${user.username}')"><i class="fas fa-undo"></i></button>
+                            <button class="btn btn-blue" onclick="editVal('${uid}', 'points', '🪙 Gold')"><i class="fas fa-coins"></i></button>
+                            <button class="btn btn-diamond" onclick="editVal('${uid}', 'diamonds', '💎 Diamond')"><i class="fas fa-gem"></i></button>
+                            <button class="btn btn-orange" onclick="resetEconomy('${uid}', '${user.username}')"><i class="fas fa-undo"></i></button>
                             <button class="btn btn-red" onclick="deleteItem('users', '${uid}')"><i class="fas fa-trash"></i></button>
                         </div>
                     </td>
@@ -242,7 +333,6 @@
         });
     });
 
-    // --- Helper Functions ---
     function calculateLevel(exp) {
         let lv = 1; let remaining = exp;
         while(true) {
