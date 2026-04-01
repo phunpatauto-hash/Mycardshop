@@ -58,6 +58,15 @@
         .lv-badge { position: absolute; top: 2px; right: 2px; background: #ffc831; color: black; font-size: 0.55rem; padding: 1px 4px; border-radius: 4px; font-weight: bold; z-index: 2; }
         .selected-glow { border: 2.5px solid #ffc831 !important; transform: scale(1.05); z-index: 5; box-shadow: 0 0 20px #ffc831; }
 
+        .elem-icon {
+            position: absolute;
+            top: 2px;
+            left: 4px;
+            font-size: 0.8rem;
+            z-index: 2;
+            filter: drop-shadow(0 0 2px black);
+        }
+
         .ui-card { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #333; transition: 0.3s; }
         .btn-action { background: linear-gradient(45deg, #ffc831, #ff9000); color: black; border: none; padding: 14px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; transition: 0.2s; font-size: 1rem; }
         .btn-action:active { transform: scale(0.98); }
@@ -98,34 +107,29 @@
         #view-defense, #view-history, #view-leaderboard, #view-battle { display: none; }
 
         .back-btn {
-            position: fixed;
-            top: 5px;
-            left: 20px;
-            width: 45px;
-            height: 45px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 200, 49, 0.5);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #ffc831;
-            text-decoration: none;
-            font-size: 1.2rem;
-            z-index: 1001;
-            transition: all 0.3s ease;
+            position: fixed; top: 5px; left: 20px; width: 45px; height: 45px;
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 200, 49, 0.5); border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            color: #ffc831; text-decoration: none; font-size: 1.2rem; z-index: 1001; transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
         .back-btn:hover {
-            background: #ffc831;
-            color: #000;
-            transform: scale(1.1);
+            background: #ffc831; color: #000; transform: scale(1.1);
             box-shadow: 0 0 20px rgba(255, 200, 49, 0.4);
         }
 
         .navbar { padding-left: 90px; }
+        
+        .reward-highlight {
+            background: rgba(0, 255, 136, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid #00ff88;
+            margin: 20px 0;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -209,6 +213,18 @@
         </div>
     </div>
 
+    <div id="seasonRewardModal" class="modal">
+        <div class="modal-content" style="border-color: #00ff88;">
+            <h2 style="color: #00ff88; text-align: center;">🎉 สิ้นสุดการแข่งขัน!</h2>
+            <p style="text-align: center;">ครบกำหนดซีซั่น 20 วันแล้ว นี่คือผลลัพธ์ของคุณ:</p>
+            <div class="reward-highlight">
+                <div id="final-rank-display" style="font-size: 1.5rem; margin-bottom: 10px; font-weight: bold;">--</div>
+                <div style="font-size: 1.2rem; color: #ffc831;">รางวัลที่ได้รับ: <b id="final-coin-reward">🪙 0</b></div>
+            </div>
+            <button class="btn-action" onclick="claimSeasonReward()">รับรางวัลและเริ่มซีซั่นใหม่ ⚔️</button>
+        </div>
+    </div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -249,7 +265,15 @@
         { name: "Supre MASTER PRO!!", min: 15000, icon: "👑", color: "rainbow", reward: {coin: 50000000} }
     ];
 
+    const ELEMENTS = {
+        "Fire": { icon: "🔥", beats: "Wind", color: "#ff4d4d" },
+        "Wind": { icon: "🌪️", beats: "Earth", color: "#4dff88" },
+        "Earth": { icon: "⛰️", beats: "Water", color: "#ffb347" },
+        "Water": { icon: "💧", beats: "Fire", color: "#4da6ff" }
+    };
+
     let userDoc = null, tempAtk = [], tempDef = [], targetOpp = null;
+    const SEASON_LIMIT = 20 * 24 * 60 * 60 * 1000;
 
     const getPower = (c) => {
         if(!c) return 0;
@@ -262,10 +286,7 @@
     const getRankInfo = (trophies) => {
         let rank = RANKS[0];
         for (let i = RANKS.length - 1; i >= 0; i--) {
-            if (trophies >= RANKS[i].min) {
-                rank = RANKS[i];
-                break;
-            }
+            if (trophies >= RANKS[i].min) { rank = RANKS[i]; break; }
         }
         return rank;
     };
@@ -273,8 +294,14 @@
     const cardHTML = (c, selected = false) => {
         if(!c) return `<div class="mini-card" style="border: 1px dashed #333; background: transparent;"></div>`;
         const imgUrl = c.img || c.image || 'https://via.placeholder.com/150';
+        if(!c.element) {
+            const keys = Object.keys(ELEMENTS);
+            c.element = keys[Math.floor(Math.random() * keys.length)];
+        }
+        const elemInfo = ELEMENTS[c.element] || ELEMENTS["Fire"];
         return `
         <div class="mini-card ${c.rarity==='EXR'?'rarity-exr':''} ${selected?'selected-glow':''}">
+            <div class="elem-icon" style="color:${elemInfo.color}">${elemInfo.icon}</div>
             <img src="${imgUrl}" onerror="this.src='https://picsum.photos/seed/error/150/225'">
             <div class="lv-badge">Lv.${c.level || 1}</div>
             <div class="stat-overlay">⚡ ${getPower(c).toLocaleString()}</div>
@@ -288,15 +315,44 @@
             if(userDoc) {
                 document.getElementById("navbar-coins").innerText = `🪙 ${Number(userDoc.points || 0).toLocaleString()}`;
                 if(!userDoc.collection) userDoc.collection = [];
-                if (tempDef.length === 0 && userDoc.defenseTeam) {
-                    tempDef = [...userDoc.defenseTeam];
-                }
+                if (tempDef.length === 0 && userDoc.defenseTeam) { tempDef = [...userDoc.defenseTeam]; }
                 updateUI();
+                checkSeasonStatus();
             }
         });
         startSeasonTimer();
         setTimeout(() => showView('lobby'), 500);
     });
+
+    async function checkSeasonStatus() {
+        if (!userDoc.seasonStartTime) {
+            await updateDoc(doc(db, "users", auth.currentUser.uid), { seasonStartTime: Date.now() });
+            return;
+        }
+        const now = Date.now();
+        const elapsed = now - userDoc.seasonStartTime;
+        if (elapsed >= SEASON_LIMIT) {
+            const currentRank = getRankInfo(userDoc.trophies || 0);
+            document.getElementById("final-rank-display").innerText = `${currentRank.icon} ${currentRank.name}`;
+            document.getElementById("final-coin-reward").innerText = `🪙 ${currentRank.reward.coin.toLocaleString()}`;
+            toggleModal("seasonRewardModal", true);
+        }
+    }
+
+    window.claimSeasonReward = async function() {
+        const currentRank = getRankInfo(userDoc.trophies || 0);
+        try {
+            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                points: increment(currentRank.reward.coin),
+                trophies: 0,
+                seasonStartTime: Date.now()
+            });
+            toggleModal("seasonRewardModal", false);
+            alert("รับรางวัลสำเร็จ! ถ้วยรางวัลถูกรีเซ็ตเพื่อเริ่มซีซั่นใหม่");
+        } catch (e) {
+            alert("เกิดข้อผิดพลาดในการรับรางวัล");
+        }
+    }
 
     function updateUI() {
         if(!userDoc) return;
@@ -305,37 +361,28 @@
         document.getElementById("rank-icon").innerText = cur.icon;
         const rName = document.getElementById("rank-name");
         rName.innerText = cur.name;
-        
-        if(cur.color === "rainbow") {
-            rName.className = "rank-rainbow";
-            rName.style.color = ""; 
-        } else {
-            rName.className = "";
-            rName.style.color = cur.color;
-        }
-        
+        if(cur.color === "rainbow") { rName.className = "rank-rainbow"; rName.style.color = ""; } 
+        else { rName.className = ""; rName.style.color = cur.color; }
         const nextRank = RANKS[RANKS.indexOf(cur)+1];
         const progEl = document.getElementById("rank-progress");
         if(nextRank) {
             const prog = ((userDoc.trophies - cur.min) / (nextRank.min - cur.min)) * 100;
             progEl.style.width = Math.min(prog, 100) + "%";
-        } else {
-            progEl.style.width = "100%";
-        }
+        } else { progEl.style.width = "100%"; }
     }
 
     function startSeasonTimer() {
         setInterval(() => {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = now.getMonth();
-            const nextMonth = new Date(year, month + 1, 1);
-            let diff = nextMonth - now;
+            if (!userDoc || !userDoc.seasonStartTime) return;
+            const endTime = userDoc.seasonStartTime + SEASON_LIMIT;
+            const diff = endTime - Date.now();
+            const el = document.getElementById("season-countdown");
+            if (diff <= 0) { el.innerText = "จบซีซั่น!"; return; }
             const d = Math.floor(diff/86400000);
             const h = Math.floor((diff%86400000)/3600000).toString().padStart(2,'0');
             const m = Math.floor((diff%3600000)/60000).toString().padStart(2,'0');
             const s = Math.floor((diff%60000)/1000).toString().padStart(2,'0');
-            document.getElementById("season-countdown").innerText = `${d} วัน ${h}:${m}:${s}`;
+            el.innerText = `${d} วัน ${h}:${m}:${s}`;
         }, 1000);
     }
 
@@ -344,14 +391,13 @@
         const botTrophies = Math.max(0, (userDoc?.trophies || 0) + (Math.floor(Math.random() * 500) - 250));
         const botTeam = [];
         const myCollection = userDoc?.collection || [];
-        let botLevel;
-        if (botTrophies >= 12000) { botLevel = 40; } else { botLevel = Math.max(1, Math.floor(botTrophies / 300) + 5); }
+        let botLevel = (botTrophies >= 12000) ? 40 : Math.max(1, Math.floor(botTrophies / 300) + 5);
         for(let i=0; i<5; i++) {
-            const randomCard = myCollection.length > 0 ? myCollection[Math.floor(Math.random() * myCollection.length)] : null;
+            const randomCard = myCollection[Math.floor(Math.random() * myCollection.length)];
+            const keys = Object.keys(ELEMENTS);
             botTeam.push({ 
-                name: "BotCard" + i, 
-                level: botLevel, 
-                rarity: Math.random() > 0.7 ? "SSR" : "SR", 
+                name: "BotCard" + i, level: botLevel, rarity: Math.random() > 0.7 ? "SSR" : "SR", 
+                element: keys[Math.floor(Math.random() * keys.length)],
                 img: randomCard ? (randomCard.img || randomCard.image) : `https://picsum.photos/seed/bot${i}/150/225` 
             });
         }
@@ -390,11 +436,11 @@
             players.forEach(u => {
                 const pwr = u.defenseTeam.reduce((s, c) => s + getPower(c), 0);
                 const rInfo = getRankInfo(u.trophies || 0);
-                const div = document.createElement("div");
-                div.className = "ui-card";
                 const rankDisplay = rInfo.color === 'rainbow' 
                     ? `<span class="rank-rainbow">${rInfo.icon} ${u.username}</span>` 
                     : `<b style="color:${rInfo.color}">${rInfo.icon} ${u.username}</b>`;
+                const div = document.createElement("div");
+                div.className = "ui-card";
                 div.innerHTML = `
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                         <span>${rankDisplay} ${u.isBot ? '<span class="bot-tag">BOT</span>' : ''}</span>
@@ -415,18 +461,12 @@
 
     window.openPrep = async function(id, isBot) {
         if(isBot) targetOpp = window["bot_data_"+id];
-        else {
-            const snap = await getDoc(doc(db, "users", id));
-            targetOpp = {id, ...snap.data()};
-        }
-        tempAtk = []; 
-        toggleModal('prepModal', true);
-        renderPrep();
+        else { const snap = await getDoc(doc(db, "users", id)); targetOpp = {id, ...snap.data()}; }
+        tempAtk = []; toggleModal('prepModal', true); renderPrep();
     };
 
     window.handleStartBattle = async function() {
-        toggleModal('prepModal', false);
-        showView('battle');
+        toggleModal('prepModal', false); showView('battle');
         const log = document.getElementById("battle-status");
         const exit = document.getElementById("exit-battle-btn");
         const pRow = document.getElementById("player-battle-row");
@@ -439,10 +479,7 @@
         vsLabel.style.transform = "scale(1)";
         oRow.innerHTML = targetOpp.defenseTeam.map(c => cardHTML(c)).join('');
         pRow.innerHTML = tempAtk.map(c => cardHTML(c)).join('');
-        setTimeout(() => {
-            log.innerHTML = "<span style='color:#ffc831'>🔥 รวบรวมพลัง!</span>";
-            pRow.classList.add('ready-up'); oRow.classList.add('ready-up');
-        }, 800);
+        setTimeout(() => { log.innerHTML = "<span style='color:#ffc831'>🔥 รวบรวมพลัง!</span>"; pRow.classList.add('ready-up'); oRow.classList.add('ready-up'); }, 800);
         setTimeout(() => {
             log.innerHTML = "<span style='color:#ff4d4d; font-size:1.5rem;'>EX-BURST ATTACK!!</span>";
             pRow.classList.remove('ready-up'); oRow.classList.remove('ready-up');
@@ -451,37 +488,41 @@
         }, 2000);
         setTimeout(() => { arena.classList.add('arena-shake'); flash.classList.add('flash-active'); }, 2150);
         setTimeout(async () => {
-            const pPwr = tempAtk.reduce((s, c) => s + getPower(c), 0);
-            const ePwr = targetOpp.defenseTeam.reduce((s, c) => s + getPower(c), 0);
-            const win = pPwr >= ePwr;
+            let pTotalPwr = 0;
+            let oTotalPwr = 0;
+            for(let i=0; i<5; i++) {
+                let pCard = tempAtk[i];
+                let oCard = targetOpp.defenseTeam[i];
+                let pPwr = getPower(pCard);
+                let oPwr = getPower(oCard);
+                if(ELEMENTS[pCard.element].beats === oCard.element) pPwr *= 1.25;
+                else if(ELEMENTS[oCard.element].beats === pCard.element) oPwr *= 1.25;
+                pTotalPwr += pPwr;
+                oTotalPwr += oPwr;
+            }
+            const win = pTotalPwr >= oTotalPwr;
             let trophyGain = 30; 
             const currentRankName = getRankInfo(userDoc.trophies || 0).name;
-            if (currentRankName.includes("SILVER 1") || currentRankName.includes("GOLD") || currentRankName.includes("DIAMOND")) {
-                trophyGain = 120;
-            } else if (currentRankName.includes("MASTER")) {
-                trophyGain = 290;
-            }
+            if (currentRankName.includes("SILVER 1") || currentRankName.includes("GOLD") || currentRankName.includes("DIAMOND")) trophyGain = 120;
+            else if (currentRankName.includes("MASTER")) trophyGain = 290;
             const trophyChange = win ? trophyGain : -Math.floor(trophyGain / 2);
             const coinPrize = win ? 250 : 50;
             log.innerHTML = win ? `
                 <div style='animation: readyAni 0.3s infinite alternate'>
                     <h2 style='color:#00ff88; margin:0; text-shadow: 0 0 15px #00ff88'>VICTORY !!</h2>
+                    <p style="color: #aaa; font-size:0.8rem;">PWR: ${Math.floor(pTotalPwr).toLocaleString()} vs ${Math.floor(oTotalPwr).toLocaleString()}</p>
                     <p style="color: #ffc831; margin:5px 0;">+${trophyChange} 🏆 | 🪙 ${coinPrize}</p>
                 </div>` : `
                 <div>
                     <h2 style='color:#ff4d4d; margin:0; text-shadow: 0 0 15px #ff4d4d'>DEFEAT</h2>
+                    <p style="color: #aaa; font-size:0.8rem;">PWR: ${Math.floor(pTotalPwr).toLocaleString()} vs ${Math.floor(oTotalPwr).toLocaleString()}</p>
                     <p style="color: #aaa; margin:5px 0;">${trophyChange} 🏆</p>
                 </div>`;
             exit.style.display = "block";
             pRow.classList.remove('strike-player'); oRow.classList.remove('strike-opp');
             arena.classList.remove('arena-shake'); flash.classList.remove('flash-active');
-            await updateDoc(doc(db, "users", auth.currentUser.uid), { 
-                trophies: Math.max(0, (userDoc.trophies || 0) + trophyChange), 
-                points: increment(coinPrize)
-            });
-            await addDoc(collection(db, "users", auth.currentUser.uid, "logs"), { 
-                type: "attack", oppName: targetOpp.username + (targetOpp.isBot ? " (Bot)" : ""), win, trophyChange: trophyChange, time: serverTimestamp() 
-            });
+            await updateDoc(doc(db, "users", auth.currentUser.uid), { trophies: Math.max(0, (userDoc.trophies || 0) + trophyChange), points: increment(coinPrize) });
+            await addDoc(collection(db, "users", auth.currentUser.uid, "logs"), { type: "attack", oppName: targetOpp.username + (targetOpp.isBot ? " (Bot)" : ""), win, trophyChange: trophyChange, time: serverTimestamp() });
             if(!targetOpp.isBot) {
                 const oppChange = win ? -15 : 20;
                 await updateDoc(doc(db, "users", targetOpp.id), { trophies: Math.max(0, (targetOpp.trophies||0) + oppChange) });
@@ -494,17 +535,10 @@
         const slots = document.getElementById("prep-slots");
         const pool = document.getElementById("prep-pool");
         slots.innerHTML = ""; pool.innerHTML = "";
-        for(let i=0; i<5; i++) { 
-            slots.innerHTML += tempAtk[i] ? cardHTML(tempAtk[i]) : `<div class="mini-card" style="border:1px dashed #444; background:transparent;"></div>`; 
-        }
+        for(let i=0; i<5; i++) { slots.innerHTML += tempAtk[i] ? cardHTML(tempAtk[i]) : `<div class="mini-card" style="border:1px dashed #444; background:transparent;"></div>`; }
         const unique = {};
-        (userDoc.collection || []).forEach(c => { 
-            if(!unique[c.name] || Number(c.level) > Number(unique[c.name].level)) unique[c.name] = c; 
-        });
-        
-        // จุดที่แก้: เรียง Level จากมากไปน้อย (มากอยู่บนสุด)
+        (userDoc.collection || []).forEach(c => { if(!unique[c.name] || Number(c.level) > Number(unique[c.name].level)) unique[c.name] = c; });
         const sortedCollection = Object.values(unique).sort((a, b) => Number(b.level || 1) - Number(a.level || 1));
-
         sortedCollection.forEach(c => {
             const isSel = tempAtk.some(t => t.name === c.name);
             const div = document.createElement("div");
@@ -522,10 +556,8 @@
 
     window.saveDefense = async function() {
         if(tempDef.length < 5) return alert("กรุณาเลือกการ์ดป้องกันให้ครบ 5 ใบ!");
-        try {
-            await updateDoc(doc(db, "users", auth.currentUser.uid), { defenseTeam: tempDef });
-            alert("✅ บันทึกทีมป้องกันเรียบร้อย!");
-        } catch (err) { alert("❌ เกิดข้อผิดพลาดในการบันทึก"); }
+        try { await updateDoc(doc(db, "users", auth.currentUser.uid), { defenseTeam: tempDef }); alert("✅ บันทึกทีมป้องกันเรียบร้อย!"); } 
+        catch (err) { alert("❌ เกิดข้อผิดพลาดในการบันทึก"); }
     };
 
     function renderPools() {
@@ -534,17 +566,10 @@
         const dPool = document.getElementById("defense-pool");
         if(!dSlots || !dPool) return;
         dSlots.innerHTML = ""; dPool.innerHTML = "";
-        for(let i=0; i<5; i++) { 
-            dSlots.innerHTML += tempDef[i] ? cardHTML(tempDef[i]) : `<div class="mini-card" style="border:1px dashed #444; background:transparent;"></div>`; 
-        }
+        for(let i=0; i<5; i++) { dSlots.innerHTML += tempDef[i] ? cardHTML(tempDef[i]) : `<div class="mini-card" style="border:1px dashed #444; background:transparent;"></div>`; }
         const unique = {};
-        (userDoc.collection || []).forEach(c => { 
-            if(!unique[c.name] || Number(c.level) > Number(unique[c.name].level)) unique[c.name] = c; 
-        });
-
-        // จุดที่แก้: เรียง Level สำหรับทีมป้องกันด้วย
+        (userDoc.collection || []).forEach(c => { if(!unique[c.name] || Number(c.level) > Number(unique[c.name].level)) unique[c.name] = c; });
         const sortedDefPool = Object.values(unique).sort((a, b) => Number(b.level || 1) - Number(a.level || 1));
-
         sortedDefPool.forEach(c => {
             const isSel = tempDef.some(t => t.name === c.name);
             const div = document.createElement("div");
@@ -562,15 +587,12 @@
     async function loadLeaderboard() {
         const list = document.getElementById("leaderboard-list");
         if(!list) return;
-        list.innerHTML = "<p style='text-align:center;'>กำลังโหลดอันดับ...</p>";
         try {
             const q = query(collection(db, "users"), orderBy("trophies", "desc"), limit(20));
             const snap = await getDocs(q);
-            list.innerHTML = "";
-            let i = 1;
+            list.innerHTML = ""; let i = 1;
             snap.forEach(d => {
-                const u = d.data();
-                const r = getRankInfo(u.trophies || 0);
+                const u = d.data(); const r = getRankInfo(u.trophies || 0);
                 const rankText = r.color === "rainbow" ? `<span class="rank-rainbow">${r.icon} ${u.username || 'Unknown'}</span>` : `<span>${r.icon} ${u.username || 'Unknown'}</span>`;
                 list.innerHTML += `<div class="ui-card" style="display:flex; justify-content:space-between; align-items:center; border-left: 4px solid ${r.color === 'rainbow' ? '#ff00ff' : r.color}"><span><b style="color:#aaa; margin-right:10px;">#${i++}</b> ${rankText}</span> <span style="color:#ffc831; font-weight:bold;">🏆 ${(u.trophies || 0).toLocaleString()}</span></div>`;
             });
@@ -584,25 +606,21 @@
             const snap = await getDocs(query(collection(db, "users", auth.currentUser.uid, "logs"), orderBy("time", "desc"), limit(10)));
             list.innerHTML = snap.empty ? "<p style='text-align:center; color:#555;'>ยังไม่มีประวัติการต่อสู้</p>" : "";
             snap.forEach(d => {
-                const l = d.data();
-                const color = l.win ? '#00ff88' : '#ff4d4d';
+                const l = d.data(); const color = l.win ? '#00ff88' : '#ff4d4d';
                 list.innerHTML += `<div class="ui-card" style="border-left:5px solid ${color}; padding:10px 15px;"><div style="display:flex; justify-content:space-between;"><b>${l.type==='attack'?'⚔️ บุก':'🛡️ ป้องกัน'} - ${l.win?'ชนะ':'แพ้'}</b><span style="color:${color}">${l.trophyChange >= 0 ? '+' : ''}${l.trophyChange} 🏆</span></div><div style="font-size:0.8rem; color:#aaa;">คู่ต่อสู้: ${l.oppName}</div></div>`;
             });
         } catch (e) { list.innerHTML = "Error loading history"; }
     }
 
     window.toggleModal = function(id, show) {
-        const el = document.getElementById(id);
-        if(el) el.style.display = show ? "block" : "none";
+        const el = document.getElementById(id); if(el) el.style.display = show ? "block" : "none";
         if(id === 'rankModal' && show) {
             document.getElementById("rank-details").innerHTML = `
                 <div style="background:rgba(255,200,49,0.1); padding:10px; border-radius:10px; margin-bottom:15px; font-size:0.85rem; border:1px dashed #ffc831; color:#ffc831; text-align:center;">
-                    🎁 รางวัลซีซั่นจะส่งมอบอัตโนมัติเมื่อจบเดือน
+                    🎁 รางวัลซีซั่นจะมอบให้เมื่อครบหลังจบซีซั่น
                 </div>
-            ` + 
-            // จุดที่แก้: ใช้ .reverse() เพื่อให้ Bronze 3 อยู่ล่างสุด (สูงไปต่ำ)
-            [...RANKS].reverse().map(r => {
-                const nameStyle = r.color === "rainbow" ? `class="rank-rainbow"` : `style="color:${r.color}"`;
+            ` + [...RANKS].reverse().map(r => {
+                const nameStyle = r.color === "rainbow" ? `class=\"rank-rainbow\"` : `style=\"color:${r.color}\"`;
                 let winTrophy = 50; 
                 if (r.name.includes("SILVER 1") || r.name.includes("GOLD") || r.name.includes("DIAMOND")) winTrophy = 120;
                 if (r.name.includes("MASTER")) winTrophy = 290;
