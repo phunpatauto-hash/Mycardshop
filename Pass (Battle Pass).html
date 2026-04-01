@@ -173,30 +173,38 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // ฟังก์ชัน Reset (คงเดิม)
+    // --- ส่วนที่แก้ไข: ระบบรีเซ็ตทุก 20 วัน ---
+    const SEASON_DURATION_DAYS = 20;
+    const START_EPOCH = new Date("2024-01-01T00:00:00").getTime(); // วันอ้างอิงเริ่มต้น
+
     async function checkAndResetSeason(userId, userData) {
-        const now = new Date();
-        const currentSeasonId = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
-        if (!userData.lastSeasonId || userData.lastSeasonId !== currentSeasonId) {
+        const now = Date.now();
+        const cycleMs = SEASON_DURATION_DAYS * 24 * 60 * 60 * 1000;
+        const currentCycleId = Math.floor((now - START_EPOCH) / cycleMs).toString();
+
+        if (!userData.lastSeasonId || userData.lastSeasonId !== currentCycleId) {
             const userRef = doc(db, "users", userId);
             try {
                 await updateDoc(userRef, {
-                    lastSeasonId: currentSeasonId, 
+                    lastSeasonId: currentCycleId, 
                     passExp: 0, 
-                    overMaxExp: 0, // เพิ่มการรีเซ็ตแต้มดาวสะสม                   
-                    claimedRewards: [],                   
-                    isPremiumUser: false,         
-                    isSuperUser: false            
+                    overMaxExp: 0, 
+                    claimedRewards: [], 
+                    isPremiumUser: false, 
+                    isSuperUser: false 
                 });
             } catch (e) { console.error("Reset Error:", e); }
         }
     }
 
     function updateTimer() {
-        const now = new Date();
-        const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1, 0, 0, 0);
-        const diff = nextMonth - now;
+        const now = Date.now();
+        const cycleMs = SEASON_DURATION_DAYS * 24 * 60 * 60 * 1000;
+        const nextReset = START_EPOCH + (Math.floor((now - START_EPOCH) / cycleMs) + 1) * cycleMs;
+        const diff = nextReset - now;
+
         if (diff <= 0) { document.getElementById("reset-timer").innerText = "กำลังรีเซ็ต..."; return; }
+        
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
         const mins = Math.floor((diff / 1000 / 60) % 60);
@@ -230,14 +238,12 @@
     window.closeBuyModal = () => document.getElementById('buy-pass-modal').style.display = 'none';
     window.closeRewardDetail = () => document.getElementById('reward-detail-modal').style.display = 'none';
 
-    // --- ส่วนการคำนวณเลเวล และ STAR FARMING ---
     function calculateLevelProgress(totalExp) {
         let lv = 1; 
         let remainingExp = totalExp;
         const MAX_LV = 50;
         const STAR_XP_REQ = 1000;
 
-        // วนลูปหาเลเวล 1-50
         while (lv < MAX_LV) {
             let req = Math.floor(Math.min(50 * Math.pow(1.2, lv - 1), 20000));
             if (remainingExp >= req) { 
@@ -248,7 +254,6 @@
             }
         }
 
-        // กรณีเลเวลเต็ม 50
         if (lv >= MAX_LV) {
             let starsEarned = Math.floor(remainingExp / STAR_XP_REQ);
             let xpToNextStar = remainingExp % STAR_XP_REQ;
@@ -277,15 +282,14 @@
                     const data = snapshot.data();
                     await checkAndResetSeason(user.uid, data);
                     
-                    // ระบบตรวจสอบและโอนแต้มดาวอัตโนมัติ
                     const prog = calculateLevelProgress(data.passExp || 0);
                     if (prog.pendingStars > 0) {
                         const userRef = doc(db, "users", user.uid);
                         await updateDoc(userRef, {
                             stars: increment(prog.pendingStars),
-                            passExp: increment(-(prog.pendingStars * 1000)) // หัก XP ที่แลกเป็นดาวไปแล้ว
+                            passExp: increment(-(prog.pendingStars * 1000))
                         });
-                        return; // onSnapshot จะทำงานใหม่อีกครั้งหลัง update
+                        return;
                     }
                     
                     renderUI(data); 
@@ -354,7 +358,28 @@
         document.getElementById("claim-btn").disabled = !canClaimAll;
     }
 
-    // ฟังก์ชันอื่นๆ คงเดิม (claimSingleReward, claimAll, buyPass)
+    // ฟังก์ชันอื่นๆ คงเดิมตามที่สั่ง
+    window.openRewardDetail = (reward, lv, track, unlocked, claimed) => {
+        const modal = document.getElementById('reward-detail-modal');
+        const claimBtn = document.getElementById('detail-claim-btn');
+        
+        document.getElementById('detail-img').src = reward.img;
+        document.getElementById('detail-name').innerText = reward.name;
+        document.getElementById('detail-amount').innerText = `x${reward.amount.toLocaleString()}`;
+        document.getElementById('detail-lv').innerText = `Level ${lv}`;
+        
+        const tag = document.getElementById('detail-tag');
+        tag.innerText = track.toUpperCase();
+        tag.style.background = track === 'super' ? '#ff00ff' : track === 'premium' ? '#ffc831' : '#555';
+        tag.style.color = track === 'premium' ? 'black' : 'white';
+
+        claimBtn.disabled = !unlocked || claimed;
+        claimBtn.innerText = claimed ? "รับไปแล้ว" : (unlocked ? "กดเพื่อรับรางวัล" : "ยังไม่ปลดล็อก");
+        claimBtn.onclick = () => claimSingleReward(reward);
+        
+        modal.style.display = 'flex';
+    };
+
     async function claimSingleReward(reward) {
         const user = auth.currentUser;
         const userRef = doc(db, "users", user.uid);
