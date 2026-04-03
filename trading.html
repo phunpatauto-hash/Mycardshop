@@ -30,12 +30,15 @@
         .status-waiting { background: #ff4757; }
         .status-ready { background: #2ed573; color: black; }
 
+        /* ส่วน Inventory ที่ปรับปรุงใหม่ตาม collection.html */
         .inventory-drawer { grid-column: span 2; background: #1a1a20; padding: 20px; border-radius: 15px; margin-top: 20px; border: 1px solid #333; }
-        .inv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px; max-height: 400px; overflow-y: auto; padding: 10px; }
-        .inv-item { cursor: pointer; transition: 0.2s; position: relative; background: rgba(255,255,255,0.05); padding: 5px; border-radius: 10px; border: 1px solid transparent; }
-        .inv-item:hover { border-color: var(--gold); transform: translateY(-3px); }
+        .inv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 15px; max-height: 450px; overflow-y: auto; padding: 10px; }
+        .inv-item { cursor: pointer; transition: 0.2s; position: relative; background: rgba(255,255,255,0.03); padding: 5px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); }
+        .inv-item:hover { transform: translateY(-5px); background: rgba(255,255,255,0.08); }
         .inv-item img { width: 100%; border-radius: 8px; display: block; }
-        .count-badge { position: absolute; top: -5px; right: -5px; background: var(--gold); color: black; font-size: 0.75rem; padding: 2px 8px; border-radius: 50px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        
+        .count-badge { position: absolute; top: -5px; right: -5px; color: white; font-size: 0.75rem; padding: 2px 8px; border-radius: 50px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.5); z-index: 2; }
+        .rarity-tag { position: absolute; bottom: 35px; right: 10px; font-size: 0.65rem; padding: 1px 5px; border-radius: 4px; background: rgba(0,0,0,0.8); font-weight: bold; }
     </style>
 </head>
 <body>
@@ -80,7 +83,7 @@
         </div>
 
         <div class="inventory-drawer">
-            <h3 style="margin-top: 0;"><i class="fas fa-th"></i> เลือกการ์ดที่ซ้ำของคุณทั้งหมด</h3>
+            <h3 style="margin-top: 0;"><i class="fas fa-th-large"></i> เลือกการ์ดที่ซ้ำของคุณ (ดึงจากสมุดสะสม)</h3>
             <div id="myInventory" class="inv-grid"></div>
         </div>
     </div>
@@ -108,6 +111,13 @@
     let myOffer = { cards: [], gold: 0, diamonds: 0, ready: false };
     window.isTradingAction = false;
 
+    // สีประจำระดับความหายาก (อ้างอิงจาก collection.html)
+    const rarityColors = {
+        'P': '#ff4757', 'EXR': '#ff4757', 'SEC': '#ff9f43',
+        'SUR': '#ffc831', 'SSR': '#ffc831', 'UR': '#00d2ff',
+        'SR': '#a29bfe', 'R': '#2ed573', 'U': '#747d8c', 'C': '#ffffff'
+    };
+
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             uid = user.uid;
@@ -120,43 +130,46 @@
         } else { window.location.href = "login.html"; }
     });
 
-    // แก้ไขฟังก์ชันให้ดึงมาทั้งหมด "จริงๆ" โดยเช็คหลาย Key
+    // ดึงข้อมูลการ์ดแบบละเอียดจาก Collection
     function renderInventory() {
         const invGrid = document.getElementById("myInventory");
         invGrid.innerHTML = "";
         
         const userCards = userData.collection || [];
-        console.log("DEBUG: ข้อมูลใน Collection ทั้งหมด ->", userCards);
-
-        // กรองการ์ดที่มีซ้ำ (เช็คทั้ง .count และ .amount เพื่อความชัวร์)
-        const duplicates = userCards.filter(card => {
-            const quantity = card.count || card.amount || 0;
-            return quantity > 1;
-        });
+        
+        // กรองการ์ดที่มีจำนวนมากกว่า 1 (ซ้ำ)
+        const duplicates = userCards.filter(card => (card.count || 0) > 1);
 
         if (duplicates.length === 0) {
             invGrid.innerHTML = `<div style="grid-column: span 4; text-align: center; color: #666; padding: 40px;">
-                ไม่มีการ์ดซ้ำในสมุดสะสมที่สามารถเทรดได้
+                <i class="fas fa-box-open fa-3x" style="margin-bottom:10px; display:block;"></i>
+                ไม่พบการ์ดซ้ำที่สามารถเทรดได้
             </div>`;
             return;
         }
 
         duplicates.forEach((card) => {
-            const quantity = card.count || card.amount || 0;
             const div = document.createElement("div");
             div.className = "inv-item";
-            div.onclick = () => addToOffer(card);
+            const color = rarityColors[card.rarity] || '#333';
             
-            // ใช้ Image จากคีย์ที่น่าจะเป็นไปได้ (img หรือ image)
-            const displayImg = card.img || card.image || 'https://via.placeholder.com/150';
+            div.onclick = () => addToOffer(card);
+            div.style.border = `1px solid ${color}33`; // ขอบสีจางๆ ตาม Rarity
 
             div.innerHTML = `
-                <img src="${displayImg}" alt="${card.name}" onerror="this.src='https://via.placeholder.com/150'">
-                <div class="count-badge">x${quantity}</div>
-                <div style="font-size: 10px; color: #fff; text-align: center; margin-top: 8px; font-weight:bold;">
+                <div style="position: relative;">
+                    <img src="${card.img}" alt="${card.name}" onerror="this.src='https://via.placeholder.com/150'">
+                    <div class="count-badge" style="background: ${color}; color: ${card.rarity === 'C' ? '#000' : '#fff'}">
+                        x${card.count}
+                    </div>
+                    <div class="rarity-tag" style="color: ${color}">${card.rarity}</div>
+                </div>
+                <div style="font-size: 10px; color: #fff; text-align: center; margin-top: 8px; font-weight:bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 4px;">
                     ${card.name}
                 </div>
-                <div style="font-size: 9px; color: var(--blue); text-align: center;">ส่งได้: ${quantity - 1} ใบ</div>
+                <div style="font-size: 9px; color: #aaa; text-align: center; margin-top: 2px;">
+                    เทรดได้: ${card.count - 1}
+                </div>
             `;
             invGrid.appendChild(div);
         });
@@ -165,11 +178,9 @@
     window.addToOffer = (card) => {
         if (myOffer.cards.length >= 4) return alert("แลกได้สูงสุดครั้งละ 4 ใบ");
         
-        const quantity = card.count || card.amount || 0;
-        const inOfferCount = myOffer.cards.filter(c => c.name === card.name).length;
-        
-        if (inOfferCount >= quantity - 1) {
-            return alert(`คุณต้องเก็บ ${card.name} ไว้อย่างน้อย 1 ใบ`);
+        const inOfferCount = myOffer.cards.filter(c => c.name === card.name && c.rarity === card.rarity).length;
+        if (inOfferCount >= card.count - 1) {
+            return alert(`คุณต้องเก็บการ์ด ${card.name} ไว้อย่างน้อย 1 ใบในสมุดสะสม`);
         }
 
         myOffer.cards.push({ ...card, count: 1 });
@@ -177,7 +188,7 @@
         syncOffer();
     };
 
-    // ส่วนประกอบอื่นๆ ของระบบแลกเปลี่ยน
+    // --- Logic ห้องและการเทรด ---
     window.createRoom = async () => {
         roomId = Math.floor(100000 + Math.random() * 900000).toString();
         isCreator = true;
@@ -190,7 +201,7 @@
 
     window.joinRoom = async () => {
         roomId = document.getElementById("roomInput").value;
-        if(!roomId) return alert("กรุณาใส่รหัสห้อง");
+        if(!roomId) return alert("ใส่รหัสห้อง");
         const roomRef = doc(db, "rooms", roomId);
         const snap = await getDoc(roomRef);
         if (snap.exists() && !snap.data().p2) {
@@ -200,7 +211,7 @@
                 status: "active"
             });
             startTrade();
-        } else { alert("ห้องเต็มหรือไม่พบเลขห้อง"); }
+        } else { alert("ไม่พบห้อง หรือห้องเต็มแล้ว"); }
     };
 
     function startTrade() {
@@ -230,7 +241,14 @@
         const status = document.getElementById(`${side}Status`);
         document.getElementById(`${side}GoldOffer`).innerText = (offer.gold || 0).toLocaleString();
         document.getElementById(`${side}DiaOffer`).innerText = (offer.diamonds || 0).toLocaleString();
-        area.innerHTML = offer.cards.map(c => `<img src="${c.img || c.image}" class="offered-card">`).join("");
+        
+        area.innerHTML = offer.cards.map(c => `
+            <div style="position:relative">
+                <img src="${c.img}" class="offered-card" style="border-color:${rarityColors[c.rarity] || '#gold'}">
+                <div style="position:absolute; bottom:2px; left:2px; font-size:7px; background:rgba(0,0,0,0.7); padding:0 3px; border-radius:2px; color:${rarityColors[c.rarity]}">${c.rarity}</div>
+            </div>
+        `).join("");
+
         if (offer.ready) {
             status.innerText = "พร้อมแล้ว"; status.className = "status-tag status-ready";
             if(side === 'my') document.getElementById("myConfirmBtn").classList.add("ready");
@@ -241,15 +259,15 @@
     }
 
     window.setResources = () => {
-        const g = parseInt(prompt("Coins:", 0)) || 0;
-        const d = parseInt(prompt("Diamonds:", 0)) || 0;
-        if (g > (userData.coins || 0) || d > (userData.diamonds || 0)) return alert("ทรัพยากรไม่พอ!");
+        const g = parseInt(prompt("ระบุ Coins ที่ต้องการให้:", 0)) || 0;
+        const d = parseInt(prompt("ระบุ Diamonds ที่ต้องการให้:", 0)) || 0;
+        if (g > (userData.coins || 0) || d > (userData.diamonds || 0)) return alert("ทรัพยากรไม่เพียงพอ!");
         myOffer.gold = g; myOffer.diamonds = d; myOffer.ready = false;
         syncOffer();
     };
 
     window.toggleReady = () => { 
-        if(myOffer.cards.length === 0 && myOffer.gold === 0 && myOffer.diamonds === 0) return alert("เลือกของก่อนครับ");
+        if(myOffer.cards.length === 0 && myOffer.gold === 0 && myOffer.diamonds === 0) return alert("เลือกสิ่งของที่จะแลกเปลี่ยนก่อน");
         myOffer.ready = !myOffer.ready; 
         syncOffer(); 
     };
@@ -271,20 +289,20 @@
             const mySnap = await getDoc(myRef);
             let myColl = [...mySnap.data().collection];
 
-            // หักของ
+            // 1. หักของที่ส่งให้เขา
             myOfferFinal.cards.forEach(cOut => {
-                const idx = myColl.findIndex(c => c.name === cOut.name);
-                if (idx > -1) myColl[idx].count = (myColl[idx].count || myColl[idx].amount) - 1;
+                const idx = myColl.findIndex(c => c.name === cOut.name && c.rarity === cOut.rarity);
+                if (idx > -1) myColl[idx].count -= 1;
             });
 
-            // เพิ่มของ
+            // 2. เพิ่มของที่ได้รับจากเขา
             peerOfferFinal.cards.forEach(cIn => {
-                const idx = myColl.findIndex(c => c.name === cIn.name);
+                const idx = myColl.findIndex(c => c.name === cIn.name && c.rarity === cIn.rarity);
                 if (idx > -1) { 
-                    const q = (myColl[idx].count || myColl[idx].amount || 1);
-                    myColl[idx].count = q + 1; 
-                } 
-                else { myColl.push({ ...cIn, count: 1 }); }
+                    myColl[idx].count += 1; 
+                } else { 
+                    myColl.push({ ...cIn, count: 1 }); 
+                }
             });
 
             await updateDoc(myRef, {
@@ -294,7 +312,7 @@
             });
 
             if (isCreator) setTimeout(async () => { await deleteDoc(doc(db, "rooms", roomId)); }, 1000);
-            alert("✅ แลกเปลี่ยนสำเร็จ!");
+            alert("✨ การแลกเปลี่ยนสำเร็จเรียบร้อย!");
             window.location.reload(); 
         } catch (e) { 
             console.error(e); 
