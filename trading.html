@@ -84,7 +84,7 @@
             <div id="myInventory" class="inv-grid"></div>
         </div>
     </div>
-
+    
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, setDoc, onSnapshot, updateDoc, deleteDoc, getDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -108,19 +108,68 @@
     let myOffer = { cards: [], gold: 0, diamonds: 0, ready: false };
     window.isTradingAction = false;
 
+    // 1. ดึงข้อมูลผู้ใช้และคลังการ์ดแบบ Real-time
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             uid = user.uid;
-            // ใช้ onSnapshot เพื่อให้ข้อมูลในมืออัปเดตตลอดเวลา
             onSnapshot(doc(db, "users", uid), (snap) => {
                 if (snap.exists()) {
                     userData = snap.data();
-                    renderInventory();
+                    renderInventory(); // เรียกฟังก์ชันแสดงการ์ดที่ซ้ำทันทีเมื่อข้อมูลเปลี่ยน
                 }
             });
         } else { window.location.href = "login.html"; }
     });
 
+    // 2. ฟังก์ชันหลัก: ดึงเฉพาะการ์ดที่มีซ้ำ (count > 1) มาแสดง
+    function renderInventory() {
+        const invGrid = document.getElementById("myInventory");
+        invGrid.innerHTML = "";
+        
+        // ดึงข้อมูลจากฟิลด์ collection ของคุณ
+        const userCards = userData.collection || [];
+
+        // กรองหาเฉพาะใบที่มีจำนวน (count) มากกว่า 1
+        const duplicates = userCards.filter(card => card.count > 1);
+
+        if (duplicates.length === 0) {
+            invGrid.innerHTML = `<div style="grid-column: span 4; text-align: center; color: #666; padding: 20px;">
+                ไม่พบการ์ดซ้ำในสมุดสะสมของคุณ
+            </div>`;
+            return;
+        }
+
+        duplicates.forEach((card) => {
+            const div = document.createElement("div");
+            div.className = "inv-item";
+            div.onclick = () => addToOffer(card);
+            div.innerHTML = `
+                <img src="${card.img}" alt="${card.name}">
+                <div class="count-badge">${card.count}</div>
+                <div style="font-size: 10px; color: #aaa; text-align: center; margin-top: 5px;">
+                    ${card.name}
+                </div>
+            `;
+            invGrid.appendChild(div);
+        });
+    }
+
+    // ฟังก์ชันเพิ่มการ์ดลงในช่องเทรด
+    window.addToOffer = (card) => {
+        if (myOffer.cards.length >= 4) return alert("แลกได้สูงสุดครั้งละ 4 ใบ");
+        
+        // ตรวจสอบว่าในช่องเทรดปัจจุบัน มีการ์ดใบนี้ไปแล้วกี่ใบ (ต้องไม่เกินจำนวนที่มี - 1)
+        const inOfferCount = myOffer.cards.filter(c => c.name === card.name).length;
+        if (inOfferCount >= card.count - 1) {
+            return alert(`คุณมี ${card.name} ทั้งหมด ${card.count} ใบ ต้องเก็บไว้อย่างน้อย 1 ใบครับ`);
+        }
+
+        myOffer.cards.push({ ...card, count: 1 }); // ส่งไปแค่ใบเดียว
+        myOffer.ready = false;
+        syncOffer();
+    };
+
+    // --- ส่วนจัดการห้องและการเชื่อมต่อ (เหมือนเดิม) ---
     window.createRoom = async () => {
         roomId = Math.floor(100000 + Math.random() * 900000).toString();
         isCreator = true;
@@ -142,7 +191,7 @@
                 status: "active"
             });
             startTrade();
-        } else { alert("ไม่พบห้อง หรือห้องเต็มแล้ว"); }
+        } else { alert("ไม่พบเลขห้องนี้ หรือห้องเต็มแล้ว"); }
     };
 
     function startTrade() {
@@ -156,77 +205,41 @@
         onSnapshot(doc(db, "rooms", roomId), async (snapshot) => {
             const data = snapshot.data();
             if (!data) return;
-
             const me = isCreator ? data.p1 : data.p2;
             const peer = isCreator ? data.p2 : data.p1;
-
             if (peer) {
                 document.getElementById("peerName").innerText = peer.name;
                 updateOfferUI("peer", peer.offer);
             }
             updateOfferUI("my", me.offer);
-
-            if (data.p1.offer.ready && data.p2?.offer.ready) {
-                executeTrade(data);
-            }
+            if (data.p1.offer.ready && data.p2?.offer.ready) { executeTrade(data); }
         });
     }
 
     function updateOfferUI(side, offer) {
         const area = document.getElementById(`${side}Offers`);
         const status = document.getElementById(`${side}Status`);
-        document.getElementById(`${side}GoldOffer`).innerText = offer.gold.toLocaleString();
-        document.getElementById(`${side}DiaOffer`).innerText = offer.diamonds.toLocaleString();
-
+        document.getElementById(`${side}GoldOffer`).innerText = (offer.gold || 0).toLocaleString();
+        document.getElementById(`${side}DiaOffer`).innerText = (offer.diamonds || 0).toLocaleString();
         area.innerHTML = offer.cards.map(c => `<img src="${c.img}" class="offered-card">`).join("");
-
         if (offer.ready) {
-            status.innerText = "พร้อมแล้ว";
-            status.className = "status-tag status-ready";
+            status.innerText = "พร้อมแล้ว"; status.className = "status-tag status-ready";
             if(side === 'my') document.getElementById("myConfirmBtn").classList.add("ready");
         } else {
-            status.innerText = "รอยืนยัน";
-            status.className = "status-tag status-waiting";
+            status.innerText = "รอยืนยัน"; status.className = "status-tag status-waiting";
             if(side === 'my') document.getElementById("myConfirmBtn").classList.remove("ready");
         }
     }
 
-    function renderInventory() {
-        const invGrid = document.getElementById("myInventory");
-        invGrid.innerHTML = "";
-        const collection = userData.collection || [];
-        collection.filter(card => card.count > 1).forEach((card) => {
-            const div = document.createElement("div");
-            div.className = "inv-item";
-            div.onclick = () => addToOffer(card);
-            div.innerHTML = `<img src="${card.img}"><div class="count-badge">${card.count}</div>`;
-            invGrid.appendChild(div);
-        });
-    }
-
-    window.addToOffer = (card) => {
-        if (myOffer.cards.length >= 4) return alert("แลกได้สูงสุด 4 ใบ");
-        // เช็คว่าเลือกไปเกินจำนวนที่มี (ต้องเหลือ 1 ใบ) หรือไม่
-        const countInOffer = myOffer.cards.filter(c => c.name === card.name).length;
-        if (countInOffer >= card.count - 1) return alert("ต้องเหลือการ์ดไว้อย่างน้อย 1 ใบ");
-        
-        myOffer.cards.push(card);
-        myOffer.ready = false;
-        syncOffer();
-    };
-
     window.setResources = () => {
-        const g = parseInt(prompt("ระบุ Coins:", 0)) || 0;
-        const d = parseInt(prompt("ระบุ Diamonds:", 0)) || 0;
-        if (g > (userData.coins || 0) || d > (userData.diamonds || 0)) return alert("เงินไม่พอ!");
+        const g = parseInt(prompt("ระบุ Coins ที่จะให้:", 0)) || 0;
+        const d = parseInt(prompt("ระบุ Diamonds ที่จะให้:", 0)) || 0;
+        if (g > (userData.coins || 0) || d > (userData.diamonds || 0)) return alert("คุณมีทรัพยากรไม่พอ!");
         myOffer.gold = g; myOffer.diamonds = d; myOffer.ready = false;
         syncOffer();
     };
 
-    window.toggleReady = () => {
-        myOffer.ready = !myOffer.ready;
-        syncOffer();
-    };
+    window.toggleReady = () => { myOffer.ready = !myOffer.ready; syncOffer(); };
 
     async function syncOffer() {
         const roomRef = doc(db, "rooms", roomId);
@@ -237,50 +250,32 @@
     async function executeTrade(roomData) {
         if (window.isTradingAction) return;
         window.isTradingAction = true;
-
         const myRef = doc(db, "users", uid);
         const myOfferFinal = isCreator ? roomData.p1.offer : roomData.p2.offer;
         const peerOfferFinal = isCreator ? roomData.p2.offer : roomData.p1.offer;
-
         try {
-            // ดึงข้อมูล collection ล่าสุด
             const mySnap = await getDoc(myRef);
-            let myCollection = [...mySnap.data().collection];
-
-            // 1. หักของที่ "ให้" เขา
-            myOfferFinal.cards.forEach(cardOut => {
-                const idx = myCollection.findIndex(c => c.name === cardOut.name);
-                if (idx > -1) myCollection[idx].count -= 1;
+            let myColl = [...mySnap.data().collection];
+            // หักของออก
+            myOfferFinal.cards.forEach(cOut => {
+                const idx = myColl.findIndex(c => c.name === cOut.name);
+                if (idx > -1) myColl[idx].count -= 1;
             });
-
-            // 2. เพิ่มของที่ "ได้รับ" จากเขา
-            peerOfferFinal.cards.forEach(cardIn => {
-                const idx = myCollection.findIndex(c => c.name === cardIn.name);
-                if (idx > -1) {
-                    myCollection[idx].count += 1;
-                } else {
-                    myCollection.push({ ...cardIn, count: 1 });
-                }
+            // เพิ่มของเข้า
+            peerOfferFinal.cards.forEach(cIn => {
+                const idx = myColl.findIndex(c => c.name === cIn.name);
+                if (idx > -1) { myColl[idx].count += 1; } 
+                else { myColl.push({ ...cIn, count: 1 }); }
             });
-
-            // 3. อัปเดต DB (การ์ด + เงิน)
             await updateDoc(myRef, {
-                collection: myCollection,
+                collection: myColl,
                 coins: increment(peerOfferFinal.gold - myOfferFinal.gold),
                 diamonds: increment(peerOfferFinal.diamonds - myOfferFinal.diamonds)
             });
-
-            if (isCreator) {
-                setTimeout(async () => { await deleteDoc(doc(db, "rooms", roomId)); }, 2000);
-            }
-
-            alert("✅ แลกเปลี่ยนสำเร็จ!");
+            if (isCreator) { setTimeout(async () => { await deleteDoc(doc(db, "rooms", roomId)); }, 2000); }
+            alert("✅ การแลกเปลี่ยนสำเร็จ!");
             window.location.reload(); 
-
-        } catch (e) {
-            console.error(e);
-            window.isTradingAction = false;
-        }
+        } catch (e) { console.error(e); window.isTradingAction = false; }
     }
 </script>
 </body>
