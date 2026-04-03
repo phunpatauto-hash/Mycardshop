@@ -26,6 +26,8 @@
 
         .confirm-btn { background: #444; color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; margin-top: 20px; cursor: pointer; transition: 0.3s; }
         .confirm-btn.ready { background: #2ed573; color: black; }
+        .cancel-btn { background: #ff4757; color: white; border: none; padding: 10px; width: 100%; border-radius: 10px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        
         .status-tag { position: absolute; top: 10px; right: 10px; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; }
         .status-waiting { background: #ff4757; }
         .status-ready { background: #2ed573; color: black; }
@@ -38,9 +40,19 @@
         
         .count-badge { position: absolute; top: -5px; right: -5px; color: white; font-size: 0.75rem; padding: 2px 8px; border-radius: 50px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.5); z-index: 2; }
         .rarity-tag { position: absolute; bottom: 35px; right: 10px; font-size: 0.65rem; padding: 1px 5px; border-radius: 4px; background: rgba(0,0,0,0.8); font-weight: bold; }
+        
+        /* สไตล์หน้าจอนับถอยหลัง */
+        #countdownOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; }
+        #timerText { font-size: 8rem; color: var(--gold); font-weight: bold; }
     </style>
 </head>
 <body>
+
+    <div id="countdownOverlay">
+        <h2 style="color: white;">กำลังดำเนินการแลกเปลี่ยน...</h2>
+        <div id="timerText">5</div>
+        <p style="color: #aaa;">ห้ามปิดหน้านี้จนกว่าจะสำเร็จ</p>
+    </div>
 
     <div id="lobby" class="lobby-container">
         <h2 style="color: var(--gold);"><i class="fas fa-sync-alt"></i> TRADE CENTER</h2>
@@ -67,6 +79,7 @@
                 <button onclick="setResources()" style="font-size: 0.7rem; background: none; border: 1px solid #555; color: #aaa; cursor: pointer; margin-left: 10px; padding: 2px 8px; border-radius: 5px;">แก้ไข</button>
             </div>
             <button class="confirm-btn" id="myConfirmBtn" onclick="toggleReady()">ยืนยันข้อเสนอ</button>
+            <button class="cancel-btn" onclick="cancelTrade()"><i class="fas fa-times"></i> ยกเลิกและออกจากห้อง</button>
         </div>
 
         <div class="trade-box" id="peerSide">
@@ -109,6 +122,7 @@
     let isCreator = false;
     let myOffer = { cards: [], gold: 0, diamonds: 0, ready: false };
     window.isTradingAction = false;
+    let countdownActive = false;
 
     const rarityColors = {
         'P': '#ff4757', 'EXR': '#ff4757', 'SEC': '#ff9f43',
@@ -131,31 +145,22 @@
     function renderInventory() {
         const invGrid = document.getElementById("myInventory");
         invGrid.innerHTML = "";
-        
         const userCards = userData.collection || [];
         const stacked = {};
 
-        // รวมยอดการ์ดชื่อเดียวกัน (Stacking) เพื่อเช็คใบซ้ำ
         userCards.forEach(c => {
             const cleanName = (c.name || "Unknown").trim();
             const cleanRarity = (c.rarity || 'C').toUpperCase().trim();
             const key = `${cleanName}_${cleanRarity}`;
             const num = Number(c.count) || 1;
-
             if (!stacked[key]) {
                 stacked[key] = { ...c, totalQty: num, rarity: cleanRarity, name: cleanName };
-            } else {
-                stacked[key].totalQty += num;
-            }
+            } else { stacked[key].totalQty += num; }
         });
 
         const duplicates = Object.values(stacked).filter(card => card.totalQty > 1);
-
         if (duplicates.length === 0) {
-            invGrid.innerHTML = `<div style="grid-column: span 4; text-align: center; color: #666; padding: 40px;">
-                <i class="fas fa-box-open fa-3x" style="margin-bottom:10px; display:block;"></i>
-                ไม่พบการ์ดซ้ำที่สามารถเทรดได้
-            </div>`;
+            invGrid.innerHTML = `<div style="grid-column: span 4; text-align: center; color: #666; padding: 40px;">ไม่พบการ์ดซ้ำ</div>`;
             return;
         }
 
@@ -163,24 +168,15 @@
             const div = document.createElement("div");
             div.className = "inv-item";
             const color = rarityColors[card.rarity] || '#333';
-            
             div.onclick = () => addToOffer(card);
             div.style.border = `1px solid ${color}33`;
-
             div.innerHTML = `
                 <div style="position: relative;">
-                    <img src="${card.img || card.image}" alt="${card.name}" onerror="this.src='https://via.placeholder.com/150'">
-                    <div class="count-badge" style="background: ${color}; color: ${card.rarity === 'C' ? '#000' : '#fff'}">
-                        x${card.totalQty}
-                    </div>
+                    <img src="${card.img || card.image}" onerror="this.src='https://via.placeholder.com/150'">
+                    <div class="count-badge" style="background: ${color};">x${card.totalQty}</div>
                     <div class="rarity-tag" style="color: ${color}">${card.rarity}</div>
                 </div>
-                <div style="font-size: 10px; color: #fff; text-align: center; margin-top: 8px; font-weight:bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 4px;">
-                    ${card.name}
-                </div>
-                <div style="font-size: 9px; color: #aaa; text-align: center; margin-top: 2px;">
-                    เทรดได้: ${card.totalQty - 1}
-                </div>
+                <div style="font-size: 10px; color: #fff; text-align: center; margin-top: 8px;">${card.name}</div>
             `;
             invGrid.appendChild(div);
         });
@@ -188,12 +184,8 @@
 
     window.addToOffer = (card) => {
         if (myOffer.cards.length >= 4) return alert("แลกได้สูงสุดครั้งละ 4 ใบ");
-        
         const inOfferCount = myOffer.cards.filter(c => c.name === card.name && c.rarity === card.rarity).length;
-        if (inOfferCount >= card.totalQty - 1) {
-            return alert(`คุณต้องเก็บการ์ด ${card.name} ไว้อย่างน้อย 1 ใบในสมุดสะสม`);
-        }
-
+        if (inOfferCount >= card.totalQty - 1) return alert("ต้องเก็บไว้อย่างน้อย 1 ใบ");
         myOffer.cards.push({ ...card, count: 1 });
         myOffer.ready = false;
         syncOffer();
@@ -231,10 +223,23 @@
         listenToRoom();
     }
 
+    // ฟังก์ชันยกเลิกและลบห้อง
+    window.cancelTrade = async () => {
+        if (confirm("ต้องการยกเลิกการแลกเปลี่ยนและลบห้องนี้ใช่หรือไม่?")) {
+            await deleteDoc(doc(db, "rooms", roomId));
+            window.location.reload(); 
+        }
+    };
+
     function listenToRoom() {
         onSnapshot(doc(db, "rooms", roomId), async (snapshot) => {
             const data = snapshot.data();
-            if (!data) return;
+            // หากห้องถูกลบ (โดยอีกฝ่ายกดยกเลิก) ให้เด้งออกหน้าแรก
+            if (!data) {
+                alert("ห้องถูกยกเลิกการแลกเปลี่ยน");
+                window.location.reload();
+                return;
+            }
             const me = isCreator ? data.p1 : data.p2;
             const peer = isCreator ? data.p2 : data.p1;
             if (peer) {
@@ -242,8 +247,29 @@
                 updateOfferUI("peer", peer.offer);
             }
             updateOfferUI("my", me.offer);
-            if (data.p1.offer.ready && data.p2?.offer.ready) { executeTrade(data); }
+
+            // เมื่อกดยืนยันทั้งคู่ และยังไม่ได้เริ่มนับถอยหลัง
+            if (data.p1.offer.ready && data.p2?.offer.ready && !countdownActive) {
+                startCountdown(data);
+            }
         });
+    }
+
+    function startCountdown(roomData) {
+        countdownActive = true;
+        const overlay = document.getElementById("countdownOverlay");
+        const timerText = document.getElementById("timerText");
+        overlay.style.display = "flex";
+        
+        let count = 5;
+        const interval = setInterval(() => {
+            count--;
+            timerText.innerText = count;
+            if (count <= 0) {
+                clearInterval(interval);
+                executeTrade(roomData);
+            }
+        }, 1000);
     }
 
     function updateOfferUI(side, offer) {
@@ -269,15 +295,15 @@
     }
 
     window.setResources = () => {
-        const g = parseInt(prompt("ระบุ Coins ที่ต้องการให้:", 0)) || 0;
-        const d = parseInt(prompt("ระบุ Diamonds ที่ต้องการให้:", 0)) || 0;
-        if (g > (userData.points || 0) || d > (userData.diamonds || 0)) return alert("ทรัพยากรไม่เพียงพอ!");
+        const g = parseInt(prompt("ระบุ Coins:", 0)) || 0;
+        const d = parseInt(prompt("ระบุ Diamonds:", 0)) || 0;
+        if (g > (userData.points || 0) || d > (userData.diamonds || 0)) return alert("ไม่พอ!");
         myOffer.gold = g; myOffer.diamonds = d; myOffer.ready = false;
         syncOffer();
     };
 
     window.toggleReady = () => { 
-        if(myOffer.cards.length === 0 && myOffer.gold === 0 && myOffer.diamonds === 0) return alert("เลือกสิ่งของที่จะแลกเปลี่ยนก่อน");
+        // แก้ไข: กดยืนยันได้เลยถึงแม้จะไม่มีการส่งของให้ (ให้ฝ่ายเดียวได้)
         myOffer.ready = !myOffer.ready; 
         syncOffer(); 
     };
@@ -302,21 +328,15 @@
             myOfferFinal.cards.forEach(cOut => {
                 const idx = myColl.findIndex(c => c.name === cOut.name && (c.rarity||'C').toUpperCase() === cOut.rarity);
                 if (idx > -1) {
-                    if (Number(myColl[idx].count) > 1) {
-                        myColl[idx].count = Number(myColl[idx].count) - 1;
-                    } else {
-                        myColl.splice(idx, 1);
-                    }
+                    if (Number(myColl[idx].count) > 1) { myColl[idx].count = Number(myColl[idx].count) - 1; } 
+                    else { myColl.splice(idx, 1); }
                 }
             });
 
             peerOfferFinal.cards.forEach(cIn => {
                 const idx = myColl.findIndex(c => c.name === cIn.name && (c.rarity||'C').toUpperCase() === cIn.rarity);
-                if (idx > -1) { 
-                    myColl[idx].count = (Number(myColl[idx].count) || 1) + 1; 
-                } else { 
-                    myColl.push({ ...cIn, count: 1 }); 
-                }
+                if (idx > -1) { myColl[idx].count = (Number(myColl[idx].count) || 1) + 1; } 
+                else { myColl.push({ ...cIn, count: 1 }); }
             });
 
             await updateDoc(myRef, {
@@ -326,7 +346,7 @@
             });
 
             if (isCreator) setTimeout(async () => { await deleteDoc(doc(db, "rooms", roomId)); }, 1000);
-            alert("✨ การแลกเปลี่ยนสำเร็จเรียบร้อย!");
+            alert("✨ การแลกเปลี่ยนสำเร็จ!");
             window.location.reload(); 
         } catch (e) { 
             console.error(e); 
