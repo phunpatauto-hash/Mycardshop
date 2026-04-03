@@ -24,6 +24,9 @@
         .offered-card { width: 100%; border-radius: 5px; border: 1px solid var(--gold); }
         .resource-offer { margin-top: 15px; font-size: 1.1rem; color: var(--blue); }
 
+        /* ส่วนแสดงราคามูลค่าการ์ด */
+        .total-value-tag { background: rgba(255, 200, 49, 0.1); border: 1px dashed var(--gold); padding: 5px 10px; border-radius: 8px; margin-top: 10px; font-size: 0.9rem; color: var(--gold); display: flex; justify-content: space-between; }
+
         .confirm-btn { background: #444; color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; margin-top: 20px; cursor: pointer; transition: 0.3s; }
         .confirm-btn.ready { background: #2ed573; color: black; }
         .cancel-btn { background: #ff4757; color: white; border: none; padding: 10px; width: 100%; border-radius: 10px; font-weight: bold; margin-top: 10px; cursor: pointer; }
@@ -41,7 +44,6 @@
         .count-badge { position: absolute; top: -5px; right: -5px; color: white; font-size: 0.75rem; padding: 2px 8px; border-radius: 50px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.5); z-index: 2; }
         .rarity-tag { position: absolute; bottom: 35px; right: 10px; font-size: 0.65rem; padding: 1px 5px; border-radius: 4px; background: rgba(0,0,0,0.8); font-weight: bold; }
         
-        /* สไตล์หน้าจอนับถอยหลัง */
         #countdownOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; }
         #timerText { font-size: 8rem; color: var(--gold); font-weight: bold; }
     </style>
@@ -78,6 +80,10 @@
                 🪙 <span id="myGoldOffer">0</span> | 💎 <span id="myDiaOffer">0</span>
                 <button onclick="setResources()" style="font-size: 0.7rem; background: none; border: 1px solid #555; color: #aaa; cursor: pointer; margin-left: 10px; padding: 2px 8px; border-radius: 5px;">แก้ไข</button>
             </div>
+            <div class="total-value-tag">
+                <span>ประเมินมูลค่า:</span>
+                <span>✨ <span id="myTotalValue">0</span></span>
+            </div>
             <button class="confirm-btn" id="myConfirmBtn" onclick="toggleReady()">ยืนยันข้อเสนอ</button>
             <button class="cancel-btn" onclick="cancelTrade()"><i class="fas fa-times"></i> ยกเลิกและออกจากห้อง</button>
         </div>
@@ -91,6 +97,10 @@
             <div class="offer-area" id="peerOffers"></div>
             <div class="resource-offer">
                 🪙 <span id="peerGoldOffer">0</span> | 💎 <span id="peerDiaOffer">0</span>
+            </div>
+            <div class="total-value-tag">
+                <span>ประเมินมูลค่า:</span>
+                <span>✨ <span id="peerTotalValue">0</span></span>
             </div>
         </div>
 
@@ -123,6 +133,13 @@
     let myOffer = { cards: [], gold: 0, diamonds: 0, ready: false };
     window.isTradingAction = false;
     let countdownActive = false;
+
+    // ระบบราคากลางประเมินมูลค่า (ปรับเปลี่ยนได้ตามต้องการ)
+    const cardPriceMap = {
+        'P': 5000, 'EXR': 4500, 'SEC': 3500,
+        'SUR': 2500, 'SSR': 1800, 'UR': 1200,
+        'SR': 600, 'R': 200, 'U': 100, 'C': 50
+    };
 
     const rarityColors = {
         'P': '#ff4757', 'EXR': '#ff4757', 'SEC': '#ff9f43',
@@ -182,6 +199,15 @@
         });
     }
 
+    // คำนวณมูลค่ารวม
+    function calculateTotalValue(offer) {
+        let cardValue = offer.cards.reduce((sum, card) => {
+            return sum + (cardPriceMap[card.rarity] || 0);
+        }, 0);
+        // มูลค่า = ราคากลางการ์ด + (Coins * 1) + (Diamonds * 10)
+        return cardValue + (offer.gold || 0) + ((offer.diamonds || 0) * 10);
+    }
+
     window.addToOffer = (card) => {
         if (myOffer.cards.length >= 4) return alert("แลกได้สูงสุดครั้งละ 4 ใบ");
         const inOfferCount = myOffer.cards.filter(c => c.name === card.name && c.rarity === card.rarity).length;
@@ -223,7 +249,6 @@
         listenToRoom();
     }
 
-    // ฟังก์ชันยกเลิกและลบห้อง
     window.cancelTrade = async () => {
         if (confirm("ต้องการยกเลิกการแลกเปลี่ยนและลบห้องนี้ใช่หรือไม่?")) {
             await deleteDoc(doc(db, "rooms", roomId));
@@ -234,7 +259,6 @@
     function listenToRoom() {
         onSnapshot(doc(db, "rooms", roomId), async (snapshot) => {
             const data = snapshot.data();
-            // หากห้องถูกลบ (โดยอีกฝ่ายกดยกเลิก) ให้เด้งออกหน้าแรก
             if (!data) {
                 alert("ห้องถูกยกเลิกการแลกเปลี่ยน");
                 window.location.reload();
@@ -248,7 +272,6 @@
             }
             updateOfferUI("my", me.offer);
 
-            // เมื่อกดยืนยันทั้งคู่ และยังไม่ได้เริ่มนับถอยหลัง
             if (data.p1.offer.ready && data.p2?.offer.ready && !countdownActive) {
                 startCountdown(data);
             }
@@ -275,9 +298,14 @@
     function updateOfferUI(side, offer) {
         const area = document.getElementById(`${side}Offers`);
         const status = document.getElementById(`${side}Status`);
+        const totalValText = document.getElementById(`${side}TotalValue`);
+        
         document.getElementById(`${side}GoldOffer`).innerText = (offer.gold || 0).toLocaleString();
         document.getElementById(`${side}DiaOffer`).innerText = (offer.diamonds || 0).toLocaleString();
         
+        // แสดงมูลค่าประเมิน
+        totalValText.innerText = calculateTotalValue(offer).toLocaleString();
+
         area.innerHTML = offer.cards.map(c => `
             <div style="position:relative">
                 <img src="${c.img || c.image}" class="offered-card" style="border-color:${rarityColors[c.rarity] || '#gold'}">
@@ -303,7 +331,6 @@
     };
 
     window.toggleReady = () => { 
-        // แก้ไข: กดยืนยันได้เลยถึงแม้จะไม่มีการส่งของให้ (ให้ฝ่ายเดียวได้)
         myOffer.ready = !myOffer.ready; 
         syncOffer(); 
     };
