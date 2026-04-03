@@ -30,7 +30,6 @@
         .status-waiting { background: #ff4757; }
         .status-ready { background: #2ed573; color: black; }
 
-        /* ส่วน Inventory ที่ปรับปรุงใหม่ตาม collection.html */
         .inventory-drawer { grid-column: span 2; background: #1a1a20; padding: 20px; border-radius: 15px; margin-top: 20px; border: 1px solid #333; }
         .inv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 15px; max-height: 450px; overflow-y: auto; padding: 10px; }
         .inv-item { cursor: pointer; transition: 0.2s; position: relative; background: rgba(255,255,255,0.03); padding: 5px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); }
@@ -111,7 +110,6 @@
     let myOffer = { cards: [], gold: 0, diamonds: 0, ready: false };
     window.isTradingAction = false;
 
-    // สีประจำระดับความหายาก (อ้างอิงจาก collection.html)
     const rarityColors = {
         'P': '#ff4757', 'EXR': '#ff4757', 'SEC': '#ff9f43',
         'SUR': '#ffc831', 'SSR': '#ffc831', 'UR': '#00d2ff',
@@ -130,15 +128,28 @@
         } else { window.location.href = "login.html"; }
     });
 
-    // ดึงข้อมูลการ์ดแบบละเอียดจาก Collection
     function renderInventory() {
         const invGrid = document.getElementById("myInventory");
         invGrid.innerHTML = "";
         
         const userCards = userData.collection || [];
-        
-        // กรองการ์ดที่มีจำนวนมากกว่า 1 (ซ้ำ)
-        const duplicates = userCards.filter(card => (card.count || 0) > 1);
+        const stacked = {};
+
+        // รวมยอดการ์ดชื่อเดียวกัน (Stacking) เพื่อเช็คใบซ้ำ
+        userCards.forEach(c => {
+            const cleanName = (c.name || "Unknown").trim();
+            const cleanRarity = (c.rarity || 'C').toUpperCase().trim();
+            const key = `${cleanName}_${cleanRarity}`;
+            const num = Number(c.count) || 1;
+
+            if (!stacked[key]) {
+                stacked[key] = { ...c, totalQty: num, rarity: cleanRarity, name: cleanName };
+            } else {
+                stacked[key].totalQty += num;
+            }
+        });
+
+        const duplicates = Object.values(stacked).filter(card => card.totalQty > 1);
 
         if (duplicates.length === 0) {
             invGrid.innerHTML = `<div style="grid-column: span 4; text-align: center; color: #666; padding: 40px;">
@@ -154,13 +165,13 @@
             const color = rarityColors[card.rarity] || '#333';
             
             div.onclick = () => addToOffer(card);
-            div.style.border = `1px solid ${color}33`; // ขอบสีจางๆ ตาม Rarity
+            div.style.border = `1px solid ${color}33`;
 
             div.innerHTML = `
                 <div style="position: relative;">
-                    <img src="${card.img}" alt="${card.name}" onerror="this.src='https://via.placeholder.com/150'">
+                    <img src="${card.img || card.image}" alt="${card.name}" onerror="this.src='https://via.placeholder.com/150'">
                     <div class="count-badge" style="background: ${color}; color: ${card.rarity === 'C' ? '#000' : '#fff'}">
-                        x${card.count}
+                        x${card.totalQty}
                     </div>
                     <div class="rarity-tag" style="color: ${color}">${card.rarity}</div>
                 </div>
@@ -168,7 +179,7 @@
                     ${card.name}
                 </div>
                 <div style="font-size: 9px; color: #aaa; text-align: center; margin-top: 2px;">
-                    เทรดได้: ${card.count - 1}
+                    เทรดได้: ${card.totalQty - 1}
                 </div>
             `;
             invGrid.appendChild(div);
@@ -179,7 +190,7 @@
         if (myOffer.cards.length >= 4) return alert("แลกได้สูงสุดครั้งละ 4 ใบ");
         
         const inOfferCount = myOffer.cards.filter(c => c.name === card.name && c.rarity === card.rarity).length;
-        if (inOfferCount >= card.count - 1) {
+        if (inOfferCount >= card.totalQty - 1) {
             return alert(`คุณต้องเก็บการ์ด ${card.name} ไว้อย่างน้อย 1 ใบในสมุดสะสม`);
         }
 
@@ -188,7 +199,6 @@
         syncOffer();
     };
 
-    // --- Logic ห้องและการเทรด ---
     window.createRoom = async () => {
         roomId = Math.floor(100000 + Math.random() * 900000).toString();
         isCreator = true;
@@ -244,7 +254,7 @@
         
         area.innerHTML = offer.cards.map(c => `
             <div style="position:relative">
-                <img src="${c.img}" class="offered-card" style="border-color:${rarityColors[c.rarity] || '#gold'}">
+                <img src="${c.img || c.image}" class="offered-card" style="border-color:${rarityColors[c.rarity] || '#gold'}">
                 <div style="position:absolute; bottom:2px; left:2px; font-size:7px; background:rgba(0,0,0,0.7); padding:0 3px; border-radius:2px; color:${rarityColors[c.rarity]}">${c.rarity}</div>
             </div>
         `).join("");
@@ -261,7 +271,7 @@
     window.setResources = () => {
         const g = parseInt(prompt("ระบุ Coins ที่ต้องการให้:", 0)) || 0;
         const d = parseInt(prompt("ระบุ Diamonds ที่ต้องการให้:", 0)) || 0;
-        if (g > (userData.coins || 0) || d > (userData.diamonds || 0)) return alert("ทรัพยากรไม่เพียงพอ!");
+        if (g > (userData.points || 0) || d > (userData.diamonds || 0)) return alert("ทรัพยากรไม่เพียงพอ!");
         myOffer.gold = g; myOffer.diamonds = d; myOffer.ready = false;
         syncOffer();
     };
@@ -289,17 +299,21 @@
             const mySnap = await getDoc(myRef);
             let myColl = [...mySnap.data().collection];
 
-            // 1. หักของที่ส่งให้เขา
             myOfferFinal.cards.forEach(cOut => {
-                const idx = myColl.findIndex(c => c.name === cOut.name && c.rarity === cOut.rarity);
-                if (idx > -1) myColl[idx].count -= 1;
+                const idx = myColl.findIndex(c => c.name === cOut.name && (c.rarity||'C').toUpperCase() === cOut.rarity);
+                if (idx > -1) {
+                    if (Number(myColl[idx].count) > 1) {
+                        myColl[idx].count = Number(myColl[idx].count) - 1;
+                    } else {
+                        myColl.splice(idx, 1);
+                    }
+                }
             });
 
-            // 2. เพิ่มของที่ได้รับจากเขา
             peerOfferFinal.cards.forEach(cIn => {
-                const idx = myColl.findIndex(c => c.name === cIn.name && c.rarity === cIn.rarity);
+                const idx = myColl.findIndex(c => c.name === cIn.name && (c.rarity||'C').toUpperCase() === cIn.rarity);
                 if (idx > -1) { 
-                    myColl[idx].count += 1; 
+                    myColl[idx].count = (Number(myColl[idx].count) || 1) + 1; 
                 } else { 
                     myColl.push({ ...cIn, count: 1 }); 
                 }
@@ -307,7 +321,7 @@
 
             await updateDoc(myRef, {
                 collection: myColl,
-                coins: increment(peerOfferFinal.gold - myOfferFinal.gold),
+                points: increment(peerOfferFinal.gold - myOfferFinal.gold),
                 diamonds: increment(peerOfferFinal.diamonds - myOfferFinal.diamonds)
             });
 
