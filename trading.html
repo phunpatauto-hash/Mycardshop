@@ -20,11 +20,12 @@
         .trade-box.active { border-color: var(--gold); box-shadow: 0 0 15px rgba(255, 200, 49, 0.2); }
         .user-info { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; }
         
-        .offer-area { min-height: 200px; background: rgba(0,0,0,0.3); border-radius: 10px; padding: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; }
-        .offered-card { width: 100%; border-radius: 5px; border: 1px solid var(--gold); }
+        /* ปรับปรุงส่วน Offer Area ให้รองรับ 8 ใบ (แถวละ 4) */
+        .offer-area { min-height: 220px; background: rgba(0,0,0,0.3); border-radius: 10px; padding: 15px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; align-content: start; }
+        .offered-card { width: 100%; border-radius: 5px; border: 1px solid var(--gold); cursor: pointer; transition: 0.2s; }
+        .offered-card:hover { filter: brightness(1.2) contrast(1.1); transform: scale(1.05); }
+        
         .resource-offer { margin-top: 15px; font-size: 1.1rem; color: var(--blue); }
-
-        /* ส่วนแสดงราคามูลค่าการ์ด */
         .total-value-tag { background: rgba(255, 200, 49, 0.1); border: 1px dashed var(--gold); padding: 5px 10px; border-radius: 8px; margin-top: 10px; font-size: 0.9rem; color: var(--gold); display: flex; justify-content: space-between; }
 
         .confirm-btn { background: #444; color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; margin-top: 20px; cursor: pointer; transition: 0.3s; }
@@ -46,6 +47,8 @@
         
         #countdownOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; }
         #timerText { font-size: 8rem; color: var(--gold); font-weight: bold; }
+
+        .remove-hint { font-size: 0.7rem; color: #666; margin-top: 5px; text-align: center; display: block; }
     </style>
 </head>
 <body>
@@ -76,6 +79,7 @@
                 <div><b>คุณ (ฉัน)</b></div>
             </div>
             <div class="offer-area" id="myOffers"></div>
+            <small class="remove-hint">* คลิกที่การ์ดเพื่อยกเลิกใบนั้น</small>
             <div class="resource-offer">
                 🪙 <span id="myGoldOffer">0</span> | 💎 <span id="myDiaOffer">0</span>
                 <button onclick="setResources()" style="font-size: 0.7rem; background: none; border: 1px solid #555; color: #aaa; cursor: pointer; margin-left: 10px; padding: 2px 8px; border-radius: 5px;">แก้ไข</button>
@@ -85,7 +89,7 @@
                 <span>✨ <span id="myTotalValue">0</span></span>
             </div>
             <button class="confirm-btn" id="myConfirmBtn" onclick="toggleReady()">ยืนยันข้อเสนอ</button>
-            <button class="cancel-btn" onclick="cancelTrade()"><i class="fas fa-times"></i> ยกเลิกและออกจากห้อง</button>
+            <button class="cancel-btn" onclick="cancelTrade()"><i class="fas fa-times"></i> ยกเลิกการเทรด (ลบห้อง)</button>
         </div>
 
         <div class="trade-box" id="peerSide">
@@ -105,7 +109,7 @@
         </div>
 
         <div class="inventory-drawer">
-            <h3 style="margin-top: 0;"><i class="fas fa-th-large"></i> เลือกการ์ดที่ซ้ำของคุณ (ดึงจากสมุดสะสม)</h3>
+            <h3 style="margin-top: 0;"><i class="fas fa-th-large"></i> เลือกการ์ดที่ซ้ำของคุณ (ดึงจากสมุดสะสม) - แลกได้สูงสุด 8 ใบ</h3>
             <div id="myInventory" class="inv-grid"></div>
         </div>
     </div>
@@ -134,11 +138,10 @@
     window.isTradingAction = false;
     let countdownActive = false;
 
-    // ระบบราคากลางประเมินมูลค่า (ปรับเปลี่ยนได้ตามต้องการ)
     const cardPriceMap = {
-        'P': 10000, 'EXR': 40000, 'SEC': 25000,
-        'SUR': 1500, 'SSR': 8000, 'UR': 4000,
-        'SR': 500, 'R': 100, 'U': 90, 'C': 50
+        'P': 5000, 'EXR': 4500, 'SEC': 3500,
+        'SUR': 2500, 'SSR': 1800, 'UR': 1200,
+        'SR': 600, 'R': 200, 'U': 100, 'C': 50
     };
 
     const rarityColors = {
@@ -199,20 +202,24 @@
         });
     }
 
-    // คำนวณมูลค่ารวม
     function calculateTotalValue(offer) {
-        let cardValue = offer.cards.reduce((sum, card) => {
-            return sum + (cardPriceMap[card.rarity] || 0);
-        }, 0);
-        // มูลค่า = ราคากลางการ์ด + (Coins * 1) + (Diamonds * 10)
+        let cardValue = offer.cards.reduce((sum, card) => sum + (cardPriceMap[card.rarity] || 0), 0);
         return cardValue + (offer.gold || 0) + ((offer.diamonds || 0) * 10);
     }
 
     window.addToOffer = (card) => {
-        if (myOffer.cards.length >= 4) return alert("แลกได้สูงสุดครั้งละ 4 ใบ");
+        if (myOffer.cards.length >= 8) return alert("แลกได้สูงสุดครั้งละ 8 ใบ"); // แก้เป็น 8 ใบ
         const inOfferCount = myOffer.cards.filter(c => c.name === card.name && c.rarity === card.rarity).length;
         if (inOfferCount >= card.totalQty - 1) return alert("ต้องเก็บไว้อย่างน้อย 1 ใบ");
+        
         myOffer.cards.push({ ...card, count: 1 });
+        myOffer.ready = false;
+        syncOffer();
+    };
+
+    // ฟังก์ชันยกเลิกการ์ดทีละใบ
+    window.removeFromOffer = (index) => {
+        myOffer.cards.splice(index, 1);
         myOffer.ready = false;
         syncOffer();
     };
@@ -302,13 +309,15 @@
         
         document.getElementById(`${side}GoldOffer`).innerText = (offer.gold || 0).toLocaleString();
         document.getElementById(`${side}DiaOffer`).innerText = (offer.diamonds || 0).toLocaleString();
-        
-        // แสดงมูลค่าประเมิน
         totalValText.innerText = calculateTotalValue(offer).toLocaleString();
 
-        area.innerHTML = offer.cards.map(c => `
+        // แสดงการ์ด และเพิ่ม onclick ให้ฝั่งเรา (my) เพื่อให้กดยกเลิกใบนั้นได้
+        area.innerHTML = offer.cards.map((c, index) => `
             <div style="position:relative">
-                <img src="${c.img || c.image}" class="offered-card" style="border-color:${rarityColors[c.rarity] || '#gold'}">
+                <img src="${c.img || c.image}" class="offered-card" 
+                     style="border-color:${rarityColors[c.rarity] || '#gold'}"
+                     ${side === 'my' ? `onclick="removeFromOffer(${index})"` : ''}
+                >
                 <div style="position:absolute; bottom:2px; left:2px; font-size:7px; background:rgba(0,0,0,0.7); padding:0 3px; border-radius:2px; color:${rarityColors[c.rarity]}">${c.rarity}</div>
             </div>
         `).join("");
