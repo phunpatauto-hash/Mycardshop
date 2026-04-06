@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MY COLLECTION - Professional System</title>
+    <title>MY COLLECTION - Arena Sync System</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; }
@@ -23,20 +23,19 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            border-bottom: 2px solid rgba(255,200,49,0.3); 
+            border-bottom: 2px solid #ffc831; 
             position: sticky; 
             top: 0; 
             z-index: 1000; 
             backdrop-filter: blur(20px); 
             height: 85px; 
         }
-        .user-name-tag { color: #ffc831; font-weight: bold; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; }
-        .nav-buttons { display: flex; gap: 12px; margin-top: 5px; align-items: center; }
+        .user-name-tag { color: #ffc831; font-weight: bold; font-size: 1.1rem; text-transform: uppercase; }
+        .nav-buttons { display: flex; gap: 12px; margin-top: 5px; }
         .btn-nav { background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 12px; text-decoration: none; font-size: 0.9rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-nav:hover { background: rgba(255,255,255,0.15); border-color: #ffc831; }
-        .btn-nav.primary { background: linear-gradient(45deg, #ffc831, #ff9000); color: #000; border: none; box-shadow: 0 4px 15px rgba(255, 200, 49, 0.3); }
+        .btn-nav.primary { background: linear-gradient(45deg, #ffc831, #ff9000); color: #000; border: none; }
         .wallet-display { display: flex; gap: 15px; }
-        .wallet-box { background: rgba(255, 255, 255, 0.05); padding: 8px 16px; border-radius: 25px; border: 1.5px solid #333; display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 0.95rem; min-width: 110px; justify-content: center; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
+        .wallet-box { background: rgba(255, 255, 255, 0.05); padding: 8px 16px; border-radius: 25px; border: 1.5px solid #333; display: flex; align-items: center; gap: 8px; font-weight: bold; }
         
         /* Rainbow Effects */
         @keyframes rainbow-rotate { 100% { filter: hue-rotate(360deg); } }
@@ -44,51 +43,52 @@
             border: 3px solid transparent !important; 
             background: linear-gradient(#111, #111) padding-box, conic-gradient(from 0deg, red, yellow, lime, aqua, blue, magenta, red) border-box !important; 
             animation: rainbow-rotate 3s linear infinite; 
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3); 
         }
         .rainbow-text { 
-            background: linear-gradient(to right, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff); 
+            background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000); 
             -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
-            background-size: 200% auto; animation: rainbow-rotate 2s linear infinite; font-weight: 800; 
+            background-size: 200% auto; animation: rainbow-rotate 2s linear infinite; 
         }
 
         /* Filter Bar */
-        .filter-bar { max-width: 1200px; margin: 25px auto; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; padding: 0 20px; align-items: center; }
-        .filter-btn { padding: 8px 20px; border-radius: 25px; border: 2px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #aaa; cursor: pointer; font-size: 0.9rem; font-weight: bold; transition: 0.3s; }
-        .filter-btn:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
-        .filter-btn.active { border-color: #ffc831; color: #fff; background: rgba(255,200,49,0.1); box-shadow: 0 0 15px rgba(255, 200, 49, 0.3); }
+        .filter-bar { max-width: 1200px; margin: 25px auto; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; padding: 0 20px; }
+        .filter-btn { padding: 8px 18px; border-radius: 25px; border: 2px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #aaa; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .filter-btn.active { border-color: #ffc831; color: #fff; background: rgba(255,200,49,0.1); }
 
         /* Grid & Cards */
         .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
-        .collection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 25px; }
+        .collection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
         .col-card { 
-            background: rgba(255,255,255,0.03); border-radius: 20px; overflow: hidden; 
-            border: 1px solid rgba(255,255,255,0.1); position: relative; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; 
+            background: #111; border-radius: 15px; overflow: hidden; 
+            border: 1px solid rgba(255,255,255,0.1); position: relative; transition: 0.3s; cursor: pointer; 
         }
-        .col-card:hover { transform: scale(1.05) translateY(-5px); border-color: rgba(255,200,49,0.5); z-index: 5; }
-        .col-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; filter: brightness(0.9); transition: 0.3s; }
-        .qty-badge { position: absolute; top: 12px; right: 12px; background: #ffc831; color: #000; padding: 3px 10px; border-radius: 12px; font-weight: bold; font-size: 0.75rem; z-index: 10; border: 2px solid #000; }
-        .star-container { position: absolute; top: 12px; left: 12px; display: flex; gap: 2px; z-index: 10; background: rgba(0,0,0,0.7); padding: 4px 8px; border-radius: 10px; border: 1px solid rgba(255,200,49,0.3); }
-        .star-icon { color: #ffc831; font-size: 0.75rem; }
+        .col-card:hover { transform: translateY(-5px); border-color: #ffc831; }
+        .col-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
+        .qty-badge { position: absolute; top: 8px; right: 8px; background: #ffc831; color: #000; padding: 2px 8px; border-radius: 10px; font-weight: bold; font-size: 0.7rem; z-index: 5; border: 1px solid #000; }
+        .star-container { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); padding: 2px 6px; border-radius: 8px; color: #ffc831; font-size: 0.7rem; z-index: 5; }
+        .elem-icon { position: absolute; top: 35px; left: 8px; font-size: 1.2rem; z-index: 5; filter: drop-shadow(0 0 2px black); }
 
         /* Modal */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(10px); }
-        .modal-content { background: #0a0a0f; border-radius: 30px; max-width: 850px; width: 100%; display: flex; overflow: hidden; border: 2px solid #333; }
-        .modal-left { width: 45%; background: #000; position: relative; }
-        .modal-right { width: 55%; padding: 40px; display: flex; flex-direction: column; background: linear-gradient(135deg, #111, #050505); }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(10px); }
+        .modal-content { background: #0a0a0f; border-radius: 25px; max-width: 800px; width: 100%; display: flex; overflow: hidden; border: 1px solid #333; }
+        .modal-left { width: 40%; background: #000; position: relative; }
+        .modal-right { width: 60%; padding: 30px; display: flex; flex-direction: column; }
         
-        /* Level Bar */
-        .lvl-bar-bg { width: 100%; height: 14px; background: rgba(255,255,255,0.05); border-radius: 20px; margin: 12px 0; border: 1px solid #333; overflow: hidden; }
-        .lvl-bar-fill { height: 100%; background: linear-gradient(90deg, #00d4ff, #00ff88); transition: 0.8s; }
+        /* Stats Arena Style */
+        .arena-stats { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 20px 0; }
+        .stat-item { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; border-left: 4px solid #ffc831; }
+        .stat-val { font-size: 1.5rem; font-weight: bold; display: block; color: #ffc831; }
+        .stat-lbl { font-size: 0.7rem; color: #aaa; text-transform: uppercase; }
 
-        .btn-action { width: 100%; padding: 16px; border-radius: 18px; border: none; font-weight: bold; cursor: pointer; margin-top: 12px; transition: 0.3s; font-size: 1rem; }
-        .btn-lv { background: linear-gradient(45deg, #0055ff, #00d4ff); color: white; }
-        .btn-star { background: linear-gradient(45deg, #ff8c00, #ffd700); color: black; }
-        .btn-sell { background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1.5px solid #ff4d4d; margin-top: 15px; }
-        .btn-sell:hover { background: #ff4d4d; color: white; }
-        .btn-sell-all { background: linear-gradient(45deg, #ff4d4d, #b30000); color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .lvl-bar-bg { width: 100%; height: 10px; background: #222; border-radius: 10px; margin: 10px 0; overflow: hidden; }
+        .lvl-bar-fill { height: 100%; background: linear-gradient(90deg, #00d4ff, #00ff88); width: 0%; transition: 0.5s; }
 
-        @media (max-width: 768px) { .modal-content { flex-direction: column; max-height: 90vh; overflow-y: auto; } .modal-left, .modal-right { width: 100%; } }
+        .btn-action { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s; }
+        .btn-lv { background: #0066ff; color: white; }
+        .btn-star { background: #ff9900; color: black; }
+        .btn-sell-all { background: #ff4d4d; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+
+        @media (max-width: 768px) { .modal-content { flex-direction: column; overflow-y: auto; } .modal-left, .modal-right { width: 100%; } }
     </style>
 </head>
 <body>
@@ -97,21 +97,19 @@
         <div class="user-info">
             <div class="user-name-tag" id="display-username">กำลังโหลด...</div>
             <div class="nav-buttons">
-                <a href="index.html" class="btn-nav">🏠 หน้าหลัก</a>
-                <a href="Banner Selection.html" class="btn-nav primary">🃏 สุ่มการ์ด</a>
+                <a href="index.html" class="btn-nav">🏠 HOME</a>
+                <a href="Banner Selection.html" class="btn-nav primary">สู่มการ์ด</a>
             </div>
         </div>
         <div class="wallet-display">
-            <div class="wallet-box" style="border-color: #ffc831; color: #ffc831;">🪙 <span id="nav-points">0</span></div>
-            <div class="wallet-box" style="border-color: #00d4ff; color: #00d4ff;">💎 <span id="nav-diamonds">0</span></div>
+            <div class="wallet-box" style="color: #ffc831;">🪙 <span id="nav-points">0</span></div>
+            <div class="wallet-box" style="color: #00d4ff;">💎 <span id="nav-diamonds">0</span></div>
         </div>
     </nav>
 
     <div class="filter-bar">
-        <div id="filterContainer" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
-        <div style="margin-left: auto;">
-            <button id="btnSellAll" class="btn-sell-all">💰 ขายใบซ้ำทั้งหมด</button>
-        </div>
+        <div id="filterContainer"></div>
+        <button id="btnSellAll" class="btn-sell-all">💰 ขายใบซ้ำทั้งหมด</button>
     </div>
 
     <div class="container">
@@ -121,36 +119,41 @@
     <div id="cardModal" class="modal" onclick="this.style.display='none'">
         <div class="modal-content" id="modalMainBox" onclick="event.stopPropagation()">
             <div class="modal-left">
+                <div id="modalElem" class="elem-icon" style="top:15px; left:15px; font-size: 2rem;"></div>
                 <img id="modalImg" src="" style="width: 100%; height: 100%; object-fit: cover;">
-                <div id="modalStarArea" style="position: absolute; bottom: 20px; left: 20px; font-size: 1.8rem; filter: drop-shadow(0 0 10px #000);"></div>
             </div>
             <div class="modal-right">
-                <h2 id="modalName" style="margin:0; font-size: 2.2rem;">Name</h2>
-                <div id="modalRarity" style="font-weight: bold; font-size: 1.1rem; margin-top: 5px;">GRADE: -</div>
-                <div id="modalCardValue" style="color: #ffc831; font-weight: bold; margin: 15px 0;">💰 มูลค่า: -</div>
+                <h2 id="modalName" style="margin:0;">Name</h2>
+                <div id="modalRarity" style="font-weight: bold; letter-spacing: 1px;">GRADE: -</div>
                 
-                <div style="margin-bottom: 25px;">
-                    <div style="display: flex; justify-content: space-between; font-weight: bold;">
-                        <span id="modalLvlDisplay" style="color:#00d4ff;">LV. 1</span>
-                        <span style="color:#555;">MAX LV. 50</span>
+                <div class="arena-stats">
+                    <div class="stat-item">
+                        <span class="stat-lbl">⚡ Battle Power (Arena Sync)</span>
+                        <span id="modalPower" class="stat-val">0</span>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
+                        <span id="modalLvlDisplay" style="color:#00d4ff; font-weight: bold;">LV. 1</span>
+                        <span style="color:#555;">MAX 50</span>
                     </div>
                     <div class="lvl-bar-bg"><div id="lvlBarFill" class="lvl-bar-fill"></div></div>
                 </div>
                 
-                <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05);">
-                    <div>🎴 จำนวนที่มี: <span id="reqQty" style="font-weight:bold;">0</span> ใบ</div>
-                    <div id="modalUpgradeInfo" style="color: #00ff88; font-weight: bold; margin-top: 5px;">เงื่อนไข: -</div>
+                <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; font-size: 0.9rem;">
+                    <div>🎴 ครอบครอง: <span id="reqQty">0</span> ใบ</div>
+                    <div id="modalUpgradeInfo" style="color: #00ff88; margin-top: 5px; font-weight: bold;">-</div>
                 </div>
 
-                <div id="lvUpgradeGroup" style="display: flex; gap: 12px;">
-                    <button id="btnUpgradeLV" class="btn-action btn-lv" style="flex:1;">⚡ เพิ่มเลเวล</button>
-                    <button id="btnBulkUpgrade" class="btn-action btn-lv" style="flex:1; background: #00ff88; color: #000;">🔥 สูงสุด</button>
+                <div id="lvUpgradeGroup" style="display: flex; gap: 10px;">
+                    <button id="btnUpgradeLV" class="btn-action btn-lv" style="flex:2;">⚡ เลเวลอัป</button>
+                    <button id="btnBulkUpgrade" class="btn-action btn-lv" style="flex:1; background: #00ff88; color: #000;">MAX</button>
                 </div>
                 <button id="btnUpgradeStar" class="btn-action btn-star" style="display:none;">⭐ วิวัฒนาการดาว</button>
-                <div id="maxLevelMessage" style="display:none; text-align:center; color:#ffd700; font-weight:bold; margin-top:15px;"></div>
+                <div id="maxLevelMessage" style="display:none; text-align:center; color:#ffc831; font-weight:bold; margin-top:15px;"></div>
                 
-                <button id="btnSellCard" class="btn-action btn-sell" style="display:none;">💰 ขายทิ้ง (ใบซ้ำ)</button>
-                <button class="btn-nav" style="width:100%; margin-top:20px;" onclick="document.getElementById('cardModal').style.display='none'">ปิด</button>
+                <button class="btn-nav" style="margin-top:20px; width: 100%;" onclick="document.getElementById('cardModal').style.display='none'">ปิดหน้าต่าง</button>
             </div>
         </div>
     </div>
@@ -174,11 +177,40 @@
     const db = getFirestore(app);
 
     let currentUID = null, userCards = [], userPoints = 0, userDiamonds = 0, currentFilter = 'ALL';
+    const MAX_LV = 50;
 
-    const MAX_LV = 50; // กำหนดค่าเลเวลสูงสุดใหม่
-    const rarityOrder = { 'P': 10, 'EXR': 9, 'SEC': 8, 'SUR': 7, 'SSR': 6, 'UR': 5, 'SR': 4, 'R': 3, 'U': 2, 'C': 1 };
+    const RARITY_POWER = {
+        "P":   { base: 5000, perLv: 1000 },
+        "EXR": { base: 4000, perLv: 2500 }, 
+        "SEC": { base: 3200, perLv: 2000 },
+        "SUR": { base: 2600, perLv: 1800 },
+        "SSR": { base: 2000, perLv: 1500 },
+        "UR":  { base: 1500, perLv: 1200 },
+        "SR":  { base: 1000, perLv: 1000 },
+        "R":   { base: 600,  perLv: 800 },
+        "U":   { base: 300,  perLv: 500 },
+        "C":   { base: 100,  perLv: 300 }
+    };
+
+    const ELEMENTS = {
+        "Fire": { icon: "🔥", color: "#ff4d4d" },
+        "Wind": { icon: "🌪️", color: "#4dff88" },
+        "Earth": { icon: "⛰️", color: "#ffb347" },
+        "Water": { icon: "💧", color: "#4da6ff" }
+    };
+
     const rarityColors = { 'P': '#ff00ff', 'EXR': '#ff4d4d', 'SEC': '#ffac33', 'SUR': '#33ffad', 'SSR': '#ffc831', 'UR': '#bf40bf', 'SR': '#33aaff', 'R': '#33ff57', 'U': '#ffffff', 'C': '#ffffff' };
-    const baseValues = { 'P': 10000, 'EXR': 50000, 'SEC': 25000, 'SUR': 15000, 'SSR': 8000, 'UR': 4000, 'SR': 500, 'R': 100, 'U': 90, 'C': 50 };
+    const sellValues = { 'P': 10000, 'EXR': 5000, 'SEC': 2500, 'SUR': 1500, 'SSR': 800, 'UR': 400, 'SR': 100, 'R': 50, 'U': 20, 'C': 10 };
+
+    function getArenaPower(card) {
+        const r = (card.rarity || 'C').toUpperCase();
+        const config = RARITY_POWER[r] || RARITY_POWER['C'];
+        const lv = Number(card.level) || 1;
+        const stars = Number(card.stars) || 0;
+        const basePower = config.base + (lv * config.perLv);
+        const starBonus = 1 + (stars * 0.1);
+        return Math.floor(basePower * starBonus);
+    }
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
@@ -191,84 +223,68 @@
                     userCards = data.collection || [];
                     document.getElementById("nav-points").innerText = userPoints.toLocaleString();
                     document.getElementById("nav-diamonds").innerText = userDiamonds.toLocaleString();
-                    document.getElementById("display-username").innerText = "Collector: " + (data.username || "User");
+                    document.getElementById("display-username").innerText = (data.username || "COLLECTOR");
                     renderCards();
                 }
             });
-        } else { window.location.href = "login.html"; }
+        }
     });
-
-    // --- SELL ALL LOGIC ---
-    document.getElementById("btnSellAll").onclick = async () => {
-        if (!userCards.length) return alert("ไม่มีการ์ด");
-        const stacked = {};
-        userCards.forEach(c => {
-            const key = `${c.name}_${(c.rarity||'C').toUpperCase()}`;
-            const countInObj = Number(c.count) || 1;
-            if(!stacked[key]) stacked[key] = [];
-            for(let i=0; i<countInObj; i++) stacked[key].push({...c, count: 1});
-        });
-        
-        let totalGain = 0, newCol = [], sellCount = 0;
-        for (const key in stacked) {
-            let cards = stacked[key];
-            if (cards.length > 1) {
-                cards.sort((a,b) => (b.level||1) - (a.level||1) || (b.stars||0) - (a.stars||0));
-                newCol.push(cards.shift());
-                cards.forEach(c => { totalGain += baseValues[(c.rarity||'C').toUpperCase()] || 50; sellCount++; });
-            } else { newCol.push(cards[0]); }
-        }
-        if (!sellCount) return alert("คุณไม่มีการ์ดซ้ำ");
-        if (confirm(`ขายการ์ดซ้ำ ${sellCount} ใบ เพื่อรับ ${totalGain} 🪙?`)) {
-            await updateDoc(doc(db, "users", currentUID), { collection: newCol, points: increment(totalGain) });
-        }
-    };
 
     function renderCards() {
         const grid = document.getElementById("grid");
         grid.innerHTML = "";
         const stacked = {};
 
+        // รวมการ์ดใบซ้ำ
         userCards.forEach(c => {
-            const cleanName = (c.name || "Unknown").trim();
-            const cleanRarity = (c.rarity || 'C').toUpperCase().trim();
-            const key = `${cleanName}_${cleanRarity}`;
-            const countInDB = Number(c.count) || 1;
-
+            const key = `${c.name}_${(c.rarity||'C').toUpperCase()}`;
+            const count = Number(c.count) || 1;
             if(!stacked[key]) { 
-                stacked[key] = {
-                    ...c, 
-                    qty: countInDB, 
-                    level: Number(c.level) || 1, 
-                    stars: Number(c.stars) || 0, 
-                    rarity: cleanRarity
-                }; 
+                stacked[key] = { ...c, qty: count, level: Number(c.level)||1, stars: Number(c.stars)||0 }; 
             } else { 
-                stacked[key].qty += countInDB;
-                if(Number(c.level || 1) > stacked[key].level) stacked[key].level = Number(c.level);
-                if(Number(c.stars || 0) > stacked[key].stars) stacked[key].stars = Number(c.stars);
+                stacked[key].qty += count;
+                if(Number(c.level) > stacked[key].level) stacked[key].level = Number(c.level);
+                if(Number(c.stars) > stacked[key].stars) stacked[key].stars = Number(c.stars);
             }
         });
 
-        let list = Object.values(stacked).sort((a,b) => (rarityOrder[b.rarity]||0) - (rarityOrder[a.rarity]||0));
-        if (currentFilter !== 'ALL') list = list.filter(c => c.rarity === currentFilter);
+        // --- ระบบเรียงลำดับ (Sorting Logic) ---
+        let list = Object.values(stacked).sort((a, b) => {
+            // 1. เรียงตาม Rarity (กำหนดน้ำหนัก)
+            const rarityOrder = { 'P': 10, 'EXR': 9, 'SEC': 8, 'SUR': 7, 'SSR': 6, 'UR': 5, 'SR': 4, 'R': 3, 'U': 2, 'C': 1 };
+            const weightA = rarityOrder[a.rarity.toUpperCase()] || 0;
+            const weightB = rarityOrder[b.rarity.toUpperCase()] || 0;
+
+            if (weightA !== weightB) {
+                return weightB - weightA; // หายากกว่าอยู่บน
+            }
+            
+            // 2. ถ้า Rarity เท่ากัน ให้เรียงตามพลัง (Power)
+            return getArenaPower(b) - getArenaPower(a); 
+        });
+
+        // กรองตาม Filter
+        if (currentFilter !== 'ALL') {
+            list = list.filter(c => c.rarity.toUpperCase() === currentFilter.toUpperCase());
+        }
         
         list.forEach(card => {
+            const pwr = getArenaPower(card);
             const div = document.createElement("div");
-            const isFullMax = card.level >= MAX_LV && card.stars >= 5;
-            div.className = `col-card ${isFullMax ? 'rainbow-effect' : ''}`;
+            const isMax = card.level >= MAX_LV && card.stars >= 5;
+            div.className = `col-card ${isMax ? 'rainbow-effect' : ''}`;
             div.onclick = () => openModal(card);
+            
+            const elem = ELEMENTS[card.element] || ELEMENTS["Fire"];
             
             div.innerHTML = `
                 ${card.qty > 1 ? `<div class="qty-badge">x${card.qty}</div>` : ''}
-                ${card.stars > 0 ? `<div class="star-container">${'★'.repeat(card.stars)}</div>` : ''}
+                ${card.stars > 0 ? `<div class="star-container">${'⭐'.repeat(card.stars)}</div>` : ''}
+                <div class="elem-icon" style="color:${elem.color}">${elem.icon}</div>
                 <img src="${card.img || card.image}">
-                <div style="padding:12px; background: rgba(0,0,0,0.6);">
-                    <div class="${isFullMax?'rainbow-text':''}" style="color:${rarityColors[card.rarity]}; font-size:0.9rem;">${card.name}</div>
-                    <div style="display:flex; justify-content:space-between; margin-top:5px; font-size:0.8rem;">
-                        <span style="color:#00d4ff;">LV.${card.level}</span>
-                        <span style="color:#ffc831;">🪙 ${(baseValues[card.rarity] || 0).toLocaleString()}</span>
-                    </div>
+                <div style="padding:10px; background: rgba(0,0,0,0.85);">
+                    <div style="color:${rarityColors[card.rarity]}; font-size:0.75rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${card.name}</div>
+                    <div style="margin-top:4px; font-size:0.7rem; color:#ffc831; font-weight:bold;">⚡ ${pwr.toLocaleString()}</div>
                 </div>`;
             grid.appendChild(div);
         });
@@ -276,39 +292,39 @@
 
     window.openModal = (card) => {
         const r = card.rarity.toUpperCase();
-        const isFullMax = card.level >= MAX_LV && card.stars >= 5;
-        document.getElementById("modalMainBox").className = `modal-content ${isFullMax?'rainbow-effect':''}`;
-        document.getElementById("modalName").className = isFullMax?'rainbow-text':'';
-        document.getElementById("modalName").style.color = isFullMax?'':rarityColors[r];
+        const pwr = getArenaPower(card);
+        const isMax = card.level >= MAX_LV && card.stars >= 5;
+        const elem = ELEMENTS[card.element] || ELEMENTS["Fire"];
+        
+        document.getElementById("modalMainBox").className = `modal-content ${isMax?'rainbow-effect':''}`;
+        document.getElementById("modalName").className = isMax?'rainbow-text':'';
+        document.getElementById("modalName").style.color = isMax?'':rarityColors[r];
         document.getElementById("modalImg").src = card.img || card.image;
         document.getElementById("modalName").innerText = card.name;
         document.getElementById("modalRarity").innerText = "GRADE: " + r;
         document.getElementById("modalRarity").style.color = rarityColors[r];
+        document.getElementById("modalPower").innerText = pwr.toLocaleString();
         document.getElementById("modalLvlDisplay").innerText = "LV. " + card.level;
         document.getElementById("lvlBarFill").style.width = (card.level/MAX_LV*100) + "%";
         document.getElementById("reqQty").innerText = card.qty;
-        
+        document.getElementById("modalElem").innerText = elem.icon;
+        document.getElementById("modalElem").style.color = elem.color;
+
         const lvGroup = document.getElementById("lvUpgradeGroup"), starBtn = document.getElementById("btnUpgradeStar"), maxMsg = document.getElementById("maxLevelMessage");
         
         if (card.level < MAX_LV) {
             lvGroup.style.display = "flex"; starBtn.style.display = "none"; maxMsg.style.display = "none";
-            // ปรับเงื่อนไขการอัปเกรดตามช่วงเลเวล
-            let req = 1;
-            if (card.level >= 10 && card.level < 30) req = 2;
-            else if (card.level >= 30) req = 3;
-
+            let req = card.level >= 30 ? 3 : (card.level >= 10 ? 2 : 1);
             document.getElementById("modalUpgradeInfo").innerText = `เงื่อนไข: ใช้ใบซ้ำ ${req} ใบ + 500 🪙`;
             document.getElementById("btnUpgradeLV").onclick = () => handleUpgrade(card, 'LV', 500, req);
             document.getElementById("btnBulkUpgrade").onclick = () => handleUpgrade(card, 'BULK', 500, req);
         } else {
-            // เมื่อเลเวลเต็ม MAX_LV (50) ปุ่มอัปดาวจะปรากฏ
             lvGroup.style.display = "none"; starBtn.style.display = "block";
             if (card.stars < 5) {
                 const cost = (card.stars + 1) * 1000;
                 maxMsg.style.display = "block"; maxMsg.innerText = "✨ พร้อมวิวัฒนาการดาว ✨";
-                starBtn.innerText = `⭐ อัปดาว (ใช้ 5 ใบ + ${cost} 💎)`;
+                starBtn.innerText = `⭐ อัปดาว (5 ใบ + ${cost} 💎)`;
                 starBtn.onclick = () => handleUpgrade(card, 'STAR', cost, 5);
-                document.getElementById("modalUpgradeInfo").innerText = "เงื่อนไข: ใช้ใบซ้ำ 5 ใบ";
             } else {
                 maxMsg.style.display = "block"; maxMsg.innerText = "🌈 FULL MAX POWER 🌈";
                 starBtn.style.display = "none";
@@ -318,51 +334,48 @@
     };
 
     async function handleUpgrade(card, type, cost, req) {
-        let allUnstacked = [];
-        userCards.forEach(c => {
-            const count = Number(c.count) || 1;
-            for(let i=0; i<count; i++) allUnstacked.push({...c, count: 1});
-        });
-
-        let targets = allUnstacked.filter(c => c.name === card.name && (c.rarity||'C').toUpperCase() === card.rarity);
-        let others = allUnstacked.filter(c => !(c.name === card.name && (c.rarity||'C').toUpperCase() === card.rarity));
-        
-        targets.sort((a,b) => (Number(b.level)||1) - (Number(a.level)||1));
+        let all = []; userCards.forEach(c => { for(let i=0; i<(c.count||1); i++) all.push({...c, count:1}); });
+        let targets = all.filter(c => c.name === card.name && (c.rarity||'C').toUpperCase() === card.rarity);
+        let others = all.filter(c => !(c.name === card.name && (c.rarity||'C').toUpperCase() === card.rarity));
+        targets.sort((a,b) => (b.level||1) - (a.level||1));
         let main = targets.shift();
 
         if (type === 'LV' && targets.length >= req && userPoints >= cost) {
-            main.level = (Number(main.level)||1) + 1; targets.splice(0, req);
+            main.level = (main.level||1) + 1; targets.splice(0, req);
             await updateDoc(doc(db, "users", currentUID), { collection: [...others, main, ...targets], points: increment(-cost) });
         } else if (type === 'STAR' && targets.length >= req && userDiamonds >= cost) {
-            main.stars = (Number(main.stars)||0) + 1; targets.splice(0, req);
+            main.stars = (main.stars||0) + 1; targets.splice(0, req);
             await updateDoc(doc(db, "users", currentUID), { collection: [...others, main, ...targets], diamonds: increment(-cost) });
         } else if (type === 'BULK') {
-            let count = 0;
-            let tempPoints = userPoints;
+            let count = 0; let tempPoints = userPoints;
             while(main.level < MAX_LV && tempPoints >= 500) {
-                let r = 1;
-                if (main.level >= 10 && main.level < 30) r = 2;
-                else if (main.level >= 30) r = 3;
-
-                if (targets.length >= r) {
-                    main.level++; targets.splice(0, r); tempPoints -= 500; count++;
-                } else break;
+                let r = main.level >= 30 ? 3 : (main.level >= 10 ? 2 : 1);
+                if (targets.length >= r) { main.level++; targets.splice(0, r); tempPoints -= 500; count++; } else break;
             }
             if(count > 0) await updateDoc(doc(db, "users", currentUID), { collection: [...others, main, ...targets], points: increment(-(count*500)) });
-        } else { alert("ทรัพยากรไม่เพียงพอ หรือจำนวนใบซ้ำไม่พอ!"); }
+        } else { alert("ทรัพยากรไม่เพียงพอ!"); }
         document.getElementById("cardModal").style.display = "none";
     }
 
+    document.getElementById("btnSellAll").onclick = async () => {
+        const stacked = {}; userCards.forEach(c => {
+            const key = `${c.name}_${(c.rarity||'C').toUpperCase()}`;
+            if(!stacked[key]) stacked[key] = []; stacked[key].push({...c});
+        });
+        let gain = 0, newCol = [], sold = 0;
+        for (const k in stacked) {
+            stacked[k].sort((a,b) => (b.level||1)-(a.level||1));
+            newCol.push(stacked[k].shift());
+            stacked[k].forEach(c => { gain += sellValues[c.rarity.toUpperCase()] || 10; sold++; });
+        }
+        if(!sold) return alert("ไม่มีใบซ้ำ");
+        if(confirm(`ขายใบซ้ำ ${sold} ใบ ได้รับ ${gain} 🪙?`)) await updateDoc(doc(db, "users", currentUID), { collection: newCol, points: increment(gain) });
+    };
+
     const fCon = document.getElementById("filterContainer");
     ['ALL','P','EXR','SEC','SUR','SSR','UR','SR','R','U','C'].forEach(r => {
-        const b = document.createElement("button");
-        b.className = `filter-btn ${r==='ALL'?'active':''}`;
-        b.innerText = r;
-        b.onclick = () => {
-            currentFilter = r;
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.toggle('active', btn.innerText === r));
-            renderCards();
-        };
+        const b = document.createElement("button"); b.className = `filter-btn ${r==='ALL'?'active':''}`; b.innerText = r;
+        b.onclick = () => { currentFilter = r; document.querySelectorAll('.filter-btn').forEach(x => x.classList.remove('active')); b.classList.add('active'); renderCards(); };
         fCon.appendChild(b);
     });
 </script>
