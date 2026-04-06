@@ -3,14 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CARD TRADE CENTER - ระบบแลกเปลี่ยน</title>
+    <title>CARD TRADE CENTER - ระบบแลกเปลี่ยน (8 Slots + Multi-Stack)</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --gold: #ffc831; --blue: #00d2ff; --bg: #0f0f13; }
         body { font-family: 'Kanit', sans-serif; background: var(--bg); color: white; margin: 0; }
         
-        .lobby-container { max-width: 500px; margin: 100px auto; text-align: center; padding: 20px; background: #1a1a20; border-radius: 20px; border: 1px solid #333; }
+        /* เพิ่มสไตล์ส่วนปุ่มนำทาง */
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(26, 26, 32, 0.9);
+            border-bottom: 1px solid #333;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .nav-btns { display: flex; gap: 10px; }
+        .btn-nav {
+            background: #2a2a35;
+            color: white;
+            border: 1px solid #444;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-nav:hover { background: var(--gold); color: black; border-color: var(--gold); }
+
+        .lobby-container { max-width: 500px; margin: 60px auto; text-align: center; padding: 20px; background: #1a1a20; border-radius: 20px; border: 1px solid #333; }
         .input-group { margin: 20px 0; }
         input { background: #000; border: 1px solid #444; color: white; padding: 12px; border-radius: 10px; width: 80%; font-size: 1.2rem; text-align: center; }
         .btn-main { background: var(--gold); color: black; border: none; padding: 12px 30px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 85%; margin-top: 10px; }
@@ -20,10 +49,10 @@
         .trade-box.active { border-color: var(--gold); box-shadow: 0 0 15px rgba(255, 200, 49, 0.2); }
         .user-info { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; }
         
-        /* ปรับปรุงส่วน Offer Area ให้รองรับ 8 ใบ (แถวละ 4) */
         .offer-area { min-height: 220px; background: rgba(0,0,0,0.3); border-radius: 10px; padding: 15px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; align-content: start; }
-        .offered-card { width: 100%; border-radius: 5px; border: 1px solid var(--gold); cursor: pointer; transition: 0.2s; }
-        .offered-card:hover { filter: brightness(1.2) contrast(1.1); transform: scale(1.05); }
+        .offered-card-wrapper { position: relative; width: 100%; cursor: pointer; transition: 0.2s; }
+        .offered-card-wrapper:hover { transform: scale(1.05); filter: brightness(1.2); }
+        .offered-card { width: 100%; border-radius: 5px; border: 1px solid var(--gold); }
         
         .resource-offer { margin-top: 15px; font-size: 1.1rem; color: var(--blue); }
         .total-value-tag { background: rgba(255, 200, 49, 0.1); border: 1px dashed var(--gold); padding: 5px 10px; border-radius: 8px; margin-top: 10px; font-size: 0.9rem; color: var(--gold); display: flex; justify-content: space-between; }
@@ -42,16 +71,24 @@
         .inv-item:hover { transform: translateY(-5px); background: rgba(255,255,255,0.08); }
         .inv-item img { width: 100%; border-radius: 8px; display: block; }
         
-        .count-badge { position: absolute; top: -5px; right: -5px; color: white; font-size: 0.75rem; padding: 2px 8px; border-radius: 50px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.5); z-index: 2; }
+        .count-badge { position: absolute; top: -5px; right: -5px; color: white; font-size: 0.75rem; padding: 2px 8px; border-radius: 50px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.5); z-index: 5; }
         .rarity-tag { position: absolute; bottom: 35px; right: 10px; font-size: 0.65rem; padding: 1px 5px; border-radius: 4px; background: rgba(0,0,0,0.8); font-weight: bold; }
         
         #countdownOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; }
         #timerText { font-size: 8rem; color: var(--gold); font-weight: bold; }
-
         .remove-hint { font-size: 0.7rem; color: #666; margin-top: 5px; text-align: center; display: block; }
     </style>
 </head>
 <body>
+
+    <div class="nav-header">
+        <div class="nav-btns">
+            <a href="index.html" class="btn-nav">
+                <i class="fas fa-home"></i> หน้าแรก
+            </a>
+        </div>
+        <div style="color: var(--gold); font-weight: bold; font-size: 1.2rem;">TRADE CENTER</div>
+    </div>
 
     <div id="countdownOverlay">
         <h2 style="color: white;">กำลังดำเนินการแลกเปลี่ยน...</h2>
@@ -60,7 +97,7 @@
     </div>
 
     <div id="lobby" class="lobby-container">
-        <h2 style="color: var(--gold);"><i class="fas fa-sync-alt"></i> TRADE CENTER</h2>
+        <h2 style="color: var(--gold);"><i class="fas fa-sync-alt"></i> ระบบแลกเปลี่ยนการ์ด</h2>
         <div class="input-group">
             <button class="btn-main" onclick="createRoom()">สร้างห้องใหม่</button>
             <p style="color: #666;">--- หรือ ---</p>
@@ -79,7 +116,7 @@
                 <div><b>คุณ (ฉัน)</b></div>
             </div>
             <div class="offer-area" id="myOffers"></div>
-            <small class="remove-hint">* คลิกที่การ์ดเพื่อยกเลิกใบนั้น</small>
+            <small class="remove-hint">* คลิกที่การ์ดเพื่อลดจำนวน/เอาออก</small>
             <div class="resource-offer">
                 🪙 <span id="myGoldOffer">0</span> | 💎 <span id="myDiaOffer">0</span>
                 <button onclick="setResources()" style="font-size: 0.7rem; background: none; border: 1px solid #555; color: #aaa; cursor: pointer; margin-left: 10px; padding: 2px 8px; border-radius: 5px;">แก้ไข</button>
@@ -89,7 +126,7 @@
                 <span>✨ <span id="myTotalValue">0</span></span>
             </div>
             <button class="confirm-btn" id="myConfirmBtn" onclick="toggleReady()">ยืนยันข้อเสนอ</button>
-            <button class="cancel-btn" onclick="cancelTrade()"><i class="fas fa-times"></i> ยกเลิกการเทรด (ลบห้อง)</button>
+            <button class="cancel-btn" onclick="cancelTrade()"><i class="fas fa-times"></i> ยกเลิกและลบห้อง</button>
         </div>
 
         <div class="trade-box" id="peerSide">
@@ -109,7 +146,7 @@
         </div>
 
         <div class="inventory-drawer">
-            <h3 style="margin-top: 0;"><i class="fas fa-th-large"></i> เลือกการ์ดที่ซ้ำของคุณ (ดึงจากสมุดสะสม) - แลกได้สูงสุด 8 ใบ</h3>
+            <h3 style="margin-top: 0;"><i class="fas fa-th-large"></i> เลือกการ์ดที่ซ้ำของคุณ (สูงสุด 8 ช่อง)</h3>
             <div id="myInventory" class="inv-grid"></div>
         </div>
     </div>
@@ -139,9 +176,8 @@
     let countdownActive = false;
 
     const cardPriceMap = {
-        'P': 5000, 'EXR': 4500, 'SEC': 3500,
-        'SUR': 2500, 'SSR': 1800, 'UR': 1200,
-        'SR': 600, 'R': 200, 'U': 100, 'C': 50
+        'P': 5000, 'EXR': 4500, 'SEC': 3500, 'SUR': 2500, 'SSR': 1800, 
+        'UR': 1200, 'SR': 600, 'R': 200, 'U': 100, 'C': 50
     };
 
     const rarityColors = {
@@ -169,12 +205,10 @@
         const stacked = {};
 
         userCards.forEach(c => {
-            const cleanName = (c.name || "Unknown").trim();
-            const cleanRarity = (c.rarity || 'C').toUpperCase().trim();
-            const key = `${cleanName}_${cleanRarity}`;
+            const key = `${(c.name || "Unknown").trim()}_${(c.rarity || 'C').toUpperCase().trim()}`;
             const num = Number(c.count) || 1;
             if (!stacked[key]) {
-                stacked[key] = { ...c, totalQty: num, rarity: cleanRarity, name: cleanName };
+                stacked[key] = { ...c, totalQty: num, rarity: (c.rarity || 'C').toUpperCase().trim() };
             } else { stacked[key].totalQty += num; }
         });
 
@@ -189,37 +223,46 @@
             div.className = "inv-item";
             const color = rarityColors[card.rarity] || '#333';
             div.onclick = () => addToOffer(card);
-            div.style.border = `1px solid ${color}33`;
             div.innerHTML = `
                 <div style="position: relative;">
                     <img src="${card.img || card.image}" onerror="this.src='https://via.placeholder.com/150'">
                     <div class="count-badge" style="background: ${color};">x${card.totalQty}</div>
                     <div class="rarity-tag" style="color: ${color}">${card.rarity}</div>
                 </div>
-                <div style="font-size: 10px; color: #fff; text-align: center; margin-top: 8px;">${card.name}</div>
+                <div style="font-size: 10px; color: #fff; text-align: center; margin-top: 8px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">${card.name}</div>
             `;
             invGrid.appendChild(div);
         });
     }
 
     function calculateTotalValue(offer) {
-        let cardValue = offer.cards.reduce((sum, card) => sum + (cardPriceMap[card.rarity] || 0), 0);
+        let cardValue = offer.cards.reduce((sum, card) => sum + ((cardPriceMap[card.rarity] || 0) * (card.count || 1)), 0);
         return cardValue + (offer.gold || 0) + ((offer.diamonds || 0) * 10);
     }
 
     window.addToOffer = (card) => {
-        if (myOffer.cards.length >= 8) return alert("แลกได้สูงสุดครั้งละ 8 ใบ"); // แก้เป็น 8 ใบ
-        const inOfferCount = myOffer.cards.filter(c => c.name === card.name && c.rarity === card.rarity).length;
-        if (inOfferCount >= card.totalQty - 1) return alert("ต้องเก็บไว้อย่างน้อย 1 ใบ");
+        const existingIdx = myOffer.cards.findIndex(c => c.name === card.name && c.rarity === card.rarity);
+        const currentInOffer = existingIdx > -1 ? myOffer.cards[existingIdx].count : 0;
         
-        myOffer.cards.push({ ...card, count: 1 });
+        if (currentInOffer >= card.totalQty - 1) return alert("ต้องเก็บไว้อย่างน้อย 1 ใบ");
+
+        if (existingIdx > -1) {
+            myOffer.cards[existingIdx].count += 1;
+        } else {
+            if (myOffer.cards.length >= 8) return alert("เต็ม 8 ช่องแล้ว");
+            myOffer.cards.push({ ...card, count: 1 });
+        }
+        
         myOffer.ready = false;
         syncOffer();
     };
 
-    // ฟังก์ชันยกเลิกการ์ดทีละใบ
     window.removeFromOffer = (index) => {
-        myOffer.cards.splice(index, 1);
+        if (myOffer.cards[index].count > 1) {
+            myOffer.cards[index].count -= 1;
+        } else {
+            myOffer.cards.splice(index, 1);
+        }
         myOffer.ready = false;
         syncOffer();
     };
@@ -264,13 +307,9 @@
     };
 
     function listenToRoom() {
-        onSnapshot(doc(db, "rooms", roomId), async (snapshot) => {
+        onSnapshot(doc(db, "rooms", roomId), (snapshot) => {
             const data = snapshot.data();
-            if (!data) {
-                alert("ห้องถูกยกเลิกการแลกเปลี่ยน");
-                window.location.reload();
-                return;
-            }
+            if (!data) { alert("ห้องถูกยกเลิก"); window.location.reload(); return; }
             const me = isCreator ? data.p1 : data.p2;
             const peer = isCreator ? data.p2 : data.p1;
             if (peer) {
@@ -278,7 +317,6 @@
                 updateOfferUI("peer", peer.offer);
             }
             updateOfferUI("my", me.offer);
-
             if (data.p1.offer.ready && data.p2?.offer.ready && !countdownActive) {
                 startCountdown(data);
             }
@@ -290,15 +328,10 @@
         const overlay = document.getElementById("countdownOverlay");
         const timerText = document.getElementById("timerText");
         overlay.style.display = "flex";
-        
         let count = 5;
         const interval = setInterval(() => {
-            count--;
-            timerText.innerText = count;
-            if (count <= 0) {
-                clearInterval(interval);
-                executeTrade(roomData);
-            }
+            count--; timerText.innerText = count;
+            if (count <= 0) { clearInterval(interval); executeTrade(roomData); }
         }, 1000);
     }
 
@@ -311,13 +344,10 @@
         document.getElementById(`${side}DiaOffer`).innerText = (offer.diamonds || 0).toLocaleString();
         totalValText.innerText = calculateTotalValue(offer).toLocaleString();
 
-        // แสดงการ์ด และเพิ่ม onclick ให้ฝั่งเรา (my) เพื่อให้กดยกเลิกใบนั้นได้
-        area.innerHTML = offer.cards.map((c, index) => `
-            <div style="position:relative">
-                <img src="${c.img || c.image}" class="offered-card" 
-                     style="border-color:${rarityColors[c.rarity] || '#gold'}"
-                     ${side === 'my' ? `onclick="removeFromOffer(${index})"` : ''}
-                >
+        area.innerHTML = offer.cards.map((c, idx) => `
+            <div class="offered-card-wrapper" ${side==='my' ? `onclick="removeFromOffer(${idx})"` : ''}>
+                <img src="${c.img || c.image}" class="offered-card" style="border-color:${rarityColors[c.rarity]}">
+                <div class="count-badge" style="background: ${rarityColors[c.rarity]}; top: -2px; right: -2px; padding: 1px 5px;">x${c.count}</div>
                 <div style="position:absolute; bottom:2px; left:2px; font-size:7px; background:rgba(0,0,0,0.7); padding:0 3px; border-radius:2px; color:${rarityColors[c.rarity]}">${c.rarity}</div>
             </div>
         `).join("");
@@ -334,15 +364,12 @@
     window.setResources = () => {
         const g = parseInt(prompt("ระบุ Coins:", 0)) || 0;
         const d = parseInt(prompt("ระบุ Diamonds:", 0)) || 0;
-        if (g > (userData.points || 0) || d > (userData.diamonds || 0)) return alert("ไม่พอ!");
+        if (g > (userData.points || 0) || d > (userData.diamonds || 0)) return alert("ทรัพยากรไม่พอ!");
         myOffer.gold = g; myOffer.diamonds = d; myOffer.ready = false;
         syncOffer();
     };
 
-    window.toggleReady = () => { 
-        myOffer.ready = !myOffer.ready; 
-        syncOffer(); 
-    };
+    window.toggleReady = () => { myOffer.ready = !myOffer.ready; syncOffer(); };
 
     async function syncOffer() {
         const roomRef = doc(db, "rooms", roomId);
@@ -364,15 +391,22 @@
             myOfferFinal.cards.forEach(cOut => {
                 const idx = myColl.findIndex(c => c.name === cOut.name && (c.rarity||'C').toUpperCase() === cOut.rarity);
                 if (idx > -1) {
-                    if (Number(myColl[idx].count) > 1) { myColl[idx].count = Number(myColl[idx].count) - 1; } 
-                    else { myColl.splice(idx, 1); }
+                    const currentCount = Number(myColl[idx].count) || 1;
+                    if (currentCount > cOut.count) {
+                        myColl[idx].count = currentCount - cOut.count;
+                    } else {
+                        myColl.splice(idx, 1);
+                    }
                 }
             });
 
             peerOfferFinal.cards.forEach(cIn => {
                 const idx = myColl.findIndex(c => c.name === cIn.name && (c.rarity||'C').toUpperCase() === cIn.rarity);
-                if (idx > -1) { myColl[idx].count = (Number(myColl[idx].count) || 1) + 1; } 
-                else { myColl.push({ ...cIn, count: 1 }); }
+                if (idx > -1) {
+                    myColl[idx].count = (Number(myColl[idx].count) || 1) + cIn.count;
+                } else {
+                    myColl.push({ ...cIn });
+                }
             });
 
             await updateDoc(myRef, {
@@ -384,10 +418,7 @@
             if (isCreator) setTimeout(async () => { await deleteDoc(doc(db, "rooms", roomId)); }, 1000);
             alert("✨ การแลกเปลี่ยนสำเร็จ!");
             window.location.reload(); 
-        } catch (e) { 
-            console.error(e); 
-            window.isTradingAction = false; 
-        }
+        } catch (e) { console.error(e); window.isTradingAction = false; }
     }
 </script>
 </body>
