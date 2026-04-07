@@ -40,7 +40,7 @@
             padding: 10px 22px; border-radius: 12px; font-weight: 600; cursor: pointer; border: none; color: white; text-decoration: none;
         }
 
-        /* --- New: Calendar Modal Styles --- */
+        /* --- Calendar Modal Styles --- */
         .cal-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9); z-index: 10001; justify-content: center; align-items: center;
@@ -196,38 +196,6 @@
             <span class="banner-btn">ไปหน้าสุ่มการ์ด <i class="fas fa-chevron-right"></i></span>
         </div>
 
-        <div class="quick-gacha-banner" style="background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white;" onclick="window.location.href='trading.html'">
-            <div>
-                <h3 style="margin:0; font-size: 1.5rem;">🤝 ระบบแลกเปลี่ยนการ์ด</h3>
-                <p style="margin:5px 0 0 0; opacity:0.9">ตั้งห้องและแลกเปลี่ยนการ์ดกับเพื่อนแบบ Real-time</p>
-            </div>
-            <span class="banner-btn">เข้าสู่ห้องแลกเปลี่ยน <i class="fas fa-handshake"></i></span>
-        </div>
-
-        <div class="quick-gacha-banner" style="background: linear-gradient(135deg, #00d4ff, #0055ff);" onclick="window.location.href='Exchange.html'">
-            <div>
-                <h3 style="margin:0; font-size: 1.5rem; color: white;">💎 แลกเปลี่ยนเพชร</h3>
-                <p style="margin:5px 0 0 0; opacity:0.9; color: white;">เปลี่ยนเหรียญทองให้กลายเป็นเพชรล้ำค่า</p>
-            </div>
-            <span class="banner-btn">แลกเปลี่ยนเลย <i class="fas fa-gem"></i></span>
-        </div>
-
-        <div class="quick-gacha-banner" style="background: linear-gradient(135deg, #ffc831, #ff8c00);" onclick="window.location.href='Pass (Battle Pass).html'">
-            <div>
-                <h3 style="margin:0; font-size: 1.5rem;">Battle Pass</h3>
-                <p style="margin:5px 0 0 0; opacity:0.7; color: #000;">ปลดล็อกของจาก Battle Pass และรับของรางวัลพิเศษมากมาย</p>
-            </div>
-            <span class="banner-btn">เข้าสู่ Battle Pass <i class="fas fa-chevron-right"></i></span>
-        </div>
-
-        <div class="quick-gacha-banner" style="background: linear-gradient(135deg, #e63946, #780000);" onclick="window.location.href='Battle.html'">
-            <div>
-                <h3 style="margin:0; font-size: 1.5rem; color: white;">⚔️ Battle Arena</h3>
-                <p style="margin:5px 0 0 0; opacity:0.9; color: white;">เข้าสู่สนามรบ ท้าทายฝีมือเพื่อชิงอันดับหนึ่ง</p>
-            </div>
-            <span class="banner-btn">เข้าสู่การต่อสู้ <i class="fas fa-fist-raised"></i></span>
-        </div>
-
         <section class="news-section">
             <h2>ข่าวสารล่าสุด</h2>
             <div id="news-container"></div>
@@ -252,7 +220,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // --- Admin System (Original) ---
+    // --- Admin System ---
     const profileContainer = document.getElementById("profile-container");
     const adminModal = document.getElementById("adminModal");
     let pressTimer;
@@ -287,7 +255,7 @@
         if (!isLongPress) window.location.href = 'profile.html';
     });
 
-    // --- 📅 New: Calendar Logic ---
+    // --- Calendar Logic ---
     function updateCalendarUI(streak, lastDate) {
         const grid = document.getElementById("calGrid");
         const today = new Date().toDateString();
@@ -298,8 +266,8 @@
             if(i <= streak) status = "claimed";
             else if(i === streak + 1) status = "active";
             
-            const icon = i === 10 ? "fa-id-card" : (i % 2 === 0 ? "fa-gem" : "fa-coins");
-            const label = i === 10 ? "CARD" : (i % 2 === 0 ? "DIAMOND" : "GOLD");
+            const icon = i === 10 ? "fa-crown" : (i % 2 === 0 ? "fa-gem" : "fa-coins");
+            const label = i === 10 ? "SR CARD" : (i % 2 === 0 ? "DIAMOND" : "GOLD");
             
             grid.innerHTML += `<div class="cal-day ${status}"><i class="fas ${icon}"></i>Day ${i}<br><small>${label}</small></div>`;
         }
@@ -307,7 +275,7 @@
         const btn = document.getElementById("calClaimBtn");
         if(lastDate === today) {
             btn.disabled = true;
-            btn.innerText = "พรุ่งนี้มาใหม่นะ";
+            btn.innerText = "วันนี้รับไปแล้ว";
         } else {
             btn.disabled = false;
             btn.innerText = "กดรับรางวัล";
@@ -319,7 +287,6 @@
             onSnapshot(doc(db, "users", user.uid), (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    // Original UI Updates
                     document.getElementById("profile-container").style.display = "flex";
                     document.getElementById("user-display").innerText = data.username;
                     document.getElementById("user-points").innerText = (data.points || 0).toLocaleString();
@@ -337,10 +304,9 @@
                         await updateDoc(doc(db, "users", user.uid), {
                             points: increment(p), diamonds: increment(d), lastClaimDate: today
                         });
-                        alert(`ยินดีด้วย! ได้รับ 🪙 ${p} และ 💎 ${d}`);
+                        alert(`ได้รับ 🪙 ${p} และ 💎 ${d}`);
                     };
 
-                    // New Calendar Updates
                     document.getElementById("cal-nav-item").style.display = "block";
                     const streak = data.loginStreak || 0;
                     const calLastDate = data.lastCalendarDate || "";
@@ -352,25 +318,24 @@
                         let updateObj = { lastCalendarDate: today, loginStreak: nextDay };
 
                         if(nextDay === 10) {
-                            // สุ่มการ์ด 1 ใบจากระบบ
-                            const cardsRef = collection(db, "cards");
-                            const cardSnap = await getDocs(cardsRef);
-                            const allCards = [];
-                            cardSnap.forEach(c => allCards.push({id: c.id, ...c.data()}));
+                            // มอบการ์ดคุกกี้โฮลี่เบอร์รี่ ระดับ SR
+                            const holyBerryCard = {
+                                name: "คุกกี้โฮลี่เบอร์รี่",
+                                rarity: "SR",
+                                img: "https://static.wikia.nocookie.net/cookierun/images/1/1b/Hollyberry_Cookie.png", // ลิงก์รูปตัวอย่าง
+                                obtainedAt: new Date()
+                            };
                             
-                            if(allCards.length > 0) {
-                                const winCard = allCards[Math.floor(Math.random() * allCards.length)];
-                                await addDoc(collection(db, "users", user.uid, "collection"), winCard);
-                                rewardMsg = `ยินดีด้วย! คุณได้รับรางวัลวันที่ 10: การ์ด [${winCard.name}]`;
-                            }
-                            updateObj.loginStreak = 0; // Reset
+                            await addDoc(collection(db, "users", user.uid, "collection"), holyBerryCard);
+                            rewardMsg = `ยินดีด้วย! คุณได้รับรางวัลใหญ่วันที่ 10: การ์ด [คุกกี้โฮลี่เบอร์รี่] ระดับ SR!`;
+                            updateObj.loginStreak = 0; // Reset ปฏิทิน
                         } else {
                             if(nextDay % 2 === 0) {
-                                const dAmt = 10;
+                                const dAmt = 15;
                                 updateObj.diamonds = increment(dAmt);
                                 rewardMsg = `คุณได้รับ 💎 ${dAmt}`;
                             } else {
-                                const pAmt = 1000;
+                                const pAmt = 1500;
                                 updateObj.points = increment(pAmt);
                                 rewardMsg = `คุณได้รับ 🪙 ${pAmt}`;
                             }
@@ -391,7 +356,6 @@
         }
     });
 
-    // Original News Loader
     const nCon = document.getElementById("news-container");
     onSnapshot(query(collection(db, "news"), orderBy("createdAt", "desc")), (snap) => {
         nCon.innerHTML = "";
