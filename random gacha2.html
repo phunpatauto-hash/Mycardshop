@@ -150,8 +150,8 @@
                 </div>
                 <div id="display" class="card-grid"></div>
                 <div class="btn-group">
-                    <button id="pull-5" class="btn-pull" onclick="pull(5)">สุ่ม 5 ใบ (100) | +100 EXP</button>
-                    <button id="pull-10" class="btn-pull" style="background: linear-gradient(90deg, #ffc831, #ff0000); color: white;" onclick="pull(10)">สุ่ม 10 ใบ (500) | +500 EXP 🔥</button>
+                    <button id="pull-5" class="btn-pull" onclick="pull(5)">สุ่ม 5 ใบ (100) | +1000 EXP</button>
+                    <button id="pull-10" class="btn-pull" style="background: linear-gradient(90deg, #ffc831, #ff0000); color: white;" onclick="pull(10)">สุ่ม 10 ใบ (500) | +1500 EXP 🔥</button>
                 </div>
             </div>
 
@@ -237,7 +237,7 @@
         if (isPulling || !userData || !currentUserUID) return;
         
         let cost = (amount === 5) ? 100 : 500;
-        let expReward = (amount === 5) ? 100 : 500;
+        let expReward = (amount === 5) ? 1000 : 1500;
 
         if (userData.points < cost) return alert("แต้มไม่พอ!");
 
