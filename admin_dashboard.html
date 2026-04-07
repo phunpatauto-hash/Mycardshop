@@ -149,13 +149,16 @@
             <div class="input-group">
                 <label>SPECIAL CARD</label>
                 <input type="text" id="reward-card-name" placeholder="ชื่อการ์ด">
-                <select id="reward-card-rarity">
-                    <option value="">-- No Card --</option>
-                    <option value="SR">SR</option>
-                    <option value="SSR">SSR</option>
-                    <option value="SEC">SEC</option>
-                    <option value="EXR">EXR</option>
-                </select>
+                <div style="display: flex; gap: 5px;">
+                    <select id="reward-card-rarity" style="flex: 2;">
+                        <option value="">-- No Card --</option>
+                        <option value="SR">SR</option>
+                        <option value="SSR">SSR</option>
+                        <option value="SEC">SEC</option>
+                        <option value="EXR">EXR</option>
+                    </select>
+                    <input type="number" id="reward-card-count" placeholder="จำนวนใบ" value="1" style="flex: 1;">
+                </div>
                 <input type="text" id="reward-card-img" placeholder="รูป URL">
             </div>
         </div>
@@ -207,16 +210,14 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // --- 🛒 Shop Management Logic ---
+    // [Shop Management คงเดิม]
     document.getElementById("add-shop-item").onclick = async () => {
         const name = document.getElementById("shop-card-name").value.trim();
         const price = parseInt(document.getElementById("shop-card-price").value) || 0;
         const rarity = document.getElementById("shop-card-rarity").value;
         const stock = parseInt(document.getElementById("shop-card-stock").value) || 0;
         const img = document.getElementById("shop-card-img").value.trim();
-
         if(!name || !img) return alert("กรุณากรอกชื่อการ์ดและรูปภาพ");
-
         try {
             await setDoc(doc(db, "exchange_shop", name), {
                 name, price, rarity, maxStock: stock, soldCount: 0, img, createdAt: new Date()
@@ -244,15 +245,14 @@
         });
     });
 
-    // แก้ไขฟังก์ชันนี้เพื่อเพิ่มสีเขียวให้ SR
     function getRarityColor(rarity) {
-        if (rarity === 'SR') return '#2ed573'; // สีเขียว
-        if (rarity === 'SSR') return '#ff4757'; // สีแดง
-        if (rarity === 'UR') return '#ffde59'; // สีเหลือง
-        return '#b388ff'; // สีม่วงสำหรับ SEC
+        if (rarity === 'SR') return '#2ed573';
+        if (rarity === 'SSR') return '#ff4757';
+        if (rarity === 'UR') return '#ffde59';
+        return '#b388ff';
     }
 
-    // --- ฟังก์ชันอื่นๆ คงเดิมตามต้นฉบับ ---
+    // [News Management คงเดิม]
     document.getElementById("post-news-btn").onclick = async () => {
         const title = document.getElementById("news-title").value.trim();
         const date = document.getElementById("news-date").value.trim();
@@ -276,25 +276,34 @@
         });
     });
 
+    // --- [แก้ไข] Generate Code Logic: เพิ่มการบันทึกจำนวนการ์ด ---
     document.getElementById("create-btn").onclick = async () => {
         const codeName = document.getElementById("new-code").value.trim().toUpperCase();
         if(!codeName) return alert("ระบุชื่อโค้ด");
-        await setDoc(doc(db, "codes", codeName), {
+
+        const cardName = document.getElementById("reward-card-name").value.trim();
+        const cardCount = parseInt(document.getElementById("reward-card-count").value) || 1;
+
+        const codeData = {
             rewardPoints: parseInt(document.getElementById("reward-points").value) || 0,
             rewardDiamonds: parseInt(document.getElementById("reward-diamonds").value) || 0,
             maxUse: parseInt(document.getElementById("max-use").value) || 0,
             usedCount: 0,
             obtainedFrom: document.getElementById("obtained-from").value || "System",
-            rewardCard: document.getElementById("reward-card-name").value ? {
-                name: document.getElementById("reward-card-name").value,
+            rewardCard: cardName ? {
+                name: cardName,
                 rarity: document.getElementById("reward-card-rarity").value,
                 img: document.getElementById("reward-card-img").value,
+                count: cardCount, // [NEW] บันทึกจำนวนใบ
                 level: 1
             } : null
-        });
-        alert(`โค้ด ${codeName} สำเร็จ!`);
+        };
+
+        await setDoc(doc(db, "codes", codeName), codeData);
+        alert(`โค้ด ${codeName} สร้างสำเร็จ! (พร้อมการ์ด ${cardCount} ใบ)`);
     };
 
+    // [User & Stats Logic คงเดิม]
     onSnapshot(collection(db, "users"), (snap) => {
         document.getElementById("stat-users").innerText = snap.size;
         let premiumCount = 0;
@@ -329,7 +338,8 @@
         body.innerHTML = "";
         snap.forEach(d => {
             const c = d.data();
-            body.innerHTML += `<tr><td><b>${d.id}</b></td><td>🪙${c.rewardPoints} 💎${c.rewardDiamonds}</td><td>${c.usedCount}/${c.maxUse}</td><td><button class="btn btn-red" onclick="deleteItem('codes', '${d.id}')">ลบ</button></td></tr>`;
+            const cardInfo = c.rewardCard ? `<br><small>+การ์ด ${c.rewardCard.name} (${c.rewardCard.count || 1} ใบ)</small>` : "";
+            body.innerHTML += `<tr><td><b>${d.id}</b></td><td>🪙${c.rewardPoints} 💎${c.rewardDiamonds}${cardInfo}</td><td>${c.usedCount}/${c.maxUse}</td><td><button class="btn btn-red" onclick="deleteItem('codes', '${d.id}')">ลบ</button></td></tr>`;
         });
     });
 
