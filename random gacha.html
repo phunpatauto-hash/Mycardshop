@@ -97,9 +97,9 @@
                 </div>
                 <div id="display" class="card-grid"></div>
                 <div class="btn-group">
-                    <button id="pull-5" class="btn-pull" onclick="pull(5)">สุ่ม 5 ใบ (100) | +50 EXP</button>
-                    <button id="pull-10" class="btn-pull" style="background: #ff00ff; color: white;" onclick="pull(10)">สุ่ม 10 ใบ (500) | +100 EXP</button>
-                    <button id="pull-50" class="btn-pull" style="background: #00d4ff; color: white;" onclick="pull(50)">สุ่ม 50 ใบ (1000) | +500 EXP</button>
+                    <button id="pull-5" class="btn-pull" onclick="pull(5)">สุ่ม 5 ใบ (100) | +500 EXP</button>
+                    <button id="pull-10" class="btn-pull" style="background: #ff00ff; color: white;" onclick="pull(10)">สุ่ม 10 ใบ (500) | +1000 EXP</button>
+                    <button id="pull-50" class="btn-pull" style="background: #00d4ff; color: white;" onclick="pull(50)">สุ่ม 50 ใบ (1000) | +1500 EXP</button>
                 </div>
             </div>
             
@@ -231,7 +231,7 @@
     window.pull = async (amount) => {
         if (isPulling || !userData) return;
         let cost = amount === 5 ? 100 : (amount === 10 ? 500 : 1000);
-        let exp = amount === 5 ? 50 : (amount === 50 ? 500 : 100);
+        let exp = amount === 5 ? 50 : (amount === 500 ? 1500 : 1000);
         if (userData.points < cost) return alert("แต้มไม่พอ!");
 
         isPulling = true; toggleButtons(true);
