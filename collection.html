@@ -66,7 +66,6 @@
         .col-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
         .qty-badge { position: absolute; top: 8px; right: 8px; background: #ffc831; color: #000; padding: 2px 8px; border-radius: 10px; font-weight: bold; font-size: 0.7rem; z-index: 5; border: 1px solid #000; }
         .star-container { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); padding: 2px 6px; border-radius: 8px; color: #ffc831; font-size: 0.7rem; z-index: 5; }
-        .elem-icon { position: absolute; top: 35px; left: 8px; font-size: 1.2rem; z-index: 5; filter: drop-shadow(0 0 2px black); }
 
         /* --- Price Style --- */
         .price-tag {
@@ -139,7 +138,6 @@
     <div id="cardModal" class="modal" onclick="this.style.display='none'">
         <div class="modal-content" id="modalMainBox" onclick="event.stopPropagation()">
             <div class="modal-left">
-                <div id="modalElem" class="elem-icon" style="top:15px; left:15px; font-size: 2rem;"></div>
                 <img id="modalImg" src="" style="width: 100%; height: 100%; object-fit: cover;">
             </div>
             <div class="modal-right">
@@ -291,12 +289,9 @@
             div.className = `col-card ${isMax ? 'rainbow-effect' : ''}`;
             div.onclick = () => openModal(card);
             
-            const elem = ELEMENTS[card.element] || ELEMENTS["Fire"];
-            
             div.innerHTML = `
                 ${card.qty > 1 ? `<div class="qty-badge">x${card.qty}</div>` : ''}
                 ${card.stars > 0 ? `<div class="star-container">${'⭐'.repeat(card.stars)}</div>` : ''}
-                <div class="elem-icon" style="color:${elem.color}">${elem.icon}</div>
                 <img src="${card.img || card.image}">
                 <div style="padding:10px; background: rgba(0,0,0,0.85);">
                     <div style="color:${rarityColors[card.rarity]}; font-size:0.75rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${card.name}</div>
@@ -312,7 +307,6 @@
         const pwr = getArenaPower(card);
         const sellVal = getDynamicSellValue(card);
         const isMax = card.level >= MAX_LV && card.stars >= 5;
-        const elem = ELEMENTS[card.element] || ELEMENTS["Fire"];
         
         document.getElementById("modalMainBox").className = `modal-content ${isMax?'rainbow-effect':''}`;
         document.getElementById("modalName").className = isMax?'rainbow-text':'';
@@ -325,8 +319,6 @@
         document.getElementById("modalLvlDisplay").innerText = "LV. " + card.level;
         document.getElementById("lvlBarFill").style.width = (card.level/MAX_LV*100) + "%";
         document.getElementById("reqQty").innerText = card.qty;
-        document.getElementById("modalElem").innerText = elem.icon;
-        document.getElementById("modalElem").style.color = elem.color;
 
         document.getElementById("modalSellPrice").innerHTML = `
             <div style="color:#aaa; font-size:0.8rem;">มูลค่าการขายปัจจุบัน (LV.${card.level}):</div>
@@ -363,7 +355,6 @@
         let others = all.filter(c => !(c.name === card.name && (c.rarity||'C').toUpperCase() === card.rarity));
         targets.sort((a,b) => (b.level||1) - (a.level||1));
         let main = targets.shift();
-
         if (type === 'LV' && targets.length >= req && userPoints >= cost) {
             main.level = (main.level||1) + 1; targets.splice(0, req);
             await updateDoc(doc(db, "users", currentUID), { collection: [...others, main, ...targets], points: increment(-cost) });
@@ -380,7 +371,6 @@
         } else { alert("ทรัพยากรไม่เพียงพอ!"); }
         document.getElementById("cardModal").style.display = "none";
     }
-
     document.getElementById("btnSellAll").onclick = async () => {
         const stacked = {}; userCards.forEach(c => {
             const key = `${c.name}_${(c.rarity||'C').toUpperCase()}`;
@@ -395,6 +385,7 @@
                 sold++; 
             });
         }
+        
         if(!sold) return alert("ไม่มีใบซ้ำ");
         if(confirm(`ขายใบซ้ำ ${sold} ใบ ได้รับ ${gain} 🪙?`)) await updateDoc(doc(db, "users", currentUID), { collection: newCol, points: increment(gain) });
     };
