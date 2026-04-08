@@ -141,12 +141,12 @@
             </div>
             <div class="total-value-tag">
                 <span>ประเมินมูลค่า:</span>
-                <span> 🪙 <span id="peerTotalValue">0</span></span>
+                <span>✨ <span id="peerTotalValue">0</span></span>
             </div>
         </div>
 
         <div class="inventory-drawer">
-            <h3 style="margin-top: 0;"><i class="fas fa-th-large"></i> เลือกการ์ดที่ซ้ำของคุณ (สูงสุด 8 ช่อง)</h3>
+            <h3 style="margin-top: 0;"><i class="fas fa-th-large"></i> เลือกการ์ดในสมุดสะสมของคุณ (สูงสุด 8 ช่อง)</h3>
             <div id="myInventory" class="inv-grid"></div>
         </div>
     </div>
@@ -176,8 +176,8 @@
     let countdownActive = false;
 
     const cardPriceMap = {
-        'P': 10000, 'EXR': 50000, 'SEC': 25000, 'SUR': 15000, 'SSR': 10000, 
-        'UR': 1200, 'SR': 1000, 'R': 500, 'U': 200, 'C': 100
+        'P': 5000, 'EXR': 4500, 'SEC': 3500, 'SUR': 2500, 'SSR': 1800, 
+        'UR': 1200, 'SR': 600, 'R': 200, 'U': 100, 'C': 50
     };
 
     const rarityColors = {
@@ -212,13 +212,15 @@
             } else { stacked[key].totalQty += num; }
         });
 
-        const duplicates = Object.values(stacked).filter(card => card.totalQty > 1);
-        if (duplicates.length === 0) {
-            invGrid.innerHTML = `<div style="grid-column: span 4; text-align: center; color: #666; padding: 40px;">ไม่พบการ์ดซ้ำ</div>`;
+        // แก้ไข: ดึงการ์ดทั้งหมดที่มีอย่างน้อย 1 ใบ (ไม่กรองเฉพาะใบซ้ำ)
+        const allCards = Object.values(stacked);
+        
+        if (allCards.length === 0) {
+            invGrid.innerHTML = `<div style="grid-column: span 4; text-align: center; color: #666; padding: 40px;">ไม่พบการ์ดในสมุดสะสม</div>`;
             return;
         }
 
-        duplicates.forEach((card) => {
+        allCards.forEach((card) => {
             const div = document.createElement("div");
             div.className = "inv-item";
             const color = rarityColors[card.rarity] || '#333';
@@ -244,7 +246,8 @@
         const existingIdx = myOffer.cards.findIndex(c => c.name === card.name && c.rarity === card.rarity);
         const currentInOffer = existingIdx > -1 ? myOffer.cards[existingIdx].count : 0;
         
-        if (currentInOffer >= card.totalQty - 1) return alert("ต้องเก็บไว้อย่างน้อย 1 ใบ");
+        // กฎความปลอดภัย: ป้องกันไม่ให้แลกจนใบสุดท้ายหายไป
+        if (currentInOffer >= card.totalQty - 1) return alert("คุณต้องเหลือการ์ดใบนี้ไว้อย่างน้อย 1 ใบในสมุดสะสม");
 
         if (existingIdx > -1) {
             myOffer.cards[existingIdx].count += 1;
