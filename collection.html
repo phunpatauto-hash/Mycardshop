@@ -70,23 +70,23 @@
 
         /* Modal */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(10px); }
-        .modal-content { background: #0a0a0f; border-radius: 25px; max-width: 800px; width: 100%; display: flex; overflow: hidden; border: 1px solid #333; }
-        .modal-left { width: 40%; background: #000; position: relative; }
-        .modal-right { width: 60%; padding: 30px; display: flex; flex-direction: column; }
+        .modal-content { background: #0a0a0f; border-radius: 25px; max-width: 900px; width: 100%; display: flex; overflow: hidden; border: 1px solid #333; box-shadow: 0 0 50px rgba(0,0,0,1); }
+        .modal-left { width: 45%; background: #000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal-right { width: 55%; padding: 35px; display: flex; flex-direction: column; background: linear-gradient(135deg, #0a0a0f 0%, #111 100%); }
         
         .stat-item { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; border-left: 4px solid #ffc831; margin: 10px 0; }
-        .stat-val { font-size: 1.5rem; font-weight: bold; display: block; color: #ffc831; }
-        .stat-lbl { font-size: 0.7rem; color: #aaa; text-transform: uppercase; }
+        .stat-val { font-size: 1.8rem; font-weight: bold; display: block; color: #ffc831; }
+        .stat-lbl { font-size: 0.75rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
         
-        .lvl-bar-bg { width: 100%; height: 10px; background: #222; border-radius: 10px; margin: 5px 0; overflow: hidden; }
+        .lvl-bar-bg { width: 100%; height: 10px; background: #222; border-radius: 10px; margin: 8px 0; overflow: hidden; }
         .lvl-bar-fill { height: 100%; background: linear-gradient(90deg, #00d4ff, #00ff88); width: 0%; transition: 0.5s; }
         
-        .btn-action { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s; }
-        .btn-lv { background: #0066ff; color: white; }
-        .btn-star { background: #ff9900; color: black; }
+        .btn-action { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s; font-size: 1rem; }
+        .btn-lv { background: #0066ff; color: white; box-shadow: 0 4px 15px rgba(0,102,255,0.3); }
+        .btn-star { background: #ff9900; color: black; box-shadow: 0 4px 15px rgba(255,153,0,0.3); }
         .btn-sell-all { background: #ff4d4d; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; }
         
-        .price-info-box { margin-top: 15px; padding: 12px; background: rgba(0, 255, 136, 0.05); border-radius: 12px; border: 1px solid rgba(0, 255, 136, 0.2); }
+        .price-info-box { margin-top: 15px; padding: 15px; background: rgba(0, 255, 136, 0.05); border-radius: 15px; border: 1px solid rgba(0, 255, 136, 0.2); }
 
         @media (max-width: 768px) { .modal-content { flex-direction: column; overflow-y: auto; } .modal-left, .modal-right { width: 100%; } }
     </style>
@@ -119,46 +119,43 @@
     <div id="cardModal" class="modal" onclick="this.style.display='none'">
         <div class="modal-content" id="modalMainBox" onclick="event.stopPropagation()">
             <div class="modal-left">
-                <img id="modalImg" src="" style="width: 100%; height: 100%; object-fit: cover;">
+                <img id="modalImg" src="" style="max-width: 100%; max-height: 75vh; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.5); object-fit: contain;">
             </div>
             <div class="modal-right">
                 <div>
-                    <h2 id="modalName" style="margin:0;">Name</h2>
-                    <div id="modalRarity" style="font-weight: bold; letter-spacing: 1px; margin-bottom: 15px;">GRADE: -</div>
+                    <h2 id="modalName" style="margin:0; font-size: 2.2rem;">Name</h2>
+                    <div id="modalRarity" style="font-weight: bold; letter-spacing: 2px; margin-bottom: 20px; font-size: 1.1rem;">GRADE: -</div>
                 </div>
                 
-                <div style="margin-bottom: 15px;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
-                        <span id="modalLvlDisplay" style="color:#00d4ff; font-weight: bold;">LV. 1</span>
-                        <span style="color:#555;">MAX 50</span>
-                    </div>
-                    <div class="lvl-bar-bg"><div id="lvlBarFill" class="lvl-bar-fill"></div></div>
-                </div>
-
                 <div class="stat-item">
-                    <span class="stat-lbl">⚡ Battle Power</span>
+                    <span class="stat-lbl">⚡ ARENA POWER (Battle)</span>
                     <span id="modalPower" class="stat-val">0</span>
                 </div>
 
-                <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; font-size: 0.9rem;">
-                    <div id="modalCollectionCount">🎴 ครอบครอง: <span id="reqQty">0</span> ใบ</div>
-                    <div id="modalUpgradeInfo" style="color: #00ff88; margin-top: 5px; font-weight: bold;">-</div>
-                </div>
-
                 <div id="modalSellPriceBox" class="price-info-box">
-                    <div style="color:#aaa; font-size:0.7rem;">มูลค่าการขายใบนี้:</div>
-                    <div id="modalSellPrice" style="color:#00ff88; font-weight:bold; font-size:1.1rem;">0 🪙</div>
+                    <div style="color:#00ff88; font-size:0.75rem; font-weight: bold; text-transform: uppercase;">💰 ราคาประเมิน (Market Value)</div>
+                    <div id="modalSellPrice" style="color:#fff; font-weight:bold; font-size:1.6rem; margin-top: 5px;">0 🪙</div>
                 </div>
 
-                <div id="lvUpgradeGroup" style="display: flex; gap: 10px; margin-top: 10px;">
+                <div style="margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
+                        <span id="modalLvlDisplay" style="color:#00d4ff; font-weight: bold;">LV. 1</span>
+                        <span style="color:#666;">MAX 50</span>
+                    </div>
+                    <div class="lvl-bar-bg"><div id="lvlBarFill" class="lvl-bar-fill"></div></div>
+                    <div id="modalCollectionCount" style="font-size: 0.8rem; color: #aaa; margin-top: 5px;">🎴 จำนวนที่ครอบครอง: <span id="reqQty" style="color:#ffc831; font-weight:bold;">0</span> ใบ</div>
+                    <div id="modalUpgradeInfo" style="color: #00ff88; margin-top: 5px; font-weight: bold; font-size: 0.85rem;">-</div>
+                </div>
+
+                <div id="lvUpgradeGroup" style="display: flex; gap: 10px; margin-top: auto;">
                     <button id="btnUpgradeLV" class="btn-action btn-lv" style="flex:2;">⚡ เลเวลอัป</button>
                     <button id="btnBulkUpgrade" class="btn-action btn-lv" style="flex:1; background: #00ff88; color: #000;">MAX</button>
                 </div>
                 
-                <button id="btnUpgradeStar" class="btn-action btn-star" style="display:none;">⭐ วิวัฒนาการดาว</button>
-                <div id="maxLevelMessage" style="display:none; text-align:center; color:#ffc831; font-weight:bold; margin-top:15px;"></div>
+                <button id="btnUpgradeStar" class="btn-action btn-star" style="display:none; margin-top: auto;">⭐ วิวัฒนาการดาว</button>
+                <div id="maxLevelMessage" style="display:none; text-align:center; color:#ffc831; font-weight:bold; margin-top:15px; font-size: 1.2rem;"></div>
                 
-                <button class="btn-nav" style="margin-top:20px; width: 100%;" onclick="document.getElementById('cardModal').style.display='none'">ปิดหน้าต่าง</button>
+                <button class="btn-nav" style="margin-top:15px; width: 100%; border-color: rgba(255,255,255,0.1);" onclick="document.getElementById('cardModal').style.display='none'">กลับ</button>
             </div>
         </div>
     </div>
