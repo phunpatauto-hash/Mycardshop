@@ -203,10 +203,13 @@
 
     const RARITY_POWER = {
         "P":   { base: 5000, perLv: 1000 },
+        "USEC": { base: 7000, perLv: 5500 },
         "EXR": { base: 4000, perLv: 2500 }, 
-        "SEC": { base: 3200, perLv: 2000 },
-        "SUR": { base: 2600, perLv: 1800 },
-        "SSR": { base: 2000, perLv: 1500 },
+        "CBR": { base: 6600, perLv: 4000 },
+        "SEC": { base: 3500, perLv: 2000 },
+        "SUR": { base: 3000, perLv: 1800 },
+        "SSR": { base: 2500, perLv: 1500 },
+        "PR":   { base: 2000, perLv: 1500 },
         "UR":  { base: 1500, perLv: 1200 },
         "SR":  { base: 1000, perLv: 1000 },
         "R":   { base: 600,  perLv: 800 },
@@ -215,7 +218,7 @@
     };
 
     const rarityColors = { 'P': '#ff00ff', 'EXR': '#ff4d4d', 'SEC': '#ffac33', 'SUR': '#33ffad', 'SSR': '#ffc831', 'UR': '#bf40bf', 'SR': '#33aaff', 'R': '#33ff57', 'U': '#ffffff', 'C': '#ffffff' };
-    const sellValuesBase = { 'P': 10000, 'EXR': 50000, 'SEC': 25000, 'SUR': 15000, 'SSR': 1000, 'UR': 1200, 'SR': 1000, 'R': 500, 'U': 200, 'C': 100 };
+    const sellValuesBase = { 'P': 10000, 'USEC': 70000, 'EXR': 55000, 'CBR': 50000, 'SEC': 25000, 'SUR': 15000, 'SSR': 15000, 'PR': 10000, 'UR': 1200, 'SR': 1000, 'R': 500, 'U': 200, 'C': 100 };
 
     function getDynamicSellValue(card) {
         const base = sellValuesBase[card.rarity.toUpperCase()] || 100;
