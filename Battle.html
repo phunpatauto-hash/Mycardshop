@@ -54,11 +54,11 @@
         .mini-card { width: 75px; aspect-ratio: 2/3; background: #222; border-radius: 8px; border: 1px solid #444; overflow: hidden; position: relative; transition: 0.3s; cursor: pointer; }
         .mini-card img { width: 100%; height: 100%; object-fit: cover; }
         
-        /* Rarity Borders */
+        /* New Rarity Styling */
         .rarity-usec { border: 2px solid #ffffff !important; box-shadow: 0 0 15px #ffffff, 0 0 5px #ffc831; }
         .rarity-exr { border: 2px solid #ff00ff !important; box-shadow: 0 0 10px #ff00ff; }
         .rarity-cbr { border: 2px solid #ff4d4d !important; box-shadow: 0 0 10px #ff4d4d; }
-        
+
         .stat-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.8); display: flex; flex-direction: column; padding: 2px; font-size: 0.6rem; text-align: center; color: #ffc831; }
         .lv-badge { position: absolute; top: 2px; right: 2px; background: #ffc831; color: black; font-size: 0.55rem; padding: 1px 4px; border-radius: 4px; font-weight: bold; z-index: 2; }
         .selected-glow { border: 2.5px solid #ffc831 !important; transform: scale(1.05); z-index: 5; box-shadow: 0 0 20px #ffc831; }
@@ -179,7 +179,7 @@
 
         <div id="view-defense" class="ui-card" style="text-align: center;">
             <h3 style="color:#00ff88;">🛡️ จัดทีมตั้งรับ (Defense Team)</h3>
-            <p style="font-size: 0.8rem; color: #aaa;">ทีมนี้จะใช้ป้องกันเมื่อมีคนอื่นมาท้าดวลคุณ (USEC จำกัด 1 ใบ)</p>
+            <p style="font-size: 0.8rem; color: #aaa;">ทีมนี้จะใช้ป้องกันเมื่อมีคนอื่นมาท้าดวลคุณ (จำกัด USEC 1 ใบ)</p>
             <div id="defense-slots" class="card-row" style="min-height: 120px; border: 1px dashed #444; border-radius: 10px; padding: 10px;"></div>
             <button class="btn-action" onclick="saveDefense()">💾 บันทึกทีมป้องกัน</button>
             <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
@@ -212,7 +212,7 @@
         <div class="modal-content">
             <span class="close-modal" onclick="toggleModal('prepModal', false)">&times;</span>
             <h3 style="color:#ffc831; text-align:center;">🚩 จัดทีมบุก (เลือก 5 ใบ)</h3>
-            <p style="text-align: center; font-size: 0.8rem; color: #ff4d4d;">* จำกัดระดับ USEC 1 ใบต่อทีม</p>
+            <p style="text-align: center; color: #ff4d4d; font-size: 0.8rem;">* จำกัด USEC ได้เพียง 1 ใบต่อทีม</p>
             <div id="prep-slots" class="card-row" style="min-height: 120px; border: 1px dashed #444; border-radius: 10px; padding: 10px;"></div>
             <button id="start-btn" class="btn-action" disabled onclick="handleStartBattle()">⚔️ เริ่มการท้าดวล!</button>
             <div id="prep-pool" class="card-row" style="margin-top:20px;"></div>
@@ -237,7 +237,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // อัปเดตตารางพลัง Rarity พร้อมระดับใหม่
+    // ตารางพลัง Rarity พร้อมระดับใหม่
     const RARITY_POWER = {
         "USEC":{ base: 6500, perLv: 3500 }, // สูงกว่า EXR
         "EXR": { base: 4000, perLv: 2500 }, 
@@ -473,14 +473,17 @@
         }, 2800);
     };
 
+    // ปรับปรุงฟังก์ชันแสดงผลกรุการ์ดพร้อมระบบเรียงลำดับ
     function renderPrep() {
         const slots = document.getElementById("prep-slots");
         const pool = document.getElementById("prep-pool");
         slots.innerHTML = ""; pool.innerHTML = "";
         for(let i=0; i<5; i++) slots.innerHTML += tempAtk[i] ? cardHTML(tempAtk[i]) : `<div class="mini-card" style="border:1px dashed #444;"></div>`;
         
-        const myCollection = userDoc.collection || [];
-        myCollection.forEach(c => {
+        // เรียงลำดับจาก LV สูงไปต่ำ
+        const sortedCollection = [...(userDoc.collection || [])].sort((a, b) => Number(b.level || 1) - Number(a.level || 1));
+
+        sortedCollection.forEach(c => {
             const isSel = tempAtk.some(t => t.name === c.name);
             const div = document.createElement("div");
             div.innerHTML = cardHTML(c, isSel);
@@ -515,7 +518,10 @@
         dSlots.innerHTML = ""; dPool.innerHTML = "";
         for(let i=0; i<5; i++) dSlots.innerHTML += tempDef[i] ? cardHTML(tempDef[i]) : `<div class="mini-card" style="border:1px dashed #444;"></div>`;
         
-        (userDoc.collection || []).forEach(c => {
+        // เรียงลำดับจาก LV สูงไปต่ำตอนเลือกทีมป้องกัน
+        const sortedPool = [...(userDoc.collection || [])].sort((a, b) => Number(b.level || 1) - Number(a.level || 1));
+
+        sortedPool.forEach(c => {
             const isSel = tempDef.some(t => t.name === c.name);
             const div = document.createElement("div");
             div.innerHTML = cardHTML(c, isSel);
