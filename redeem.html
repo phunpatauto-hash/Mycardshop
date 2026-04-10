@@ -197,7 +197,6 @@
         btnLoader.style.display = "inline-block";
 
         try {
-            // 1. ตรวจสอบว่ามีโค้ดนี้จริงไหม
             const codeRef = doc(db, "codes", inputCode);
             const codeSnap = await getDoc(codeRef);
 
@@ -205,17 +204,14 @@
 
             const codeData = codeSnap.data();
             
-            // 2. ตรวจสอบจำนวนการใช้สูงสุด (ถ้ามีกำหนดไว้)
             if (codeData.maxUse > 0 && codeData.usedCount >= codeData.maxUse) {
                 throw new Error("ขออภัย โค้ดนี้มีผู้ใช้งานครบจำนวนแล้ว");
             }
 
-            // 3. ตรวจสอบว่า User คนนี้เคยใช้โค้ดนี้ไปหรือยัง
             const historyRef = doc(db, "users", currentUserId, "used_codes", inputCode);
             const historySnap = await getDoc(historyRef);
             if (historySnap.exists()) throw new Error("คุณเคยแลกรับโค้ดนี้ไปแล้ว!");
 
-            // 4. ดึงข้อมูล User เพื่อจัดการ Collection (เช็คการ์ดซ้ำ)
             const userRef = doc(db, "users", currentUserId);
             const userSnap = await getDoc(userRef);
             if (!userSnap.exists()) throw new Error("ไม่พบข้อมูลผู้ใช้งาน");
@@ -225,43 +221,39 @@
             let updatedCollection = [...currentCollection];
             let cardInfo = "";
 
-            // ตรวจสอบการให้รางวัลการ์ด
+            // --- ส่วนที่แก้ไข: เปลี่ยนจากการเพิ่ม count เป็นการเพิ่ม Object ใบใหม่ ---
             if (codeData.rewardCard && codeData.rewardCard.name) {
                 const rewardAmount = Number(codeData.rewardCard.count) || 1;
                 
-                // ค้นหาว่าในการ์ดที่มีอยู่ มีชื่อซ้ำกับของรางวัลไหม
-                const existingIndex = updatedCollection.findIndex(item => item.name === codeData.rewardCard.name);
+                // ข้อมูลตั้งต้นของการ์ดที่จะได้รับ
+                const newCardEntry = {
+                    name: codeData.rewardCard.name,
+                    rarity: (codeData.rewardCard.rarity || "C").toUpperCase(),
+                    // ใช้ได้ทั้งฟิลด์ img หรือ image ตามที่ Firestore มี
+                    img: codeData.rewardCard.img || codeData.rewardCard.image || "", 
+                    level: 1,
+                    stars: 0,
+                    obtainedDate: new Date().toLocaleDateString('th-TH'),
+                    type: "Gift"
+                };
 
-                if (existingIndex !== -1) {
-                    // ถ้ามีอยู่แล้ว ให้บวกจำนวน (count) เพิ่มเข้าไป
-                    const currentCount = Number(updatedCollection[existingIndex].count) || 0;
-                    updatedCollection[existingIndex].count = currentCount + rewardAmount;
-                } else {
-                    // ถ้ายังไม่มี ให้สร้าง Object ใหม่เพิ่มเข้าไป
-                    const newCard = {
-                        ...codeData.rewardCard,
-                        level: 1, 
-                        stars: 0,
-                        count: rewardAmount,
-                        obtainedDate: new Date().toLocaleDateString('th-TH'),
-                        type: "Gift"
-                    };
-                    updatedCollection.push(newCard);
+                // วนลูปเพิ่มการ์ดลงในอาเรย์ตามจำนวน (rewardAmount)
+                // เพื่อให้ระบบหน้า Collection มองเห็นเป็นใบแยกกัน และใช้เป็นวัตถุดิบได้
+                for (let i = 0; i < rewardAmount; i++) {
+                    updatedCollection.push({ ...newCardEntry });
                 }
+
                 cardInfo = `\n🎴 การ์ด: ${codeData.rewardCard.name} (x${rewardAmount})`;
             }
+            // -----------------------------------------------------------
 
-            // 5. อัปเดตข้อมูลทุกอย่างลง Firebase
             await updateDoc(userRef, {
                 points: increment(codeData.rewardPoints || 0),
                 diamonds: increment(codeData.rewardDiamonds || 0),
-                collection: updatedCollection // อัปเดต Array ที่จัดการแล้ว
+                collection: updatedCollection 
             });
 
-            // เพิ่มจำนวนการใช้งานโค้ดใบนี้
             await updateDoc(codeRef, { usedCount: increment(1) });
-            
-            // บันทึกประวัติการใช้โค้ดรายบุคคล
             await setDoc(historyRef, { redeemedAt: new Date().toISOString(), code: inputCode });
 
             alert(`🎉 แลกโค้ดสำเร็จ!\n🪙 ${codeData.rewardPoints || 0} Gold\n💎 ${codeData.rewardDiamonds || 0} Diamonds${cardInfo}`);
