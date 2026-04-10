@@ -228,13 +228,12 @@
                     userPoints = data.points || 0;
                     userDiamonds = data.diamonds || 0;
                     
-                    // --- หัวใจการแก้บั๊ก: แตก count ใน DB ออกเป็นใบเดี่ยวๆ ทันทีที่โหลด ---
                     let rawCollection = data.collection || [];
                     let expanded = [];
                     rawCollection.forEach(item => {
                         let c = Number(item.count) || 1;
                         let singleCard = {...item};
-                        delete singleCard.count; // เคลียร์ count ทิ้ง
+                        delete singleCard.count;
                         for(let i=0; i<c; i++) {
                             expanded.push({...singleCard});
                         }
@@ -264,7 +263,6 @@
         let displayList = [];
         for (const key in grouped) {
             const copies = grouped[key];
-            // เรียงให้ตัวเลเวลสูงดาวสูงอยู่หน้าสุดเพื่อเป็นตัวแทน
             copies.sort((a, b) => ((b.stars||0)*100 + (b.level||1)) - ((a.stars||0)*100 + (a.level||1)));
             const rep = {...copies[0]};
             rep.count = copies.length;
@@ -346,9 +344,8 @@
     };
 
     async function handleUpgrade(card, type, cost, req) {
-        let all = [...userCards]; // ข้อมูลที่เป็นใบเดี่ยวทั้งหมด
+        let all = [...userCards];
         
-        // ค้นหาใบต้นแบบที่เราจะอัปเกรด
         let targetIdx = all.findIndex(c => 
             c.name === card.name && 
             (c.rarity||'C').toUpperCase() === (card.rarity||'C').toUpperCase() &&
@@ -359,40 +356,59 @@
         if(targetIdx === -1) return alert("หาข้อมูลการ์ดต้นแบบไม่พบ");
         
         let main = {...all[targetIdx]};
-        all.splice(targetIdx, 1); // ดึงใบหลักออกมาพักไว้
+        all.splice(targetIdx, 1);
 
-        // แยกใบที่เป็นชนิดเดียวกัน (วัตถุดิบ) กับใบอื่น
         let materials = all.filter(c => c.name === card.name && (c.rarity||'C').toUpperCase() === (card.rarity||'C').toUpperCase());
         let others = all.filter(c => !(c.name === card.name && (c.rarity||'C').toUpperCase() === (card.rarity||'C').toUpperCase()));
 
         let updatedPoints = userPoints;
         let updatedDiamonds = userDiamonds;
 
-        if (type === 'LV' && materials.length >= req && userPoints >= cost) {
-            main.level = (main.level||1) + 1;
-            materials.splice(0, req);
-            updatedPoints -= cost;
-        } else if (type === 'STAR' && materials.length >= req && userDiamonds >= cost) {
-            main.stars = (main.stars||0) + 1;
-            materials.splice(0, req);
-            updatedDiamonds -= cost;
+        if (type === 'LV') {
+            if (materials.length >= req && userPoints >= cost) {
+                // --- ส่วนที่แก้: เพิ่มคำถามกดยืนยันปุ่มซ้าย ---
+                if(!confirm("ต้องการอัปเกรดเลเวลการ์ดนี้ใช่หรือไม่?")) return;
+                main.level = (main.level||1) + 1;
+                materials.splice(0, req);
+                updatedPoints -= cost;
+            } else {
+                return alert("ทรัพยากรไม่เพียงพอ หรือการ์ดซ้ำไม่พอ!");
+            }
+        } else if (type === 'STAR') {
+            if (materials.length >= req && userDiamonds >= cost) {
+                if(!confirm("ต้องการวิวัฒนาการดาวการ์ดนี้ใช่หรือไม่?")) return;
+                main.stars = (main.stars||0) + 1;
+                materials.splice(0, req);
+                updatedDiamonds -= cost;
+            } else {
+                return alert("ทรัพยากรไม่เพียงพอ หรือการ์ดซ้ำไม่พอ!");
+            }
         } else if (type === 'BULK') {
             let count = 0;
-            while((main.level||1) < MAX_LV && updatedPoints >= 500) {
-                let r = main.level >= 30 ? 3 : (main.level >= 10 ? 2 : 1);
-                if (materials.length >= r) { 
-                    main.level++; 
-                    materials.splice(0, r); 
-                    updatedPoints -= 500; 
+            let tempMaterials = [...materials];
+            let tempPoints = updatedPoints;
+            let tempLevel = main.level || 1;
+
+            while(tempLevel < MAX_LV && tempPoints >= 500) {
+                let r = tempLevel >= 30 ? 3 : (tempLevel >= 10 ? 2 : 1);
+                if (tempMaterials.length >= r) { 
+                    tempLevel++; 
+                    tempMaterials.splice(0, r); 
+                    tempPoints -= 500; 
                     count++; 
                 } else break;
             }
+
             if(count === 0) return alert("ทรัพยากรไม่พอสำหรับการอัปเกรด");
-        } else {
-            return alert("ทรัพยากรไม่เพียงพอ หรือการ์ดซ้ำไม่พอ!");
+            
+            // --- ส่วนที่แก้: เพิ่มคำถามกดยืนยันปุ่มขวา (MAX) ---
+            if(!confirm(`ต้องการอัปเกรดรวดเดียว ${count} เลเวล ใช่หรือไม่?`)) return;
+            
+            main.level = tempLevel;
+            materials = tempMaterials;
+            updatedPoints = tempPoints;
         }
 
-        // รวมร่างกลับไปเป็น Array ก้อนเดียว (ไม่มี count)
         const finalCollection = [...others, main, ...materials];
 
         try {
