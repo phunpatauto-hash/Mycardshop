@@ -93,7 +93,6 @@
         .modal-left { width: 40%; background: #000; position: relative; }
         .modal-right { width: 60%; padding: 30px; display: flex; flex-direction: column; }
         
-        /* Stats Arena Style */
         .arena-stats { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 15px 0; }
         .stat-item { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; border-left: 4px solid #ffc831; }
         .stat-val { font-size: 1.5rem; font-weight: bold; display: block; color: #ffc831; }
@@ -201,12 +200,12 @@
     let currentUID = null, userCards = [], userPoints = 0, userDiamonds = 0, currentFilter = 'ALL';
     const MAX_LV = 50;
 
-    // --- ตารางพลัง (รวมระดับใหม่ USEC, CBR, PR) ---
+    // --- ส่วนที่เพิ่มระดับใหม่ (USEC, CBR, PR) ---
     const RARITY_POWER = {
         "P":    { base: 5000, perLv: 1000 },
-        "USEC": { base: 8000, perLv: 6000 }, // สูงสุดเหนือ EXR
+        "USEC": { base: 8500, perLv: 6500 }, // สูงที่สุดเหนือ EXR
         "EXR":  { base: 4000, perLv: 2500 }, 
-        "CBR":  { base: 6600, perLv: 4000 }, // สูงกว่า SEC
+        "CBR":  { base: 6600, perLv: 4000 }, // รองจาก SEC ในการเรียงแต่พลังสูง
         "SEC":  { base: 3500, perLv: 2000 },
         "SUR":  { base: 3000, perLv: 1800 },
         "SSR":  { base: 2500, perLv: 1500 },
@@ -218,16 +217,14 @@
         "C":    { base: 100,  perLv: 300 }
     };
 
-    // --- สีประจำระดับ ---
     const rarityColors = { 
         'P': '#ff00ff', 'USEC': '#ff00ff', 'EXR': '#ff4d4d', 'CBR': '#ff4d4d', 
         'SEC': '#ffac33', 'SUR': '#33ffad', 'SSR': '#ffc831', 'PR': '#ffc831', 
         'UR': '#bf40bf', 'SR': '#33aaff', 'R': '#33ff57', 'U': '#ffffff', 'C': '#ffffff' 
     };
 
-    // --- ราคาขายคืน ---
     const sellValuesBase = { 
-        'P': 10000, 'USEC': 85000, 'EXR': 55000, 'CBR': 50000, 
+        'P': 10000, 'USEC': 90000, 'EXR': 55000, 'CBR': 50000, 
         'SEC': 25000, 'SUR': 15000, 'SSR': 15000, 'PR': 10000, 
         'UR': 1200, 'SR': 1000, 'R': 500, 'U': 200, 'C': 100 
     };
@@ -285,7 +282,7 @@
         });
 
         let list = Object.values(stacked).sort((a, b) => {
-            // ลำดับการเรียงหน้า Collection
+            // ลำดับการเรียงหน้าจอ (USEC อยู่บนสุด/รองจาก P, CBR อยู่รองจาก SEC, PR อยู่รองจาก SSR)
             const rarityOrder = { 
                 'P': 13, 'USEC': 12, 'EXR': 11, 'CBR': 10, 'SEC': 9, 
                 'SUR': 8, 'SSR': 7, 'PR': 6, 'UR': 5, 'SR': 4, 'R': 3, 'U': 2, 'C': 1 
@@ -370,7 +367,6 @@
 
     async function handleUpgrade(card, type, cost, req) {
         let all = []; userCards.forEach(c => { for(let i=0; i<(c.count||1); i++) all.push({...c, count:1}); });
-        // ตรวจสอบ Case-Insensitive สำหรับระดับการ์ด
         let targets = all.filter(c => c.name === card.name && (c.rarity||'C').toUpperCase() === card.rarity.toUpperCase());
         let others = all.filter(c => !(c.name === card.name && (c.rarity||'C').toUpperCase() === card.rarity.toUpperCase()));
         targets.sort((a,b) => (b.level||1) - (a.level||1));
@@ -408,11 +404,10 @@
             });
         }
         if(!sold) return alert("ไม่มีใบซ้ำ");
-        if(confirm(`ขายใบซ้ำ ${sold} ใบ ได้รับ ${gain} 🪙?`)) await updateDoc(doc(db, \"users\", currentUID), { collection: newCol, points: increment(gain) });
+        if(confirm(`ขายใบซ้ำ ${sold} ใบ ได้รับ ${gain} 🪙?`)) await updateDoc(doc(db, "users", currentUID), { collection: newCol, points: increment(gain) });
     };
 
     const fCon = document.getElementById("filterContainer");
-    // อัปเดตรายการปุ่ม Filter
     ['ALL','P','USEC','EXR','CBR','SEC','SUR','SSR','PR','UR','SR','R','U','C'].forEach(r => {
         const b = document.createElement("button"); b.className = `filter-btn ${r==='ALL'?'active':''}`; b.innerText = r;
         b.onclick = () => { currentFilter = r; document.querySelectorAll('.filter-btn').forEach(x => x.classList.remove('active')); b.classList.add('active'); renderCards(); };
