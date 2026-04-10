@@ -98,11 +98,20 @@
             color: #111;
             margin-top: 20px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
         }
 
         button:hover { 
             transform: scale(1.02);
             box-shadow: 0 0 30px rgba(255, 200, 49, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
         }
 
         .back-link { 
@@ -150,7 +159,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, updateDoc, increment, setDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, updateDoc, increment, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -188,42 +197,71 @@
         btnLoader.style.display = "inline-block";
 
         try {
+            // 1. ตรวจสอบว่ามีโค้ดนี้จริงไหม
             const codeRef = doc(db, "codes", inputCode);
             const codeSnap = await getDoc(codeRef);
 
             if (!codeSnap.exists()) throw new Error("ไม่พบโค้ดนี้ หรือโค้ดอาจจะหมดอายุแล้ว");
 
             const codeData = codeSnap.data();
-            if (codeData.maxUse > 0 && codeData.usedCount >= codeData.maxUse) throw new Error("ขออภัย โค้ดนี้มีผู้ใช้งานครบจำนวนแล้ว");
+            
+            // 2. ตรวจสอบจำนวนการใช้สูงสุด (ถ้ามีกำหนดไว้)
+            if (codeData.maxUse > 0 && codeData.usedCount >= codeData.maxUse) {
+                throw new Error("ขออภัย โค้ดนี้มีผู้ใช้งานครบจำนวนแล้ว");
+            }
 
+            // 3. ตรวจสอบว่า User คนนี้เคยใช้โค้ดนี้ไปหรือยัง
             const historyRef = doc(db, "users", currentUserId, "used_codes", inputCode);
             const historySnap = await getDoc(historyRef);
             if (historySnap.exists()) throw new Error("คุณเคยแลกรับโค้ดนี้ไปแล้ว!");
 
+            // 4. ดึงข้อมูล User เพื่อจัดการ Collection (เช็คการ์ดซ้ำ)
             const userRef = doc(db, "users", currentUserId);
-            const userUpdate = {
-                points: increment(codeData.rewardPoints || 0),
-                diamonds: increment(codeData.rewardDiamonds || 0)
-            };
-
+            const userSnap = await getDoc(userRef);
+            if (!userSnap.exists()) throw new Error("ไม่พบข้อมูลผู้ใช้งาน");
+            
+            const userData = userSnap.data();
+            let currentCollection = userData.collection || [];
+            let updatedCollection = [...currentCollection];
             let cardInfo = "";
+
+            // ตรวจสอบการให้รางวัลการ์ด
             if (codeData.rewardCard && codeData.rewardCard.name) {
-                // แก้ไขจุดนี้: ดึงค่า count จาก database มาใช้งาน
-                const cardObj = {
-                    ...codeData.rewardCard,
-                    level: 1, 
-                    stars: 0,
-                    count: Number(codeData.rewardCard.count) || 1, // ดึงค่าจาก Firestore ถ้าไม่มีให้เป็น 1
-                    obtainedDate: new Date().toLocaleDateString('th-TH'),
-                    type: "Gift"
-                };
+                const rewardAmount = Number(codeData.rewardCard.count) || 1;
                 
-                userUpdate.collection = arrayUnion(cardObj);
-                cardInfo = `\n🎴 การ์ด: ${codeData.rewardCard.name} (x${cardObj.count})`;
+                // ค้นหาว่าในการ์ดที่มีอยู่ มีชื่อซ้ำกับของรางวัลไหม
+                const existingIndex = updatedCollection.findIndex(item => item.name === codeData.rewardCard.name);
+
+                if (existingIndex !== -1) {
+                    // ถ้ามีอยู่แล้ว ให้บวกจำนวน (count) เพิ่มเข้าไป
+                    const currentCount = Number(updatedCollection[existingIndex].count) || 0;
+                    updatedCollection[existingIndex].count = currentCount + rewardAmount;
+                } else {
+                    // ถ้ายังไม่มี ให้สร้าง Object ใหม่เพิ่มเข้าไป
+                    const newCard = {
+                        ...codeData.rewardCard,
+                        level: 1, 
+                        stars: 0,
+                        count: rewardAmount,
+                        obtainedDate: new Date().toLocaleDateString('th-TH'),
+                        type: "Gift"
+                    };
+                    updatedCollection.push(newCard);
+                }
+                cardInfo = `\n🎴 การ์ด: ${codeData.rewardCard.name} (x${rewardAmount})`;
             }
 
-            await updateDoc(userRef, userUpdate); 
+            // 5. อัปเดตข้อมูลทุกอย่างลง Firebase
+            await updateDoc(userRef, {
+                points: increment(codeData.rewardPoints || 0),
+                diamonds: increment(codeData.rewardDiamonds || 0),
+                collection: updatedCollection // อัปเดต Array ที่จัดการแล้ว
+            });
+
+            // เพิ่มจำนวนการใช้งานโค้ดใบนี้
             await updateDoc(codeRef, { usedCount: increment(1) });
+            
+            // บันทึกประวัติการใช้โค้ดรายบุคคล
             await setDoc(historyRef, { redeemedAt: new Date().toISOString(), code: inputCode });
 
             alert(`🎉 แลกโค้ดสำเร็จ!\n🪙 ${codeData.rewardPoints || 0} Gold\n💎 ${codeData.rewardDiamonds || 0} Diamonds${cardInfo}`);
