@@ -227,7 +227,29 @@
                     const data = snap.data();
                     userPoints = data.points || 0;
                     userDiamonds = data.diamonds || 0;
-                    userCards = data.collection || [];
+                    
+                    // --- ส่วนที่แก้ไข: กระจายการ์ดที่มี count มากกว่า 1 ให้เป็นใบเดี่ยวๆ ---
+                    let rawCollection = data.collection || [];
+                    let expandedCollection = [];
+                    
+                    rawCollection.forEach(item => {
+                        let count = Number(item.count) || 1;
+                        if (count > 1) {
+                            // ถ้ามีการ์ดแบบ x10000 ให้แตกเป็นใบเดี่ยวๆ 10,000 ใบลงใน Array
+                            // เพื่อให้ระบบ Upgrade / Sell All ทำงานได้ปกติ
+                            let singleCard = {...item};
+                            delete singleCard.count; // ลบ count ออกเพราะกลายเป็นใบเดี่ยวแล้ว
+                            for (let i = 0; i < count; i++) {
+                                expandedCollection.push({...singleCard});
+                            }
+                        } else {
+                            expandedCollection.push(item);
+                        }
+                    });
+                    
+                    userCards = expandedCollection;
+                    // ---------------------------------------------------------
+
                     document.getElementById("nav-points").innerText = userPoints.toLocaleString();
                     document.getElementById("nav-diamonds").innerText = userDiamonds.toLocaleString();
                     document.getElementById("display-username").innerText = (data.username || "COLLECTOR");
@@ -273,13 +295,11 @@
             const isMax = card.level >= MAX_LV && card.stars >= 5;
             div.className = `col-card ${isMax ? 'rainbow-effect' : ''}`;
             div.onclick = () => openModal(card);
-            
-            // เพิ่มเงา Glow ตามระดับสี Rarity
             div.style.border = `1px solid ${rarityColors[r]}33`;
 
             div.innerHTML = `
                 ${card.stars > 0 ? `<div class="star-container">${'⭐'.repeat(card.stars)}</div>` : ''}
-                ${card.count > 1 ? `<div class="card-count-badge">x${card.count}</div>` : ''}
+                ${card.count > 1 ? `<div class="card-count-badge">x${card.count.toLocaleString()}</div>` : ''}
                 <img src="${card.img || card.image}">
                 <div style="padding:10px; background: linear-gradient(to top, #000 0%, rgba(0,0,0,0.8) 100%); border-top: 1px solid rgba(255,255,255,0.05);">
                     <div style="color:${rarityColors[r]}; font-size:0.75rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${card.name}</div>
@@ -306,7 +326,7 @@
         document.getElementById("modalPower").innerText = pwr.toLocaleString();
         document.getElementById("modalLvlDisplay").innerText = "LV. " + (card.level||1);
         document.getElementById("lvlBarFill").style.width = ((card.level||1)/MAX_LV*100) + "%";
-        document.getElementById("reqQty").innerText = sameCards.length;
+        document.getElementById("reqQty").innerText = sameCards.length.toLocaleString();
         document.getElementById("modalSellPrice").innerText = sellVal.toLocaleString() + " 🪙";
 
         const lvGroup = document.getElementById("lvUpgradeGroup"), starBtn = document.getElementById("btnUpgradeStar"), maxMsg = document.getElementById("maxLevelMessage");
@@ -342,7 +362,7 @@
             (c.stars||0) === (card.stars||0)
         );
 
-        if(targetIdx === -1) return alert("หาข้อมูลการ์ดต้นแบบไม่พบ กรุณาลองใหม่");
+        if(targetIdx === -1) return alert("หาข้อมูลการ์ดต้นแบบไม่พบ");
         
         let main = {...all[targetIdx]};
         all.splice(targetIdx, 1);
@@ -367,7 +387,7 @@
             if(count > 0) await updateDoc(doc(db, "users", currentUID), { collection: [...others, main, ...materials], points: increment(-(count*500)) });
             else return alert("ทรัพยากรไม่พอสำหรับการอัปเกรด");
         } else {
-            return alert("ทรัพยากร (เงิน/เพชร/ใบซ้ำ) ไม่เพียงพอ!");
+            return alert("ทรัพยากรไม่เพียงพอ!");
         }
         document.getElementById("cardModal").style.display = "none";
     }
@@ -386,7 +406,7 @@
             stacked[k].forEach(c => { gain += getDynamicSellValue(c); sold++; });
         }
         if(!sold) return alert("ไม่มีใบซ้ำ");
-        if(confirm(`ขายใบซ้ำ ${sold} ใบ ได้รับ ${gain.toLocaleString()} 🪙?`)) {
+        if(confirm(`ขายใบซ้ำ ${sold.toLocaleString()} ใบ ได้รับ ${gain.toLocaleString()} 🪙?`)) {
             await updateDoc(doc(db, "users", currentUID), { collection: newCol, points: increment(gain) });
         }
     };
