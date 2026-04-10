@@ -193,7 +193,7 @@
         });
     });
 
-    // --- Generate Code Logic ---
+    // --- Generate Code Logic (แก้ไขแล้ว) ---
     document.getElementById("create-btn").onclick = async () => {
         const codeName = document.getElementById("new-code").value.trim().toUpperCase();
         if(!codeName) return alert("ระบุชื่อโค้ด");
@@ -210,20 +210,22 @@
             obtainedFrom: document.getElementById("obtained-from").value || "System",
             rewardCard: cardName ? {
                 name: cardName,
-                rarity: rarity, // บันทึกระดับ USEC, CBR, PR ฯลฯ
+                rarity: rarity,
                 img: document.getElementById("reward-card-img").value,
-                count: cardCount,
+                count: cardCount, // เก็บจำนวนจริงที่กรอกลง DB
                 level: 1,
-                stars: 0 // เพิ่มดาวเริ่มต้นเป็น 0
+                stars: 0
             } : null
         };
         
         await setDoc(doc(db, "codes", codeName), codeData);
-        alert(`โค้ด ${codeName} สร้างสำเร็จ!`);
+        alert(`โค้ด ${codeName} สร้างสำเร็จ! (การ์ดจำนวน ${cardCount} ใบ)`);
         
         // ล้างค่า
         document.getElementById("new-code").value = "";
         document.getElementById("reward-card-name").value = "";
+        document.getElementById("reward-card-count").value = "1";
+        document.getElementById("reward-card-img").value = "";
     };
 
     // --- User & Stats Logic ---
@@ -266,7 +268,8 @@
         body.innerHTML = "";
         snap.forEach(d => {
             const c = d.data();
-            const cardInfo = c.rewardCard ? `<br><small style="color:#ffc831">+การ์ด ${c.rewardCard.name} [${c.rewardCard.rarity}]</small>` : "";
+            // ปรับปรุงการแสดงผลให้โชว์จำนวนการ์ด (x จำนวน)
+            const cardInfo = c.rewardCard ? `<br><small style="color:#ffc831">+การ์ด ${c.rewardCard.name} [${c.rewardCard.rarity}] x${c.rewardCard.count}</small>` : "";
             body.innerHTML += `<tr><td><b>${d.id}</b></td><td>🪙${c.rewardPoints} 💎${c.rewardDiamonds}${cardInfo}</td><td>${c.usedCount}/${c.maxUse}</td><td><button class="btn btn-red" onclick="deleteItem('codes', '${d.id}')">ลบ</button></td></tr>`;
         });
     });
