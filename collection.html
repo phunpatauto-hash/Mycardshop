@@ -366,7 +366,6 @@
 
         if (type === 'LV') {
             if (materials.length >= req && userPoints >= cost) {
-                // --- ส่วนที่แก้: เพิ่มคำถามกดยืนยันปุ่มซ้าย ---
                 if(!confirm("ต้องการอัปเกรดเลเวลการ์ดนี้ใช่หรือไม่?")) return;
                 main.level = (main.level||1) + 1;
                 materials.splice(0, req);
@@ -400,8 +399,6 @@
             }
 
             if(count === 0) return alert("ทรัพยากรไม่พอสำหรับการอัปเกรด");
-            
-            // --- ส่วนที่แก้: เพิ่มคำถามกดยืนยันปุ่มขวา (MAX) ---
             if(!confirm(`ต้องการอัปเกรดรวดเดียว ${count} เลเวล ใช่หรือไม่?`)) return;
             
             main.level = tempLevel;
