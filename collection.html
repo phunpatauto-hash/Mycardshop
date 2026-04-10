@@ -43,7 +43,7 @@
             border: 3px solid transparent !important; 
             background: linear-gradient(#111, #111) padding-box, conic-gradient(from 0deg, red, yellow, lime, aqua, blue, magenta, red) border-box !important; 
             animation: rainbow-rotate 3s linear infinite; 
-            box-shadow: 0 0 20px rgba(255,255,255,0.2);
+            box-shadow: 0 0 20px rgba(255,255,255,0.4);
         }
         .rainbow-text { 
             background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000); 
@@ -88,7 +88,7 @@
         .btn-lv { background: #0066ff; color: white; box-shadow: 0 4px 15px rgba(0,102,255,0.3); }
         .btn-lv:hover { background: #1a75ff; transform: scale(1.02); }
         .btn-star { background: #ff9900; color: black; box-shadow: 0 4px 15px rgba(255,153,0,0.3); }
-        .btn-sell-all { background: #ff4d4d; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-sell-all { background: #ff4d4d; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-left: 10px; }
         .btn-sell-all:hover { background: #ff3333; box-shadow: 0 0 15px rgba(255,77,77,0.4); }
         
         .price-info-box { margin-top: 15px; padding: 15px; background: rgba(0, 255, 136, 0.05); border-radius: 15px; border: 1px solid rgba(0, 255, 136, 0.2); }
@@ -102,7 +102,7 @@
         <div class="user-info">
             <div class="user-name-tag" id="display-username">กำลังโหลด...</div>
             <div class="nav-buttons">
-                <a href="index.html" class="btn-nav">🏠 HOME</a>
+                <a href="index.html" class="btn-nav">🏠 หน้าหลัก</a>
                 <a href="Banner Selection.html" class="btn-nav primary">สุ่มการ์ด</a>
             </div>
         </div>
@@ -113,7 +113,7 @@
     </nav>
 
     <div class="filter-bar">
-        <div id="filterContainer"></div>
+        <div id="filterContainer" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
         <button id="btnSellAll" class="btn-sell-all">💰 ขายใบซ้ำทั้งหมด</button>
     </div>
 
@@ -228,18 +228,14 @@
                     userPoints = data.points || 0;
                     userDiamonds = data.diamonds || 0;
                     
+                    // แปลงโครงสร้างข้อมูล (กรณีเก็บเป็น array ธรรมดา)
                     let rawCollection = data.collection || [];
-                    let expanded = [];
-                    rawCollection.forEach(item => {
-                        let c = Number(item.count) || 1;
-                        let singleCard = {...item};
-                        delete singleCard.count;
-                        for(let i=0; i<c; i++) {
-                            expanded.push({...singleCard});
-                        }
-                    });
-                    
-                    userCards = expanded;
+                    userCards = rawCollection.map(c => ({
+                        ...c,
+                        level: c.level || 1,
+                        stars: c.stars || 0
+                    }));
+
                     document.getElementById("nav-points").innerText = userPoints.toLocaleString();
                     document.getElementById("nav-diamonds").innerText = userDiamonds.toLocaleString();
                     document.getElementById("display-username").innerText = (data.username || "COLLECTOR");
@@ -253,6 +249,7 @@
         const grid = document.getElementById("grid");
         grid.innerHTML = "";
         
+        // จับกลุ่มการ์ด
         const grouped = {};
         userCards.forEach(card => {
             const key = `${card.name}_${(card.rarity||'C').toUpperCase()}`;
@@ -263,6 +260,7 @@
         let displayList = [];
         for (const key in grouped) {
             const copies = grouped[key];
+            // เรียงให้ตัวเก่งสุดอยู่บนสุดเพื่อใช้เป็นตัวแทนกลุ่ม
             copies.sort((a, b) => ((b.stars||0)*100 + (b.level||1)) - ((a.stars||0)*100 + (a.level||1)));
             const rep = {...copies[0]};
             rep.count = copies.length;
@@ -273,6 +271,7 @@
             displayList = displayList.filter(c => (c.rarity||'C').toUpperCase() === currentFilter.toUpperCase());
         }
 
+        // เรียงตามความหายาก
         displayList.sort((a, b) => {
             const rarityOrder = { 'P': 13, 'USEC': 12, 'EXR': 11, 'CBR': 10, 'SEC': 9, 'SUR': 8, 'SSR': 7, 'PR': 6, 'UR': 5, 'SR': 4, 'R': 3, 'U': 2, 'C': 1 };
             return (rarityOrder[(b.rarity||'C').toUpperCase()] || 0) - (rarityOrder[(a.rarity||'C').toUpperCase()] || 0);
@@ -285,15 +284,16 @@
             const isMax = card.level >= MAX_LV && card.stars >= 5;
             div.className = `col-card ${isMax ? 'rainbow-effect' : ''}`;
             div.onclick = () => openModal(card);
-            div.style.border = `1px solid ${rarityColors[r]}33`;
+            div.style.border = `1px solid ${rarityColors[r]}44`;
 
             div.innerHTML = `
                 ${card.stars > 0 ? `<div class="star-container">${'⭐'.repeat(card.stars)}</div>` : ''}
-                ${card.count > 1 ? `<div class="card-count-badge">x${card.count.toLocaleString()}</div>` : ''}
+                ${card.count > 1 ? `<div class="card-count-badge">x${card.count}</div>` : ''}
                 <img src="${card.img || card.image}">
-                <div style="padding:10px; background: linear-gradient(to top, #000 0%, rgba(0,0,0,0.8) 100%); border-top: 1px solid rgba(255,255,255,0.05);">
+                <div style="padding:10px; background: linear-gradient(to top, #000 0%, rgba(0,0,0,0.8) 100%);">
                     <div style="color:${rarityColors[r]}; font-size:0.75rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${card.name}</div>
                     <div style="margin-top:4px; font-size:0.7rem; color:#ffc831; font-weight:bold;">⚡ ${pwr.toLocaleString()}</div>
+                    <div style="font-size:0.65rem; color:#aaa;">LV. ${card.level}</div>
                 </div>`;
             grid.appendChild(div);
         });
@@ -306,20 +306,25 @@
         const isMax = (card.level||1) >= MAX_LV && (card.stars||0) >= 5;
         const sameCards = userCards.filter(c => c.name === card.name && (c.rarity||'C').toUpperCase() === r);
         
-        document.getElementById("modalMainBox").className = `modal-content ${isMax?'rainbow-effect':''}`;
-        document.getElementById("modalName").className = isMax?'rainbow-text':'';
-        document.getElementById("modalName").style.color = isMax?'':rarityColors[r];
+        const modalContent = document.getElementById("modalMainBox");
+        modalContent.className = `modal-content ${isMax ? 'rainbow-effect' : ''}`;
+        
         document.getElementById("modalImg").src = card.img || card.image;
         document.getElementById("modalName").innerText = card.name;
+        document.getElementById("modalName").className = isMax ? 'rainbow-text' : '';
+        document.getElementById("modalName").style.color = isMax ? '' : rarityColors[r];
+        
         document.getElementById("modalRarity").innerText = "GRADE: " + r;
         document.getElementById("modalRarity").style.color = rarityColors[r];
         document.getElementById("modalPower").innerText = pwr.toLocaleString();
         document.getElementById("modalLvlDisplay").innerText = "LV. " + (card.level||1);
         document.getElementById("lvlBarFill").style.width = ((card.level||1)/MAX_LV*100) + "%";
-        document.getElementById("reqQty").innerText = sameCards.length.toLocaleString();
+        document.getElementById("reqQty").innerText = sameCards.length;
         document.getElementById("modalSellPrice").innerText = sellVal.toLocaleString() + " 🪙";
 
-        const lvGroup = document.getElementById("lvUpgradeGroup"), starBtn = document.getElementById("btnUpgradeStar"), maxMsg = document.getElementById("maxLevelMessage");
+        const lvGroup = document.getElementById("lvUpgradeGroup"), 
+              starBtn = document.getElementById("btnUpgradeStar"), 
+              maxMsg = document.getElementById("maxLevelMessage");
         
         if ((card.level||1) < MAX_LV) {
             lvGroup.style.display = "flex"; starBtn.style.display = "none"; maxMsg.style.display = "none";
@@ -331,10 +336,10 @@
             lvGroup.style.display = "none";
             if ((card.stars||0) < 5) {
                 starBtn.style.display = "block"; maxMsg.style.display = "block";
-                const cost = ((card.stars||0) + 1) * 1000;
+                const starCost = ((card.stars||0) + 1) * 1000;
                 maxMsg.innerText = "✨ พร้อมวิวัฒนาการดาว ✨";
-                starBtn.innerText = `⭐ อัปดาว (5 ใบ + ${cost} 💎)`;
-                starBtn.onclick = () => handleUpgrade(card, 'STAR', cost, 5);
+                starBtn.innerText = `⭐ อัปดาว (ใช้ใบซ้ำ 5 ใบ + ${starCost} 💎)`;
+                starBtn.onclick = () => handleUpgrade(card, 'STAR', starCost, 5);
             } else {
                 starBtn.style.display = "none"; maxMsg.style.display = "block";
                 maxMsg.innerText = "🌈 FULL MAX POWER 🌈";
@@ -344,8 +349,9 @@
     };
 
     async function handleUpgrade(card, type, cost, req) {
-        let all = [...userCards];
+        let all = JSON.parse(JSON.stringify(userCards));
         
+        // ค้นหาการ์ดหลักที่จะอัป (ตัวที่เลเวล/ดาวตรงกับที่กดมา)
         let targetIdx = all.findIndex(c => 
             c.name === card.name && 
             (c.rarity||'C').toUpperCase() === (card.rarity||'C').toUpperCase() &&
@@ -353,98 +359,97 @@
             (c.stars||0) === (card.stars||0)
         );
 
-        if(targetIdx === -1) return alert("หาข้อมูลการ์ดต้นแบบไม่พบ");
+        if(targetIdx === -1) return alert("ไม่พบการ์ดต้นฉบับ");
         
-        let main = {...all[targetIdx]};
-        all.splice(targetIdx, 1);
+        let main = all[targetIdx];
+        all.splice(targetIdx, 1); // ดึงตัวหลักออกมาก่อน เพื่อเอาที่เหลือไปเป็นวัตถุดิบ
 
         let materials = all.filter(c => c.name === card.name && (c.rarity||'C').toUpperCase() === (card.rarity||'C').toUpperCase());
         let others = all.filter(c => !(c.name === card.name && (c.rarity||'C').toUpperCase() === (card.rarity||'C').toUpperCase()));
 
-        let updatedPoints = userPoints;
-        let updatedDiamonds = userDiamonds;
-
         if (type === 'LV') {
             if (materials.length >= req && userPoints >= cost) {
-                if(!confirm("ต้องการอัปเกรดเลเวลการ์ดนี้ใช่หรือไม่?")) return;
-                main.level = (main.level||1) + 1;
+                main.level += 1;
                 materials.splice(0, req);
-                updatedPoints -= cost;
-            } else {
-                return alert("ทรัพยากรไม่เพียงพอ หรือการ์ดซ้ำไม่พอ!");
-            }
-        } else if (type === 'STAR') {
+                await updateDoc(doc(db, "users", currentUID), { collection: [...others, main, ...materials], points: increment(-cost) });
+            } else return alert("ทรัพยากรไม่เพียงพอ!");
+        } 
+        else if (type === 'STAR') {
             if (materials.length >= req && userDiamonds >= cost) {
-                if(!confirm("ต้องการวิวัฒนาการดาวการ์ดนี้ใช่หรือไม่?")) return;
-                main.stars = (main.stars||0) + 1;
+                main.stars = (main.stars || 0) + 1;
                 materials.splice(0, req);
-                updatedDiamonds -= cost;
-            } else {
-                return alert("ทรัพยากรไม่เพียงพอ หรือการ์ดซ้ำไม่พอ!");
-            }
-        } else if (type === 'BULK') {
+                await updateDoc(doc(db, "users", currentUID), { collection: [...others, main, ...materials], diamonds: increment(-cost) });
+            } else return alert("เพชรหรือการ์ดซ้ำไม่พอ!");
+        }
+        else if (type === 'BULK') {
+            let tempPoints = userPoints;
             let count = 0;
-            let tempMaterials = [...materials];
-            let tempPoints = updatedPoints;
-            let tempLevel = main.level || 1;
-
-            while(tempLevel < MAX_LV && tempPoints >= 500) {
-                let r = tempLevel >= 30 ? 3 : (tempLevel >= 10 ? 2 : 1);
-                if (tempMaterials.length >= r) { 
-                    tempLevel++; 
-                    tempMaterials.splice(0, r); 
-                    tempPoints -= 500; 
-                    count++; 
+            while(main.level < MAX_LV && tempPoints >= cost) {
+                let r = main.level >= 30 ? 3 : (main.level >= 10 ? 2 : 1);
+                if (materials.length >= r) {
+                    main.level++;
+                    materials.splice(0, r);
+                    tempPoints -= cost;
+                    count++;
                 } else break;
             }
-
-            if(count === 0) return alert("ทรัพยากรไม่พอสำหรับการอัปเกรด");
-            if(!confirm(`ต้องการอัปเกรดรวดเดียว ${count} เลเวล ใช่หรือไม่?`)) return;
-            
-            main.level = tempLevel;
-            materials = tempMaterials;
-            updatedPoints = tempPoints;
+            if(count > 0) {
+                await updateDoc(doc(db, "users", currentUID), { collection: [...others, main, ...materials], points: tempPoints });
+            } else return alert("อัปเกรดไม่ได้!");
         }
-
-        const finalCollection = [...others, main, ...materials];
-
-        try {
-            await updateDoc(doc(db, "users", currentUID), { 
-                collection: finalCollection, 
-                points: updatedPoints,
-                diamonds: updatedDiamonds
-            });
-            document.getElementById("cardModal").style.display = "none";
-        } catch (err) {
-            console.error(err);
-            alert("บันทึกข้อมูลไม่สำเร็จ!");
-        }
+        document.getElementById("cardModal").style.display = "none";
     }
 
     document.getElementById("btnSellAll").onclick = async () => {
-        if(!userCards.length) return alert("ไม่มีการ์ด");
-        const stacked = {};
+        if(!userCards.length) return;
+        
+        const grouped = {};
         userCards.forEach(c => {
             const k = `${c.name}_${(c.rarity||'C').toUpperCase()}`;
-            if(!stacked[k]) stacked[k] = []; stacked[k].push({...c});
+            if(!grouped[k]) grouped[k] = [];
+            grouped[k].push(c);
         });
-        let gain = 0, newCol = [], sold = 0;
-        for (const k in stacked) {
-            stacked[k].sort((a,b) => ((b.stars||0)*100+(b.level||1)) - ((a.stars||0)*100+(a.level||1)));
-            newCol.push(stacked[k].shift());
-            stacked[k].forEach(c => { gain += getDynamicSellValue(c); sold++; });
+
+        let totalGain = 0;
+        let newCollection = [];
+        let soldCount = 0;
+
+        for (const k in grouped) {
+            // เก็บตัวเก่งที่สุดไว้ 1 ใบ
+            grouped[k].sort((a,b) => ((b.stars||0)*100+(b.level||1)) - ((a.stars||0)*100+(a.level||1)));
+            newCollection.push(grouped[k].shift());
+            
+            // ขายที่เหลือ
+            grouped[k].forEach(card => {
+                totalGain += getDynamicSellValue(card);
+                soldCount++;
+            });
         }
-        if(!sold) return alert("ไม่มีใบซ้ำ");
-        if(confirm(`ขายใบซ้ำ ${sold.toLocaleString()} ใบ ได้รับ ${gain.toLocaleString()} 🪙?`)) {
-            await updateDoc(doc(db, "users", currentUID), { collection: newCol, points: increment(gain) });
+
+        if(soldCount === 0) return alert("ไม่มีการ์ดซ้ำให้ขาย");
+        
+        if(confirm(`ยืนยันการขายการ์ดซ้ำ ${soldCount} ใบ ได้รับทั้งหมด ${totalGain.toLocaleString()} 🪙?`)) {
+            await updateDoc(doc(db, "users", currentUID), { 
+                collection: newCollection, 
+                points: increment(totalGain) 
+            });
+            alert(`ขายเรียบร้อย! ได้รับ ${totalGain.toLocaleString()} 🪙`);
         }
     };
 
+    // Filter Buttons
     const fCon = document.getElementById("filterContainer");
     ['ALL','P','USEC','EXR','CBR','SEC','SUR','SSR','PR','UR','SR','R','U','C'].forEach(r => {
-        const b = document.createElement("button"); b.className = `filter-btn ${r==='ALL'?'active':''}`; b.innerText = r;
-        b.onclick = () => { currentFilter = r; document.querySelectorAll('.filter-btn').forEach(x => x.classList.remove('active')); b.classList.add('active'); renderCards(); };
-        fCon.appendChild(b);
+        const btn = document.createElement("button");
+        btn.className = `filter-btn ${r === 'ALL' ? 'active' : ''}`;
+        btn.innerText = r;
+        btn.onclick = () => {
+            currentFilter = r;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderCards();
+        };
+        fCon.appendChild(btn);
     });
 </script>
 </body>
