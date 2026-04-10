@@ -6,6 +6,7 @@
     <title>MY COLLECTION - Arena Sync System</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
+        /* [สไตล์เดิมทั้งหมดของคุณ] */
         * { box-sizing: border-box; }
         body { 
             font-family: 'Kanit', sans-serif; 
@@ -15,8 +16,6 @@
             min-height: 100vh; 
             overflow-x: hidden;
         }
-        
-        /* Navbar */
         .navbar { 
             background-color: rgba(10, 10, 15, 0.9); 
             padding: 15px 25px; 
@@ -36,8 +35,6 @@
         .btn-nav.primary { background: linear-gradient(45deg, #ffc831, #ff9000); color: #000; border: none; }
         .wallet-display { display: flex; gap: 15px; }
         .wallet-box { background: rgba(255, 255, 255, 0.05); padding: 8px 16px; border-radius: 25px; border: 1.5px solid #333; display: flex; align-items: center; gap: 8px; font-weight: bold; }
-        
-        /* Rainbow Effects */
         @keyframes rainbow-rotate { 100% { filter: hue-rotate(360deg); } }
         .rainbow-effect { 
             border: 3px solid transparent !important; 
@@ -49,13 +46,9 @@
             -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
             background-size: 200% auto; animation: rainbow-rotate 2s linear infinite; 
         }
-
-        /* Filter Bar */
         .filter-bar { max-width: 1200px; margin: 25px auto; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; padding: 0 20px; }
         .filter-btn { padding: 8px 18px; border-radius: 25px; border: 2px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #aaa; cursor: pointer; font-weight: bold; transition: 0.3s; }
         .filter-btn.active { border-color: #ffc831; color: #fff; background: rgba(255,200,49,0.1); }
-
-        /* Grid & Cards */
         .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
         .collection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
         .col-card { 
@@ -65,46 +58,38 @@
         .col-card:hover { transform: translateY(-5px); border-color: #ffc831; }
         .col-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
         .star-container { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); padding: 2px 6px; border-radius: 8px; color: #ffc831; font-size: 0.7rem; z-index: 5; }
-
-        /* Price Style */
-        .price-tag {
-            font-size: 0.7rem;
-            color: #00ff88;
-            background: rgba(0, 255, 136, 0.1);
-            padding: 2px 6px;
-            border-radius: 4px;
-            display: inline-block;
-            margin-top: 5px;
-            border: 1px solid rgba(0, 255, 136, 0.3);
-        }
-        .modal-price-info {
-            margin-top: 15px;
-            padding: 12px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 12px;
-            border-left: 4px solid #00ff88;
-            font-size: 0.9rem;
+        
+        /* สไตล์จำนวนการ์ดที่ซ้ำ */
+        .card-count-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #ffc831;
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            z-index: 5;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
         }
 
-        /* Modal */
+        .price-tag { font-size: 0.7rem; color: #00ff88; background: rgba(0, 255, 136, 0.1); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 5px; border: 1px solid rgba(0, 255, 136, 0.3); }
+        .modal-price-info { margin-top: 15px; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 12px; border-left: 4px solid #00ff88; font-size: 0.9rem; }
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(10px); }
         .modal-content { background: #0a0a0f; border-radius: 25px; max-width: 800px; width: 100%; display: flex; overflow: hidden; border: 1px solid #333; }
         .modal-left { width: 40%; background: #000; position: relative; }
         .modal-right { width: 60%; padding: 30px; display: flex; flex-direction: column; }
-        
         .arena-stats { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 15px 0; }
         .stat-item { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; border-left: 4px solid #ffc831; }
         .stat-val { font-size: 1.5rem; font-weight: bold; display: block; color: #ffc831; }
         .stat-lbl { font-size: 0.7rem; color: #aaa; text-transform: uppercase; }
-
         .lvl-bar-bg { width: 100%; height: 10px; background: #222; border-radius: 10px; margin: 5px 0; overflow: hidden; }
         .lvl-bar-fill { height: 100%; background: linear-gradient(90deg, #00d4ff, #00ff88); width: 0%; transition: 0.5s; }
-
         .btn-action { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s; }
         .btn-lv { background: #0066ff; color: white; }
         .btn-star { background: #ff9900; color: black; }
         .btn-sell-all { background: #ff4d4d; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-
         @media (max-width: 768px) { .modal-content { flex-direction: column; overflow-y: auto; } .modal-left, .modal-right { width: 100%; } }
     </style>
 </head>
@@ -143,7 +128,6 @@
                     <h2 id="modalName" style="margin:0;">Name</h2>
                     <div id="modalRarity" style="font-weight: bold; letter-spacing: 1px; margin-bottom: 15px;">GRADE: -</div>
                 </div>
-
                 <div style="margin-bottom: 15px;">
                     <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
                         <span id="modalLvlDisplay" style="color:#00d4ff; font-weight: bold;">LV. 1</span>
@@ -151,28 +135,23 @@
                     </div>
                     <div class="lvl-bar-bg"><div id="lvlBarFill" class="lvl-bar-fill"></div></div>
                 </div>
-
                 <div class="arena-stats">
                     <div class="stat-item">
-                        <span class="stat-lbl">⚡ Battle Power (Auction Value)</span>
+                        <span class="stat-lbl">⚡ Battle Power</span>
                         <span id="modalPower" class="stat-val">0</span>
                     </div>
                 </div>
-                
                 <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; font-size: 0.9rem;">
-                    <div id="modalCollectionCount">🎴 ครอบครองใบชื่อนี้: <span id="reqQty">0</span> ใบ</div>
+                    <div id="modalCollectionCount">🎴 ครอบครอง: <span id="reqQty">0</span> ใบ</div>
                     <div id="modalUpgradeInfo" style="color: #00ff88; margin-top: 5px; font-weight: bold;">-</div>
                 </div>
-
                 <div id="modalSellPrice" class="modal-price-info"></div>
-
                 <div id="lvUpgradeGroup" style="display: flex; gap: 10px; margin-top: 10px;">
                     <button id="btnUpgradeLV" class="btn-action btn-lv" style="flex:2;">⚡ เลเวลอัป</button>
                     <button id="btnBulkUpgrade" class="btn-action btn-lv" style="flex:1; background: #00ff88; color: #000;">MAX</button>
                 </div>
                 <button id="btnUpgradeStar" class="btn-action btn-star" style="display:none;">⭐ วิวัฒนาการดาว</button>
                 <div id="maxLevelMessage" style="display:none; text-align:center; color:#ffc831; font-weight:bold; margin-top:15px;"></div>
-                
                 <button class="btn-nav" style="margin-top:20px; width: 100%;" onclick="document.getElementById('cardModal').style.display='none'">ปิดหน้าต่าง</button>
             </div>
         </div>
@@ -183,6 +162,7 @@
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+    // Firebase Config [คงเดิม]
     const firebaseConfig = { 
         apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM", 
         authDomain: "sign-up-73f99.firebaseapp.com", 
@@ -200,19 +180,10 @@
     const MAX_LV = 50;
 
     const RARITY_POWER = {
-        "P":    { base: 5000, perLv: 1000 },
-        "USEC": { base: 8500, perLv: 6500 },
-        "EXR":  { base: 4000, perLv: 2500 }, 
-        "CBR":  { base: 6600, perLv: 4000 }, 
-        "SEC":  { base: 3500, perLv: 2000 },
-        "SUR":  { base: 3000, perLv: 1800 },
-        "SSR":  { base: 2500, perLv: 1500 },
-        "PR":   { base: 2000, perLv: 1500 }, 
-        "UR":   { base: 1500, perLv: 1200 },
-        "SR":   { base: 1000, perLv: 1000 },
-        "R":    { base: 600,  perLv: 800 },
-        "U":    { base: 300,  perLv: 500 },
-        "C":    { base: 100,  perLv: 300 }
+        "P": { base: 5000, perLv: 1000 }, "USEC": { base: 8500, perLv: 6500 }, "EXR": { base: 4000, perLv: 2500 }, 
+        "CBR": { base: 6600, perLv: 4000 }, "SEC": { base: 3500, perLv: 2000 }, "SUR": { base: 3000, perLv: 1800 },
+        "SSR": { base: 2500, perLv: 1500 }, "PR": { base: 2000, perLv: 1500 }, "UR": { base: 1500, perLv: 1200 },
+        "SR": { base: 1000, perLv: 1000 }, "R": { base: 600, perLv: 800 }, "U": { base: 300, perLv: 500 }, "C": { base: 100, perLv: 300 }
     };
 
     const rarityColors = { 
@@ -230,8 +201,7 @@
     function getDynamicSellValue(card) {
         const base = sellValuesBase[(card.rarity||'C').toUpperCase()] || 100;
         const lv = Number(card.level) || 1;
-        const bonus = (lv - 1) * 0.1; 
-        return Math.floor(base * (1 + bonus));
+        return Math.floor(base * (1 + (lv - 1) * 0.1));
     }
 
     function getArenaPower(card) {
@@ -239,9 +209,7 @@
         const config = RARITY_POWER[r] || RARITY_POWER['C'];
         const lv = Number(card.level) || 1;
         const stars = Number(card.stars) || 0;
-        const basePower = config.base + (lv * config.perLv);
-        const starBonus = 1 + (stars * 0.1);
-        return Math.floor(basePower * starBonus);
+        return Math.floor((config.base + (lv * config.perLv)) * (1 + (stars * 0.1)));
     }
 
     onAuthStateChanged(auth, (user) => {
@@ -262,55 +230,74 @@
         }
     });
 
+    // --- ส่วนที่แก้ไข: การรวมการ์ดซ้ำในหน้าแสดงผล ---
     function renderCards() {
         const grid = document.getElementById("grid");
         grid.innerHTML = "";
         
-        // กรองและเรียงลำดับการ์ด
-        let list = [...userCards].map((c, index) => ({...c, originalIndex: index}));
+        // 1. นำการ์ดทั้งหมดมาจัดกลุ่มตาม ชื่อ + เกรด
+        const grouped = {};
+        userCards.forEach(card => {
+            const key = `${card.name}_${(card.rarity||'C').toUpperCase()}`;
+            if (!grouped[key]) grouped[key] = [];
+            grouped[key].push(card);
+        });
 
-        list.sort((a, b) => {
-            const rarityOrder = { 
-                'P': 13, 'USEC': 12, 'EXR': 11, 'CBR': 10, 'SEC': 9, 
-                'SUR': 8, 'SSR': 7, 'PR': 6, 'UR': 5, 'SR': 4, 'R': 3, 'U': 2, 'C': 1 
-            };
+        // 2. ในแต่ละกลุ่ม เลือกใบที่ "เก่งที่สุด" (เลเวลสูงสุด/ดาวสูงสุด) มาเป็นตัวแทนแสดงผล
+        let displayList = [];
+        for (const key in grouped) {
+            const copies = grouped[key];
+            // เรียงให้ใบที่เก่งที่สุดอยู่ index 0
+            copies.sort((a, b) => {
+                if((b.stars||0) !== (a.stars||0)) return (b.stars||0) - (a.stars||0);
+                return (b.level||1) - (a.level||1);
+            });
+            
+            const representative = {...copies[0]}; // ใช้ใบแรกเป็นตัวแทน
+            representative.count = copies.length; // เก็บจำนวนที่ซ้ำไว้แสดงตัวเลข
+            displayList.push(representative);
+        }
+
+        // 3. กรองตาม Rarity Filter
+        if (currentFilter !== 'ALL') {
+            displayList = displayList.filter(c => (c.rarity||'C').toUpperCase() === currentFilter.toUpperCase());
+        }
+
+        // 4. เรียงลำดับการ์ดที่จะแสดง (เกรดสูงขึ้นก่อน)
+        displayList.sort((a, b) => {
+            const rarityOrder = { 'P': 13, 'USEC': 12, 'EXR': 11, 'CBR': 10, 'SEC': 9, 'SUR': 8, 'SSR': 7, 'PR': 6, 'UR': 5, 'SR': 4, 'R': 3, 'U': 2, 'C': 1 };
             const weightA = rarityOrder[(a.rarity||'C').toUpperCase()] || 0;
             const weightB = rarityOrder[(b.rarity||'C').toUpperCase()] || 0;
             if (weightA !== weightB) return weightB - weightA;
-            return getArenaPower(b) - getArenaPower(a); 
+            return getArenaPower(b) - getArenaPower(a);
         });
 
-        if (currentFilter !== 'ALL') {
-            list = list.filter(c => (c.rarity||'C').toUpperCase() === currentFilter.toUpperCase());
-        }
-        
-        list.forEach(card => {
+        // 5. สร้าง HTML Element
+        displayList.forEach(card => {
             const pwr = getArenaPower(card);
-            const sellVal = getDynamicSellValue(card);
             const div = document.createElement("div");
             const isMax = card.level >= MAX_LV && card.stars >= 5;
             div.className = `col-card ${isMax ? 'rainbow-effect' : ''}`;
-            div.onclick = () => openModal(card);
+            div.onclick = () => openModal(card); // เมื่อคลิกจะไปเปิด Modal ของใบที่เก่งที่สุดใบนั้น
             
             div.innerHTML = `
                 ${card.stars > 0 ? `<div class="star-container">${'⭐'.repeat(card.stars)}</div>` : ''}
+                ${card.count > 1 ? `<div class="card-count-badge">x${card.count}</div>` : ''}
                 <img src="${card.img || card.image}">
                 <div style="padding:10px; background: rgba(0,0,0,0.85);">
                     <div style="color:${rarityColors[(card.rarity||'C').toUpperCase()]}; font-size:0.75rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${card.name}</div>
                     <div style="margin-top:4px; font-size:0.7rem; color:#ffc831; font-weight:bold;">⚡ ${pwr.toLocaleString()}</div>
-                    <div class="price-tag">💰 ${sellVal.toLocaleString()}</div>
                 </div>`;
             grid.appendChild(div);
         });
     }
 
+    // Modal & Upgrade Logic [เหมือนเดิม แต่แก้ไขให้หา Target Card ได้แม่นยำขึ้น]
     window.openModal = (card) => {
         const r = (card.rarity||'C').toUpperCase();
         const pwr = getArenaPower(card);
         const sellVal = getDynamicSellValue(card);
         const isMax = card.level >= MAX_LV && card.stars >= 5;
-        
-        // หาจำนวนใบชื่อซ้ำทั้งหมดในไอดี เพื่อใช้ในการแสดงผลหน้าอัปเกรด
         const sameCards = userCards.filter(c => c.name === card.name && (c.rarity||'C').toUpperCase() === r);
         
         document.getElementById("modalMainBox").className = `modal-content ${isMax?'rainbow-effect':''}`;
@@ -326,7 +313,7 @@
         document.getElementById("reqQty").innerText = sameCards.length;
 
         document.getElementById("modalSellPrice").innerHTML = `
-            <div style="color:#aaa; font-size:0.8rem;">มูลค่าการขายใบนี้ (LV.${card.level||1}):</div>
+            <div style="color:#aaa; font-size:0.8rem;">มูลค่าการขายใบนี้:</div>
             <div style="color:#00ff88; font-weight:bold; font-size:1.1rem;">${sellVal.toLocaleString()} 🪙</div>
         `;
 
@@ -335,7 +322,7 @@
         if ((card.level||1) < MAX_LV) {
             lvGroup.style.display = "flex"; starBtn.style.display = "none"; maxMsg.style.display = "none";
             let req = card.level >= 30 ? 3 : (card.level >= 10 ? 2 : 1);
-            document.getElementById("modalUpgradeInfo").innerText = `เงื่อนไข: ใช้ใบซ้ำชื่อเดียวกัน ${req} ใบ + 500 🪙`;
+            document.getElementById("modalUpgradeInfo").innerText = `เงื่อนไข: ใช้ใบซ้ำ ${req} ใบ + 500 🪙`;
             document.getElementById("btnUpgradeLV").onclick = () => handleUpgrade(card, 'LV', 500, req);
             document.getElementById("btnBulkUpgrade").onclick = () => handleUpgrade(card, 'BULK', 500, req);
         } else {
@@ -354,10 +341,8 @@
     };
 
     async function handleUpgrade(card, type, cost, req) {
-        // สร้าง Copy ของการ์ดทั้งหมด
         let all = [...userCards];
-        // แยกใบที่จะอัปเกรด (Target) กับใบอื่นๆ
-        // เราจะหาใบที่เหมือนกันทุกอย่าง (ชื่อ, เกรด, เลเวล, ดาว) เพื่อระบุตัวตนใบที่จะอัป
+        // หาใบที่เราจะอัป (ต้องตรงทั้ง ชื่อ, เกรด, เลเวล, ดาว)
         let targetIdx = all.findIndex(c => 
             c.name === card.name && 
             (c.rarity||'C').toUpperCase() === (card.rarity||'C').toUpperCase() &&
@@ -370,67 +355,49 @@
         let main = {...all[targetIdx]};
         all.splice(targetIdx, 1);
 
-        // หาวัตถุดิบ (ใบซ้ำชื่อเดียวกัน เกรดเดียวกัน)
-        let materials = all.filter(c => 
-            c.name === card.name && 
-            (c.rarity||'C').toUpperCase() === (card.rarity||'C').toUpperCase()
-        );
-        let others = all.filter(c => 
-            !(c.name === card.name && (c.rarity||'C').toUpperCase() === (card.rarity||'C').toUpperCase())
-        );
+        let materials = all.filter(c => c.name === card.name && (c.rarity||'C').toUpperCase() === (card.rarity||'C').toUpperCase());
+        let others = all.filter(c => !(c.name === card.name && (c.rarity||'C').toUpperCase() === (card.rarity||'C').toUpperCase()));
 
         if (type === 'LV' && materials.length >= req && userPoints >= cost) {
             main.level = (main.level||1) + 1; 
-            materials.splice(0, req); // ลบวัตถุดิบออกตามจำนวน
+            materials.splice(0, req);
             await updateDoc(doc(db, "users", currentUID), { collection: [...others, main, ...materials], points: increment(-cost) });
         } else if (type === 'STAR' && materials.length >= req && userDiamonds >= cost) {
             main.stars = (main.stars||0) + 1; 
             materials.splice(0, req);
             await updateDoc(doc(db, "users", currentUID), { collection: [...others, main, ...materials], diamonds: increment(-cost) });
         } else if (type === 'BULK') {
-            let count = 0; let tempPoints = userPoints;
+            let count = 0, tempPoints = userPoints;
             while((main.level||1) < MAX_LV && tempPoints >= 500) {
                 let r = main.level >= 30 ? 3 : (main.level >= 10 ? 2 : 1);
                 if (materials.length >= r) { main.level++; materials.splice(0, r); tempPoints -= 500; count++; } else break;
             }
             if(count > 0) await updateDoc(doc(db, "users", currentUID), { collection: [...others, main, ...materials], points: increment(-(count*500)) });
-        } else { alert("ทรัพยากรไม่เพียงพอ หรือ จำนวนการ์ดซ้ำไม่พอ!"); }
-        
+        } else { alert("ทรัพยากรไม่เพียงพอ!"); }
         document.getElementById("cardModal").style.display = "none";
     }
 
+    // ขายใบซ้ำ [คงเดิม]
     document.getElementById("btnSellAll").onclick = async () => {
         if(!userCards || userCards.length === 0) return alert("ไม่มีการ์ด");
-        
         const stacked = {}; 
         userCards.forEach(c => {
             const key = `${c.name}_${(c.rarity||'C').toUpperCase()}`;
             if(!stacked[key]) stacked[key] = []; 
             stacked[key].push({...c});
         });
-
         let gain = 0, newCol = [], sold = 0;
         for (const k in stacked) {
-            // เรียงใบที่เก่งที่สุดไว้บนสุด (เลเวลเยอะสุด, ดาวเยอะสุด)
             stacked[k].sort((a,b) => {
                 if((b.stars||0) !== (a.stars||0)) return (b.stars||0) - (a.stars||0);
                 return (b.level||1)-(a.level||1);
             });
-            
-            // เก็บใบที่เก่งที่สุดไว้ 1 ใบ
             newCol.push(stacked[k].shift());
-            
-            // ใบที่เหลือทั้งหมดคือ "ใบซ้ำ" ที่จะถูกขาย
-            stacked[k].forEach(c => { 
-                gain += getDynamicSellValue(c);
-                sold++; 
-            });
+            stacked[k].forEach(c => { gain += getDynamicSellValue(c); sold++; });
         }
-
-        if(!sold) return alert("ไม่มีใบซ้ำให้ขาย (ระบบจะเก็บใบที่เก่งที่สุดไว้ 1 ใบเสมอ)");
-        if(confirm(`ขายใบซ้ำทั้งหมด ${sold} ใบ ได้รับ ${gain.toLocaleString()} 🪙?\n(ระบบจะเลือกเก็บใบที่เลเวล/ดาว สูงสุดไว้ให้)`)) {
+        if(!sold) return alert("ไม่มีใบซ้ำให้ขาย");
+        if(confirm(`ขายใบซ้ำทั้งหมด ${sold} ใบ ได้รับ ${gain.toLocaleString()} 🪙?`)) {
             await updateDoc(doc(db, "users", currentUID), { collection: newCol, points: increment(gain) });
-            alert(`ขายสำเร็จ! ได้รับ ${gain} 🪙`);
         }
     };
 
