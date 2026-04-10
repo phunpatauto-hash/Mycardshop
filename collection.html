@@ -270,7 +270,7 @@
         });
 
         let list = Object.values(stacked).sort((a, b) => {
-            const rarityOrder = { 'P': 10, 'EXR': 9, 'SEC': 8, 'SUR': 7, 'SSR': 6, 'UR': 5, 'SR': 4, 'R': 3, 'U': 2, 'C': 1 };
+            const rarityOrder = { 'P': 13, 'USEC': 12, 'EXR': 11, 'CBR': 10, 'SEC': 9, 'SUR': 8, 'SSR': 7, 'PR': 6, 'UR': 5, 'SR': 4, 'R': 3, 'U': 2, 'C': 1 };
             const weightA = rarityOrder[a.rarity.toUpperCase()] || 0;
             const weightB = rarityOrder[b.rarity.toUpperCase()] || 0;
             if (weightA !== weightB) return weightB - weightA;
