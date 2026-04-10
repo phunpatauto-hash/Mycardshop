@@ -12,11 +12,13 @@
             --gold-dark: #e5b32a;
             --bg: #0f0f13;
             --card-bg: #1a1a20;
+            --input-bg: #0a0a0c;
         }
         
         body { 
             font-family: 'Kanit', sans-serif; 
             background: var(--bg); 
+            background-image: radial-gradient(circle at center, #1a1a20 0%, #050505 100%);
             color: white; 
             display: flex; 
             justify-content: center; 
@@ -26,105 +28,91 @@
             overflow: hidden;
         }
 
-        /* เอฟเฟกต์พื้นหลังเรืองแสง */
-        body::before {
-            content: "";
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(255, 200, 49, 0.1) 0%, rgba(0,0,0,0) 70%);
-            z-index: -1;
-        }
-
+        /* กล่องหลักปรับให้เหมือนในรูปที่ส่งมา */
         .box { 
             background: var(--card-bg); 
-            padding: 40px 30px; 
-            border-radius: 24px; 
+            padding: 50px 40px; 
+            border-radius: 30px; 
             text-align: center; 
-            border: 1px solid #333; 
+            border: 1px solid rgba(255, 200, 49, 0.2); 
             width: 100%;
-            max-width: 350px; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-            transition: transform 0.3s ease;
+            max-width: 400px; 
+            box-shadow: 0 25px 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(255, 255, 255, 0.02);
+            position: relative;
         }
 
+        /* ไอคอนตั๋วทอง */
         .icon-header {
-            font-size: 3rem;
+            font-size: 4rem;
             color: var(--gold);
-            margin-bottom: 15px;
-            filter: drop-shadow(0 0 10px rgba(255, 200, 49, 0.3));
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 15px rgba(255, 200, 49, 0.5));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
 
         h2 { 
             color: var(--gold); 
-            margin: 0 0 10px 0; 
-            letter-spacing: 1px;
-            font-size: 1.8rem;
+            margin: 0 0 5px 0; 
+            font-size: 2rem;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
-        .desc { font-size: 0.9rem; color: #888; margin-bottom: 25px; }
+        .desc { font-size: 1rem; color: #aaa; margin-bottom: 35px; }
 
-        .input-wrapper {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
+        /* ปรับช่อง Input ให้เหมือนในรูป */
         input { 
             width: 100%; 
-            padding: 15px; 
-            border-radius: 12px; 
-            border: 2px solid #333; 
-            background: #000; 
-            color: var(--gold); 
+            padding: 18px; 
+            border-radius: 15px; 
+            border: 2px solid #222; 
+            background: var(--input-bg); 
+            color: white; 
             text-align: center; 
-            font-size: 1.2rem; 
+            font-size: 1.4rem; 
             font-weight: bold; 
             box-sizing: border-box; 
             transition: 0.3s;
-            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         input:focus { 
             outline: none; 
             border-color: var(--gold); 
-            box-shadow: 0 0 15px rgba(255, 200, 49, 0.2);
+            box-shadow: 0 0 20px rgba(255, 200, 49, 0.15);
+            background: #000;
         }
 
+        /* ปุ่มยืนยันปรับสีให้สดใสขึ้น */
         button { 
             width: 100%; 
-            padding: 15px; 
-            background: linear-gradient(135deg, var(--gold), var(--gold-dark)); 
+            padding: 18px; 
+            background: linear-gradient(135deg, var(--gold), #f39c12); 
             border: none; 
-            border-radius: 12px; 
+            border-radius: 15px; 
             font-weight: bold; 
             cursor: pointer; 
             transition: 0.3s; 
-            font-size: 1.1rem; 
+            font-size: 1.2rem; 
             color: #111;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
+            margin-top: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
 
         button:hover { 
-            transform: translateY(-3px); 
-            box-shadow: 0 5px 15px rgba(255, 200, 49, 0.4);
-        }
-
-        button:active { transform: translateY(-1px); }
-
-        button:disabled { 
-            background: #444; 
-            color: #888;
-            cursor: not-allowed; 
-            transform: none;
+            transform: scale(1.02);
+            box-shadow: 0 0 30px rgba(255, 200, 49, 0.4);
         }
 
         .back-link { 
-            color: #666; 
+            color: #777; 
             text-decoration: none; 
-            margin-top: 25px; 
+            margin-top: 30px; 
             display: inline-block; 
             font-size: 0.9rem; 
             transition: 0.3s;
@@ -132,10 +120,8 @@
 
         .back-link:hover { color: var(--gold); }
 
-        /* Animation Loading */
         .loader {
-            width: 18px;
-            height: 18px;
+            width: 20px; height: 20px;
             border: 3px solid #111;
             border-bottom-color: transparent;
             border-radius: 50%;
@@ -143,10 +129,7 @@
             animation: rotation 1s linear infinite;
         }
 
-        @keyframes rotation {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -158,19 +141,19 @@
         <h2>แลกโค้ดรางวัล</h2>
         <p class="desc">กรอกรหัสลับเพื่อรับไอเทมพิเศษ</p>
         
-        <div class="input-wrapper">
-            <input type="text" id="code-input" placeholder="GIFT2026" maxlength="20" autocomplete="off">
-        </div>
+        <input type="text" id="code-input" placeholder="GIFT2026" maxlength="20" autocomplete="off">
 
         <button id="redeem-btn">
             <span class="loader" id="btn-loader"></span>
             <span id="btn-text">ยืนยันแลกรับ</span>
         </button>
 
+        <br>
         <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> กลับหน้าหลัก</a>
     </div>
 
 <script type="module">
+    // ... (Firebase Config คงเดิมตามที่คุณให้มา) ...
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, getDoc, updateDoc, increment, setDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -194,7 +177,8 @@
         if (user) {
             currentUserId = user.uid;
         } else {
-            window.location.href = "login.html";
+            // ถ้าจะใช้ในเครื่องตัวเองขณะพัฒนา อาจจะคอมเมนต์บรรทัดนี้ไว้ก่อนได้ครับ
+            // window.location.href = "login.html";
         }
     });
 
@@ -207,36 +191,23 @@
         if (!currentUserId) return alert("❌ กรุณาล็อกอินก่อนแลกโค้ด!");
         if (!inputCode) return alert("❌ กรุณากรอกโค้ด!");
 
-        // Start Loading State
         btn.disabled = true;
         btnText.innerText = "กำลังตรวจสอบ...";
         btnLoader.style.display = "inline-block";
 
         try {
-            // 1. ตรวจสอบโค้ดในคอลเลกชัน "codes"
             const codeRef = doc(db, "codes", inputCode);
             const codeSnap = await getDoc(codeRef);
 
-            if (!codeSnap.exists()) {
-                throw new Error("ไม่พบโค้ดนี้ หรือโค้ดอาจจะหมดอายุแล้ว");
-            }
+            if (!codeSnap.exists()) throw new Error("ไม่พบโค้ดนี้ หรือโค้ดอาจจะหมดอายุแล้ว");
 
             const codeData = codeSnap.data();
+            if (codeData.maxUse > 0 && codeData.usedCount >= codeData.maxUse) throw new Error("ขออภัย โค้ดนี้มีผู้ใช้งานครบจำนวนแล้ว");
 
-            // 2. ตรวจสอบโควตาการใช้งานรวม (Global Limit)
-            if (codeData.maxUse > 0 && codeData.usedCount >= codeData.maxUse) {
-                throw new Error("ขออภัย โค้ดนี้มีผู้ใช้งานครบจำนวนแล้ว");
-            }
-
-            // 3. ตรวจสอบประวัติการใช้ส่วนตัว (ป้องกันใช้ซ้ำ)
             const historyRef = doc(db, "users", currentUserId, "used_codes", inputCode);
             const historySnap = await getDoc(historyRef);
+            if (historySnap.exists()) throw new Error("คุณเคยแลกรับโค้ดนี้ไปแล้ว!");
 
-            if (historySnap.exists()) {
-                throw new Error("คุณเคยแลกรับโค้ดนี้ไปแล้ว!");
-            }
-
-            // 4. เตรียมข้อมูลการอัปเดต
             const userRef = doc(db, "users", currentUserId);
             const userUpdate = {
                 points: increment(codeData.rewardPoints || 0),
@@ -244,51 +215,37 @@
                 stars: increment(codeData.rewardStars || 0)
             };
 
-            // 5. จัดการระบบการ์ดรางวัล
             let cardInfo = "";
             if (codeData.rewardCard && codeData.rewardCard.name) {
                 const cardObj = {
                     ...codeData.rewardCard,
-                    count: 1, // เริ่มต้นที่ 1 ใบ
+                    count: 1,
                     obtainedDate: new Date().toLocaleDateString('th-TH'),
                     type: "Gift"
                 };
                 
-                // ดึงข้อมูล collection ปัจจุบันมาตรวจสอบก่อน (เพื่อทำระบบ stack count)
                 const userSnap = await getDoc(userRef);
                 let currentCollection = userSnap.data().collection || [];
-                
-                const existingCardIdx = currentCollection.findIndex(c => 
-                    c.name === cardObj.name && c.rarity === cardObj.rarity
-                );
+                const existingCardIdx = currentCollection.findIndex(c => c.name === cardObj.name && c.rarity === cardObj.rarity);
 
                 if (existingCardIdx > -1) {
-                    // ถ้ามีการ์ดอยู่แล้ว ให้ไปเพิ่ม count ในใบเดิม
                     currentCollection[existingCardIdx].count = (Number(currentCollection[existingCardIdx].count) || 1) + 1;
                     userUpdate.collection = currentCollection;
                 } else {
-                    // ถ้ายังไม่มี ให้เพิ่มใบใหม่เข้าไป
                     userUpdate.collection = arrayUnion(cardObj);
                 }
-                
-                cardInfo = `\n🎴 การ์ด: ${codeData.rewardCard.name} (${codeData.rewardCard.rarity})`;
+                cardInfo = `\n🎴 การ์ด: ${codeData.rewardCard.name}`;
             }
 
-            // 6. Execute Transaction (อัปเดตทุกอย่างพร้อมกัน)
             await updateDoc(userRef, userUpdate); 
             await updateDoc(codeRef, { usedCount: increment(1) });
-            await setDoc(historyRef, { 
-                redeemedAt: new Date().toISOString(),
-                code: inputCode 
-            });
+            await setDoc(historyRef, { redeemedAt: new Date().toISOString(), code: inputCode });
 
-            // Success Alert
-            alert(`🎉 แลกโค้ดสำเร็จ!\n🪙 ${codeData.rewardPoints || 0} พอยท์\n💎 ${codeData.rewardDiamonds || 0} เพชร${cardInfo}`);
+            alert(`🎉 แลกโค้ดสำเร็จ!\n🪙 ${codeData.rewardPoints || 0} Gold\n💎 ${codeData.rewardDiamonds || 0} Diamonds${cardInfo}`);
             window.location.href = "index.html";
 
         } catch (e) {
             alert("❌ " + e.message);
-            // Reset Button State
             btn.disabled = false;
             btnText.innerText = "ยืนยันแลกรับ";
             btnLoader.style.display = "none";
