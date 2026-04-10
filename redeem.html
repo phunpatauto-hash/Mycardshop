@@ -28,7 +28,6 @@
             overflow: hidden;
         }
 
-        /* กล่องหลักปรับให้เหมือนในรูปที่ส่งมา */
         .box { 
             background: var(--card-bg); 
             padding: 50px 40px; 
@@ -41,7 +40,6 @@
             position: relative;
         }
 
-        /* ไอคอนตั๋วทอง */
         .icon-header {
             font-size: 4rem;
             color: var(--gold);
@@ -65,7 +63,6 @@
 
         .desc { font-size: 1rem; color: #aaa; margin-bottom: 35px; }
 
-        /* ปรับช่อง Input ให้เหมือนในรูป */
         input { 
             width: 100%; 
             padding: 18px; 
@@ -88,7 +85,6 @@
             background: #000;
         }
 
-        /* ปุ่มยืนยันปรับสีให้สดใสขึ้น */
         button { 
             width: 100%; 
             padding: 18px; 
@@ -153,7 +149,6 @@
     </div>
 
 <script type="module">
-    // ... (Firebase Config คงเดิมตามที่คุณให้มา) ...
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, getDoc, updateDoc, increment, setDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -176,9 +171,6 @@
     onAuthStateChanged(auth, (user) => {
         if (user) {
             currentUserId = user.uid;
-        } else {
-            // ถ้าจะใช้ในเครื่องตัวเองขณะพัฒนา อาจจะคอมเมนต์บรรทัดนี้ไว้ก่อนได้ครับ
-            // window.location.href = "login.html";
         }
     });
 
@@ -211,26 +203,31 @@
             const userRef = doc(db, "users", currentUserId);
             const userUpdate = {
                 points: increment(codeData.rewardPoints || 0),
-                diamonds: increment(codeData.rewardDiamonds || 0),
-                stars: increment(codeData.rewardStars || 0)
+                diamonds: increment(codeData.rewardDiamonds || 0)
             };
 
             let cardInfo = "";
             if (codeData.rewardCard && codeData.rewardCard.name) {
+                // แก้ไขตรงนี้: เพิ่ม level และ stars เริ่มต้นเข้าไป
                 const cardObj = {
                     ...codeData.rewardCard,
-                    count: 1,
+                    level: 1, 
+                    stars: 0,
                     obtainedDate: new Date().toLocaleDateString('th-TH'),
                     type: "Gift"
                 };
                 
                 const userSnap = await getDoc(userRef);
-                let currentCollection = userSnap.data().collection || [];
+                const userData = userSnap.data();
+                let currentCollection = userData.collection || [];
+                
+                // เช็คว่ามีการ์ดชื่อและระดับนี้อยู่แล้วหรือไม่
                 const existingCardIdx = currentCollection.findIndex(c => c.name === cardObj.name && c.rarity === cardObj.rarity);
 
                 if (existingCardIdx > -1) {
-                    currentCollection[existingCardIdx].count = (Number(currentCollection[existingCardIdx].count) || 1) + 1;
-                    userUpdate.collection = currentCollection;
+                    // ถ้ามีแล้ว ไม่ต้องเพิ่มก้อนใหม่ แต่ให้ระบบ grouped ในหน้า Collection จัดการนับจำนวนเอง
+                    // หรือจะส่งไปเป็นใบใหม่เพื่อให้มันไปโผล่เป็น x2 ก็ได้
+                    userUpdate.collection = arrayUnion(cardObj);
                 } else {
                     userUpdate.collection = arrayUnion(cardObj);
                 }
