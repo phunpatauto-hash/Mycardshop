@@ -395,7 +395,7 @@
     };
 
     const fCon = document.getElementById("filterContainer");
-    ['ALL','P','EXR','SEC','SUR','SSR','UR','SR','R','U','C'].forEach(r => {
+    ['ALL','P','EXR','USEC','SEC','CBR','SUR','SSR','PR','UR','SR','R','U','C'].forEach(r => {
         const b = document.createElement("button"); b.className = `filter-btn ${r==='ALL'?'active':''}`; b.innerText = r;
         b.onclick = () => { currentFilter = r; document.querySelectorAll('.filter-btn').forEach(x => x.classList.remove('active')); b.classList.add('active'); renderCards(); };
         fCon.appendChild(b);
