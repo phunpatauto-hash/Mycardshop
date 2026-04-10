@@ -208,30 +208,18 @@
 
             let cardInfo = "";
             if (codeData.rewardCard && codeData.rewardCard.name) {
-                // แก้ไขตรงนี้: เพิ่ม level และ stars เริ่มต้นเข้าไป
+                // แก้ไขจุดนี้: ดึงค่า count จาก database มาใช้งาน
                 const cardObj = {
                     ...codeData.rewardCard,
                     level: 1, 
                     stars: 0,
+                    count: Number(codeData.rewardCard.count) || 1, // ดึงค่าจาก Firestore ถ้าไม่มีให้เป็น 1
                     obtainedDate: new Date().toLocaleDateString('th-TH'),
                     type: "Gift"
                 };
                 
-                const userSnap = await getDoc(userRef);
-                const userData = userSnap.data();
-                let currentCollection = userData.collection || [];
-                
-                // เช็คว่ามีการ์ดชื่อและระดับนี้อยู่แล้วหรือไม่
-                const existingCardIdx = currentCollection.findIndex(c => c.name === cardObj.name && c.rarity === cardObj.rarity);
-
-                if (existingCardIdx > -1) {
-                    // ถ้ามีแล้ว ไม่ต้องเพิ่มก้อนใหม่ แต่ให้ระบบ grouped ในหน้า Collection จัดการนับจำนวนเอง
-                    // หรือจะส่งไปเป็นใบใหม่เพื่อให้มันไปโผล่เป็น x2 ก็ได้
-                    userUpdate.collection = arrayUnion(cardObj);
-                } else {
-                    userUpdate.collection = arrayUnion(cardObj);
-                }
-                cardInfo = `\n🎴 การ์ด: ${codeData.rewardCard.name}`;
+                userUpdate.collection = arrayUnion(cardObj);
+                cardInfo = `\n🎴 การ์ด: ${codeData.rewardCard.name} (x${cardObj.count})`;
             }
 
             await updateDoc(userRef, userUpdate); 
