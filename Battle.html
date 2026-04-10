@@ -53,7 +53,12 @@
         .card-row { display: flex; gap: 8px; margin: 10px 0; justify-content: center; flex-wrap: wrap; }
         .mini-card { width: 75px; aspect-ratio: 2/3; background: #222; border-radius: 8px; border: 1px solid #444; overflow: hidden; position: relative; transition: 0.3s; cursor: pointer; }
         .mini-card img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* Rarity Borders */
+        .rarity-usec { border: 2px solid #ffffff !important; box-shadow: 0 0 15px #ffffff, 0 0 5px #ffc831; }
         .rarity-exr { border: 2px solid #ff00ff !important; box-shadow: 0 0 10px #ff00ff; }
+        .rarity-cbr { border: 2px solid #ff4d4d !important; box-shadow: 0 0 10px #ff4d4d; }
+        
         .stat-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.8); display: flex; flex-direction: column; padding: 2px; font-size: 0.6rem; text-align: center; color: #ffc831; }
         .lv-badge { position: absolute; top: 2px; right: 2px; background: #ffc831; color: black; font-size: 0.55rem; padding: 1px 4px; border-radius: 4px; font-weight: bold; z-index: 2; }
         .selected-glow { border: 2.5px solid #ffc831 !important; transform: scale(1.05); z-index: 5; box-shadow: 0 0 20px #ffc831; }
@@ -174,7 +179,7 @@
 
         <div id="view-defense" class="ui-card" style="text-align: center;">
             <h3 style="color:#00ff88;">🛡️ จัดทีมตั้งรับ (Defense Team)</h3>
-            <p style="font-size: 0.8rem; color: #aaa;">ทีมนี้จะใช้ป้องกันเมื่อมีคนอื่นมาท้าดวลคุณ</p>
+            <p style="font-size: 0.8rem; color: #aaa;">ทีมนี้จะใช้ป้องกันเมื่อมีคนอื่นมาท้าดวลคุณ (USEC จำกัด 1 ใบ)</p>
             <div id="defense-slots" class="card-row" style="min-height: 120px; border: 1px dashed #444; border-radius: 10px; padding: 10px;"></div>
             <button class="btn-action" onclick="saveDefense()">💾 บันทึกทีมป้องกัน</button>
             <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
@@ -207,28 +212,17 @@
         <div class="modal-content">
             <span class="close-modal" onclick="toggleModal('prepModal', false)">&times;</span>
             <h3 style="color:#ffc831; text-align:center;">🚩 จัดทีมบุก (เลือก 5 ใบ)</h3>
+            <p style="text-align: center; font-size: 0.8rem; color: #ff4d4d;">* จำกัดระดับ USEC 1 ใบต่อทีม</p>
             <div id="prep-slots" class="card-row" style="min-height: 120px; border: 1px dashed #444; border-radius: 10px; padding: 10px;"></div>
             <button id="start-btn" class="btn-action" disabled onclick="handleStartBattle()">⚔️ เริ่มการท้าดวล!</button>
             <div id="prep-pool" class="card-row" style="margin-top:20px;"></div>
         </div>
     </div>
 
-    <div id="seasonRewardModal" class="modal">
-        <div class="modal-content" style="border-color: #00ff88;">
-            <h2 style="color: #00ff88; text-align: center;">🎉 สิ้นสุดการแข่งขัน!</h2>
-            <p style="text-align: center;">ครบกำหนดซีซั่น 20 วันแล้ว นี่คือผลลัพธ์ของคุณ:</p>
-            <div class="reward-highlight">
-                <div id="final-rank-display" style="font-size: 1.5rem; margin-bottom: 10px; font-weight: bold;">--</div>
-                <div style="font-size: 1.2rem; color: #ffc831;">รางวัลที่ได้รับ: <b id="final-coin-reward">🪙 0</b></div>
-            </div>
-            <button class="btn-action" onclick="claimSeasonReward()">รับรางวัลและเริ่มซีซั่นใหม่ ⚔️</button>
-        </div>
-    </div>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, onSnapshot, updateDoc, increment, collection, query, orderBy, limit, getDocs, getDoc, addDoc, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, updateDoc, increment, collection, query, orderBy, limit, getDocs, getDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = { 
         apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM", 
@@ -243,13 +237,15 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // ตารางพลัง Rarity
+    // อัปเดตตารางพลัง Rarity พร้อมระดับใหม่
     const RARITY_POWER = {
-        "P":   { base: 5000, perLv: 1000 },
+        "USEC":{ base: 6500, perLv: 3500 }, // สูงกว่า EXR
         "EXR": { base: 4000, perLv: 2500 }, 
+        "CBR": { base: 3600, perLv: 2200 }, // รองจาก EXR
         "SEC": { base: 3200, perLv: 2000 },
         "SUR": { base: 2600, perLv: 1800 },
         "SSR": { base: 2000, perLv: 1500 },
+        "PR":  { base: 1800, perLv: 1350 }, // รองจาก SSR
         "UR":  { base: 1500, perLv: 1200 },
         "SR":  { base: 1000, perLv: 1000 },
         "R":   { base: 600,  perLv: 800 },
@@ -257,7 +253,6 @@
         "C":   { base: 100,  perLv: 300 }
     };
 
-    // RANKS ครบ 19 ระดับ
     const RANKS = [
         { name: "BRONZE 3", min: 0, icon: "🥉", color: "#cd7f32", reward: {coin: 1000} },
         { name: "BRONZE 2", min: 100, icon: "🥉", color: "#cd7f32", reward: {coin: 2500} },
@@ -290,16 +285,13 @@
     let userDoc = null, tempAtk = [], tempDef = [], targetOpp = null;
     const SEASON_LIMIT = 20 * 24 * 60 * 60 * 1000;
 
-    // แก้ไขการคำนวณพลังให้รวม "ระบบดาว" (Stars)
     const getPower = (c) => {
         if(!c) return 0;
         const config = RARITY_POWER[c.rarity] || RARITY_POWER["C"];
         const level = Number(c.level || 1);
-        const stars = Number(c.stars || 0); // ดึงค่าดาว
-        
+        const stars = Number(c.stars || 0); 
         const basePower = config.base + (level * config.perLv);
-        const starBonus = 1 + (stars * 0.1); // เพิ่มพลังดาวละ 10%
-        
+        const starBonus = 1 + (stars * 0.1); 
         return Math.floor(basePower * starBonus);
     };
 
@@ -311,25 +303,27 @@
         return rank;
     };
     
-    // แก้ไข CardHTML ให้แสดงผลไอคอนดาว
     const cardHTML = (c, selected = false) => {
         if(!c) return `<div class="mini-card" style="border: 1px dashed #333; background: transparent;"></div>`;
         const imgUrl = c.img || c.image || 'https://via.placeholder.com/150';
-        if(!c.element) {
-            const keys = Object.keys(ELEMENTS);
-            c.element = keys[Math.floor(Math.random() * keys.length)];
-        }
-        const elemInfo = ELEMENTS[c.element] || ELEMENTS["Fire"];
-        const starDisplay = "⭐".repeat(c.stars || 0); // สร้างสตริงของดาว
+        const elemInfo = ELEMENTS[c.element || "Fire"] || ELEMENTS["Fire"];
+        const starDisplay = "⭐".repeat(c.stars || 0);
+        
+        // CSS class ตาม Rarity
+        let rarityClass = "";
+        if(c.rarity === "USEC") rarityClass = "rarity-usec";
+        else if(c.rarity === "EXR") rarityClass = "rarity-exr";
+        else if(c.rarity === "CBR") rarityClass = "rarity-cbr";
 
         return `
-        <div class="mini-card ${c.rarity==='EXR'?'rarity-exr':''} ${selected?'selected-glow':''}">
+        <div class="mini-card ${rarityClass} ${selected?'selected-glow':''}">
             <div class="elem-icon" style="color:${elemInfo.color}">${elemInfo.icon}</div>
             <img src="${imgUrl}" onerror="this.src='https://picsum.photos/seed/error/150/225'">
             <div class="lv-badge">Lv.${c.level || 1}</div>
             <div style="position: absolute; top: 15px; width: 100%; text-align: center; font-size: 0.5rem; z-index: 2; text-shadow: 0 0 2px black;">
                 ${starDisplay}
             </div>
+            <div style="position: absolute; top: 2px; left: 18px; font-size: 0.5rem; font-weight: bold; color: #ffc831; text-shadow: 0 0 2px black;">${c.rarity}</div>
             <div class="stat-overlay">⚡ ${getPower(c).toLocaleString()}</div>
         </div>`;
     };
@@ -343,42 +337,11 @@
                 if(!userDoc.collection) userDoc.collection = [];
                 if (tempDef.length === 0 && userDoc.defenseTeam) { tempDef = [...userDoc.defenseTeam]; }
                 updateUI();
-                checkSeasonStatus();
             }
         });
         startSeasonTimer();
         setTimeout(() => showView('lobby'), 500);
     });
-
-    async function checkSeasonStatus() {
-        if (!userDoc.seasonStartTime) {
-            await updateDoc(doc(db, "users", auth.currentUser.uid), { seasonStartTime: Date.now() });
-            return;
-        }
-        const now = Date.now();
-        const elapsed = now - userDoc.seasonStartTime;
-        if (elapsed >= SEASON_LIMIT) {
-            const currentRank = getRankInfo(userDoc.trophies || 0);
-            document.getElementById("final-rank-display").innerText = `${currentRank.icon} ${currentRank.name}`;
-            document.getElementById("final-coin-reward").innerText = `🪙 ${currentRank.reward.coin.toLocaleString()}`;
-            toggleModal("seasonRewardModal", true);
-        }
-    }
-
-    window.claimSeasonReward = async function() {
-        const currentRank = getRankInfo(userDoc.trophies || 0);
-        try {
-            await updateDoc(doc(db, "users", auth.currentUser.uid), {
-                points: increment(currentRank.reward.coin),
-                trophies: 0,
-                seasonStartTime: Date.now()
-            });
-            toggleModal("seasonRewardModal", false);
-            alert("รับรางวัลสำเร็จ! ถ้วยรางวัลถูกรีเซ็ตเพื่อเริ่มซีซั่นใหม่");
-        } catch (e) {
-            alert("เกิดข้อผิดพลาดในการรับรางวัล");
-        }
-    }
 
     function updateUI() {
         if(!userDoc) return;
@@ -412,25 +375,6 @@
         }, 1000);
     }
 
-    async function generateBot() {
-        const botNames = ["Shadow_King", "Zero_Bot", "Arena_Master", "Ghost_Rider", "Cyber_Slayer"];
-        const botTrophies = Math.max(0, (userDoc?.trophies || 0) + (Math.floor(Math.random() * 500) - 250));
-        const botTeam = [];
-        const myCollection = userDoc?.collection || [];
-        let botLevel = (botTrophies >= 12000) ? 40 : Math.max(1, Math.floor(botTrophies / 300) + 5);
-        for(let i=0; i<5; i++) {
-            const randomCard = myCollection[Math.floor(Math.random() * myCollection.length)];
-            const keys = Object.keys(ELEMENTS);
-            botTeam.push({ 
-                name: "BotCard" + i, level: botLevel, rarity: Math.random() > 0.7 ? "SSR" : "SR", 
-                element: keys[Math.floor(Math.random() * keys.length)],
-                stars: Math.floor(Math.random() * 3), // สุ่มดาวให้บอท
-                img: randomCard ? (randomCard.img || randomCard.image) : `https://picsum.photos/seed/bot${i}/150/225` 
-            });
-        }
-        return { id: "bot_" + Math.random().toString(36).substr(2, 9), username: botNames[Math.floor(Math.random() * botNames.length)], trophies: botTrophies, defenseTeam: botTeam, isBot: true };
-    }
-
     window.showView = function(v) {
         ["lobby", "defense", "history", "leaderboard", "battle"].forEach(id => {
             const el = document.getElementById(`view-${id}`);
@@ -457,20 +401,16 @@
                     if(data.defenseTeam && data.defenseTeam.length === 5) players.push({id: d.id, ...data});
                 }
             });
-            while(players.length < 5) { players.push(await generateBot()); }
             list.innerHTML = "";
             players.sort((a,b) => (b.trophies || 0) - (a.trophies || 0));
             players.forEach(u => {
                 const pwr = u.defenseTeam.reduce((s, c) => s + getPower(c), 0);
                 const rInfo = getRankInfo(u.trophies || 0);
-                const rankDisplay = rInfo.color === 'rainbow' 
-                    ? `<span class="rank-rainbow">${rInfo.icon} ${u.username}</span>` 
-                    : `<b style="color:${rInfo.color}">${rInfo.icon} ${u.username}</b>`;
                 const div = document.createElement("div");
                 div.className = "ui-card";
                 div.innerHTML = `
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                        <span>${rankDisplay} ${u.isBot ? '<span class="bot-tag">BOT</span>' : ''}</span>
+                        <b>${rInfo.icon} ${u.username}</b>
                         <span style="color:#aaa; font-size:0.8rem;">🏆 ${u.trophies || 0}</span>
                     </div>
                     <div class="card-row" style="justify-content:flex-start; transform: scale(0.85); transform-origin: left center;">
@@ -478,17 +418,15 @@
                     </div>
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
                         <span style="color:#ffc831; font-weight:bold;">DEF: ${pwr.toLocaleString()}</span>
-                        <button class="btn-action" style="width:120px; margin:0;" onclick="openPrep('${u.id}', ${u.isBot})">ท้าชิง ⚔️</button>
+                        <button class="btn-action" style="width:120px; margin:0;" onclick="openPrep('${u.id}')">ท้าชิง ⚔️</button>
                     </div>`;
                 list.appendChild(div);
-                if(u.isBot) window["bot_data_"+u.id] = u;
             });
         } catch (err) { list.innerHTML = "Error: " + err.message; }
     }
 
-    window.openPrep = async function(id, isBot) {
-        if(isBot) targetOpp = window["bot_data_"+id];
-        else { const snap = await getDoc(doc(db, "users", id)); targetOpp = {id, ...snap.data()}; }
+    window.openPrep = async function(id) {
+        const snap = await getDoc(doc(db, "users", id)); targetOpp = {id, ...snap.data()};
         tempAtk = []; toggleModal('prepModal', true); renderPrep();
     };
 
@@ -500,80 +438,62 @@
         const oRow = document.getElementById("opp-battle-row");
         const arena = document.getElementById("arena-box");
         const flash = document.getElementById("flash-effect");
-        const vsLabel = document.getElementById("vs-label");
         exit.style.display = "none";
         log.innerHTML = "<span style='color:#aaa'>⚔️ เตรียมตัวเข้าสู่สนามประลอง...</span>";
-        vsLabel.style.transform = "scale(1)";
         oRow.innerHTML = targetOpp.defenseTeam.map(c => cardHTML(c)).join('');
         pRow.innerHTML = tempAtk.map(c => cardHTML(c)).join('');
-        setTimeout(() => { log.innerHTML = "<span style='color:#ffc831'>🔥 รวบรวมพลัง!</span>"; pRow.classList.add('ready-up'); oRow.classList.add('ready-up'); }, 800);
+        
+        setTimeout(() => { 
+            log.innerHTML = "<span style='color:#ffc831'>🔥 รวบรวมพลัง!</span>"; 
+            pRow.classList.add('ready-up'); oRow.classList.add('ready-up'); 
+        }, 800);
+
         setTimeout(() => {
             log.innerHTML = "<span style='color:#ff4d4d; font-size:1.5rem;'>EX-BURST ATTACK!!</span>";
             pRow.classList.remove('ready-up'); oRow.classList.remove('ready-up');
             pRow.classList.add('strike-player'); oRow.classList.add('strike-opp');
-            vsLabel.style.transform = "scale(1.5)"; vsLabel.style.color = "white";
         }, 2000);
+
         setTimeout(() => { arena.classList.add('arena-shake'); flash.classList.add('flash-active'); }, 2150);
+
         setTimeout(async () => {
-            let pTotalPwr = 0;
-            let oTotalPwr = 0;
+            let pTotalPwr = 0, oTotalPwr = 0;
             for(let i=0; i<5; i++) {
-                let pCard = tempAtk[i];
-                let oCard = targetOpp.defenseTeam[i];
-                let pPwr = getPower(pCard);
-                let oPwr = getPower(oCard);
-                if(ELEMENTS[pCard.element].beats === oCard.element) pPwr *= 1.25;
-                else if(ELEMENTS[oCard.element].beats === pCard.element) oPwr *= 1.25;
-                pTotalPwr += pPwr;
-                oTotalPwr += oPwr;
+                let pCard = tempAtk[i], oCard = targetOpp.defenseTeam[i];
+                let pP = getPower(pCard), oP = getPower(oCard);
+                if(ELEMENTS[pCard.element]?.beats === oCard.element) pP *= 1.25;
+                else if(ELEMENTS[oCard.element]?.beats === pCard.element) oP *= 1.25;
+                pTotalPwr += pP; oTotalPwr += oP;
             }
             const win = pTotalPwr >= oTotalPwr;
-            let trophyGain = 30; 
-            const currentRankName = getRankInfo(userDoc.trophies || 0).name;
-            if (currentRankName.includes("SILVER 1") || currentRankName.includes("GOLD") || currentRankName.includes("DIAMOND")) trophyGain = 120;
-            else if (currentRankName.includes("MASTER")) trophyGain = 290;
-            const trophyChange = win ? trophyGain : -Math.floor(trophyGain / 2);
-            const coinPrize = win ? 250 : 50;
-            log.innerHTML = win ? `
-                <div style='animation: readyAni 0.3s infinite alternate'>
-                    <h2 style='color:#00ff88; margin:0; text-shadow: 0 0 15px #00ff88'>VICTORY !!</h2>
-                    <p style="color: #aaa; font-size:0.8rem;">PWR: ${Math.floor(pTotalPwr).toLocaleString()} vs ${Math.floor(oTotalPwr).toLocaleString()}</p>
-                    <p style="color: #ffc831; margin:5px 0;">+${trophyChange} 🏆 | 🪙 ${coinPrize}</p>
-                </div>` : `
-                <div>
-                    <h2 style='color:#ff4d4d; margin:0; text-shadow: 0 0 15px #ff4d4d'>DEFEAT</h2>
-                    <p style="color: #aaa; font-size:0.8rem;">PWR: ${Math.floor(pTotalPwr).toLocaleString()} vs ${Math.floor(oTotalPwr).toLocaleString()}</p>
-                    <p style="color: #aaa; margin:5px 0;">${trophyChange} 🏆</p>
-                </div>`;
+            const trophyChange = win ? 30 : -15;
+            log.innerHTML = win ? `<h2 style='color:#00ff88;'>VICTORY !!</h2><p>+${trophyChange} 🏆</p>` : `<h2 style='color:#ff4d4d;'>DEFEAT</h2><p>${trophyChange} 🏆</p>`;
             exit.style.display = "block";
-            pRow.classList.remove('strike-player'); oRow.classList.remove('strike-opp');
-            arena.classList.remove('arena-shake'); flash.classList.remove('flash-active');
-            await updateDoc(doc(db, "users", auth.currentUser.uid), { trophies: Math.max(0, (userDoc.trophies || 0) + trophyChange), points: increment(coinPrize) });
-            await addDoc(collection(db, "users", auth.currentUser.uid, "logs"), { type: "attack", oppName: targetOpp.username + (targetOpp.isBot ? " (Bot)" : ""), win, trophyChange: trophyChange, time: serverTimestamp() });
-            if(!targetOpp.isBot) {
-                const oppChange = win ? -15 : 20;
-                await updateDoc(doc(db, "users", targetOpp.id), { trophies: Math.max(0, (targetOpp.trophies||0) + oppChange) });
-            }
+            await updateDoc(doc(db, "users", auth.currentUser.uid), { trophies: Math.max(0, (userDoc.trophies || 0) + trophyChange), points: increment(win ? 250 : 50) });
         }, 2800);
     };
 
     function renderPrep() {
-        if (!userDoc) return;
         const slots = document.getElementById("prep-slots");
         const pool = document.getElementById("prep-pool");
         slots.innerHTML = ""; pool.innerHTML = "";
-        for(let i=0; i<5; i++) { slots.innerHTML += tempAtk[i] ? cardHTML(tempAtk[i]) : `<div class="mini-card" style="border:1px dashed #444; background:transparent;"></div>`; }
-        const unique = {};
-        (userDoc.collection || []).forEach(c => { if(!unique[c.name] || Number(c.level) > Number(unique[c.name].level)) unique[c.name] = c; });
-        const sortedCollection = Object.values(unique).sort((a, b) => Number(b.level || 1) - Number(a.level || 1));
-        sortedCollection.forEach(c => {
+        for(let i=0; i<5; i++) slots.innerHTML += tempAtk[i] ? cardHTML(tempAtk[i]) : `<div class="mini-card" style="border:1px dashed #444;"></div>`;
+        
+        const myCollection = userDoc.collection || [];
+        myCollection.forEach(c => {
             const isSel = tempAtk.some(t => t.name === c.name);
             const div = document.createElement("div");
             div.innerHTML = cardHTML(c, isSel);
             div.onclick = () => {
                 const idx = tempAtk.findIndex(t => t.name === c.name);
                 if(idx > -1) tempAtk.splice(idx, 1);
-                else if(tempAtk.length < 5) tempAtk.push(c);
+                else if(tempAtk.length < 5) {
+                    // เงื่อนไข: USEC จำกัด 1 ใบ
+                    if(c.rarity === "USEC" && tempAtk.some(t => t.rarity === "USEC")) {
+                        return alert("⚠️ คุณสามารถใส่การ์ดระดับ USEC ได้เพียง 1 ใบเท่านั้น!");
+                    }
+                    tempAtk.push(c);
+                }
                 renderPrep();
             };
             pool.appendChild(div);
@@ -582,85 +502,49 @@
     }
 
     window.saveDefense = async function() {
-        if(tempDef.length < 5) return alert("กรุณาเลือกการ์ดป้องกันให้ครบ 5 ใบ!");
-        try { await updateDoc(doc(db, "users", auth.currentUser.uid), { defenseTeam: tempDef }); alert("✅ บันทึกทีมป้องกันเรียบร้อย!"); } 
-        catch (err) { alert("❌ เกิดข้อผิดพลาดในการบันทึก"); }
+        if(tempDef.length < 5) return alert("เลือกให้ครบ 5 ใบ!");
+        // เช็คเงื่อนไข USEC ในทีมป้องกัน
+        if(tempDef.filter(c => c.rarity === "USEC").length > 1) return alert("ทีมป้องกันใส่ USEC ได้แค่ 1 ใบ!");
+        await updateDoc(doc(db, "users", auth.currentUser.uid), { defenseTeam: tempDef });
+        alert("บันทึกสำเร็จ!");
     };
 
     function renderPools() {
-        if (!userDoc) return;
         const dSlots = document.getElementById("defense-slots");
         const dPool = document.getElementById("defense-pool");
-        if(!dSlots || !dPool) return;
         dSlots.innerHTML = ""; dPool.innerHTML = "";
-        for(let i=0; i<5; i++) { dSlots.innerHTML += tempDef[i] ? cardHTML(tempDef[i]) : `<div class="mini-card" style="border:1px dashed #444; background:transparent;"></div>`; }
-        const unique = {};
-        (userDoc.collection || []).forEach(c => { if(!unique[c.name] || Number(c.level) > Number(unique[c.name].level)) unique[c.name] = c; });
-        const sortedDefPool = Object.values(unique).sort((a, b) => Number(b.level || 1) - Number(a.level || 1));
-        sortedDefPool.forEach(c => {
+        for(let i=0; i<5; i++) dSlots.innerHTML += tempDef[i] ? cardHTML(tempDef[i]) : `<div class="mini-card" style="border:1px dashed #444;"></div>`;
+        
+        (userDoc.collection || []).forEach(c => {
             const isSel = tempDef.some(t => t.name === c.name);
             const div = document.createElement("div");
             div.innerHTML = cardHTML(c, isSel);
             div.onclick = () => {
                 const idx = tempDef.findIndex(t => t.name === c.name);
                 if(idx > -1) tempDef.splice(idx, 1);
-                else if(tempDef.length < 5) tempDef.push(c);
+                else if(tempDef.length < 5) {
+                    if(c.rarity === "USEC" && tempDef.some(t => t.rarity === "USEC")) return alert("ใส่ USEC ได้ใบเดียว!");
+                    tempDef.push(c);
+                }
                 renderPools();
             };
-            dPool.appendChild(div); 
+            dPool.appendChild(div);
         });
     }
 
     async function loadLeaderboard() {
         const list = document.getElementById("leaderboard-list");
-        if(!list) return;
-        try {
-            const q = query(collection(db, "users"), orderBy("trophies", "desc"), limit(20));
-            const snap = await getDocs(q);
-            list.innerHTML = ""; let i = 1;
-            snap.forEach(d => {
-                const u = d.data(); const r = getRankInfo(u.trophies || 0);
-                const rankText = r.color === "rainbow" ? `<span class="rank-rainbow">${r.icon} ${u.username || 'Unknown'}</span>` : `<span>${r.icon} ${u.username || 'Unknown'}</span>`;
-                list.innerHTML += `<div class="ui-card" style="display:flex; justify-content:space-between; align-items:center; border-left: 4px solid ${r.color === 'rainbow' ? '#ff00ff' : r.color}"><span><b style="color:#aaa; margin-right:10px;">#${i++}</b> ${rankText}</span> <span style="color:#ffc831; font-weight:bold;">🏆 ${(u.trophies || 0).toLocaleString()}</span></div>`;
-            });
-        } catch (e) { list.innerHTML = "Error loading leaderboard"; }
-    }
-
-    async function loadHistory() {
-        const list = document.getElementById("history-list");
-        if(!list) return;
-        try {
-            const snap = await getDocs(query(collection(db, "users", auth.currentUser.uid, "logs"), orderBy("time", "desc"), limit(10)));
-            list.innerHTML = snap.empty ? "<p style='text-align:center; color:#555;'>ยังไม่มีประวัติการต่อสู้</p>" : "";
-            snap.forEach(d => {
-                const l = d.data(); const color = l.win ? '#00ff88' : '#ff4d4d';
-                list.innerHTML += `<div class="ui-card" style="border-left:5px solid ${color}; padding:10px 15px;"><div style="display:flex; justify-content:space-between;"><b>${l.type==='attack'?'⚔️ บุก':'🛡️ ป้องกัน'} - ${l.win?'ชนะ':'แพ้'}</b><span style="color:${color}">${l.trophyChange >= 0 ? '+' : ''}${l.trophyChange} 🏆</span></div><div style="font-size:0.8rem; color:#aaa;">คู่ต่อสู้: ${l.oppName}</div></div>`;
-            });
-        } catch (e) { list.innerHTML = "Error loading history"; }
+        const q = query(collection(db, "users"), orderBy("trophies", "desc"), limit(20));
+        const snap = await getDocs(q);
+        list.innerHTML = "";
+        snap.forEach(d => {
+            const u = d.data();
+            list.innerHTML += `<div class="ui-card" style="display:flex; justify-content:space-between;"><span>${u.username}</span> <b>🏆 ${u.trophies || 0}</b></div>`;
+        });
     }
 
     window.toggleModal = function(id, show) {
-        const el = document.getElementById(id); if(el) el.style.display = show ? "block" : "none";
-        if(id === 'rankModal' && show) {
-            document.getElementById("rank-details").innerHTML = `
-                <div style="background:rgba(255,200,49,0.1); padding:10px; border-radius:10px; margin-bottom:15px; font-size:0.85rem; border:1px dashed #ffc831; color:#ffc831; text-align:center;">
-                    🎁 รางวัลซีซั่นจะมอบให้เมื่อครบหลังจบซีซั่น
-                </div>
-            ` + [...RANKS].reverse().map(r => {
-                const nameStyle = r.color === "rainbow" ? `class=\"rank-rainbow\"` : `style=\"color:${r.color}\"`;
-                let winTrophy = 50; 
-                if (r.name.includes("SILVER 1") || r.name.includes("GOLD") || r.name.includes("DIAMOND")) winTrophy = 120;
-                if (r.name.includes("MASTER")) winTrophy = 290;
-                return `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; border-bottom:1px solid #333;">
-                    <div ${nameStyle}><b>${r.icon} ${r.name}</b><br><small style="color:#aaa;">${r.min}+ 🏆</small></div>
-                    <div style="text-align:right; font-size:0.85rem;">
-                        <span style="color:#00ff88;">Win: +${winTrophy} 🏆</span><br>
-                        <span style="color:#ffc831;">Coin: ${r.reward.coin.toLocaleString()}</span>
-                    </div>
-                </div>`;
-            }).join('');
-        }
+        document.getElementById(id).style.display = show ? "block" : "none";
     };
 </script>
 </body>
