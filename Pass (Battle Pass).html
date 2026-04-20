@@ -228,9 +228,9 @@
     for(let i=1; i<=50; i++) {
         passData.push({
             lv: i,
-            free: (i % 10 === 0) ? { id: `free_card_${i}`, name: 'Hollyberry(SR)', amount: 1, img: imgAssets.cardSR } : (i % 10 === 2) ? { id: `free_dia_${i}`, name: 'Diamonds', amount: 100, img: imgAssets.diamond } : { id: `free_gold_${i}`, name: 'Gold', amount: i*100, img: imgAssets.coin },
-            premium: (i % 5 === 0) ? { id: `prem_card_${i}`, name: 'Hollyberry(SSR)', amount: 1, img: imgAssets.cardSSR } : { id: `prem_dia_${i}`, name: 'Gems', amount: 500, img: imgAssets.diamond },
-            super: (i === 1 || i % 5 === 0) ? { id: `super_card_${i}`, name: 'Cream Puff Cookie(SEC)', amount: 1, img: imgAssets.cardUltimate } : { id: `super_dia_${i}`, name: 'Diamonds', amount: 2500, img: imgAssets.diamond }
+            free: (i % 10 === 0) ? { id: `free_card_${i}`, name: 'เวทีแห่งความฝัน(SR)', amount: 1, img: imgAssets.cardSR } : (i % 10 === 2) ? { id: `free_dia_${i}`, name: 'Diamonds', amount: 100, img: imgAssets.diamond } : { id: `free_gold_${i}`, name: 'Gold', amount: i*100, img: imgAssets.coin },
+            premium: (i % 5 === 0) ? { id: `prem_card_${i}`, name: 'Sugar Swan Cookie(SSR)', amount: 1, img: imgAssets.cardSSR } : { id: `prem_dia_${i}`, name: 'Gems', amount: 500, img: imgAssets.diamond },
+            super: (i === 1 || i % 5 === 0) ? { id: `super_card_${i}`, name: 'มีมมิจัง ไอดอล No.1(SEC)', amount: 1, img: imgAssets.cardUltimate } : { id: `super_dia_${i}`, name: 'Diamonds', amount: 2500, img: imgAssets.diamond }
         });
     }
 
