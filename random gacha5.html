@@ -160,21 +160,21 @@
                 <div class="gacha-point-display">⭐ แต้มสะสม: <span id="gacha-points">0</span></div>
                 
                 <div class="reward-item">
-                    <div class="reward-title">🪙 เงิน 100,000 Coins</div>
+                    <div class="reward-title">🪙 เงิน 1,000,000 Coins</div>
                     <div class="reward-cost">ใช้ 30 แต้ม</div>
-                    <button class="btn-exchange" id="exc-1" onclick="exchangeReward('coins', 30, 100000, 1)">แลกรางวัล</button>
+                    <button class="btn-exchange" id="exc-1" onclick="exchangeReward('coins', 30, 1000000, 1)">แลกรางวัล</button>
                 </div>
                 
                 <div class="reward-item">
-                    <div class="reward-title">💎 เพชร 10,000 Diamonds</div>
+                    <div class="reward-title">💎 เพชร 100,000 Diamonds</div>
                     <div class="reward-cost">ใช้ 110 แต้ม</div>
-                    <button class="btn-exchange" id="exc-2" onclick="exchangeReward('diamonds', 110, 10000, 2)">แลกรางวัล</button>
+                    <button class="btn-exchange" id="exc-2" onclick="exchangeReward('diamonds', 110, 100000, 2)">แลกรางวัล</button>
                 </div>
 
                 <div class="reward-item">
-                    <div class="reward-title">💎 เพชร 100,000 Diamonds</div>
+                    <div class="reward-title">💎 เพชร 1,000,000 Diamonds</div>
                     <div class="reward-cost">ใช้ 150 แต้ม</div>
-                    <button class="btn-exchange" id="exc-3" onclick="exchangeReward('diamonds', 150, 100000, 3)">แลกรางวัล</button>
+                    <button class="btn-exchange" id="exc-3" onclick="exchangeReward('diamonds', 150, 1000000, 3)">แลกรางวัล</button>
                 </div>
 
                 <div class="reward-item">
@@ -342,10 +342,10 @@
     };
 
     window.confirmChoice = async (cardName, cardImg, cost) => {
-        if (!confirm(`ยืนยันรับ ${cardName} 10 ใบ? (ระบบจะเริ่มรอบใหม่)`)) return;
+        if (!confirm(`ยืนยันรับ ${cardName} 10 ใบ? `)) return;
         try {
             const userRef = doc(db, "users", currentUserUID);
-            const rewardCards = Array(10).fill().map(() => ({
+            const rewardCards = Array(5).fill().map(() => ({
                 name: cardName, rarity: "USEC", img: cardImg,
                 obtainedDate: Date.now(), level: 1, source: "Selection Reward"
             }));
