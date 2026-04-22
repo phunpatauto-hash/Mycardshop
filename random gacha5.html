@@ -345,7 +345,7 @@
         if (!confirm(`ยืนยันรับ ${cardName} 10 ใบ? `)) return;
         try {
             const userRef = doc(db, "users", currentUserUID);
-            const rewardCards = Array(5).fill().map(() => ({
+            const rewardCards = Array(10).fill().map(() => ({
                 name: cardName, rarity: "USEC", img: cardImg,
                 obtainedDate: Date.now(), level: 1, source: "Selection Reward"
             }));
