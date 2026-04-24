@@ -28,10 +28,7 @@
         .reward-cost { font-size: 0.8rem; color: #aaa; margin-bottom: 10px; }
         .btn-exchange { background: #ffc831; color: black; border: none; padding: 8px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; font-size: 0.85rem; }
         .btn-exchange:disabled { background: #444 !important; color: #888 !important; cursor: not-allowed; opacity: 0.6; }
-        
-        /* เพิ่มสถานะปุ่มเมื่อแลกแล้ว */
         .btn-exchanged { background: #28a745 !important; color: white !important; cursor: default !important; }
-
         .gacha-point-display { font-size: 1.2rem; font-weight: bold; color: #ffc831; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; }
         #choiceModal .card-choice-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 15px; }
         .choice-item { cursor: pointer; border: 2px solid transparent; border-radius: 10px; padding: 5px; transition: 0.2s; background: #222; text-align: center; }
@@ -94,7 +91,7 @@
 
     <div id="choiceModal" class="modal">
         <div class="modal-content" style="max-width: 600px; border: 2px solid #00d4ff;">
-            <h3 style="color:#00d4ff; text-align: center; margin-top: 0;">เลือกการ์ด USEC ที่คุณต้องการ (รับ 10 ใบ)</h3>
+            <h3 style="color:#00d4ff; text-align: center; margin-top: 0;">เลือกการ์ด USEC ที่ต้องการ (รับ 1 ใบ สุ่ม LV 1-50)</h3>
             <p style="text-align: center; font-size: 0.8rem; color: #aaa;">แต้มสะสมจะถูกหักเมื่อเลือกเสร็จสิ้น</p>
             <div id="usec-choice-list" class="card-choice-grid"></div>
             <button class="btn-pull" style="width: 100%; margin-top: 20px; background: #444; color: #fff;" onclick="closeModal('choiceModal')">ยกเลิก</button>
@@ -179,7 +176,7 @@
 
                 <div class="reward-item">
                     <div class="reward-title">
-                        🃏 USEC 10 ใบ (เลือกได้)
+                        🃏 USEC 1 ใบ (สุ่ม LV 1-50)
                         <button class="info-btn" onclick="showUsecInfo()">i</button>
                     </div>
                     <div class="reward-cost">ใช้ 250 แต้ม</div>
@@ -211,7 +208,7 @@
     let currentUserUID = null;
     let isPulling = false;
 
-    // --- รายชื่อการ์ดของคุณ (คงเดิมทั้งหมด) ---
+    // --- รายชื่อการ์ดคงเดิม ---
     const allCards = [
         { id: 1, rarity: "USEC", name: "พระอิศวร (USEC)", rate: 0.2, img: "https://cdn.bangbon.app/cards/SL01-003.png" },
         { id: 1, rarity: "USEC", name: "พระนารายณ์ (USEC)", rate: 0.2, img: "https://cdn.bangbon.app/cards/SL01-004.png" },
@@ -291,8 +288,7 @@
         document.getElementById("pity-bar-exr").style.width = (Math.min(pe, 900) / 900 * 100) + "%";
         document.getElementById("pity-text-exr").innerText = `${pe} / 900`;
 
-        // --- ระบบล็อกลำดับการแลก ---
-        const redeemed = userData.redeemedMilestones || []; // ลำดับที่แลกไปแล้ว
+        const redeemed = userData.redeemedMilestones || []; 
 
         for(let i=1; i<=4; i++) {
             const btn = document.getElementById(`exc-${i}`);
@@ -305,7 +301,6 @@
             } else {
                 btn.innerText = "แลกรางวัล";
                 btn.classList.remove("btn-exchanged");
-                // เงื่อนไข: แต้มถึง และ (เป็นรางวัลแรก หรือ รางวัลก่อนหน้าแลกไปแล้ว)
                 const isPrevRedeemed = (i === 1) || redeemed.includes(i - 1);
                 btn.disabled = (gp < cost) || !isPrevRedeemed;
             }
@@ -317,9 +312,7 @@
         if (!confirm(`ยืนยันรับรางวัล?`)) return;
         try {
             const userRef = doc(db, "users", currentUserUID);
-            const updateData = {
-                redeemedMilestones: arrayUnion(id)
-            };
+            const updateData = { redeemedMilestones: arrayUnion(id) };
             if (type === 'coins') updateData.points = increment(value);
             else if (type === 'diamonds') updateData.diamonds = increment(value);
             
@@ -341,26 +334,38 @@
         document.getElementById("choiceModal").style.display = "block";
     };
 
+    // --- แก้ไขฟังก์ชัน confirmChoice ให้สุ่มเลเวลและรับแค่ 1 ใบ ---
     window.confirmChoice = async (cardName, cardImg, cost) => {
-        if (!confirm(`ยืนยันรับ ${cardName} 10 ใบ? `)) return;
+        // สุ่มเลเวล 1-50
+        const randomLV = Math.floor(Math.random() * 50) + 1;
+        
+        if (!confirm(`ยืนยันรับ ${cardName} 1 ใบ (สุ่มได้ LV.${randomLV})? (ระบบจะเริ่มรอบใหม่)`)) return;
+        
         try {
             const userRef = doc(db, "users", currentUserUID);
-            const rewardCards = Array(10).fill().map(() => ({
-                name: cardName, rarity: "USEC", img: cardImg,
-                obtainedDate: Date.now(), level: 1, source: "Selection Reward"
-            }));
+            
+            // สร้างข้อมูลการ์ดใบเดียวที่มีเลเวลสุ่ม
+            const rewardCard = {
+                name: cardName, 
+                rarity: "USEC", 
+                img: cardImg,
+                obtainedDate: Date.now(), 
+                level: randomLV, // ใส่เลเวลที่สุ่มได้
+                source: "Selection Reward"
+            };
 
             await updateDoc(userRef, {
-                gachaPoints: 0, // รีเซ็ตแต้ม
-                redeemedMilestones: [], // ล้างลำดับเพื่อเริ่มใหม่
-                collection: arrayUnion(...rewardCards)
+                gachaPoints: 0, 
+                redeemedMilestones: [], 
+                collection: arrayUnion(rewardCard) // เพิ่มเข้าไป 1 ใบ
             });
+            
             closeModal('choiceModal');
-            alert(`ได้รับ ${cardName} เรียบร้อย! ระบบเริ่มรอบใหม่ให้แล้ว`);
+            alert(`ยินดีด้วย! คุณได้รับ ${cardName} LV.${randomLV} เรียบร้อยแล้ว!`);
         } catch (error) { alert("เกิดข้อผิดพลาด: " + error.message); }
     };
 
-    // --- ส่วน Gacha Pull (คงเดิม) ---
+    // --- ส่วน Gacha Pull และอื่นๆ คงเดิม ---
     window.pull = async (amount) => {
         if (isPulling || !userData) return;
         const costs = { 5: 100, 10: 500, 50: 1000 };
@@ -431,7 +436,6 @@
         finally { isPulling = false; toggleButtons(false); }
     };
 
-    // --- ฟังก์ชันเสริม (คงเดิม) ---
     window.showUsecInfo = () => {
         const usecPool = allCards.filter(c => c.rarity === "USEC");
         const listDiv = document.getElementById("usec-info-list");
