@@ -194,7 +194,7 @@
                 <div style="margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px;">
                     <div style="display: flex; justify-content: space-between;">
                         <span id="modalLvlDisplay" style="color:#00d4ff; font-weight: bold;">LV. 1</span>
-                        <span style="color:#666;">MAX 50</span>
+                        <span style="color:#666;">MAX 80</span>
                     </div>
                     <div class="lvl-bar-bg"><div id="lvlBarFill" class="lvl-bar-fill"></div></div>
                     <div style="font-size: 0.8rem; color: #aaa;">🎴 จำนวนที่ซ้ำ: <span id="reqQty" style="color:#ffc831;">0</span> ใบ</div>
@@ -231,7 +231,7 @@
     const db = getFirestore(app);
 
     let currentUID = null, userCards = [], currentFilter = 'ALL', searchQuery = '';
-    const MAX_LV = 50;
+    const MAX_LV = 80; // อัปเดต Max LV เป็น 80
 
     const rarityOrder = { 'P': 13, 'USEC': 12, 'EXR': 11, 'CBR': 10, 'SEC': 9, 'SUR': 8, 'SSR': 7, 'PR': 6, 'UR': 5, 'SR': 4, 'R': 3, 'U': 2, 'C': 1 };
     const rarityColors = { 'P': '#ff00ff', 'USEC': '#ff00ff', 'EXR': '#ff4d4d', 'CBR': '#ff4d4d', 'SEC': '#ffac33', 'SUR': '#33ffad', 'SSR': '#ffc831', 'PR': '#ffc831', 'UR': '#bf40bf', 'SR': '#33aaff', 'R': '#33ff57', 'U': '#ffffff', 'C': '#ffffff' };
@@ -336,7 +336,7 @@
         
         if (card.level < MAX_LV) {
             lvGroup.style.display = "flex"; starBtn.style.display = "none"; maxMsg.style.display = "none";
-            let req = card.level >= 30 ? 3 : (card.level >= 10 ? 2 : 1);
+            let req = 3; // อัปเดตเงื่อนไขให้ใช้ 3 ใบเสมอ
             document.getElementById("modalUpgradeInfo").innerText = `เงื่อนไข: ใช้ใบซ้ำ ${req} ใบ + 500 🪙`;
             document.getElementById("btnUpgradeLV").onclick = () => handleUpgrade(card, 'LV', 500);
             document.getElementById("btnBulkUpgrade").onclick = () => handleUpgrade(card, 'BULK', 500);
@@ -354,7 +354,6 @@
         document.getElementById("btnSellCard").onclick = () => handleSingleSell(card);
         document.getElementById("cardModal").style.display = "flex";
     };
-
     async function handleUpgrade(card, type, costBase) {
         const userDocRef = doc(db, "users", currentUID);
         const userSnap = await getDoc(userDocRef);
@@ -365,20 +364,17 @@
         let currentPoints = data.points || 0;
         let currentDiamonds = data.diamonds || 0;
 
-        // ค้นหาใบหลักที่จะอัปเกรด
         let mainIdx = collection.findIndex(c => c.name === card.name && c.rarity === card.rarity && (c.level||1) === card.level && (c.stars||0) === card.stars);
         if (mainIdx === -1) return alert("ไม่พบการ์ดหลัก");
 
         let totalCostPoints = 0;
         let totalCostDiamonds = 0;
         let upgraded = false;
-
         if (type === 'LV' || type === 'BULK') {
             while (collection[mainIdx].level < MAX_LV) {
                 let currentLv = collection[mainIdx].level || 1;
-                let reqQty = currentLv >= 30 ? 3 : (currentLv >= 10 ? 2 : 1);
+                let reqQty = 3; // อัปเดตเงื่อนไขใช้การ์ด 3 ใบตลอดจนถึงเลเวล 80
                 
-                // หาใบซ้ำ (ที่ไม่ใช่ใบหลัก)
                 let materialIndices = [];
                 for (let i = 0; i < collection.length; i++) {
                     if (i !== mainIdx && collection[i].name === card.name && collection[i].rarity === card.rarity) {
@@ -388,17 +384,15 @@
                 }
 
                 if (materialIndices.length < reqQty || currentPoints < (totalCostPoints + costBase)) {
-                    if (type === 'LV' && materialIndices.length < reqQty) alert("ใบซ้ำไม่พอ");
+                    if (type === 'LV' && materialIndices.length < reqQty) alert("ใบซ้ำไม่พอ (ต้องการ 3 ใบ)");
                     if (type === 'LV' && currentPoints < costBase) alert("Coins ไม่พอ");
                     break;
                 }
 
-                // ลบใบซ้ำ (ลบจากหลังไปหน้าเพื่อไม่ให้ Index เพี้ยน)
                 materialIndices.sort((a, b) => b - a).forEach(idx => {
                     collection.splice(idx, 1);
                     if (idx < mainIdx) mainIdx--;
                 });
-
                 collection[mainIdx].level = (collection[mainIdx].level || 1) + 1;
                 totalCostPoints += costBase;
                 upgraded = true;
@@ -414,7 +408,6 @@
                     if (materialIndices.length >= reqQty) break;
                 }
             }
-
             if (materialIndices.length < reqQty) return alert("ต้องการใบซ้ำ 5 ใบเพื่ออัปดาว");
             if (currentDiamonds < costBase) return alert("Diamonds ไม่พอ");
 
@@ -437,7 +430,6 @@
             document.getElementById("cardModal").style.display = "none";
         }
     }
-
     async function handleSingleSell(card) {
         if(!confirm(`ขายการ์ด ${card.name} หรือไม่?`)) return;
         let updated = [...userCards];
@@ -459,7 +451,6 @@
             if (!grouped[key]) grouped[key] = [];
             grouped[key].push(card);
         });
-
         let newCollection = [];
         let totalGain = 0;
         let sellCount = 0;
@@ -478,7 +469,6 @@
         await updateDoc(doc(db, "users", currentUID), { collection: newCollection, points: increment(totalGain) });
         alert(`ขายการ์ดทั้งหมด ${sellCount} ใบ ได้รับ ${totalGain.toLocaleString()} 🪙`);
     };
-
     document.getElementById("searchInput").oninput = (e) => { searchQuery = e.target.value; renderCards(); };
     document.getElementById("sortSelect").onchange = () => renderCards();
     const fCon = document.getElementById("filterContainer");
