@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COOKIE WORLD - Park Adventure</title>
+    <title>COOKIE PARK ADVENTURE</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; }
@@ -12,14 +11,12 @@
             font-family: 'Kanit', sans-serif; 
             margin: 0; 
             background: #2d4c1e; 
-            color: white; 
-            min-height: 100vh; 
             overflow: hidden; 
             display: flex;
             flex-direction: column;
+            height: 100vh;
         }
         
-        /* Navbar */
         .navbar { 
             background-color: rgba(20, 40, 10, 0.9); 
             padding: 15px 25px; 
@@ -31,63 +28,46 @@
             z-index: 1000;
         }
 
-        /* Game Area */
         #game-area {
             flex: 1;
             position: relative;
             overflow: hidden;
-            display: flex;
-            align-items: flex-end; 
         }
 
-        /* 2D World Map - ใช้รูป 1.jpg เป็นฉากหลัง */
+        /* ตรวจสอบว่าไฟล์ 1.jpg อยู่ในโฟลเดอร์เดียวกับไฟล์นี้ */
         #city-map {
-            width: 5000px; /* ขยายความกว้างเพื่อการเดินสำรวจ */
+            width: 5000px; 
             height: 100%;
-            background-image: url('1.jpg'); 
+            background-image: url('1.jpg'); /* ตรวจสอบชื่อไฟล์ให้ตรงกัน */
+            background-color: #4CAF50; /* สีสำรองกรณีรูปไม่ขึ้น */
             background-size: cover;
             background-position: bottom;
             position: absolute;
+            bottom: 0;
+            left: 0;
             transition: transform 0.6s ease-out;
             will-change: transform;
         }
 
-        /* Character Sprite */
         .card-avatar {
             position: absolute;
             width: 100px; 
-            bottom: 60px; /* ปรับระดับให้ยืนบนทางเดินในรูป 1.jpg พอดี */
+            bottom: 80px; 
             transition: left 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
-            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
             z-index: 50;
             text-align: center;
-            pointer-events: none;
         }
 
         .card-avatar img {
             width: 100%;
             aspect-ratio: 2/3;
             object-fit: cover;
-            border-radius: 12px;
             border: 3px solid #fff;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border-radius: 10px;
         }
 
-        /* หันหน้าตัวละคร */
         .facing-left img { transform: scaleX(-1); }
 
-        .card-name {
-            font-size: 11px;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 2px 10px;
-            border-radius: 10px;
-            margin-top: 5px;
-            border: 1px solid #a4c639;
-            display: inline-block;
-            white-space: nowrap;
-        }
-
-        /* UI Menu */
         #selection-menu {
             position: fixed; bottom: 20px; left: 50%;
             transform: translateX(-50%); display: flex; gap: 10px;
@@ -98,123 +78,58 @@
         .mini-card-select {
             width: 50px; height: 75px; object-fit: cover;
             border-radius: 6px; cursor: pointer; opacity: 0.5;
-            transition: 0.3s;
         }
-        .mini-card-select.active { opacity: 1; border: 2px solid #fff; transform: translateY(-5px); }
+        .mini-card-select.active { opacity: 1; border: 2px solid #fff; }
     </style>
 </head>
 <body>
 
     <nav class="navbar">
-        <div style="color:#a4c639; font-weight:bold; font-size:1.2rem;">COOKIE PARK ADVENTURE</div>
-        <a href="collection.html" style="color:white; text-decoration:none; background:#388e3c; padding:8px 20px; border-radius:10px;">BACK</a>
+        <div style="color:#a4c639; font-weight:bold;">COOKIE PARK ADVENTURE</div>
+        <button onclick="window.history.back()" style="color:white; background:#388e3c; border:none; padding:8px 20px; border-radius:10px; cursor:pointer;">BACK</button>
     </nav>
 
     <div id="game-area">
         <div id="city-map">
             <div id="player" class="card-avatar">
                 <img id="player-img" src="" alt="Player">
-                <div class="card-name" id="player-name">Loading...</div>
+                <div style="background: rgba(0,0,0,0.7); font-size: 12px; margin-top:5px;" id="player-name"></div>
             </div>
-            <div id="npc-container"></div>
         </div>
     </div>
 
     <div id="selection-menu"></div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    <script>
+        const map = document.getElementById('city-map');
+        const player = document.getElementById('player');
+        const gameArea = document.getElementById('game-area');
+        let currentPlayerX = 500;
 
-    const firebaseConfig = { 
-        apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM", 
-        authDomain: "sign-up-73f99.firebaseapp.com", 
-        projectId: "sign-up-73f99", 
-        appId: "1:916335559099:web:3a8ed896ba26e38991849e" 
-    };
+        // ฟังก์ชันคลิกเพื่อเดิน
+        gameArea.onclick = (e) => {
+            const rect = map.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            
+            if (clickX < currentPlayerX) player.classList.add('facing-left');
+            else player.classList.remove('facing-left');
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+            currentPlayerX = clickX;
+            player.style.left = (currentPlayerX - 50) + 'px';
+            
+            // เลื่อนกล้องตาม
+            const viewW = gameArea.offsetWidth;
+            let offsetX = (viewW / 2) - currentPlayerX;
+            offsetX = Math.min(0, Math.max(viewW - 5000, offsetX));
+            map.style.transform = `translateX(${offsetX}px)`;
+        };
 
-    const map = document.getElementById('city-map');
-    const player = document.getElementById('player');
-    const playerImg = document.getElementById('player-img');
-    const playerName = document.getElementById('player-name');
-    const menu = document.getElementById('selection-menu');
-    const gameArea = document.getElementById('game-area');
-
-    const worldWidth = 5000;
-    let currentPlayerX = 2500;
-
-    function updateCamera(x) {
-        const viewW = gameArea.offsetWidth;
-        let offsetX = (viewW / 2) - x;
-        offsetX = Math.min(0, Math.max(viewW - worldWidth, offsetX));
-        map.style.transform = `translateX(${offsetX}px)`;
-    }
-
-    gameArea.onclick = (e) => {
-        const rect = map.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        
-        if (clickX < currentPlayerX) player.classList.add('facing-left');
-        else player.classList.remove('facing-left');
-
-        currentPlayerX = clickX;
-        player.style.left = (currentPlayerX - 50) + 'px';
-        updateCamera(currentPlayerX);
-    };
-
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            const snap = await getDoc(doc(db, "users", user.uid));
-            if (snap.exists()) {
-                const userCards = snap.data().collection || [];
-                setupMenu(userCards);
-                player.style.left = currentPlayerX + 'px';
-                updateCamera(currentPlayerX);
-                createNPCs(userCards);
-            }
-        }
-    });
-
-    function setupMenu(cards) {
-        const unique = Array.from(new Set(cards.map(c => c.name))).map(n => cards.find(c => c.name === n));
-        unique.forEach((card, i) => {
-            const img = document.createElement('img');
-            img.src = card.img || card.image;
-            img.className = 'mini-card-select';
-            if(i === 0) {
-                img.classList.add('active');
-                playerImg.src = card.img || card.image;
-                playerName.innerText = card.name;
-            }
-            img.onclick = (e) => {
-                e.stopPropagation();
-                playerImg.src = card.img || card.image;
-                playerName.innerText = card.name;
-                document.querySelectorAll('.mini-card-select').forEach(m => m.classList.remove('active'));
-                img.classList.add('active');
-            };
-            menu.appendChild(img);
-        });
-    }
-
-    function createNPCs(cards) {
-        const container = document.getElementById('npc-container');
-        for(let i=0; i < Math.min(5, cards.length); i++) {
-            const npc = document.createElement('div');
-            npc.className = 'card-avatar';
-            npc.style.opacity = "0.7";
-            npc.style.width = "80px";
-            npc.style.bottom = "70px";
-            npc.style.left = (Math.random() * worldWidth) + 'px';
-            npc.innerHTML = `<img src="${cards[i].img || cards[i].image}"><div class="card-name">${cards[i].name}</div>`;
-            container.appendChild(npc);
-        }
-    }
-</script>
+        // แสดงข้อความเตือนถ้าโหลดรูปไม่สำเร็จ
+        const imgTest = new Image();
+        imgTest.src = '1.jpg';
+        imgTest.onerror = () => {
+            alert("ไม่พบไฟล์ภาพ '1.jpg' กรุณาตรวจสอบว่าชื่อไฟล์ถูกต้องและอยู่ในโฟลเดอร์เดียวกันกับโค้ดนี้ครับ");
+        };
+    </script>
 </body>
 </html>
