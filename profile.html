@@ -41,12 +41,23 @@
         }
 
         .user-section { display: flex; align-items: center; gap: 25px; }
+        
+        /* Avatar Wrapper with Upload Button */
         .avatar-wrapper { 
             position: relative; width: 120px; height: 120px; 
             border-radius: 22px; padding: 5px; background: linear-gradient(45deg, #ffc831, transparent);
         }
         .avatar-wrapper img { width: 100%; height: 100%; border-radius: 18px; background: #111; object-fit: cover; }
         
+        .upload-btn {
+            position: absolute; bottom: -5px; right: -5px; 
+            background: #ffc831; color: #000; width: 32px; height: 32px; 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; border: 3px solid #050507; font-size: 0.8rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .upload-btn:hover { transform: scale(1.1); background: #fff; }
+
         .user-info h1 { margin: 0; font-size: 1.8rem; letter-spacing: 1px; color: #fff; }
         .user-id { font-size: 0.75rem; color: #ffc831; opacity: 0.8; font-weight: 300; }
 
@@ -153,6 +164,10 @@
         <div class="user-section">
             <div class="avatar-wrapper">
                 <img id="pfp-display" src="" alt="Avatar">
+                <label for="pfp-input" class="upload-btn">
+                    <i class="fas fa-camera"></i>
+                </label>
+                <input type="file" id="pfp-input" accept="image/*" style="display: none;">
             </div>
             <div class="user-info">
                 <div class="user-id" id="user-uid-label">ID: Loading...</div>
@@ -213,6 +228,10 @@
         if (user) {
             currentUserUID = user.uid;
             document.getElementById("user-uid-label").innerText = `ID: ${user.uid.substring(0,12)}...`;
+            
+            // เพิ่ม Event Listener สำหรับปุ่มเลือกรูป
+            document.getElementById("pfp-input").addEventListener("change", handlePhotoUpload);
+
             onSnapshot(doc(db, "users", user.uid), (docSnap) => {
                 if (docSnap.exists()) {
                     renderPage(docSnap.data());
@@ -228,12 +247,46 @@
         }
     });
 
+    // --- ฟังก์ชันอัปโหลดรูปภาพ ---
+    async function handlePhotoUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        // เช็คขนาดไฟล์ (แนะนำไม่เกิน 1MB สำหรับเก็บใน Firestore)
+        if (file.size > 1024 * 1024) {
+            alert("ไฟล์รูปภาพใหญ่เกินไป (จำกัดไม่เกิน 1MB)");
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = async () => {
+            const base64String = reader.result;
+            try {
+                await updateDoc(doc(db, "users", currentUserUID), {
+                    userPhoto: base64String
+                });
+                console.log("Photo updated!");
+            } catch (err) {
+                console.error("Upload error:", err);
+                alert("ไม่สามารถอัปโหลดรูปภาพได้");
+            }
+        };
+    }
+
     function renderPage(data) {
         document.getElementById("display-name").innerText = data.username || "TRAINER";
         document.getElementById("p-points").innerText = (data.points || 0).toLocaleString();
         document.getElementById("p-diamonds").innerText = (data.diamonds || 0).toLocaleString();
         document.getElementById("p-stars").innerText = (data.stars || 0).toLocaleString();
-        document.getElementById("pfp-display").src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.username}&backgroundColor=b6e3f4`;
+        
+        // เช็คว่ามีรูปที่อัปโหลดไว้ไหม ถ้าไม่มีใช้ Dicebear แทน
+        const pfpImg = document.getElementById("pfp-display");
+        if (data.userPhoto) {
+            pfpImg.src = data.userPhoto;
+        } else {
+            pfpImg.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.username}&backgroundColor=b6e3f4`;
+        }
         
         const rawCards = data.collection || [];
         const total = rawCards.length;
@@ -260,11 +313,9 @@
             const key = card.name + "_" + card.rarity;
             if (cardMap[key]) {
                 cardMap[key].count++;
-                // ดึงเลเวลที่สูงที่สุดมาโชว์
                 if (card.lv && card.lv > cardMap[key].lv) cardMap[key].lv = card.lv;
                 if (card.stars && card.stars > cardMap[key].stars) cardMap[key].stars = card.stars;
             } else {
-                // ถ้าไม่มีข้อมูลเลเวลใน DB ให้ default เป็น 1
                 cardMap[key] = { ...card, count: 1, lv: card.lv || 1, stars: card.stars || 1 };
             }
         });
