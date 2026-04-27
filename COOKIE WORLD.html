@@ -3,120 +3,514 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COOKIE WORLD - LIVE IMAGE</title>
+    <title>COOKIE WORLD - 2D Side Scrolling</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; }
         body { 
             font-family: 'Kanit', sans-serif; 
             margin: 0; 
-            background: #111; 
+            background: #1a0f05; 
+            color: white; 
+            min-height: 100vh; 
             overflow: hidden; 
-        }
-
-        #game-screen {
-            width: 100vw;
-            height: 100vh;
-            position: relative;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
         }
-
-        /* พื้นหลังดึงจาก URL โดยตรง */
-        #scrolling-bg {
-            width: 5000px; /* ความกว้างจำลอง */
-            height: 100%;
-            position: absolute;
-            left: 0;
-            top: 0;
-            background-image: url('https://www.shutterstock.com/shutterstock/videos/1109982421/thumb/1.jpg?ip=x480');
-            background-size: cover;
-            background-position: center bottom;
-            background-repeat: repeat-x;
-            transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            will-change: transform;
+        
+        .navbar { 
+            background-color: rgba(40, 20, 10, 0.95); 
+            padding: 15px 25px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 2px solid #e7ac66; 
+            height: 80px; 
+            z-index: 1000;
         }
 
-        /* ตัวละคร */
-        #player {
-            position: absolute;
-            width: 110px;
-            bottom: 120px; /* ปรับระดับให้ยืนบนทางเดินในรูปพอดี */
-            z-index: 100;
-            transition: left 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            text-align: center;
-            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6));
-        }
-
-        #player img {
-            width: 100%;
-            border: 3px solid gold;
-            border-radius: 12px;
-            background: white;
-        }
-
-        .flip-char { transform: scaleX(-1); }
-
-        /* UI */
-        .header {
-            height: 70px;
-            background: rgba(0,0,0,0.8);
-            display: flex;
-            align-items: center;
-            padding: 0 25px;
-            border-bottom: 2px solid gold;
-            z-index: 500;
-            color: gold;
+        #game-clock {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #e7ac66;
+            padding: 5px 15px;
+            border-radius: 10px;
+            color: #e7ac66;
             font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
         }
+
+        #game-area {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end; 
+        }
+
+        #city-map {
+            width: 2600px; 
+            height: 100%;
+            /* แก้ไขเป็นชื่อไฟล์ภาพที่คุณอัปโหลด */
+            background-image: url('Gemini_Generated_Image_cbgsypcbgsypcbgs.jpg'); 
+            background-size: cover; 
+            background-repeat: repeat-x; 
+            background-position: bottom;
+            position: absolute;
+            transition: transform 0.6s ease-out, background-image 2s ease-in-out;
+        }
+
+        .card-avatar {
+            position: absolute;
+            width: 110px; 
+            bottom: 120px; 
+            transition: left 3s linear, transform 0.3s, opacity 1s; 
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.7));
+            z-index: 50;
+            text-align: center;
+            opacity: 1;
+        }
+
+        .hunger-container {
+            width: 60px;
+            height: 6px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 5px;
+            margin: 0 auto 5px auto;
+            border: 1px solid #e7ac66;
+            overflow: hidden;
+        }
+        .hunger-fill {
+            width: 100%;
+            height: 100%;
+            background: #4CAF50;
+            transition: width 0.3s, background 0.3s;
+        }
+
+        #player { transition: left 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+
+        .card-avatar img {
+            width: 100%;
+            aspect-ratio: 2/3;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 3px solid #fff;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .is-talking img { transform: scale(1.1); border-color: #ff9000; }
+        .facing-left img { transform: scaleX(-1); }
+        .facing-left.is-talking img { transform: scaleX(-1) scale(1.1); }
+
+        .card-name {
+            font-size: 11px;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 3px 12px;
+            border-radius: 15px;
+            margin-top: 8px;
+            border: 1px solid #e7ac66;
+            display: inline-block;
+        }
+
+        .speech-bubble {
+            position: absolute; bottom: 135%; left: 50%; transform: translateX(-50%);
+            background: white; color: #333; padding: 8px 12px; border-radius: 12px;
+            font-size: 13px; font-weight: bold; min-width: 130px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: none; z-index: 100;
+            animation: popIn 0.3s ease-out;
+        }
+
+        @keyframes popIn {
+            0% { transform: translateX(-50%) scale(0.5); opacity: 0; }
+            100% { transform: translateX(-50%) scale(1); opacity: 1; }
+        }
+
+        #collection-popup, #food-popup {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 2000;
+            display: none; align-items: center; justify-content: center;
+        }
+
+        .popup-content {
+            background: #2d1b0e; width: 90%; max-width: 1000px; height: 80vh;
+            border: 3px solid #e7ac66; border-radius: 20px;
+            display: flex; overflow: hidden; position: relative;
+        }
+
+        .close-btn {
+            position: absolute; top: 15px; right: 20px; font-size: 30px;
+            cursor: pointer; color: #e7ac66; z-index: 10;
+        }
+
+        .food-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px; padding: 20px;
+        }
+        .food-card {
+            background: #4a301a; border-radius: 15px; padding: 15px;
+            text-align: center; border: 2px solid #5d4037; cursor: pointer;
+            transition: 0.3s;
+        }
+        .food-card:hover { transform: translateY(-5px); border-color: #4CAF50; }
+        .food-card img { width: 80px; height: 80px; object-fit: contain; margin-bottom: 10px; }
+
+        .preview-side {
+            flex: 1; background: rgba(0,0,0,0.3);
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; border-right: 2px solid #4a301a;
+            padding: 20px;
+        }
+        .preview-side img {
+            width: 220px; border-radius: 15px; border: 4px solid #ff9000;
+            box-shadow: 0 0 30px rgba(255,144,0,0.4);
+        }
+        .preview-info { margin-top: 20px; text-align: center; }
+
+        .list-side {
+            flex: 2; padding: 25px; overflow-y: auto;
+        }
+        .card-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 15px;
+        }
+        .grid-card-item {
+            cursor: pointer; transition: 0.3s; position: relative;
+        }
+        .grid-card-item img {
+            width: 100%; aspect-ratio: 2/3; object-fit: cover;
+            border-radius: 8px; border: 2px solid #5d4037;
+        }
+        .grid-card-item:hover { transform: translateY(-5px); }
+        .grid-card-item.active img { border-color: #ff9000; box-shadow: 0 0 15px #ff9000; }
     </style>
 </head>
 <body>
 
-<div id="game-screen">
-    <div class="header">COOKIE CITY EXPLORER</div>
+    <nav class="navbar">
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <div style="color:#e7ac66; font-weight:bold; font-size:1.2rem;">COOKIE WORLD</div>
+            <div id="game-clock">00:00:00</div>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button onclick="toggleFoodPopup(true)" style="cursor:pointer; border:none; color:white; background:#4CAF50; padding:8px 20px; border-radius:10px; font-weight:bold; font-family:'Kanit';">FEED ALL</button>
+            <button onclick="togglePopup(true)" style="cursor:pointer; border:none; color:white; background:#ff9000; padding:8px 20px; border-radius:10px; font-weight:bold; font-family:'Kanit';">CHARACTER</button>
+        </div>
+    </nav>
 
-    <div id="scrolling-bg">
-        <div id="player">
-            <img src="https://via.placeholder.com/100x150?text=COOKIE" alt="player">
-            <div style="background:rgba(0,0,0,0.7); color:white; font-size:12px; padding:2px; border-radius:4px; margin-top:5px;">YOU</div>
+    <div id="game-area">
+        <div id="city-map">
+            <div id="player" class="card-avatar">
+                <div class="hunger-container"><div class="hunger-fill" id="player-hunger"></div></div>
+                <div class="speech-bubble" id="player-bubble"></div>
+                <img id="player-img" src="" alt="Player" onclick="feed(this.parentElement)">
+                <div class="card-name" id="player-name">Loading...</div>
+            </div>
+            <div id="npc-container"></div>
         </div>
     </div>
-</div>
 
-<script>
-    const bg = document.getElementById('scrolling-bg');
-    const player = document.getElementById('player');
-    const screen = document.getElementById('game-screen');
-    
-    let currentX = 500; // ตำแหน่งเริ่มต้น
+    <div id="food-popup">
+        <div class="popup-content" style="flex-direction: column; height: auto; max-width: 600px; padding-bottom: 30px;">
+            <span class="close-btn" onclick="toggleFoodPopup(false)">&times;</span>
+            <div style="padding: 25px; text-align: center;">
+                <h3 style="color:#4CAF50; margin-bottom:10px;">SELECT FOOD</h3>
+                <p style="color: #aaa; margin-bottom: 20px;">เลือกอาหารเพื่อเติมพลังงานให้ทุกคน!</p>
+                <div class="food-grid">
+                    <div class="food-card" onclick="processFeedAll('ข้าวผัดกุ้ง')">
+                        <img src="https://s.isanook.com/wo/0/ud/16/82677/82677-20171002051729-5e992c5.jpg" alt="Rice">
+                        <div>ข้าวผัดกุ้ง</div>
+                    </div>
+                    <div class="food-card" onclick="processFeedAll('ไก่ทอดหาดใหญ่')">
+                        <img src="https://images.deliveryhero.io/image/fd-th/LH/o1ao-hero.jpg" alt="Chicken">
+                        <div>ไก่ทอดหาดใหญ่</div>
+                    </div>
+                    <div class="food-card" onclick="processFeedAll('นมสดเย็น')">
+                        <img src="https://tse2.mm.bing.net/th/id/OIP.S-PZuRbkMI7Whv8v91q9gQHaSa?rs=1&pid=ImgDetMain&o=7&rm=3" alt="Milk">
+                        <div>นมสดเย็น</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    screen.onclick = (e) => {
-        const screenW = window.innerWidth;
-        const clickXInWorld = e.clientX - bg.getBoundingClientRect().left;
+    <div id="collection-popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="togglePopup(false)">&times;</span>
+            <div class="preview-side">
+                <h3 style="color:#e7ac66; margin-bottom:15px;">SELECTED</h3>
+                <img id="popup-preview-img" src="" alt="Selected Card">
+                <div class="preview-info">
+                    <h2 id="popup-preview-name" style="margin:10px 0;">-</h2>
+                    <p style="color:#aaa; font-size:0.9rem;">กำลังใช้งานตัวละครนี้</p>
+                </div>
+            </div>
+            <div class="list-side">
+                <h3 style="margin-bottom:20px;">MY COLLECTION</h3>
+                <div class="card-grid" id="card-grid-container"></div>
+            </div>
+        </div>
+    </div>
 
-        // 1. หันหน้าตัวละคร
-        if (e.clientX < (player.getBoundingClientRect().left + 55)) {
-            player.classList.add('flip-char');
-        } else {
-            player.classList.remove('flip-char');
-        }
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // 2. เคลื่อนที่ตัวละคร
-        currentX = clickXInWorld;
-        player.style.left = (currentX - 55) + 'px';
-
-        // 3. เลื่อนกล้องตามตัวละคร (Camera Follow)
-        let camOffset = (screenW / 2) - currentX;
-        
-        // จำกัดไม่ให้เห็นขอบดำ
-        if (camOffset > 0) camOffset = 0;
-        if (camOffset < -(5000 - screenW)) camOffset = -(5000 - screenW);
-
-        bg.style.transform = `translateX(${camOffset}px)`;
+    const firebaseConfig = { 
+        apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM", 
+        authDomain: "sign-up-73f99.firebaseapp.com", 
+        projectId: "sign-up-73f99", 
+        appId: "1:916335559099:web:3a8ed896ba26e38991849e" 
     };
-</script>
 
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const map = document.getElementById('city-map');
+    const player = document.getElementById('player');
+    const playerImg = document.getElementById('player-img');
+    const playerName = document.getElementById('player-name');
+    const gameArea = document.getElementById('game-area');
+    const clockElement = document.getElementById('game-clock');
+
+    const worldWidth = 2600;
+    let currentPlayerX = 1300; 
+    let npcsList = [];
+    let userCards = []; 
+
+    // --- ส่วนตั้งค่ารูปภาพกลางวัน-กลางคืนที่คุณอัปโหลด ---
+    const DAY_BG = 'https://media.discordapp.net/attachments/879354561423343618/1498312657353048114/Gemini_Generated_Image_cbgsypcbgsypcbgs.png?ex=69f0b3e6&is=69ef6266&hm=01891e1fc96fc15926600979e2c96f82d3f092dced510de518fe889c9889de3b&=&format=webp&quality=lossless';
+    const NIGHT_BG = 'https://media.discordapp.net/attachments/879354561423343618/1498312656648667236/Gemini_Generated_Image_9jzhhy9jzhhy9jzh.png?ex=69f0b3e6&is=69ef6266&hm=f05271d18f7fe4a89f8f8402cc501827dd5da7edeb9ceaa88a4b66988f4e61bc&=&format=webp&quality=lossless';
+    // ------------------------------------
+
+    const idleQuotes = ["อากาศดีจัง", "หิวขนมจังเลย", "เดินเล่นกันเถอะ", "ที่นี้ดุเงียบจัง...", "บรรยกาศที่นี้...ดูสงบจัง...", "วันนี้จะเจอการ์ดแรร์ไหมนะ?", "ง่วงจังเลย...", "เมืองนี้สวยดีนะ", "สวัดดี้ทุกคนนน!", "วันนี้จะทำให้เต็มที่ไปเลยย!!", "ในเมืองนี้มีคนเยอะจัง", "ขอน้ำหน่อยได้ไหม"];
+    const hungerQuotes = ["หิวจังเลย...", "ขอขนมหน่อยได้ไหม?", "ไม่มีแรงเดินแล้ว", "ท้องร้องจ๊อกๆ", "หิวข้าวววววววววววว"];
+    const talkQuotes = ["ไง! สบายดีไหม?", "มาเล่นการ์ดกับฉันไหม?", "วันนี้คุณดูดีนะ!", "ยินดีที่ได้รู้จัก!", "แถวนี้มีร้านขนมอร่อยๆ ไหม?", "กำลังจะไปไหนหรอ?", "ขอให้เป็นวันที่ดีนะ!"];
+
+    function updateTime() {
+        const now = new Date();
+        const hours = now.getHours();
+        const mins = String(now.getMinutes()).padStart(2, '0');
+        const secs = String(now.getSeconds()).padStart(2, '0');
+        
+        clockElement.innerText = `${String(hours).padStart(2, '0')}:${mins}:${secs}`;
+
+        // ระบบเปลี่ยนฉาก: กลางคืน 19:00 - 06:00
+        if (hours >= 19 || hours < 6) {
+            if (!map.style.backgroundImage.includes(NIGHT_BG)) {
+                map.style.backgroundImage = `url('${NIGHT_BG}')`;
+            }
+        } else {
+            if (!map.style.backgroundImage.includes(DAY_BG)) {
+                map.style.backgroundImage = `url('${DAY_BG}')`;
+            }
+        }
+    }
+    
+    setInterval(updateTime, 1000);
+    updateTime();
+
+    window.togglePopup = (show) => {
+        document.getElementById('collection-popup').style.display = show ? 'flex' : 'none';
+    };
+    window.toggleFoodPopup = (show) => {
+        document.getElementById('food-popup').style.display = show ? 'flex' : 'none';
+    };
+
+    function updateCamera(x) {
+        const viewW = gameArea.offsetWidth;
+        let offsetX = (viewW / 2) - x;
+        offsetX = Math.min(0, Math.max(viewW - worldWidth, offsetX));
+        map.style.transform = `translateX(${offsetX}px)`;
+    }
+
+    gameArea.onclick = (e) => {
+        if(e.target.closest('.card-avatar') || e.target.closest('#collection-popup') || e.target.closest('#food-popup')) return; 
+        const rect = map.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        player.classList.toggle('facing-left', clickX < currentPlayerX);
+        currentPlayerX = clickX;
+        player.style.left = (currentPlayerX - 55) + 'px';
+        updateCamera(currentPlayerX);
+    };
+
+    window.feed = (entity, foodName = "ขนม") => {
+        entity.dataset.hunger = 100;
+        updateHungerUI(entity);
+        handleGreet(entity, [`ง่ำๆ ${foodName} อร่อยจัง!`, `ขอบคุณสำหรับ ${foodName} นะ!`, "สดชื่นเลย!"]);
+    };
+
+    window.talkToNPC = (npc) => {
+        const npcX = parseFloat(npc.style.left);
+        const distance = Math.abs(npcX - currentPlayerX);
+        
+        if (distance < 150) {
+            handleGreet(npc, talkQuotes);
+            player.classList.toggle('facing-left', npcX < currentPlayerX);
+        } else {
+            handleGreet(player, ["อยู่ไกลเกินไป คุยไม่ได้แฮะ", "ต้องเดินเข้าไปใกล้กว่านี้หน่อย"]);
+        }
+    };
+
+    window.processFeedAll = (foodName) => {
+        feed(player, foodName);
+        npcsList.forEach(npc => feed(npc, foodName));
+        toggleFoodPopup(false);
+    };
+
+    function updateHungerUI(entity) {
+        const fill = entity.querySelector('.hunger-fill');
+        if(!fill) return;
+        const val = parseFloat(entity.dataset.hunger);
+        fill.style.width = val + '%';
+        fill.style.background = val < 30 ? '#f44336' : (val < 60 ? '#ff9800' : '#4CAF50');
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const snap = await getDoc(doc(db, "users", user.uid));
+            if (snap.exists()) {
+                const userData = snap.data();
+                userCards = userData.collection || [];
+                playerName.innerText = userData.username || "Explorer";
+                renderCollection(userCards);
+                if(userCards.length > 0) selectCharacter(userCards[0]);
+
+                player.dataset.hunger = 100;
+                player.style.left = currentPlayerX + 'px';
+                updateCamera(currentPlayerX);
+                createNPCs(userCards);
+                startWorldEvents();
+                startHungerSystem();
+                startNPCCycle();
+            }
+        }
+    });
+
+    function renderCollection(cards) {
+        const grid = document.getElementById('card-grid-container');
+        grid.innerHTML = '';
+        const unique = Array.from(new Set(cards.map(c => c.name))).map(n => cards.find(c => c.name === n));
+        unique.forEach((card) => {
+            const item = document.createElement('div');
+            item.className = 'grid-card-item';
+            item.innerHTML = `<img src="${card.img || card.image}" alt="${card.name}">`;
+            item.onclick = () => selectCharacter(card);
+            grid.appendChild(item);
+        });
+    }
+
+    function selectCharacter(card) {
+        const imgPath = card.img || card.image;
+        playerImg.src = imgPath;
+        document.getElementById('popup-preview-img').src = imgPath;
+        document.getElementById('popup-preview-name').innerText = card.name;
+        document.querySelectorAll('.grid-card-item').forEach(el => {
+            el.classList.toggle('active', el.querySelector('img').alt === card.name);
+        });
+    }
+
+    function createNPCs(cards) {
+        const container = document.getElementById('npc-container');
+        container.innerHTML = ''; npcsList = [];
+        const shuffled = [...cards].sort(() => 0.5 - Math.random());
+        shuffled.slice(0, 11).forEach((data) => spawnNPC(data));
+    }
+
+    function spawnNPC(data) {
+        const container = document.getElementById('npc-container');
+        const npc = document.createElement('div');
+        npc.className = 'card-avatar';
+        npc.style.opacity = '0';
+        npc.style.left = (Math.random() * (worldWidth - 200) + 100) + 'px';
+        npc.dataset.hunger = Math.random() * 50 + 50;
+        
+        npc.innerHTML = `
+            <div class="hunger-container"><div class="hunger-fill"></div></div>
+            <div class="speech-bubble"></div>
+            <img src="${data.img || data.image}" onclick="talkToNPC(this.parentElement)">
+            <div class="card-name">${data.name}</div>`;
+        
+        container.appendChild(npc);
+        npcsList.push(npc);
+        updateHungerUI(npc);
+        
+        setTimeout(() => npc.style.opacity = '1', 100);
+        makeNPCWander(npc);
+    }
+
+    function startNPCCycle() {
+        setInterval(() => {
+            if (npcsList.length > 0 && userCards.length > 0) {
+                const index = Math.floor(Math.random() * npcsList.length);
+                const oldNpc = npcsList[index];
+                if(oldNpc.classList.contains('is-talking')) return; 
+                
+                handleGreet(oldNpc, ["ไว้เจอกันใหม่นะ!", "บ๊ายบาย~", "ขอตัวไปพักก่อนนะ", "ขอบคุณที่เป็นเพื่อนกันนะ","ฉัน...ต้องไปแล้วหรอ..."]);
+                setTimeout(() => {
+                    oldNpc.style.opacity = '0';
+                    setTimeout(() => {
+                        oldNpc.remove();
+                        npcsList.splice(index, 1);
+                        const newData = userCards[Math.floor(Math.random() * userCards.length)];
+                        spawnNPC(newData);
+                    }, 1000);
+                }, 2000);
+            }
+        }, 15000);
+    }
+
+    function handleGreet(entity, quotes) {
+        const bubble = entity.querySelector('.speech-bubble');
+        if(!bubble) return;
+        entity.classList.add('is-talking');
+        bubble.innerText = quotes[Math.floor(Math.random() * quotes.length)];
+        bubble.style.display = 'block';
+        setTimeout(() => { 
+            entity.classList.remove('is-talking'); 
+            bubble.style.display = 'none'; 
+        }, 3000);
+    }
+
+    function makeNPCWander(npc) {
+        function wander() {
+            if (!npc || !npc.parentElement || npc.classList.contains('is-talking')) return setTimeout(wander, 2000);
+            const currentX = parseFloat(npc.style.left);
+            const targetX = Math.random() * (worldWidth - 150) + 50;
+            npc.classList.toggle('facing-left', targetX < currentX);
+            npc.style.left = targetX + 'px';
+            setTimeout(wander, Math.random() * 7000 + 5000);
+        }
+        setTimeout(wander, Math.random() * 3000);
+    }
+
+    function startHungerSystem() {
+        setInterval(() => {
+            player.dataset.hunger = Math.max(0, player.dataset.hunger - 1);
+            updateHungerUI(player);
+            if(player.dataset.hunger < 20 && Math.random() < 0.3) handleGreet(player, hungerQuotes);
+
+            npcsList.forEach(npc => {
+                npc.dataset.hunger = Math.max(0, npc.dataset.hunger - 0.8);
+                updateHungerUI(npc);
+                if(npc.dataset.hunger < 20 && !npc.classList.contains('is-talking') && Math.random() < 0.2) {
+                    handleGreet(npc, hungerQuotes);
+                }
+            });
+        }, 3000);
+    }
+
+    function startWorldEvents() {
+        setInterval(() => {
+            npcsList.forEach(npc => {
+                if (!npc.classList.contains('is-talking') && Math.random() < 0.1 && npc.dataset.hunger > 20) {
+                    handleGreet(npc, idleQuotes);
+                }
+            });
+        }, 5000);
+    }
+</script>
 </body>
 </html>
