@@ -29,6 +29,26 @@
             z-index: 1000;
         }
 
+        /* สไตล์ปุ่มย้อนกลับ */
+        .back-btn {
+            background: #4a301a;
+            border: 1px solid #e7ac66;
+            color: #e7ac66;
+            padding: 5px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .back-btn:hover {
+            background: #e7ac66;
+            color: #2d1b0e;
+        }
+
         #game-clock {
             background: rgba(0, 0, 0, 0.7);
             border: 1px solid #e7ac66;
@@ -51,8 +71,7 @@
         #city-map {
             width: 2600px; 
             height: 100%;
-            /* แก้ไขเป็นชื่อไฟล์ภาพที่คุณอัปโหลด */
-            background-image: url('Gemini_Generated_Image_cbgsypcbgsypcbgs.jpg'); 
+            background-image: url('https://media.discordapp.net/attachments/879354561423343618/1498312657353048114/Gemini_Generated_Image_cbgsypcbgsypcbgs.png?ex=69f0b3e6&is=69ef6266&hm=01891e1fc96fc15926600979e2c96f82d3f092dced510de518fe889c9889de3b&=&format=webp&quality=lossless'); 
             background-size: cover; 
             background-repeat: repeat-x; 
             background-position: bottom;
@@ -189,6 +208,7 @@
 
     <nav class="navbar">
         <div style="display: flex; align-items: center; gap: 20px;">
+            <a href="index.html" class="back-btn">❮ BACK</a>
             <div style="color:#e7ac66; font-weight:bold; font-size:1.2rem;">COOKIE WORLD</div>
             <div id="game-clock">00:00:00</div>
         </div>
@@ -215,7 +235,6 @@
             <span class="close-btn" onclick="toggleFoodPopup(false)">&times;</span>
             <div style="padding: 25px; text-align: center;">
                 <h3 style="color:#4CAF50; margin-bottom:10px;">SELECT FOOD</h3>
-                <p style="color: #aaa; margin-bottom: 20px;">เลือกอาหารเพื่อเติมพลังงานให้ทุกคน!</p>
                 <div class="food-grid">
                     <div class="food-card" onclick="processFeedAll('ข้าวผัดกุ้ง')">
                         <img src="https://s.isanook.com/wo/0/ud/16/82677/82677-20171002051729-5e992c5.jpg" alt="Rice">
@@ -242,7 +261,6 @@
                 <img id="popup-preview-img" src="" alt="Selected Card">
                 <div class="preview-info">
                     <h2 id="popup-preview-name" style="margin:10px 0;">-</h2>
-                    <p style="color:#aaa; font-size:0.9rem;">กำลังใช้งานตัวละครนี้</p>
                 </div>
             </div>
             <div class="list-side">
@@ -280,44 +298,32 @@
     let npcsList = [];
     let userCards = []; 
 
-    // --- ส่วนตั้งค่ารูปภาพกลางวัน-กลางคืนที่คุณอัปโหลด ---
     const DAY_BG = 'https://media.discordapp.net/attachments/879354561423343618/1498312657353048114/Gemini_Generated_Image_cbgsypcbgsypcbgs.png?ex=69f0b3e6&is=69ef6266&hm=01891e1fc96fc15926600979e2c96f82d3f092dced510de518fe889c9889de3b&=&format=webp&quality=lossless';
     const NIGHT_BG = 'https://media.discordapp.net/attachments/879354561423343618/1498312656648667236/Gemini_Generated_Image_9jzhhy9jzhhy9jzh.png?ex=69f0b3e6&is=69ef6266&hm=f05271d18f7fe4a89f8f8402cc501827dd5da7edeb9ceaa88a4b66988f4e61bc&=&format=webp&quality=lossless';
-    // ------------------------------------
 
-    const idleQuotes = ["อากาศดีจัง", "หิวขนมจังเลย", "เดินเล่นกันเถอะ", "ที่นี้ดุเงียบจัง...", "บรรยกาศที่นี้...ดูสงบจัง...", "วันนี้จะเจอการ์ดแรร์ไหมนะ?", "ง่วงจังเลย...", "เมืองนี้สวยดีนะ", "สวัดดี้ทุกคนนน!", "วันนี้จะทำให้เต็มที่ไปเลยย!!", "ในเมืองนี้มีคนเยอะจัง", "ขอน้ำหน่อยได้ไหม"];
-    const hungerQuotes = ["หิวจังเลย...", "ขอขนมหน่อยได้ไหม?", "ไม่มีแรงเดินแล้ว", "ท้องร้องจ๊อกๆ", "หิวข้าวววววววววววว"];
-    const talkQuotes = ["ไง! สบายดีไหม?", "มาเล่นการ์ดกับฉันไหม?", "วันนี้คุณดูดีนะ!", "ยินดีที่ได้รู้จัก!", "แถวนี้มีร้านขนมอร่อยๆ ไหม?", "กำลังจะไปไหนหรอ?", "ขอให้เป็นวันที่ดีนะ!"];
+    const idleQuotes = ["อากาศดีจัง", "หิวขนมจังเลย", "เดินเล่นกันเถอะ", "ง่วงจังเลย...", "เมืองนี้สวยดีนะ"];
+    const hungerQuotes = ["หิวจังเลย...", "ขอขนมหน่อยได้ไหม?", "ไม่มีแรงเดินแล้ว"];
+    const talkQuotes = ["ไง! สบายดีไหม?", "มาเล่นการ์ดกับฉันไหม?", "วันนี้คุณดูดีนะ!"];
 
     function updateTime() {
         const now = new Date();
         const hours = now.getHours();
         const mins = String(now.getMinutes()).padStart(2, '0');
         const secs = String(now.getSeconds()).padStart(2, '0');
-        
         clockElement.innerText = `${String(hours).padStart(2, '0')}:${mins}:${secs}`;
 
-        // ระบบเปลี่ยนฉาก: กลางคืน 19:00 - 06:00
         if (hours >= 19 || hours < 6) {
-            if (!map.style.backgroundImage.includes(NIGHT_BG)) {
-                map.style.backgroundImage = `url('${NIGHT_BG}')`;
-            }
+            if (!map.style.backgroundImage.includes(NIGHT_BG)) map.style.backgroundImage = `url('${NIGHT_BG}')`;
         } else {
-            if (!map.style.backgroundImage.includes(DAY_BG)) {
-                map.style.backgroundImage = `url('${DAY_BG}')`;
-            }
+            if (!map.style.backgroundImage.includes(DAY_BG)) map.style.backgroundImage = `url('${DAY_BG}')`;
         }
     }
     
     setInterval(updateTime, 1000);
     updateTime();
 
-    window.togglePopup = (show) => {
-        document.getElementById('collection-popup').style.display = show ? 'flex' : 'none';
-    };
-    window.toggleFoodPopup = (show) => {
-        document.getElementById('food-popup').style.display = show ? 'flex' : 'none';
-    };
+    window.togglePopup = (show) => document.getElementById('collection-popup').style.display = show ? 'flex' : 'none';
+    window.toggleFoodPopup = (show) => document.getElementById('food-popup').style.display = show ? 'flex' : 'none';
 
     function updateCamera(x) {
         const viewW = gameArea.offsetWidth;
@@ -327,7 +333,7 @@
     }
 
     gameArea.onclick = (e) => {
-        if(e.target.closest('.card-avatar') || e.target.closest('#collection-popup') || e.target.closest('#food-popup')) return; 
+        if(e.target.closest('.card-avatar') || e.target.closest('.popup-content') || e.target.closest('.navbar')) return; 
         const rect = map.getBoundingClientRect();
         const clickX = e.clientX - rect.left;
         player.classList.toggle('facing-left', clickX < currentPlayerX);
@@ -339,18 +345,15 @@
     window.feed = (entity, foodName = "ขนม") => {
         entity.dataset.hunger = 100;
         updateHungerUI(entity);
-        handleGreet(entity, [`ง่ำๆ ${foodName} อร่อยจัง!`, `ขอบคุณสำหรับ ${foodName} นะ!`, "สดชื่นเลย!"]);
+        handleGreet(entity, [`ง่ำๆ อร่อยจัง!`, `ขอบคุณนะ!`]);
     };
 
     window.talkToNPC = (npc) => {
         const npcX = parseFloat(npc.style.left);
         const distance = Math.abs(npcX - currentPlayerX);
-        
         if (distance < 150) {
             handleGreet(npc, talkQuotes);
             player.classList.toggle('facing-left', npcX < currentPlayerX);
-        } else {
-            handleGreet(player, ["อยู่ไกลเกินไป คุยไม่ได้แฮะ", "ต้องเดินเข้าไปใกล้กว่านี้หน่อย"]);
         }
     };
 
@@ -377,7 +380,6 @@
                 playerName.innerText = userData.username || "Explorer";
                 renderCollection(userCards);
                 if(userCards.length > 0) selectCharacter(userCards[0]);
-
                 player.dataset.hunger = 100;
                 player.style.left = currentPlayerX + 'px';
                 updateCamera(currentPlayerX);
@@ -407,9 +409,6 @@
         playerImg.src = imgPath;
         document.getElementById('popup-preview-img').src = imgPath;
         document.getElementById('popup-preview-name').innerText = card.name;
-        document.querySelectorAll('.grid-card-item').forEach(el => {
-            el.classList.toggle('active', el.querySelector('img').alt === card.name);
-        });
     }
 
     function createNPCs(cards) {
@@ -423,21 +422,16 @@
         const container = document.getElementById('npc-container');
         const npc = document.createElement('div');
         npc.className = 'card-avatar';
-        npc.style.opacity = '0';
         npc.style.left = (Math.random() * (worldWidth - 200) + 100) + 'px';
         npc.dataset.hunger = Math.random() * 50 + 50;
-        
         npc.innerHTML = `
             <div class="hunger-container"><div class="hunger-fill"></div></div>
             <div class="speech-bubble"></div>
             <img src="${data.img || data.image}" onclick="talkToNPC(this.parentElement)">
             <div class="card-name">${data.name}</div>`;
-        
         container.appendChild(npc);
         npcsList.push(npc);
         updateHungerUI(npc);
-        
-        setTimeout(() => npc.style.opacity = '1', 100);
         makeNPCWander(npc);
     }
 
@@ -447,17 +441,12 @@
                 const index = Math.floor(Math.random() * npcsList.length);
                 const oldNpc = npcsList[index];
                 if(oldNpc.classList.contains('is-talking')) return; 
-                
-                handleGreet(oldNpc, ["ไว้เจอกันใหม่นะ!", "บ๊ายบาย~", "ขอตัวไปพักก่อนนะ", "ขอบคุณที่เป็นเพื่อนกันนะ","ฉัน...ต้องไปแล้วหรอ..."]);
+                oldNpc.style.opacity = '0';
                 setTimeout(() => {
-                    oldNpc.style.opacity = '0';
-                    setTimeout(() => {
-                        oldNpc.remove();
-                        npcsList.splice(index, 1);
-                        const newData = userCards[Math.floor(Math.random() * userCards.length)];
-                        spawnNPC(newData);
-                    }, 1000);
-                }, 2000);
+                    oldNpc.remove();
+                    npcsList.splice(index, 1);
+                    spawnNPC(userCards[Math.floor(Math.random() * userCards.length)]);
+                }, 1000);
             }
         }, 15000);
     }
@@ -490,14 +479,9 @@
         setInterval(() => {
             player.dataset.hunger = Math.max(0, player.dataset.hunger - 1);
             updateHungerUI(player);
-            if(player.dataset.hunger < 20 && Math.random() < 0.3) handleGreet(player, hungerQuotes);
-
             npcsList.forEach(npc => {
                 npc.dataset.hunger = Math.max(0, npc.dataset.hunger - 0.8);
                 updateHungerUI(npc);
-                if(npc.dataset.hunger < 20 && !npc.classList.contains('is-talking') && Math.random() < 0.2) {
-                    handleGreet(npc, hungerQuotes);
-                }
             });
         }, 3000);
     }
@@ -505,9 +489,7 @@
     function startWorldEvents() {
         setInterval(() => {
             npcsList.forEach(npc => {
-                if (!npc.classList.contains('is-talking') && Math.random() < 0.1 && npc.dataset.hunger > 20) {
-                    handleGreet(npc, idleQuotes);
-                }
+                if (!npc.classList.contains('is-talking') && Math.random() < 0.1) handleGreet(npc, idleQuotes);
             });
         }, 5000);
     }
