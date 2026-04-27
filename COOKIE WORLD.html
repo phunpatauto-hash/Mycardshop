@@ -3,133 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COOKIE PARK ADVENTURE</title>
+    <title>COOKIE PARK - FIX LOAD</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; }
         body { 
             font-family: 'Kanit', sans-serif; 
             margin: 0; 
-            background: #2d4c1e; 
+            background: #1a1a1a; 
             overflow: hidden; 
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-        
-        .navbar { 
-            background-color: rgba(20, 40, 10, 0.9); 
-            padding: 15px 25px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-bottom: 2px solid #a4c639; 
-            height: 80px; 
-            z-index: 1000;
         }
 
-        #game-area {
+        #game-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ส่วนแสดงผลแผนที่ */
+        #viewport {
             flex: 1;
             position: relative;
             overflow: hidden;
+            background: #2d4c1e; /* สีสำรองถ้าภาพ 1.jpg ไม่โหลด */
         }
 
-        /* ตรวจสอบว่าไฟล์ 1.jpg อยู่ในโฟลเดอร์เดียวกับไฟล์นี้ */
-        #city-map {
-            width: 5000px; 
+        #world-map {
+            width: 5000px; /* ความกว้างของสวนสาธารณะ */
             height: 100%;
-            background-image: url('1.jpg'); /* ตรวจสอบชื่อไฟล์ให้ตรงกัน */
-            background-color: #4CAF50; /* สีสำรองกรณีรูปไม่ขึ้น */
-            background-size: cover;
-            background-position: bottom;
             position: absolute;
-            bottom: 0;
             left: 0;
-            transition: transform 0.6s ease-out;
+            top: 0;
+            /* ดึงภาพ 1.jpg มาใช้ */
+            background-image: url('1.jpg'); 
+            background-size: cover;
+            background-position: bottom center;
+            background-repeat: no-repeat;
+            transition: transform 0.5s ease-out;
             will-change: transform;
         }
 
-        .card-avatar {
+        /* ตัวละคร */
+        .character {
             position: absolute;
-            width: 100px; 
-            bottom: 80px; 
-            transition: left 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
-            z-index: 50;
+            width: 100px;
+            bottom: 15%; /* ปรับให้ยืนบนทางเดินในภาพ */
+            left: 500px;
+            z-index: 100;
+            transition: left 0.6s ease-out;
             text-align: center;
         }
 
-        .card-avatar img {
+        .character img {
             width: 100%;
-            aspect-ratio: 2/3;
-            object-fit: cover;
-            border: 3px solid #fff;
-            border-radius: 10px;
+            border: 4px solid white;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
         }
 
-        .facing-left img { transform: scaleX(-1); }
+        .flip { transform: scaleX(-1); }
 
-        #selection-menu {
-            position: fixed; bottom: 20px; left: 50%;
-            transform: translateX(-50%); display: flex; gap: 10px;
-            background: rgba(0, 0, 0, 0.8); padding: 10px;
-            border-radius: 15px; border: 2px solid #a4c639;
-            z-index: 1000;
+        /* UI */
+        .controls-hint {
+            position: fixed;
+            top: 100px;
+            left: 20px;
+            background: rgba(0,0,0,0.6);
+            padding: 10px;
+            border-radius: 8px;
+            pointer-events: none;
         }
-        .mini-card-select {
-            width: 50px; height: 75px; object-fit: cover;
-            border-radius: 6px; cursor: pointer; opacity: 0.5;
-        }
-        .mini-card-select.active { opacity: 1; border: 2px solid #fff; }
     </style>
 </head>
 <body>
 
-    <nav class="navbar">
-        <div style="color:#a4c639; font-weight:bold;">COOKIE PARK ADVENTURE</div>
-        <button onclick="window.history.back()" style="color:white; background:#388e3c; border:none; padding:8px 20px; border-radius:10px; cursor:pointer;">BACK</button>
+<div id="game-container">
+    <nav style="height:70px; background:#222; display:flex; align-items:center; padding:0 20px; border-bottom:2px solid #a4c639;">
+        <span style="color:#a4c639; font-weight:bold;">PARK EXPLORER</span>
     </nav>
 
-    <div id="game-area">
-        <div id="city-map">
-            <div id="player" class="card-avatar">
-                <img id="player-img" src="" alt="Player">
-                <div style="background: rgba(0,0,0,0.7); font-size: 12px; margin-top:5px;" id="player-name"></div>
+    <div id="viewport">
+        <div id="world-map">
+            <div id="player" class="character">
+                <img id="p-img" src="https://via.placeholder.com/100x150?text=Cookie" alt="player">
+                <div style="background:rgba(0,0,0,0.8); margin-top:5px; border-radius:5px; font-size:12px;">YOU</div>
             </div>
         </div>
+        <div class="controls-hint">คลิกที่พื้นเพื่อเดินสำรวจ</div>
     </div>
+</div>
 
-    <div id="selection-menu"></div>
+<script>
+    const worldMap = document.getElementById('world-map');
+    const player = document.getElementById('player');
+    const viewport = document.getElementById('viewport');
+    
+    let pX = 500; // ตำแหน่งเริ่มต้น
 
-    <script>
-        const map = document.getElementById('city-map');
-        const player = document.getElementById('player');
-        const gameArea = document.getElementById('game-area');
-        let currentPlayerX = 500;
+    // ตรวจสอบไฟล์ภาพ 1.jpg
+    const checkImg = new Image();
+    checkImg.src = '1.jpg';
+    checkImg.onerror = () => {
+        console.error("หาไฟล์ 1.jpg ไม่เจอ!");
+        document.body.insertAdjacentHTML('beforeend', `
+            <div style="position:fixed; top:80px; right:20px; background:red; color:white; padding:10px; z-index:9999;">
+                ⚠️ ไม่พบไฟล์ '1.jpg' ในโฟลเดอร์เดียวกับ HTML
+            </div>
+        `);
+    };
 
-        // ฟังก์ชันคลิกเพื่อเดิน
-        gameArea.onclick = (e) => {
-            const rect = map.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            
-            if (clickX < currentPlayerX) player.classList.add('facing-left');
-            else player.classList.remove('facing-left');
+    viewport.onclick = (e) => {
+        const rect = worldMap.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
 
-            currentPlayerX = clickX;
-            player.style.left = (currentPlayerX - 50) + 'px';
-            
-            // เลื่อนกล้องตาม
-            const viewW = gameArea.offsetWidth;
-            let offsetX = (viewW / 2) - currentPlayerX;
-            offsetX = Math.min(0, Math.max(viewW - 5000, offsetX));
-            map.style.transform = `translateX(${offsetX}px)`;
-        };
+        // หันหน้า
+        if (clickX < pX) player.classList.add('flip');
+        else player.classList.remove('flip');
 
-        // แสดงข้อความเตือนถ้าโหลดรูปไม่สำเร็จ
-        const imgTest = new Image();
-        imgTest.src = '1.jpg';
-        imgTest.onerror = () => {
-            alert("ไม่พบไฟล์ภาพ '1.jpg' กรุณาตรวจสอบว่าชื่อไฟล์ถูกต้องและอยู่ในโฟลเดอร์เดียวกันกับโค้ดนี้ครับ");
-        };
-    </script>
+        // เดิน
+        pX = clickX;
+        player.style.left = (pX - 50) + 'px';
+
+        // กล้องเลื่อนตาม
+        const viewW = viewport.offsetWidth;
+        let camX = (viewW / 2) - pX;
+        
+        // ล็อคขอบแมพ
+        if (camX > 0) camX = 0;
+        if (camX < -(5000 - viewW)) camX = -(5000 - viewW);
+
+        worldMap.style.transform = `translateX(${camX}px)`;
+    };
+</script>
 </body>
 </html>
