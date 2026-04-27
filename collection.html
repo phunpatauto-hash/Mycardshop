@@ -37,75 +37,26 @@
         .wallet-display { display: flex; gap: 15px; }
         .wallet-box { background: rgba(255, 255, 255, 0.05); padding: 8px 16px; border-radius: 25px; border: 1.5px solid #333; display: flex; align-items: center; gap: 8px; font-weight: bold; }
 
-        /* Control Panel (Search & Filter) */
-        .control-panel {
-            max-width: 1200px;
-            margin: 25px auto 10px;
-            padding: 0 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .search-sort-row {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .search-input {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid #444;
-            padding: 10px 20px;
-            border-radius: 12px;
-            color: white;
-            font-family: 'Kanit';
-            width: 300px;
-            outline: none;
-            transition: 0.3s;
-        }
+        /* Control Panel */
+        .control-panel { max-width: 1200px; margin: 25px auto 10px; padding: 0 20px; display: flex; flex-direction: column; gap: 15px; }
+        .search-sort-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+        .search-input { background: rgba(255,255,255,0.05); border: 1px solid #444; padding: 10px 20px; border-radius: 12px; color: white; font-family: 'Kanit'; width: 300px; outline: none; transition: 0.3s; }
         .search-input:focus { border-color: #ffc831; box-shadow: 0 0 10px rgba(255,200,49,0.2); }
-        
-        .sort-select {
-            background: #222;
-            color: white;
-            border: 1px solid #444;
-            padding: 10px;
-            border-radius: 12px;
-            font-family: 'Kanit';
-            cursor: pointer;
-            outline: none;
-        }
-
+        .sort-select { background: #222; color: white; border: 1px solid #444; padding: 10px; border-radius: 12px; font-family: 'Kanit'; cursor: pointer; outline: none; }
         .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
         .filter-btn { padding: 8px 18px; border-radius: 25px; border: 2px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #aaa; cursor: pointer; font-weight: bold; transition: 0.3s; }
         .filter-btn.active { border-color: #ffc831; color: #fff; background: rgba(255,200,49,0.1); }
 
         /* Effects */
         @keyframes rainbow-rotate { 100% { filter: hue-rotate(360deg); } }
-        .rainbow-effect { 
-            border: 3px solid transparent !important; 
-            background: linear-gradient(#111, #111) padding-box, conic-gradient(from 0deg, red, yellow, lime, aqua, blue, magenta, red) border-box !important; 
-            animation: rainbow-rotate 3s linear infinite; 
-            box-shadow: 0 0 20px rgba(255,255,255,0.4);
-        }
-        .rainbow-text { 
-            background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000); 
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
-            background-size: 200% auto; animation: rainbow-rotate 2s linear infinite; 
-        }
+        .rainbow-effect { border: 3px solid transparent !important; background: linear-gradient(#111, #111) padding-box, conic-gradient(from 0deg, red, yellow, lime, aqua, blue, magenta, red) border-box !important; animation: rainbow-rotate 3s linear infinite; box-shadow: 0 0 20px rgba(255,255,255,0.4); }
 
         /* Grid & Cards */
         .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
         .collection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
-        
-        .col-card { 
-            background: #111; border-radius: 15px; overflow: hidden; 
-            border: 1px solid rgba(255,255,255,0.1); position: relative; transition: 0.3s; cursor: pointer; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-        }
+        .col-card { background: #111; border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); position: relative; transition: 0.3s; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
         .col-card:hover { transform: translateY(-8px); border-color: #ffc831; box-shadow: 0 0 20px rgba(255, 200, 49, 0.3); }
         .col-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; transition: 0.3s; }
-        
         .star-container { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); padding: 2px 6px; border-radius: 8px; color: #ffc831; font-size: 0.7rem; z-index: 5; backdrop-filter: blur(5px); }
         .card-count-badge { position: absolute; top: 8px; right: 8px; background: #ffc831; color: #000; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; font-weight: bold; z-index: 5; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
 
@@ -114,14 +65,11 @@
         .modal-content { background: #0a0a0f; border-radius: 25px; max-width: 900px; width: 100%; display: flex; overflow: hidden; border: 1px solid #333; box-shadow: 0 0 50px rgba(0,0,0,1); }
         .modal-left { width: 45%; background: #000; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .modal-right { width: 55%; padding: 35px; display: flex; flex-direction: column; background: linear-gradient(135deg, #0a0a0f 0%, #111 100%); }
-        
         .stat-item { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; border-left: 4px solid #ffc831; margin: 10px 0; }
         .stat-val { font-size: 1.8rem; font-weight: bold; display: block; color: #ffc831; }
         .stat-lbl { font-size: 0.75rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
-        
         .lvl-bar-bg { width: 100%; height: 10px; background: #222; border-radius: 10px; margin: 8px 0; overflow: hidden; }
         .lvl-bar-fill { height: 100%; background: linear-gradient(90deg, #00d4ff, #00ff88); width: 0%; transition: 0.5s; }
-        
         .btn-action { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s; font-size: 1rem; }
         .btn-lv { background: #0066ff; color: white; }
         .btn-star { background: #ff9900; color: black; }
@@ -159,7 +107,6 @@
             </select>
             <button id="btnSellAll" class="btn-sell-all">💰 ขายใบซ้ำทั้งหมด</button>
         </div>
-
         <div class="filter-bar">
             <div id="filterContainer" style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;"></div>
         </div>
@@ -231,7 +178,7 @@
     const db = getFirestore(app);
 
     let currentUID = null, userCards = [], currentFilter = 'ALL', searchQuery = '';
-    const MAX_LV = 80; // อัปเดต Max LV เป็น 80
+    const MAX_LV = 80;
 
     const rarityOrder = { 'P': 13, 'USEC': 12, 'EXR': 11, 'CBR': 10, 'SEC': 9, 'SUR': 8, 'SSR': 7, 'PR': 6, 'UR': 5, 'SR': 4, 'R': 3, 'U': 2, 'C': 1 };
     const rarityColors = { 'P': '#ff00ff', 'USEC': '#ff00ff', 'EXR': '#ff4d4d', 'CBR': '#ff4d4d', 'SEC': '#ffac33', 'SUR': '#33ffad', 'SSR': '#ffc831', 'PR': '#ffc831', 'UR': '#bf40bf', 'SR': '#33aaff', 'R': '#33ff57', 'U': '#ffffff', 'C': '#ffffff' };
@@ -247,6 +194,23 @@
     function getDynamicSellValue(card) {
         const base = sellValuesBase[(card.rarity||'C').toUpperCase()] || 100;
         return Math.floor(base * (1 + ((card.level||1) - 1) * 0.1));
+    }
+
+    // ฟังก์ชันช่วยคำนวณเงื่อนไขการอัปเกรด (จำนวนการ์ด และ เหรียญ)
+    function getUpgradeRequirements(card) {
+        const r = (card.rarity || 'C').toUpperCase();
+        const lv = card.level || 1;
+        
+        // กรณีพิเศษ USEC และ EXR
+        if (r === 'USEC' || r === 'EXR') {
+            if (lv <= 45) return { reqQty: 1, cost: 500 }; // ราคาเหรียญใช้ตาม LV1-35 เป็นเกณฑ์พื้นฐาน
+            return { reqQty: 2, cost: 1500 }; 
+        }
+
+        // กรณีการ์ดระดับอื่นๆ
+        if (lv <= 35) return { reqQty: 1, cost: 500 };
+        if (lv <= 65) return { reqQty: 2, cost: 1500 };
+        return { reqQty: 3, cost: 2000 };
     }
 
     onAuthStateChanged(auth, (user) => {
@@ -268,37 +232,29 @@
     function renderCards() {
         const grid = document.getElementById("grid");
         grid.innerHTML = "";
-        
         const grouped = {};
         userCards.forEach(card => {
             const key = `${card.name}_${(card.rarity||'C').toUpperCase()}`;
             if (!grouped[key]) grouped[key] = [];
             grouped[key].push(card);
         });
-
         let displayList = [];
         for (const key in grouped) {
             const copies = grouped[key];
             copies.sort((a, b) => ((b.stars||0)*100 + b.level) - ((a.stars||0)*100 + a.level));
-            const rep = {...copies[0], count: copies.length};
-            displayList.push(rep);
+            displayList.push({...copies[0], count: copies.length});
         }
-
         if (currentFilter !== 'ALL') displayList = displayList.filter(c => (c.rarity||'C').toUpperCase() === currentFilter);
         if (searchQuery) displayList = displayList.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
-
         const sortType = document.getElementById("sortSelect").value;
         displayList.sort((a, b) => {
-            const pwrA = getArenaPower(a), pwrB = getArenaPower(b);
-            const rarA = rarityOrder[(a.rarity||'C').toUpperCase()], rarB = rarityOrder[(b.rarity||'C').toUpperCase()];
-            if (sortType === 'power_desc') return pwrB - pwrA;
-            if (sortType === 'power_asc') return pwrA - pwrB;
-            if (sortType === 'rarity_desc') return rarB - rarA;
-            if (sortType === 'rarity_asc') return rarA - rarB;
+            if (sortType === 'power_desc') return getArenaPower(b) - getArenaPower(a);
+            if (sortType === 'power_asc') return getArenaPower(a) - getArenaPower(b);
+            if (sortType === 'rarity_desc') return rarityOrder[(b.rarity||'C').toUpperCase()] - rarityOrder[(a.rarity||'C').toUpperCase()];
+            if (sortType === 'rarity_asc') return rarityOrder[(a.rarity||'C').toUpperCase()] - rarityOrder[(b.rarity||'C').toUpperCase()];
             if (sortType === 'lv_desc') return b.level - a.level;
             return 0;
         });
-
         displayList.forEach(card => {
             const r = (card.rarity||'C').toUpperCase();
             const div = document.createElement("div");
@@ -310,7 +266,7 @@
                 ${card.count > 1 ? `<div class="card-count-badge">x${card.count}</div>` : ''}
                 <img src="${card.img || card.image}">
                 <div style="padding:10px; background: rgba(0,0,0,0.8);">
-                    <div style="color:${rarityColors[r]}; font-size:0.75rem; font-weight:bold; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${card.name}</div>
+                    <div style="color:${rarityColors[r]}; font-size:0.75rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis;">${card.name}</div>
                     <div style="color:#ffc831; font-size:0.8rem; font-weight:bold;">⚡ ${getArenaPower(card).toLocaleString()}</div>
                     <div style="color:#aaa; font-size:0.65rem;">LV. ${card.level}</div>
                 </div>`;
@@ -321,7 +277,6 @@
     window.openModal = (card) => {
         const r = (card.rarity||'C').toUpperCase();
         const sameCards = userCards.filter(c => c.name === card.name && (c.rarity||'C').toUpperCase() === r);
-        
         document.getElementById("modalImg").src = card.img || card.image;
         document.getElementById("modalName").innerText = card.name;
         document.getElementById("modalRarity").innerText = "GRADE: " + r;
@@ -336,10 +291,10 @@
         
         if (card.level < MAX_LV) {
             lvGroup.style.display = "flex"; starBtn.style.display = "none"; maxMsg.style.display = "none";
-            let req = 3; // อัปเดตเงื่อนไขให้ใช้ 3 ใบเสมอ
-            document.getElementById("modalUpgradeInfo").innerText = `เงื่อนไข: ใช้ใบซ้ำ ${req} ใบ + 500 🪙`;
-            document.getElementById("btnUpgradeLV").onclick = () => handleUpgrade(card, 'LV', 500);
-            document.getElementById("btnBulkUpgrade").onclick = () => handleUpgrade(card, 'BULK', 500);
+            const req = getUpgradeRequirements(card);
+            document.getElementById("modalUpgradeInfo").innerText = `เงื่อนไข: ใช้ใบซ้ำ ${req.reqQty} ใบ + ${req.cost} 🪙`;
+            document.getElementById("btnUpgradeLV").onclick = () => handleUpgrade(card, 'LV');
+            document.getElementById("btnBulkUpgrade").onclick = () => handleUpgrade(card, 'BULK');
         } else {
             lvGroup.style.display = "none";
             if (card.stars < 5) {
@@ -354,7 +309,8 @@
         document.getElementById("btnSellCard").onclick = () => handleSingleSell(card);
         document.getElementById("cardModal").style.display = "flex";
     };
-    async function handleUpgrade(card, type, costBase) {
+
+    async function handleUpgrade(card, type, starCost = 0) {
         const userDocRef = doc(db, "users", currentUID);
         const userSnap = await getDoc(userDocRef);
         if (!userSnap.exists()) return;
@@ -370,22 +326,23 @@
         let totalCostPoints = 0;
         let totalCostDiamonds = 0;
         let upgraded = false;
+
         if (type === 'LV' || type === 'BULK') {
             while (collection[mainIdx].level < MAX_LV) {
-                let currentLv = collection[mainIdx].level || 1;
-                let reqQty = 3; // อัปเดตเงื่อนไขใช้การ์ด 3 ใบตลอดจนถึงเลเวล 80
-                
+                const req = getUpgradeRequirements(collection[mainIdx]);
                 let materialIndices = [];
                 for (let i = 0; i < collection.length; i++) {
                     if (i !== mainIdx && collection[i].name === card.name && collection[i].rarity === card.rarity) {
                         materialIndices.push(i);
-                        if (materialIndices.length >= reqQty) break;
+                        if (materialIndices.length >= req.reqQty) break;
                     }
                 }
 
-                if (materialIndices.length < reqQty || currentPoints < (totalCostPoints + costBase)) {
-                    if (type === 'LV' && materialIndices.length < reqQty) alert("ใบซ้ำไม่พอ (ต้องการ 3 ใบ)");
-                    if (type === 'LV' && currentPoints < costBase) alert("Coins ไม่พอ");
+                if (materialIndices.length < req.reqQty || currentPoints < (totalCostPoints + req.cost)) {
+                    if (type === 'LV') {
+                        if (materialIndices.length < req.reqQty) alert(`ใบซ้ำไม่พอ (ต้องการ ${req.reqQty} ใบ)`);
+                        else alert("Coins ไม่พอ");
+                    }
                     break;
                 }
 
@@ -394,9 +351,8 @@
                     if (idx < mainIdx) mainIdx--;
                 });
                 collection[mainIdx].level = (collection[mainIdx].level || 1) + 1;
-                totalCostPoints += costBase;
+                totalCostPoints += req.cost;
                 upgraded = true;
-
                 if (type === 'LV') break;
             }
         } else if (type === 'STAR') {
@@ -409,15 +365,13 @@
                 }
             }
             if (materialIndices.length < reqQty) return alert("ต้องการใบซ้ำ 5 ใบเพื่ออัปดาว");
-            if (currentDiamonds < costBase) return alert("Diamonds ไม่พอ");
-
+            if (currentDiamonds < starCost) return alert("Diamonds ไม่พอ");
             materialIndices.sort((a, b) => b - a).forEach(idx => {
                 collection.splice(idx, 1);
                 if (idx < mainIdx) mainIdx--;
             });
-
             collection[mainIdx].stars = (collection[mainIdx].stars || 0) + 1;
-            totalCostDiamonds = costBase;
+            totalCostDiamonds = starCost;
             upgraded = true;
         }
 
@@ -430,6 +384,7 @@
             document.getElementById("cardModal").style.display = "none";
         }
     }
+
     async function handleSingleSell(card) {
         if(!confirm(`ขายการ์ด ${card.name} หรือไม่?`)) return;
         let updated = [...userCards];
@@ -444,17 +399,13 @@
 
     document.getElementById("btnSellAll").onclick = async () => {
         if (!confirm("ระบบจะเก็บการ์ดที่เลเวลและดาวสูงสุดไว้ 1 ใบ และขายใบที่เหลือทั้งหมด ยืนยันหรือไม่?")) return;
-        
         const grouped = {};
         userCards.forEach(card => {
             const key = `${card.name}_${(card.rarity||'C').toUpperCase()}`;
             if (!grouped[key]) grouped[key] = [];
             grouped[key].push(card);
         });
-        let newCollection = [];
-        let totalGain = 0;
-        let sellCount = 0;
-
+        let newCollection = [], totalGain = 0, sellCount = 0;
         for (const key in grouped) {
             const copies = grouped[key];
             copies.sort((a, b) => ((b.stars||0)*100 + b.level) - ((a.stars||0)*100 + a.level));
@@ -464,11 +415,11 @@
                 sellCount++;
             }
         }
-
         if (sellCount === 0) return alert("ไม่มีใบซ้ำให้ขาย");
         await updateDoc(doc(db, "users", currentUID), { collection: newCollection, points: increment(totalGain) });
         alert(`ขายการ์ดทั้งหมด ${sellCount} ใบ ได้รับ ${totalGain.toLocaleString()} 🪙`);
     };
+
     document.getElementById("searchInput").oninput = (e) => { searchQuery = e.target.value; renderCards(); };
     document.getElementById("sortSelect").onchange = () => renderCards();
     const fCon = document.getElementById("filterContainer");
