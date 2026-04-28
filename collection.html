@@ -357,7 +357,7 @@
                 if (type === 'LV') break;
             }
         } else if (type === 'STAR') {
-            let reqQty = 5;
+            let reqQty = 2;
             let materialIndices = [];
             for (let i = 0; i < collection.length; i++) {
                 if (i !== mainIdx && collection[i].name === card.name && collection[i].rarity === card.rarity) {
@@ -365,7 +365,7 @@
                     if (materialIndices.length >= reqQty) break;
                 }
             }
-            if (materialIndices.length < reqQty) return alert("ต้องการใบซ้ำ 5 ใบเพื่ออัปดาว");
+            if (materialIndices.length < reqQty) return alert("ต้องการใบซ้ำ 2 ใบเพื่ออัปดาว");
             if (currentDiamonds < starCost) return alert("Diamonds ไม่พอ");
             materialIndices.sort((a, b) => b - a).forEach(idx => {
                 collection.splice(idx, 1);
