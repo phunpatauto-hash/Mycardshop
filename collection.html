@@ -104,6 +104,7 @@
                 <option value="power_desc">พลัง: สูง - ต่ำ</option>
                 <option value="power_asc">พลัง: ต่ำ - สูง</option>
                 <option value="lv_desc">เลเวล: สูง - ต่ำ</option>
+                <option value="lv_desc">เลเวล: ต่ำ - สูง</option>
             </select>
             <button id="btnSellAll" class="btn-sell-all">💰 ขายใบซ้ำทั้งหมด</button>
         </div>
@@ -297,9 +298,9 @@
             document.getElementById("btnBulkUpgrade").onclick = () => handleUpgrade(card, 'BULK');
         } else {
             lvGroup.style.display = "none";
-            if (card.stars < 5) {
+            if (card.stars < 2) {
                 starBtn.style.display = "block"; maxMsg.style.display = "block";
-                maxMsg.innerText = "✨ พร้อมวิวัฒนาการ (ใช้ 5 ใบซ้ำ) ✨";
+                maxMsg.innerText = "✨ พร้อมวิวัฒนาการ (ใช้ 2 ใบซ้ำ) ✨";
                 starBtn.onclick = () => handleUpgrade(card, 'STAR', (card.stars+1)*1000);
             } else {
                 starBtn.style.display = "none"; maxMsg.style.display = "block";
