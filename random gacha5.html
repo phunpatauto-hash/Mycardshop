@@ -176,7 +176,7 @@
 
                 <div class="reward-item">
                     <div class="reward-title">
-                        🃏 USEC 1 ใบ (สุ่ม LV 1-50)
+                        🃏 USEC 1 ใบ (สุ่ม LV 1-80)
                         <button class="info-btn" onclick="showUsecInfo()">i</button>
                     </div>
                     <div class="reward-cost">ใช้ 250 แต้ม</div>
@@ -337,7 +337,7 @@
     // --- แก้ไขฟังก์ชัน confirmChoice ให้สุ่มเลเวลและรับแค่ 1 ใบ ---
     window.confirmChoice = async (cardName, cardImg, cost) => {
         // สุ่มเลเวล 1-50
-        const randomLV = Math.floor(Math.random() * 50) + 1;
+        const randomLV = Math.floor(Math.random() * 80) + 1;
         
         if (!confirm(`ยืนยันรับ ${cardName} 1 ใบ (สุ่มได้ LV.${randomLV})? (ระบบจะเริ่มรอบใหม่)`)) return;
         
