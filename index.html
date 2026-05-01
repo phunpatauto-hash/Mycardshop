@@ -29,7 +29,7 @@
             user-select: none; -webkit-user-drag: none;
         }
         .profile-link:active { transform: scale(0.95); background: rgba(255, 200, 49, 0.1); }
-        .nav-avatar { width: 35px; height: 35px; border-radius: 12px; border: 2px solid #ffc831; background: #222; pointer-events: none; }
+        .nav-avatar { width: 35px; height: 35px; border-radius: 12px; border: 2px solid #ffc831; background: #222; pointer-events: none; object-fit: cover; }
         
         .currency-display { display: flex; gap: 12px; font-size: 0.85rem; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 12px; pointer-events: none; }
         .point-text { color: #ffc831; font-weight: bold; }
@@ -39,31 +39,6 @@
             background: linear-gradient(135deg, #2b52ff, #1a36b1); 
             padding: 10px 22px; border-radius: 12px; font-weight: 600; cursor: pointer; border: none; color: white; text-decoration: none;
         }
-
-        /* --- [แก้ไข] Calendar Styles ตามรูปภาพ --- */
-        .cal-modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); z-index: 10001; justify-content: center; align-items: center;
-        }
-        .cal-content {
-            background: #1a1a1a; padding: 30px; border-radius: 25px; border: 2px solid #ffc831;
-            width: 90%; max-width: 550px; text-align: center; box-shadow: 0 0 20px rgba(255, 200, 49, 0.3);
-        }
-        .cal-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 25px 0; }
-        .cal-day {
-            background: #111; padding: 15px 5px; border-radius: 12px; border: 1px solid #333;
-            font-size: 0.75rem; color: #555; position: relative;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: 0.3s;
-        }
-        .cal-day.active { border-color: #ffc831; color: #fff; opacity: 1; }
-        .cal-day.claimed { border-color: #00e5ff; color: #fff; background: rgba(0, 229, 255, 0.05); }
-        .cal-day.claimed::after {
-            content: "\f00c"; font-family: "Font Awesome 6 Free"; font-weight: 900;
-            position: absolute; top: 5px; right: 8px; color: #00e5ff; font-size: 0.65rem;
-        }
-        .cal-day i { display: block; margin-bottom: 8px; font-size: 1.2rem; }
-        .cal-day img { width: 35px; height: 45px; object-fit: contain; margin-bottom: 5px; filter: drop-shadow(0 0 5px rgba(255,200,49,0.5)); }
 
         /* --- Admin Modal --- */
         .admin-modal {
@@ -112,7 +87,6 @@
         }
         .btn-spin:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
         
-        /* Banner Styles */
         .quick-gacha-banner { 
             background: linear-gradient(135deg, #00e5ff, #ffe600); 
             border-radius: 20px; padding: 35px 45px; display: flex; justify-content: space-between; 
@@ -129,16 +103,7 @@
 </head>
 <body>
 
-    <div id="calModal" class="cal-modal">
-        <div class="cal-content">
-            <h2 style="color:#ffc831; margin-top:0; font-size: 1.4rem;">📅 ปฏิทินล็อกอิน 10 วัน</h2>
-            <div class="cal-grid" id="calGrid"></div>
-            <div style="display:flex; gap:12px;">
-                <button class="btn-cancel" onclick="document.getElementById('calModal').style.display='none'" style="border-radius: 12px;">ปิด</button>
-                <button id="calClaimBtn" class="btn-confirm" style="flex:2; border-radius: 12px;">กดรับรางวัล</button>
-            </div>
-        </div>
-    </div>
+    <!-- ลบปฏิทิน Modal ออกแล้ว -->
 
     <div id="adminModal" class="admin-modal">
         <div class="modal-content">
@@ -155,10 +120,9 @@
         <div class="logo">Mycard</div>
         <ul class="nav-links">
             <li><a href="index.html">หน้าแรก</a></li>
-            <li id="cal-nav-item" style="display:none;"><a onclick="document.getElementById('calModal').style.display='flex'" style="color: #00e5ff; font-weight: bold;"><i class="fas fa-calendar-star"></i> ปฏิทิน</a></li>
+            <!-- ลบปฏิทินในแถบเมนูออกแล้ว -->
             <li><a href="collection.html">สมุดสะสม</a></li>
             <li id="redeem-tab" style="display: none;"><a href="redeem.html" style="color: #ffc831;">แลกโค้ด</a></li>
-            <li><a href="Cookie city.html">Cookie city🏠</a></li>
             <li>
                 <div class="profile-link" id="profile-container" style="display: none;">
                     <img src="" id="nav-avatar-img" class="nav-avatar">
@@ -215,7 +179,7 @@
 
         <div class="quick-gacha-banner" style="background: linear-gradient(135deg, #ffc831, #ff8c00);" onclick="window.location.href='Pass (Battle Pass).html'">
             <div>
-                <h3 style="margin:0; font-size: 1.5rem;">Battle Pass SS2 </h3>
+                <h3 style="margin:0; font-size: 1.5rem;">Battle Pass</h3>
                 <p style="margin:5px 0 0 0; opacity:0.7; color: #000;">ปลดล็อกของจาก Battle Pass และรับของรางวัลพิเศษมากมาย</p>
             </div>
             <span class="banner-btn">เข้าสู่ Battle Pass <i class="fas fa-chevron-right"></i></span>
@@ -253,7 +217,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // --- Admin System (เหมือนเดิม) ---
+    // --- Admin System ---
     const profileContainer = document.getElementById("profile-container");
     const adminModal = document.getElementById("adminModal");
     let pressTimer;
@@ -293,33 +257,6 @@
         if (!isLongPress) window.location.href = 'profile.html';
     });
 
-    // --- [แก้ไข] Calendar Function ตามโค้ดที่คุณมี (ปรับ UI ภายใน) ---
-    function updateCalendarUI(streak, lastDate) {
-        const grid = document.getElementById("calGrid");
-        const today = new Date().toDateString();
-        grid.innerHTML = "";
-        
-        for(let i=1; i<=10; i++) {
-            let status = (i <= streak) ? "claimed" : (i === streak + 1 ? "active" : "");
-            
-            let displayContent = "";
-            if(i === 10) {
-                // วันที่ 10 โชว์รูปการ์ดตามรูปภาพ (ใช้ URL รูปตัวอย่าง)
-                displayContent = `<img src="https://cdn.bangbon.app/cards/ODY1-006.png" alt="Card">`;
-            } else {
-                // วันอื่นๆ โชว์ไอคอนเพชรหรือเหรียญ
-                let icon = (i % 2 === 0 ? "fa-gem" : "fa-coins");
-                displayContent = `<i class="fas ${icon}"></i>`;
-            }
-
-            grid.innerHTML += `<div class="cal-day ${status}">${displayContent}Day ${i}</div>`;
-        }
-        
-        const btn = document.getElementById("calClaimBtn");
-        btn.disabled = (lastDate === today);
-        btn.innerText = (lastDate === today) ? "วันนี้รับไปแล้ว" : "กดรับรางวัล";
-    }
-
     onAuthStateChanged(auth, (user) => {
         if (user) {
             onSnapshot(doc(db, "users", user.uid), (docSnap) => {
@@ -329,7 +266,13 @@
                     document.getElementById("user-display").innerText = data.username;
                     document.getElementById("user-points").innerText = (data.points || 0).toLocaleString();
                     document.getElementById("user-diamonds").innerText = (data.diamonds || 0).toLocaleString();
-                    document.getElementById("nav-avatar-img").src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.username}`;
+                    
+                    // ดึงรูปจาก Firestore (ซิงค์จากหน้า profile.html)
+                    if (data.userPhoto) {
+                        document.getElementById("nav-avatar-img").src = data.userPhoto;
+                    } else {
+                        document.getElementById("nav-avatar-img").src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.username}`;
+                    }
                     
                     const today = new Date().toDateString();
                     const btn = document.getElementById("spin-btn");
@@ -346,35 +289,6 @@
                         });
                         alert(`ยินดีด้วย! ได้รับ 🪙 ${p} และ 💎 ${d}`);
                     };
-
-                    document.getElementById("cal-nav-item").style.display = "block";
-                    const streak = data.loginStreak || 0;
-                    updateCalendarUI(streak, data.lastCalendarDate || "");
-
-                    document.getElementById("calClaimBtn").onclick = async () => {
-                        const nextDay = streak + 1;
-                        let updateObj = { lastCalendarDate: today, loginStreak: nextDay };
-
-                        if(nextDay === 10) {
-                            await addDoc(collection(db, "users", user.uid, "collection"), {
-                                name: "พระอิศวร",
-                                rarity: "SR",
-                                img: "https://cdn.bangbon.app/cards/ODY1-006.png",
-                                obtainedAt: new Date()
-                            });
-                            alert("ยินดีด้วย! คุณได้รับรางวัลใหญ่วันที่ 10: การ์ด [พระอิศวร] ระดับ SR!");
-                            updateObj.loginStreak = 0;
-                        } else {
-                            if(nextDay % 2 === 0) {
-                                updateObj.diamonds = increment(150);
-                                alert(`ได้รับรางวัลเช็คอินวันที่ ${nextDay}: 💎 150`);
-                            } else {
-                                updateObj.points = increment(1500);
-                                alert(`ได้รับรางวัลเช็คอินวันที่ ${nextDay}: 🪙 1500`);
-                            }
-                        }
-                        await updateDoc(doc(db, "users", user.uid), updateObj);
-                    };
                 }
             });
             document.getElementById("auth-btn").innerText = "ออกจากระบบ";
@@ -384,7 +298,6 @@
         } else {
             document.getElementById("profile-container").style.display = "none";
             document.getElementById("daily-section").style.display = "none";
-            document.getElementById("cal-nav-item").style.display = "none";
         }
     });
 
