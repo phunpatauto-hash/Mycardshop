@@ -125,7 +125,7 @@
 
     <div class="container">
         <div class="header-info" style="text-align: center; margin-bottom: 20px;">
-            <h1 style="font-size: 2.2rem; font-weight: 900; color: #ffc831; margin: 0;">BATTLE PASS SS2 เวทีแห่งความฝัน</h1>
+            <h1 style="font-size: 2.2rem; font-weight: 900; color: #ffc831; margin: 0;">BATTLE PASS SS3 น่าร้อนสุดสนุก</h1>
             <div class="timer-container">
                 <i class="fas fa-clock"></i> ซีซั่นจะรีเซ็ตใน: <span id="reset-timer">-- วัน -- ชม. -- นาที -- วิ</span>
             </div>
@@ -219,18 +219,18 @@
     const imgAssets = {
         coin: "https://cdn-icons-png.flaticon.com/512/2311/2311904.png",
         diamond: "https://cdn-icons-png.flaticon.com/512/2532/2532847.png",
-        cardSR: "https://cdn.bangbon.app/cards/KD03-020.png",
-        cardSSR: "https://cookierunbraverse.com/data/en_storage/L1wzJOdWGCZmANrNABjYPA.webp",
-        cardUltimate: "https://cdn.bangbon.app/cards/KD03-001-SCR.png"
+        cardSR: "https://cookierunbraverse.com/data/en_storage/KsH7b5fNjukaPwzpAcS_UA.webp",
+        cardSSR: "hhttps://cookierunbraverse.com/data/en_storage/tKqI0EsG4s-JZIY5nSMl1Q.webp",
+        cardUltimate: "https://cookierunbraverse.com/data/en_storage/lF6lyV3RoeCqVW38mfFDSg.webp"
     };
 
     const passData = [];
     for(let i=1; i<=50; i++) {
         passData.push({
             lv: i,
-            free: (i % 10 === 0) ? { id: `free_card_${i}`, name: 'เวทีแห่งความฝัน(SR)', amount: 1, img: imgAssets.cardSR } : (i % 10 === 2) ? { id: `free_dia_${i}`, name: 'Diamonds', amount: 100, img: imgAssets.diamond } : { id: `free_gold_${i}`, name: 'Gold', amount: i*100, img: imgAssets.coin },
-            premium: (i % 5 === 0) ? { id: `prem_card_${i}`, name: 'Sugar Swan Cookie(SSR)', amount: 1, img: imgAssets.cardSSR } : { id: `prem_dia_${i}`, name: 'Gems', amount: 500, img: imgAssets.diamond },
-            super: (i === 1 || i % 5 === 0) ? { id: `super_card_${i}`, name: 'มีมมิจัง ไอดอล No.1(SEC)', amount: 1, img: imgAssets.cardUltimate } : { id: `super_dia_${i}`, name: 'Diamonds', amount: 2500, img: imgAssets.diamond }
+            free: (i % 10 === 0) ? { id: `free_card_${i}`, name: 'Grapefruit Cookie(SR)', amount: 1, img: imgAssets.cardSR } : (i % 10 === 2) ? { id: `free_dia_${i}`, name: 'Diamonds', amount: 100, img: imgAssets.diamond } : { id: `free_gold_${i}`, name: 'Gold', amount: i*100, img: imgAssets.coin },
+            premium: (i % 5 === 0) ? { id: `prem_card_${i}`, name: 'Grapefruit Cookie(SSR)', amount: 1, img: imgAssets.cardSSR } : { id: `prem_dia_${i}`, name: 'Gems', amount: 500, img: imgAssets.diamond },
+            super: (i === 1 || i % 5 === 0) ? { id: `super_card_${i}`, name: 'Custard Cookie III(SEC)', amount: 1, img: imgAssets.cardUltimate } : { id: `super_dia_${i}`, name: 'Diamonds', amount: 2500, img: imgAssets.diamond }
         });
     }
 
