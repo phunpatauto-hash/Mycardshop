@@ -13,7 +13,6 @@
         .navbar { background-color: rgba(10, 10, 15, 0.95); width: 100%; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); position: sticky; top: 0; z-index: 1000; box-sizing: border-box; backdrop-filter: blur(10px); }
         .user-stat { color: var(--gold); font-weight: bold; }
 
-        /* สไตล์ปุ่มหน้าแรกที่เพิ่มใหม่ */
         .btn-home { 
             background: transparent; 
             border: 1px solid var(--gold); 
@@ -159,8 +158,8 @@
     function getRandomRarity() {
         const roll = Math.random() * 100;
         if (roll <= 20) return 'SEC';
-        if (roll <= 1) return 'USEC';
-        if (roll <= 1) return 'EXR';
+        if (roll <= 5) return 'USEC';
+        if (roll <= 5) return 'EXR';
         if (roll <= 30) return 'SSR';
         return 'SR';
     }
@@ -246,30 +245,40 @@
         
         const participants = data.participants || [];
         if (participants.length > 0) {
+            // สุ่มหาผู้ชนะเพียง 1 เดียว
             let pool = [];
             participants.forEach(p => { for(let i = 0; i < p.bid; i++) pool.push(p.uid); });
             const winnerIdx = Math.floor(Math.random() * pool.length);
             const winnerUid = pool[winnerIdx];
             const winnerInfo = participants.find(p => p.uid === winnerUid);
 
+            // บันทึก Log ผู้ชนะเพียงครั้งเดียว
             await setDoc(doc(collection(db, "winnerLogs")), {
                 username: winnerInfo.name,
                 rarity: data.rarity,
                 time: Date.now()
             });
 
+            // มอบของรางวัลให้ผู้ชนะเพียง 1 ชิ้นเท่านั้น
             if (currentUID === winnerUid) {
                 const asset = rarityAssets[data.rarity] || rarityAssets['SR'];
+                const uniqueId = Date.now().toString() + "_" + Math.random().toString(36).substr(2, 5);
+                
                 await updateDoc(doc(db, "users", winnerUid), {
                     collection: arrayUnion({ 
-                        name: asset.name, rarity: data.rarity, img: asset.img, 
-                        level: 1, stars: 0, obtainedAt: Date.now() 
+                        id: uniqueId,
+                        name: asset.name, 
+                        rarity: data.rarity, 
+                        img: asset.img, 
+                        level: 1, 
+                        stars: 0, 
+                        obtainedAt: Date.now() 
                     })
                 });
                 
                 let config = {
                     title: `🎊 ยินดีด้วยคุณชนะได้รับ!`,
-                    html: `<img src="${asset.img}" style="width:200px; border-radius:10px; margin:15px 0;"><br>ได้รับ: ${asset.name}`,
+                    html: `<img src="${asset.img}" style="width:200px; border-radius:10px; margin:15px 0;"><br>ได้รับ: ${asset.name} (1 ใบ)`,
                     background: '#12121a',
                     color: rarityColors[data.rarity],
                     confirmButtonText: 'เก็บเข้าคลัง'
@@ -278,6 +287,7 @@
             }
         }
 
+        // รีเซ็ตการประมูลรอบใหม่
         const nextRarity = (data.nextCard && data.nextCard.rarity) ? data.nextCard.rarity : getRandomRarity();
         const futureRarity = getRandomRarity();
 
