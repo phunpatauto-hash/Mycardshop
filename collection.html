@@ -60,6 +60,26 @@
         .star-container { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); padding: 2px 6px; border-radius: 8px; color: #ffc831; font-size: 0.7rem; z-index: 5; backdrop-filter: blur(5px); }
         .card-count-badge { position: absolute; top: 8px; right: 8px; background: #ffc831; color: #000; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; font-weight: bold; z-index: 5; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
 
+        /* Achievement Styles */
+        .achievement-section { max-width: 1200px; margin: 60px auto 40px; padding: 0 20px; border-top: 1px solid #333; padding-top: 40px; }
+        .achievement-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin-top: 20px; }
+        .ach-card { background: rgba(255,255,255,0.05); border-radius: 15px; padding: 20px; border: 1px solid #333; position: relative; transition: 0.3s; }
+        .ach-card.completed { border-color: #ffc831; background: rgba(255,200,49,0.05); box-shadow: 0 0 15px rgba(255,200,49,0.1); }
+        .ach-card.claimed { opacity: 0.6; filter: grayscale(0.5); }
+        .ach-tier { font-size: 0.7rem; font-weight: bold; padding: 3px 8px; border-radius: 5px; text-transform: uppercase; margin-bottom: 10px; display: inline-block; }
+        .tier-easy { background: #4caf50; color: white; }
+        .tier-medium { background: #2196f3; color: white; }
+        .tier-hard { background: #f44336; color: white; }
+        .tier-impossible { background: #9c27b0; color: white; animation: rainbow-rotate 3s linear infinite; }
+        .tier-secret { background: #000; color: #ffc831; border: 1px solid #ffc831; }
+        .ach-title { font-weight: bold; font-size: 1.1rem; margin-bottom: 5px; color: #fff; }
+        .ach-desc { font-size: 0.85rem; color: #aaa; margin-bottom: 15px; min-height: 40px; }
+        .ach-progress-container { height: 8px; background: #222; border-radius: 4px; overflow: hidden; margin-bottom: 10px; }
+        .ach-progress-bar { height: 100%; background: #ffc831; width: 0%; transition: 0.5s; }
+        .btn-claim { width: 100%; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; background: #ffc831; color: #000; transition: 0.3s; }
+        .btn-claim:disabled { background: #444; color: #888; cursor: not-allowed; }
+        .reward-tag { font-size: 0.8rem; color: #ffc831; margin-bottom: 10px; display: block; font-weight: bold; }
+
         /* Modal */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(10px); }
         .modal-content { background: #0a0a0f; border-radius: 25px; max-width: 900px; width: 100%; display: flex; overflow: hidden; border: 1px solid #333; box-shadow: 0 0 50px rgba(0,0,0,1); }
@@ -77,6 +97,16 @@
         .btn-sell-all { background: #ff4d4d; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; }
 
         @media (max-width: 768px) { .modal-content { flex-direction: column; overflow-y: auto; } .modal-left, .modal-right { width: 100%; } .search-input { width: 100%; } }
+        .tier-divine {
+    border: 2px solid #00f2ff;
+    box-shadow: 0 0 15px rgba(0, 242, 255, 0.5);
+    background: linear-gradient(135deg, rgba(0, 242, 255, 0.1), rgba(186, 0, 255, 0.1));
+}
+
+.tier-divine .ach-title {
+    color: #00f2ff;
+    text-shadow: 0 0 5px #00f2ff;
+}
     </style>
 </head>
 <body>
@@ -104,7 +134,7 @@
                 <option value="power_desc">พลัง: สูง - ต่ำ</option>
                 <option value="power_asc">พลัง: ต่ำ - สูง</option>
                 <option value="lv_desc">เลเวล: สูง - ต่ำ</option>
-                <option value="lv_desc">เลเวล: ต่ำ - สูง</option>
+                <option value="lv_asc">เลเวล: ต่ำ - สูง</option>
             </select>
             <button id="btnSellAll" class="btn-sell-all">💰 ขายใบซ้ำทั้งหมด</button>
         </div>
@@ -115,6 +145,11 @@
 
     <div class="container">
         <div id="grid" class="collection-grid"></div>
+    </div>
+
+    <div class="achievement-section">
+        <h2 style="color: #ffc831; border-left: 5px solid #ffc831; padding-left: 15px; margin-bottom: 25px;">🏆 ความสำเร็จ (ACHIEVEMENTS)</h2>
+        <div id="achievementGrid" class="achievement-grid"></div>
     </div>
 
     <div id="cardModal" class="modal" onclick="this.style.display='none'">
@@ -163,7 +198,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, onSnapshot, updateDoc, increment, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, updateDoc, increment, getDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = { 
         apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM", 
@@ -186,6 +221,34 @@
     const RARITY_POWER = { "P": { base: 5000, perLv: 1000 }, "USEC": { base: 8500, perLv: 6500 }, "EXR": { base: 4000, perLv: 2500 }, "CBR": { base: 6600, perLv: 4000 }, "SEC": { base: 3500, perLv: 2000 }, "SUR": { base: 3000, perLv: 1800 }, "SSR": { base: 2500, perLv: 1500 }, "PR": { base: 2000, perLv: 1500 }, "UR": { base: 1500, perLv: 1200 }, "SR": { base: 1000, perLv: 1000 }, "R": { base: 600, perLv: 800 }, "U": { base: 300, perLv: 500 }, "C": { base: 100, perLv: 300 } };
     const sellValuesBase = { 'P': 10000, 'USEC': 90000, 'EXR': 55000, 'CBR': 50000, 'SEC': 25000, 'SUR': 15000, 'SSR': 15000, 'PR': 10000, 'UR': 1200, 'SR': 1000, 'R': 500, 'U': 200, 'C': 100 };
 
+    const ACHIEVEMENTS_DATA = [
+        { id: 'starter_collector', tier: 'easy', title: 'นักสะสมมือใหม่', desc: 'สะสมการ์ดไม่ซ้ำแบบให้ครบ 10 ใบ', goal: 10, reward: { points: 1000, diamonds: 10 } },
+        { id: 'arena_starter', tier: 'easy', title: 'ผู้เริ่มต้นการต่อสู้', desc: 'ต่อสู้ใน Battle ARENA ครบ 10 ครั้ง', goal: 10, reward: { points: 500, diamonds: 5 } },
+        { id: 'lv80_easy', tier: 'easy', title: 'Easy Collector', desc: 'สะสมการ์ด Lv.80 และ 5 ดาว ครบ 10 ใบ', goal: 10, reward: { points: 50000, diamonds: 100 } },
+
+        { id: 'expert_collector', tier: 'medium', title: 'นักสะสมผู้เชี่ยวชาญ', desc: 'สะสมการ์ดไม่ซ้ำแบบให้ครบ 50 ใบ', goal: 50, reward: { points: 5000, diamonds: 50 } },
+        { id: 'arena_adept', tier: 'medium', title: 'นักรบผู้ชำนาญ', desc: 'ต่อสู้ใน Battle ARENA ครบ 100 ครั้ง', goal: 100, reward: { points: 5000, diamonds: 50 } },
+        { id: 'lv80_medium', tier: 'medium', title: 'Medium Collector', desc: 'สะสมการ์ด Lv.80 และ 5 ดาว ครบ 30 ใบ', goal: 30, reward: { points: 150000, diamonds: 300 } },
+
+        { id: 'god_tier', tier: 'hard', title: 'เหนือคำบรรยาย', desc: 'สะสมการ์ดระดับ USEC หรือ EXR ได้สำเร็จ', goal: 1, reward: { points: 10000, diamonds: 100 } },
+        { id: 'arena_expert', tier: 'hard', title: 'จอมยุทธ์แห่งอารีน่า', desc: 'ต่อสู้ใน Battle ARENA ครบ 150 ครั้ง', goal: 150, reward: { points: 15000, diamonds: 150 } },
+        { id: 'lv80_hard', tier: 'hard', title: 'Hard Collector', desc: 'สะสมการ์ด Lv.80 และ 5 ดาว ครบ 40 ใบ', goal: 40, reward: { points: 300000, diamonds: 500 } },
+
+        { id: 'rainbow_master', tier: 'impossible', title: 'ผู้พิชิตสีรุ้ง', desc: 'ทำ Full Power (LV.80 และ 5 ดาว) 1 ใบ', goal: 1, reward: { points: 50000, diamonds: 500 } },
+        { id: 'power_up4', tier: 'impossible', title: 'ผู้สูงสุดทุกอย่าง!!', desc: 'มีการ์ดเลเวล 80 ขึ้นไปอย่างน้อย 60 ใบ', goal: 60, reward: { points: 2000, diamonds: 20 } },
+        { id: 'lv80_impossible', tier: 'impossible', title: 'Impossible Collector', desc: 'สะสมการ์ด Lv.80 และ 5 ดาว ครบ 80 ใบ', goal: 80, reward: { points: 1000000, diamonds: 2000 } },
+
+        { id: 'arena_divine', tier: 'divine', title: 'เหนือเกินความคาดหมาย',  desc: 'จิตวิญญาณแห่งการต่อสู้ ต่อสู้ใน Battle ARENA ครบ 500 ครั้ง', goal: 500, reward: { points: 2000000, diamonds: 5000 },rewardTitle: 'ราชันย์อารีน่าไร้พ่าย' },
+
+        { id: 'whale_secret_usec', tier: 'secret', title: '???', desc: 'มีการ์ดระดับ USEC Full Power (LV.80 และ 5 ดาว) 6 ใบ', goal: 6, reward: { points: 60000000, diamonds: 60000000 } },
+        { id: 'whale_secret_exr', tier: 'secret', title: '???', desc: 'มีการ์ดระดับ EXR Full Power (LV.80 และ 5 ดาว) 2 ใบ', goal: 2, reward: { points: 50000000, diamonds: 50000000 } },
+        { id: 'p_collector_secret', tier: 'secret', title: '???', desc: 'ครอบครองการ์ดระดับ P อย่างน้อย 1 ใบ', goal: 1, reward: { points: 10000000, diamonds: 10000000 } },
+        { id: 'arena_legend_secret', tier: 'secret', title: '???', desc: 'ตำนานแห่ง Battle ARENA ต่อสู้ครบ 1000 ครั้ง', goal: 1000, reward: { points: 500000000, diamonds: 500000000 } },
+        { id: 'whale_secret_coins', tier: 'secret', title: '???', desc: 'สะสม Coins ในตัวให้มากกว่า 1,000,000', goal: 1000000, reward: { points: 0, diamonds: 100000000 } },
+        { id: 'power_Full_Allcollector',tier: 'secret',title: '???', desc: 'สะสมการ์ด Level 80 และ 5 ดาวให้ครบตามจำนวน',goal: 150,reward: { points: 100000000, diamonds: 100000000 } 
+    },
+    ];
+
     function getArenaPower(card) {
         const r = (card.rarity || 'C').toUpperCase();
         const config = RARITY_POWER[r] || RARITY_POWER['C'];
@@ -197,18 +260,13 @@
         return Math.floor(base * (1 + ((card.level||1) - 1) * 0.1));
     }
 
-    // ฟังก์ชันช่วยคำนวณเงื่อนไขการอัปเกรด (จำนวนการ์ด และ เหรียญ)
     function getUpgradeRequirements(card) {
         const r = (card.rarity || 'C').toUpperCase();
         const lv = card.level || 1;
-        
-        // กรณีพิเศษ USEC และ EXR
         if (r === 'USEC' || r === 'EXR') {
-            if (lv <= 45) return { reqQty: 1, cost: 500 }; // ราคาเหรียญใช้ตาม LV1-35 เป็นเกณฑ์พื้นฐาน
+            if (lv <= 45) return { reqQty: 1, cost: 500 };
             return { reqQty: 2, cost: 1500 }; 
         }
-
-        // กรณีการ์ดระดับอื่นๆ
         if (lv <= 35) return { reqQty: 1, cost: 500 };
         if (lv <= 65) return { reqQty: 2, cost: 1500 };
         return { reqQty: 3, cost: 2000 };
@@ -225,6 +283,8 @@
                     document.getElementById("nav-diamonds").innerText = (data.diamonds || 0).toLocaleString();
                     document.getElementById("display-username").innerText = data.username || "COLLECTOR";
                     renderCards();
+                    // ดึงข้อมูล arenaBattles มาคำนวณ Achievement โดยตรง
+                    renderAchievements(data);
                 }
             });
         }
@@ -247,6 +307,7 @@
         }
         if (currentFilter !== 'ALL') displayList = displayList.filter(c => (c.rarity||'C').toUpperCase() === currentFilter);
         if (searchQuery) displayList = displayList.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
+        
         const sortType = document.getElementById("sortSelect").value;
         displayList.sort((a, b) => {
             if (sortType === 'power_desc') return getArenaPower(b) - getArenaPower(a);
@@ -254,8 +315,10 @@
             if (sortType === 'rarity_desc') return rarityOrder[(b.rarity||'C').toUpperCase()] - rarityOrder[(a.rarity||'C').toUpperCase()];
             if (sortType === 'rarity_asc') return rarityOrder[(a.rarity||'C').toUpperCase()] - rarityOrder[(b.rarity||'C').toUpperCase()];
             if (sortType === 'lv_desc') return b.level - a.level;
+            if (sortType === 'lv_asc') return a.level - b.level;
             return 0;
         });
+
         displayList.forEach(card => {
             const r = (card.rarity||'C').toUpperCase();
             const div = document.createElement("div");
@@ -267,13 +330,113 @@
                 ${card.count > 1 ? `<div class="card-count-badge">x${card.count}</div>` : ''}
                 <img src="${card.img || card.image}">
                 <div style="padding:10px; background: rgba(0,0,0,0.8);">
-                    <div style="color:${rarityColors[r]}; font-size:0.75rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis;">${card.name}</div>
+                    <div style="color:${rarityColors[r]}; font-size:0.75rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${card.name}</div>
                     <div style="color:#ffc831; font-size:0.8rem; font-weight:bold;">⚡ ${getArenaPower(card).toLocaleString()}</div>
                     <div style="color:#aaa; font-size:0.65rem;">LV. ${card.level}</div>
                 </div>`;
             grid.appendChild(div);
         });
     }
+
+    function checkAchProgress(ach, userData) {
+        const collection = userData.collection || [];
+        const uniqueCardsCount = new Set(collection.map(c => `${c.name}_${c.rarity}`)).size;
+        const points = userData.points || 0;
+
+        const arenaCount = userData.arenaBattles || 0; 
+        
+        switch(ach.id) {
+            case 'starter_collector': return Math.min(uniqueCardsCount, ach.goal);
+            case 'expert_collector': return Math.min(uniqueCardsCount, ach.goal);
+            case 'lv80_easy':return collection.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;
+            case 'lv80_medium':return collection.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;
+            case 'lv80_hard':return collection.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;
+            case 'lv80_impossible':return collection.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;
+            case 'god_tier': return collection.some(c => ['USEC', 'EXR'].includes((c.rarity||'').toUpperCase())) ? 1 : 0;
+            case 'rainbow_master': return collection.some(c => (c.level||1) >= 80 && (c.stars||0) >= 5) ? 1 : 0;
+            case 'whale_secret_usec': 
+                return collection.filter(c => 
+                    (c.rarity || '').toUpperCase() === 'USEC' && 
+                    (c.level || 1) >= 80 && 
+                    (c.stars || 0) >= 5
+                ).length;
+            case 'whale_secret_exr': 
+                return collection.filter(c => 
+                    (c.rarity || '').toUpperCase() === 'EXR' && 
+                    (c.level || 1) >= 80 && 
+                    (c.stars || 0) >= 5
+                ).length;
+            case 'p_collector_secret':
+                return collection.some(c => (c.rarity || '').toUpperCase() === 'P') ? 1 : 0;
+            case 'arena_starter':
+            case 'arena_adept':
+            case 'arena_expert':
+            case 'arena_legend_secret':
+                return Math.min(arenaCount, ach.goal);
+            case 'whale_secret_coins': return points >= ach.goal ? ach.goal : points;
+            case 'power_Full_Allcollector':const fullMaxCount = collection.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;return fullMaxCount;
+            case 'arena_divine':return Math.min(arenaCount, 500);
+            default: return 0;
+        }
+    }
+
+    function renderAchievements(userData) {
+        const grid = document.getElementById("achievementGrid");
+        grid.innerHTML = "";
+        const claimedAchs = userData.claimedAchievements || [];
+
+        ACHIEVEMENTS_DATA.forEach(ach => {
+            const progress = checkAchProgress(ach, userData);
+            const isCompleted = progress >= ach.goal;
+            const isClaimed = claimedAchs.includes(ach.id);
+            const percent = (progress / ach.goal) * 100;
+
+            const card = document.createElement("div");
+            card.className = `ach-card ${isCompleted ? 'completed' : ''} ${isClaimed ? 'claimed' : ''}`;
+            
+            const isSecret = ach.tier === 'secret';
+            const displayTitle = (isSecret && !isCompleted) ? "ภารกิจลับที่ยังไม่เปิดเผย" : ach.title;
+            const displayDesc = (isSecret && !isCompleted) ? "เงื่อนไข: เป็นความลับจนกว่าจะทำสำเร็จ" : ach.desc;
+            const displayTier = (isSecret && !isCompleted) ? "???" : ach.tier;
+
+            card.innerHTML = `
+                <span class="ach-tier tier-${ach.tier}">${displayTier}</span>
+                <div class="ach-title">${displayTitle}</div>
+                <div class="ach-desc">${displayDesc}</div>
+                <span class="reward-tag">🎁 ${ach.reward.points > 0 ? ach.reward.points.toLocaleString() + ' 🪙' : ''} ${ach.reward.diamonds > 0 ? ach.reward.diamonds.toLocaleString() + ' 💎' : ''}</span>
+                <div class="ach-progress-container">
+                    <div class="ach-progress-bar" style="width: ${percent}%"></div>
+                </div>
+                <div style="font-size: 0.75rem; color: #888; margin-bottom: 12px;">
+                    ความคืบหน้า: ${progress.toLocaleString()} / ${ach.goal.toLocaleString()}
+                </div>
+                <button class="btn-claim" 
+                    ${!isCompleted || isClaimed ? 'disabled' : ''} 
+                    onclick="claimReward('${ach.id}')">
+                    ${isClaimed ? 'รับรางวัลแล้ว' : (isCompleted ? 'รับของรางวัล' : 'ยังไม่สำเร็จ')}
+                </button>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    window.claimReward = async (achId) => {
+        const ach = ACHIEVEMENTS_DATA.find(a => a.id === achId);
+        if (!ach || !currentUID) return;
+
+        const userDocRef = doc(db, "users", currentUID);
+        try {
+            await updateDoc(userDocRef, {
+                points: increment(ach.reward.points || 0),
+                diamonds: increment(ach.reward.diamonds || 0),
+                claimedAchievements: arrayUnion(achId)
+            });
+            alert(`🎉 ยินดีด้วย! คุณได้รับรางวัลจากความสำเร็จ: ${ach.title}\n💎 +${ach.reward.diamonds} | 🪙 +${ach.reward.points}`);
+        } catch (e) {
+            console.error("Error claiming reward:", e);
+            alert("เกิดข้อผิดพลาดในการรับรางวัล");
+        }
+    };
 
     window.openModal = (card) => {
         const r = (card.rarity||'C').toUpperCase();
@@ -298,7 +461,7 @@
             document.getElementById("btnBulkUpgrade").onclick = () => handleUpgrade(card, 'BULK');
         } else {
             lvGroup.style.display = "none";
-            if (card.stars < 2) {
+            if (card.stars < 5) {
                 starBtn.style.display = "block"; maxMsg.style.display = "block";
                 maxMsg.innerText = "✨ พร้อมวิวัฒนาการ (ใช้ 2 ใบซ้ำ) ✨";
                 starBtn.onclick = () => handleUpgrade(card, 'STAR', (card.stars+1)*1000);
@@ -338,7 +501,6 @@
                         if (materialIndices.length >= req.reqQty) break;
                     }
                 }
-
                 if (materialIndices.length < req.reqQty || currentPoints < (totalCostPoints + req.cost)) {
                     if (type === 'LV') {
                         if (materialIndices.length < req.reqQty) alert(`ใบซ้ำไม่พอ (ต้องการ ${req.reqQty} ใบ)`);
@@ -346,7 +508,6 @@
                     }
                     break;
                 }
-
                 materialIndices.sort((a, b) => b - a).forEach(idx => {
                     collection.splice(idx, 1);
                     if (idx < mainIdx) mainIdx--;
@@ -423,6 +584,7 @@
 
     document.getElementById("searchInput").oninput = (e) => { searchQuery = e.target.value; renderCards(); };
     document.getElementById("sortSelect").onchange = () => renderCards();
+    
     const fCon = document.getElementById("filterContainer");
     ['ALL','P','USEC','EXR','CBR','SEC','SUR','SSR','PR','UR','SR','R','U','C'].forEach(r => {
         const btn = document.createElement("button");
