@@ -3,155 +3,371 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Admin - Ultimate Control</title>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <title>SUPER ADMIN - Galactic Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { font-family: 'Kanit', sans-serif; background: #0a0a0a; color: white; margin: 0; padding: 20px; }
-        .admin-container { max-width: 1300px; margin: 0 auto; }
-        .card { background: #161616; padding: 25px; border-radius: 15px; border: 1px solid #333; margin-bottom: 25px; position: relative; overflow: hidden; }
-        .card::before { content: ""; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: #ffc831; }
-        h2 { color: #ffc831; margin-top: 0; font-size: 1.3rem; display: flex; align-items: center; gap: 10px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .stat-box { background: linear-gradient(145deg, #1e1e1e, #111); padding: 20px; border-radius: 12px; border: 1px solid #333; text-align: center; }
-        .stat-val { font-size: 1.8rem; font-weight: 800; color: #ffc831; display: block; }
-        .stat-label { color: #888; font-size: 0.8rem; text-transform: uppercase; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #222; }
-        th { color: #ffc831; background: #0d0d0d; font-weight: 400; }
-        input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #111; color: white; margin-bottom: 10px; font-family: 'Kanit'; }
-        label { font-size: 0.8rem; color: #888; display: block; margin-bottom: 5px; margin-top: 5px; }
-        .btn { border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; }
-        .btn-green { background: #2ed573; color: #000; width: 100%; padding: 15px; font-size: 1rem; justify-content: center; }
-        .btn-red { background: #ff4757; color: white; }
-        .btn-blue { background: #1e90ff; color: white; }
-        .btn-diamond { background: #00d2d3; color: white; }
-        .btn-star { background: #ffc831; color: black; }
-        .btn-orange { background: #ffa502; color: white; }
-        .btn-gray { background: #2f3542; color: white; }
-        .badge { padding: 2px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; }
-        .badge-premium { background: #ffc831; color: black; }
-        .reward-tag { display: inline-block; background: #222; padding: 2px 6px; border-radius: 4px; margin: 2px; border: 1px solid #333; font-size: 0.75rem; }
-        .search-input { border-left: 3px solid #ffc831 !important; font-size: 1rem; }
+        :root {
+            --gold: #ffc831;
+            --gold-glow: rgba(255, 200, 49, 0.3);
+            --bg-darker: #050505;
+            --bg-card: #121216;
+            --border: rgba(255, 255, 255, 0.05);
+            --red: #ff4757;
+            --blue: #1e90ff;
+            --green: #2ed573;
+            --star: #ff9f43; /* เพิ่มสีเงินดวงดาว */
+        }
+
+        body { 
+            font-family: 'Kanit', sans-serif; 
+            background: var(--bg-darker); 
+            color: #e0e0e0; 
+            margin: 0; 
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* --- Sidebar Navigation --- */
+        .sidebar {
+            width: 260px;
+            background: #0a0a0c;
+            border-right: 1px solid var(--border);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .sidebar h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: var(--gold);
+            letter-spacing: 2px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .nav-item {
+            padding: 15px;
+            border-radius: 12px;
+            color: #888;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: 0.3s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255, 200, 49, 0.1);
+            color: var(--gold);
+        }
+
+        /* --- Main Content --- */
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        /* --- Stats Grid --- */
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 20px; 
+            margin-bottom: 40px; 
+        }
+
+        .stat-box { 
+            background: var(--bg-card); 
+            padding: 25px; 
+            border-radius: 20px; 
+            border: 1px solid var(--border); 
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+
+        .stat-box:hover { transform: translateY(-5px); border-color: var(--gold); }
+
+        .stat-val { 
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem; 
+            font-weight: 700; 
+            color: var(--gold); 
+            display: block; 
+            margin-bottom: 5px;
+        }
+
+        .stat-label { color: #666; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* --- Glass Cards --- */
+        .card { 
+            background: var(--bg-card); 
+            padding: 30px; 
+            border-radius: 24px; 
+            border: 1px solid var(--border); 
+            margin-bottom: 30px; 
+        }
+
+        h2 { 
+            font-size: 1.1rem; 
+            color: #fff; 
+            margin-bottom: 25px; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        h2 i { color: var(--gold); }
+
+        /* --- Form Elements --- */
+        .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        
+        label { font-size: 0.75rem; color: #555; display: block; margin-bottom: 8px; font-weight: bold; }
+
+        input, select { 
+            width: 100%; 
+            padding: 14px; 
+            border-radius: 12px; 
+            border: 1px solid #222; 
+            background: #080808; 
+            color: white; 
+            font-family: 'Kanit'; 
+            box-sizing: border-box;
+            transition: 0.3s;
+        }
+
+        input:focus, select:focus { border-color: var(--gold); outline: none; background: #000; }
+
+        /* --- Buttons --- */
+        .btn { 
+            border: none; padding: 12px 18px; border-radius: 10px; cursor: pointer; 
+            font-weight: bold; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; 
+            text-decoration: none; font-family: 'Kanit';
+        }
+
+        .btn-main { background: var(--gold); color: #000; width: 100%; justify-content: center; font-size: 1rem; margin-top: 10px; }
+        .btn-main:hover { box-shadow: 0 0 20px var(--gold-glow); transform: scale(1.01); }
+
+        .btn-action { padding: 8px; border-radius: 8px; font-size: 0.9rem; }
+        .btn-red { background: rgba(255, 71, 87, 0.1); color: var(--red); }
+        .btn-red:hover { background: var(--red); color: white; }
+        
+        .btn-blue { background: rgba(30, 144, 255, 0.1); color: var(--blue); }
+        .btn-blue:hover { background: var(--blue); color: white; }
+
+        .btn-star { background: rgba(255, 159, 67, 0.1); color: var(--star); }
+        .btn-star:hover { background: var(--star); color: white; }
+
+        .btn-green { background: rgba(46, 213, 115, 0.1); color: var(--green); }
+        .btn-green:hover { background: var(--green); color: white; }
+
+        /* --- Tables --- */
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { text-align: left; padding: 15px; color: #444; font-size: 0.8rem; text-transform: uppercase; border-bottom: 1px solid #222; }
+        td { padding: 18px 15px; border-bottom: 1px solid #1a1a1a; font-size: 0.9rem; }
+        
+        tr:hover td { background: rgba(255,255,255,0.01); }
+
+        .user-info b { color: var(--gold); display: block; font-size: 1rem; }
+        .user-info small { color: #555; font-family: monospace; }
+
+        .badge { padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; }
+        .badge-premium { background: var(--gold); color: #000; }
+        .badge-banned { background: var(--red); color: #fff; }
+        
+        .currency-tag { background: #000; padding: 4px 8px; border-radius: 6px; border: 1px solid #222; margin-right: 5px; font-size: 0.8rem; display: inline-block; margin-bottom: 5px; }
+        .gold-txt { color: var(--gold); }
+        .dia-txt { color: #00d2ff; }
+        .star-txt { color: var(--star); }
+
+        .search-bar {
+            background: #0a0a0c;
+            border: 1px solid #222;
+            padding: 12px 20px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 300px;
+            color: white;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
 
-<div class="admin-container">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+<aside class="sidebar">
+    <h1>CORE ADMIN</h1>
+    <a href="#" class="nav-item active"><i class="fas fa-chart-pie"></i> Dashboard</a>
+    <a href="#users-sec" class="nav-item"><i class="fas fa-users"></i> Player Base</a>
+    <a href="#code-sec" class="nav-item"><i class="fas fa-ticket-alt"></i> Reward Codes</a>
+    <a href="#news-sec" class="nav-item"><i class="fas fa-newspaper"></i> News Feed</a>
+    <div style="margin-top: auto;">
+        <a href="index.html" class="nav-item" style="color: var(--red);"><i class="fas fa-power-off"></i> LOGOUT</a>
+    </div>
+</aside>
+
+<main class="main-content">
+    <div class="header-top">
         <div>
-            <h1 style="margin:0; font-size: 2rem; color: #ffc831;">SUPER ADMIN <span style="font-weight: 300; color: #fff;">DASHBOARD</span></h1>
-            <p style="color: #666; margin: 0;">ระบบจัดการข้อมูล และโค้ดรางวัล</p>
+            <h2 style="font-size: 1.8rem; margin: 0; color: #fff;">SYSTEM OVERVIEW</h2>
+            <p style="color: #555; margin: 5px 0 0 0;">ยินดีต้อนรับกลับ, ผู้ดูแลระบบสูงสุด</p>
         </div>
-        <a href="index.html" class="btn btn-gray"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
+        <div id="live-clock" style="font-family: 'Orbitron'; color: var(--gold); font-size: 1.2rem;">00:00:00</div>
     </div>
 
     <div class="stats-grid">
-        <div class="stat-box"><span class="stat-label">Total Survivors</span><span id="stat-users" class="stat-val">0</span></div>
-        <div class="stat-box"><span class="stat-label">Active Reward Codes</span><span id="stat-codes" class="stat-val">0</span></div>
-        <div class="stat-box"><span class="stat-label">Premium Users</span><span id="stat-premium" class="stat-val">0</span></div>
-    </div>
-
-    <div class="card" style="border-left: 4px solid #ff4757;">
-        <h2><i class="fas fa-bullhorn"></i> MANAGE SYSTEM ANNOUNCEMENT</h2>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-            <div>
-                <label>TOPIC</label>
-                <input type="text" id="news-title" placeholder="หัวข้อประกาศ...">
-            </div>
-            <div>
-                <label>DISPLAY DATE</label>
-                <input type="text" id="news-date" placeholder="21 มี.ค. 2026">
-            </div>
-            <div>
-                <label>BADGE TYPE</label>
-                <select id="news-badge">
-                    <option value="badge-new">NEW (สีแดง)</option>
-                    <option value="badge-update">UPDATE (สีส้ม)</option>
-                </select>
-            </div>
+        <div class="stat-box">
+            <span class="stat-label">Total Players</span>
+            <span id="stat-users" class="stat-val">0</span>
+            <i class="fas fa-users" style="position:absolute; right:20px; bottom:20px; font-size:3rem; opacity:0.05;"></i>
         </div>
-        <button class="btn btn-green" id="post-news-btn" style="background: #ff4757; color: white;">
-            <i class="fas fa-paper-plane"></i> PUBLISH NEWS
-        </button>
-        <table style="margin-top: 20px;">
-            <tbody id="news-table-body"></tbody>
-        </table>
+        <div class="stat-box">
+            <span class="stat-label">Active Codes</span>
+            <span id="stat-codes" class="stat-val">0</span>
+            <i class="fas fa-qrcode" style="position:absolute; right:20px; bottom:20px; font-size:3rem; opacity:0.05;"></i>
+        </div>
+        <div class="stat-box">
+            <span class="stat-label">Premium Members</span>
+            <span id="stat-premium" class="stat-val">0</span>
+            <i class="fas fa-crown" style="position:absolute; right:20px; bottom:20px; font-size:3rem; opacity:0.05;"></i>
+        </div>
     </div>
 
-    <div class="card">
-        <h2><i class="fas fa-ticket-alt"></i> GENERATE REDEEM CODE</h2>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-            <div class="input-group">
-                <label>CODE NAME</label>
-                <input type="text" id="new-code" placeholder="GIFT2026">
-                <label>OBTAINED FROM</label>
-                <input type="text" id="obtained-from" placeholder="ระบุที่มา">
-            </div>
-            <div class="input-group">
-                <label>REWARDS</label>
-                <div style="display: flex; gap: 5px;">
-                    <input type="number" id="reward-points" placeholder="🪙 Gold">
-                    <input type="number" id="reward-diamonds" placeholder="💎 Diamond">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+        <section class="card" id="news-sec">
+            <h2><i class="fas fa-bullhorn"></i> Announcement System</h2>
+            <div class="grid-inputs">
+                <div>
+                    <label>หัวข้อประกาศ</label>
+                    <input type="text" id="news-title" placeholder="Update v1.2...">
                 </div>
-                <label>MAX USES (0 = Unlimited)</label>
-                <input type="number" id="max-use" value="0">
-            </div>
-            <div class="input-group">
-                <label>SPECIAL CARD</label>
-                <input type="text" id="reward-card-name" placeholder="ชื่อการ์ด">
-                <div style="display: flex; gap: 5px;">
-                    <select id="reward-card-rarity" style="flex: 2;">
-                        <option value="">-- No Card --</option>
-                        <option value="P">P (Highest)</option>
-                        <option value="USEC">USEC</option>
-                        <option value="EXR">EXR</option>
-                        <option value="CBR">CBR</option>
-                        <option value="SEC">SEC</option>
-                        <option value="SUR">SUR</option>
-                        <option value="SSR">SSR</option>
-                        <option value="PR">PR</option>
-                        <option value="UR">UR</option>
-                        <option value="SR">SR</option>
-                        <option value="R">R</option>
-                        <option value="U">U</option>
-                        <option value="C">C</option>
+                <div>
+                    <label>Badge</label>
+                    <select id="news-badge">
+                        <option value="badge-new">NEW CONTENT</option>
+                        <option value="badge-update">SYSTEM UPDATE</option>
                     </select>
-                    <input type="number" id="reward-card-count" placeholder="จำนวนใบ" value="1" style="flex: 1;">
                 </div>
-                <input type="text" id="reward-card-img" placeholder="รูป URL">
             </div>
-        </div>
-        <button class="btn btn-green" id="create-btn"><i class="fas fa-plus-circle"></i> PUBLISH CODE</button>
+            <button class="btn btn-main" id="post-news-btn" style="background: var(--red); color: white;">
+                <i class="fas fa-paper-plane"></i> PUBLISH NOW
+            </button>
+            <div class="table-container" style="max-height: 300px;">
+                <table>
+                    <tbody id="news-table-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="card" id="code-sec">
+            <h2><i class="fas fa-plus-square"></i> Forge New Reward Code</h2>
+            <div class="grid-inputs">
+                <div>
+                    <label>CODE NAME</label>
+                    <input type="text" id="new-code" placeholder="NEWYEAR2026">
+                </div>
+                <div>
+                    <label>LIMIT USE</label>
+                    <input type="number" id="max-use" value="0">
+                </div>
+            </div>
+            <div class="grid-inputs">
+                <div>
+                    <label>GOLD</label>
+                    <input type="number" id="reward-points" placeholder="0">
+                </div>
+                <div>
+                    <label>DIAMOND</label>
+                    <input type="number" id="reward-diamonds" placeholder="0">
+                </div>
+                <div>
+                    <label>STAR (⭐)</label>
+                    <input type="number" id="reward-stars" placeholder="0">
+                </div>
+            </div>
+            <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; border: 1px dashed #333; margin-top: 10px;">
+                <label style="color: var(--gold);">SPECIAL CARD REWARD (OPTIONAL)</label>
+                <div class="grid-inputs" style="margin-top: 10px;">
+                    <input type="text" id="reward-card-name" placeholder="ชื่อการ์ดรางวัล">
+                    <select id="reward-card-rarity">
+                        <option value="">-- ระดับความหายาก --</option>
+                        <option value="P" style="color: #ff4757; font-weight: bold;">P (Highest)</option>
+                        <option value="USEC" style="color: #ffc831;">USEC</option>
+                        <option value="EXR" style="color: #ffc831;">EXR</option>
+                        <option value="SSR" style="color: #ffa502;">SSR</option>
+                        <option value="UR" style="color: #2ed573;">UR</option>
+                        <option value="SR" style="color: #1e90ff;">SR</option>
+                        <option value="R" style="color: #a29bfe;">R</option>
+                    </select>
+                </div>
+                <div class="grid-inputs">
+                    <div>
+                        <label>จำนวนการ์ด</label>
+                        <input type="number" id="reward-card-count" value="1" min="1">
+                    </div>
+                    <div>
+                        <label>Image URL</label>
+                        <input type="text" id="reward-card-img" placeholder="https://...">
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-main" id="create-btn"><i class="fas fa-hammer"></i> FORGE CODE</button>
+        </section>
     </div>
 
-    <div class="card">
-        <h2><i class="fas fa-users-cog"></i> USER MANAGEMENT</h2>
-        <input type="text" id="user-search" class="search-input" placeholder="ค้นหาชื่อ..." onkeyup="filterUsers()">
-        <div style="overflow-x: auto;">
+    <section class="card" id="users-sec">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2><i class="fas fa-database"></i> Player Database</h2>
+            <input type="text" id="user-search" class="search-bar" placeholder="🔍 Search username..." onkeyup="filterUsers()">
+        </div>
+        <div class="table-container">
             <table>
                 <thead>
                     <tr>
                         <th>Identity</th>
-                        <th>Pass Status</th>
-                        <th>Economy (Gold/Dia/Star)</th> <th>Battle Progress</th>
-                        <th>Operations</th>
+                        <th>Status</th>
+                        <th>Economy (Gold/Dia/Star)</th>
+                        <th>Progress</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="user-table-body"></tbody>
             </table>
         </div>
-    </div>
+    </section>
 
-    <div class="card">
-        <h2><i class="fas fa-list-ul"></i> ACTIVE CODES REGISTRY</h2>
-        <div style="overflow-x: auto;">
+    <section class="card">
+        <h2><i class="fas fa-history"></i> Active Code Registry</h2>
+        <div class="table-container">
             <table>
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Reward Details</th>
+                        <th>Usage</th>
+                        <th>Control</th>
+                    </tr>
+                </thead>
                 <tbody id="code-table-body"></tbody>
             </table>
         </div>
-    </div>
-</div>
+    </section>
+</main>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -169,19 +385,25 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    // Live Clock
+    setInterval(() => {
+        document.getElementById('live-clock').innerText = new Date().toLocaleTimeString();
+    }, 1000);
+
     // --- News Management ---
     document.getElementById("post-news-btn").onclick = async () => {
         const title = document.getElementById("news-title").value.trim();
-        const date = document.getElementById("news-date").value.trim();
         const badge = document.getElementById("news-badge").value;
-        if(!title || !date) return alert("กรุณาระบุหัวข้อและวันที่");
+        if(!title) return alert("กรุณาระบุหัวข้อ");
+        
+        const dateStr = new Date().toLocaleDateString('th-TH', { day:'numeric', month:'short' });
+
         await addDoc(collection(db, "news"), {
-            title, date, badgeClass: badge,
-            badgeText: badge === 'badge-new' ? 'New' : 'Update',
+            title, date: dateStr, badgeClass: badge,
+            badgeText: badge === 'badge-new' ? 'NEW' : 'UPDATE',
             createdAt: new Date()
         });
         document.getElementById("news-title").value = "";
-        alert("ลงประกาศแล้ว!");
     };
 
     onSnapshot(query(collection(db, "news"), orderBy("createdAt", "desc")), (snap) => {
@@ -189,46 +411,42 @@
         body.innerHTML = "";
         snap.forEach(d => {
             const n = d.data();
-            body.innerHTML += `<tr><td>${n.date}</td><td><b>${n.title}</b></td><td><span class="badge ${n.badgeClass}">${n.badgeText}</span></td><td><button class="btn btn-red" onclick="deleteItem('news', '${d.id}')">ลบ</button></td></tr>`;
+            body.innerHTML += `<tr>
+                <td style="color:#555; width:80px;">${n.date}</td>
+                <td><span class="badge ${n.badgeClass}">${n.badgeText}</span> <b>${n.title}</b></td>
+                <td style="text-align:right;"><button class="btn btn-action btn-red" onclick="deleteItem('news', '${d.id}')"><i class="fas fa-trash"></i></button></td>
+            </tr>`;
         });
     });
 
-    // --- Generate Code Logic (แก้ไขแล้ว) ---
+    // --- Code Forge ---
     document.getElementById("create-btn").onclick = async () => {
         const codeName = document.getElementById("new-code").value.trim().toUpperCase();
-        if(!codeName) return alert("ระบุชื่อโค้ด");
+        if(!codeName) return alert("Enter Code Name");
         
         const cardName = document.getElementById("reward-card-name").value.trim();
-        const cardCount = parseInt(document.getElementById("reward-card-count").value) || 1;
         const rarity = document.getElementById("reward-card-rarity").value;
+        const cardCount = parseInt(document.getElementById("reward-card-count").value) || 1;
 
         const codeData = {
             rewardPoints: parseInt(document.getElementById("reward-points").value) || 0,
             rewardDiamonds: parseInt(document.getElementById("reward-diamonds").value) || 0,
+            rewardStars: parseInt(document.getElementById("reward-stars").value) || 0, // เพิ่ม Star
             maxUse: parseInt(document.getElementById("max-use").value) || 0,
             usedCount: 0,
-            obtainedFrom: document.getElementById("obtained-from").value || "System",
             rewardCard: cardName ? {
-                name: cardName,
-                rarity: rarity,
-                img: document.getElementById("reward-card-img").value,
-                count: cardCount, // เก็บจำนวนจริงที่กรอกลง DB
-                level: 1,
-                stars: 0
+                name: cardName, rarity: rarity,
+                img: document.getElementById("reward-card-img").value || "",
+                count: cardCount, level: 1, stars: 0
             } : null
         };
         
         await setDoc(doc(db, "codes", codeName), codeData);
-        alert(`โค้ด ${codeName} สร้างสำเร็จ! (การ์ดจำนวน ${cardCount} ใบ)`);
-        
-        // ล้างค่า
+        alert(`Code ${codeName} ACTIVATED`);
         document.getElementById("new-code").value = "";
-        document.getElementById("reward-card-name").value = "";
-        document.getElementById("reward-card-count").value = "1";
-        document.getElementById("reward-card-img").value = "";
     };
 
-    // --- User & Stats Logic ---
+    // --- User Management ---
     onSnapshot(collection(db, "users"), (snap) => {
         document.getElementById("stat-users").innerText = snap.size;
         let premiumCount = 0;
@@ -236,25 +454,30 @@
         body.innerHTML = "";
         snap.forEach(d => {
             const user = d.data();
-            const uid = d.id;
             if(user.isPremiumUser) premiumCount++;
+            
+            const statusBadge = user.isBanned ? 
+                '<span class="badge badge-banned">BANNED</span>' : 
+                (user.isPremiumUser ? '<span class="badge badge-premium">PREMIUM</span>' : '<span style="color:#444">STANDARD</span>');
+
             body.innerHTML += `
                 <tr>
-                    <td><b>${user.username || 'Ghost'}</b><br><small>${uid.substring(0,8)}</small></td>
-                    <td>${user.isPremiumUser ? '<span class="badge badge-premium">PREMIUM</span>' : '-'}</td>
+                    <td class="user-info"><b>${user.username || 'N/A'}</b><small>${d.id.substring(0,8)}</small></td>
+                    <td>${statusBadge}</td>
                     <td>
-                        <span class="reward-tag">🪙 ${(user.points||0).toLocaleString()}</span><br>
-                        <span class="reward-tag">💎 ${(user.diamonds||0).toLocaleString()}</span><br>
-                        <span class="reward-tag" style="color:#ffc831">⭐ ${(user.stars||0).toLocaleString()}</span>
+                        <span class="currency-tag gold-txt">🪙 ${user.points||0}</span>
+                        <span class="currency-tag dia-txt">💎 ${user.diamonds||0}</span>
+                        <span class="currency-tag star-txt">⭐ ${user.stars||0}</span>
                     </td>
-                    <td><span style="color:#ffc831">LV.${calculateLevel(user.passExp || 0)}</span></td>
+                    <td><b style="color:var(--gold)">LV.${calculateLevel(user.passExp || 0)}</b></td>
                     <td>
-                        <div style="display:flex; flex-wrap:wrap; gap:5px;">
-                            <button class="btn btn-blue" onclick="editVal('${uid}', 'points', '🪙 Gold')"><i class="fas fa-coins"></i></button>
-                            <button class="btn btn-diamond" onclick="editVal('${uid}', 'diamonds', '💎 Diamond')"><i class="fas fa-gem"></i></button>
-                            <button class="btn btn-star" onclick="editVal('${uid}', 'stars', '⭐ Star')"><i class="fas fa-star"></i></button>
-                            <button class="btn btn-orange" onclick="resetEconomy('${uid}', '${user.username}')"><i class="fas fa-undo"></i></button>
-                            <button class="btn btn-red" onclick="deleteItem('users', '${uid}')"><i class="fas fa-trash"></i></button>
+                        <div style="display:flex; gap:5px;">
+                            <button class="btn btn-action btn-blue" onclick="editVal('${d.id}', 'points', 'Gold')" title="Edit Gold"><i class="fas fa-coins"></i></button>
+                            <button class="btn btn-action btn-blue" onclick="editVal('${d.id}', 'diamonds', 'Diamond')" title="Edit Diamond"><i class="fas fa-gem"></i></button>
+                            <button class="btn btn-action btn-star" onclick="editVal('${d.id}', 'stars', 'Star')" title="Edit Star"><i class="fas fa-star"></i></button>
+                            <button class="btn btn-action ${user.isBanned ? 'btn-green' : 'btn-red'}" onclick="toggleBan('${d.id}', ${user.isBanned})" title="${user.isBanned ? 'Unban' : 'Ban'}">
+                                <i class="fas ${user.isBanned ? 'fa-user-check' : 'fa-user-slash'}"></i>
+                            </button>
                         </div>
                     </td>
                 </tr>`;
@@ -268,43 +491,49 @@
         body.innerHTML = "";
         snap.forEach(d => {
             const c = d.data();
-            // ปรับปรุงการแสดงผลให้โชว์จำนวนการ์ด (x จำนวน)
-            const cardInfo = c.rewardCard ? `<br><small style="color:#ffc831">+การ์ด ${c.rewardCard.name} [${c.rewardCard.rarity}] x${c.rewardCard.count}</small>` : "";
-            body.innerHTML += `<tr><td><b>${d.id}</b></td><td>🪙${c.rewardPoints} 💎${c.rewardDiamonds}${cardInfo}</td><td>${c.usedCount}/${c.maxUse}</td><td><button class="btn btn-red" onclick="deleteItem('codes', '${d.id}')">ลบ</button></td></tr>`;
+            const starPart = c.rewardStars > 0 ? ` ⭐${c.rewardStars}` : '';
+            const cardPart = c.rewardCard ? ` | 🎴 ${c.rewardCard.name} (${c.rewardCard.rarity})` : '';
+            body.innerHTML += `<tr>
+                <td><b style="color:var(--gold)">${d.id}</b></td>
+                <td>🪙${c.rewardPoints} 💎${c.rewardDiamonds}${starPart}${cardPart}</td>
+                <td>${c.usedCount}/${c.maxUse === 0 ? '∞' : c.maxUse}</td>
+                <td><button class="btn btn-action btn-red" onclick="deleteItem('codes', '${d.id}')"><i class="fas fa-times"></i></button></td>
+            </tr>`;
         });
     });
 
+    // --- Globals for Actions ---
     function calculateLevel(exp) {
-        let lv = 1; let remaining = exp;
+        let lv = 1; let rem = exp;
         while(true) {
             let req = Math.floor(50 * Math.pow(1.2, lv - 1));
-            if(remaining >= req && lv < 50) { remaining -= req; lv++; } else break;
+            if(rem >= req && lv < 100) { rem -= req; lv++; } else break;
         }
         return lv;
     }
 
     window.editVal = async (uid, field, label) => {
-        const val = prompt(`ระบุจำนวนที่ต้องการเพิ่ม/ลด ให้ผู้ใช้ (${label}) \n(ใส่เลขติดลบเพื่อลด เช่น -100)`);
-        if(val) await updateDoc(doc(db, "users", uid), { [field]: increment(parseInt(val)) });
+        const val = prompt(`ระบุจำนวนที่ต้องการเพิ่ม/ลด ${label} (ใส่เลขลบเพื่อลด):`);
+        if(val && !isNaN(val)) await updateDoc(doc(db, "users", uid), { [field]: increment(parseInt(val)) });
     };
 
-    window.resetEconomy = async (uid, username) => {
-        if(confirm(`รีเซ็ตค่าเงินทั้งหมด (Gold, Diamond, Star) ของ ${username}?`)) {
-            await updateDoc(doc(db, "users", uid), { points: 0, diamonds: 0, stars: 0 });
-            alert("รีเซ็ตเรียบร้อย!");
+    window.toggleBan = async (uid, currentStatus) => {
+        const action = currentStatus ? "ปลดแบน" : "แบน";
+        if(confirm(`คุณต้องการ ${action} ผู้เล่นนี้ใช่หรือไม่?`)) {
+            await updateDoc(doc(db, "users", uid), { isBanned: !currentStatus });
         }
     };
 
     window.deleteItem = async (col, id) => {
-        if(confirm(`ลบ ${id}?`)) await deleteDoc(doc(db, col, id));
+        if(confirm(`ยืนยันการลบ ${id}?`)) await deleteDoc(doc(db, col, id));
     };
 
     window.filterUsers = () => {
-        const input = document.getElementById('user-search').value.toLowerCase();
+        const query = document.getElementById('user-search').value.toLowerCase();
         const rows = document.getElementById('user-table-body').getElementsByTagName('tr');
         for (let row of rows) {
-            const name = row.getElementsByTagName('td')[0].innerText.toLowerCase();
-            row.style.display = name.includes(input) ? "" : "none";
+            const name = row.cells[0].innerText.toLowerCase();
+            row.style.display = name.includes(query) ? "" : "none";
         }
     };
 </script>
