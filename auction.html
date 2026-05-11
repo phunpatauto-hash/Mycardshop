@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARENA AUCTION - HIGH RARITY ONLY</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root { --gold: #ffc831; --dark: #050505; --card-bg: rgba(20, 20, 30, 0.98); }
+        body { font-family: 'Kanit', sans-serif; background: #000000; color: white; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
+        
+        .navbar { background-color: rgba(10, 10, 15, 0.95); width: 100%; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); position: sticky; top: 0; z-index: 1000; box-sizing: border-box; backdrop-filter: blur(10px); }
+        .user-stat { color: var(--gold); font-weight: bold; }
+
+        /* สไตล์ปุ่มหน้าแรกที่เพิ่มใหม่ */
+        .btn-home { 
+            background: transparent; 
+            border: 1px solid var(--gold); 
+            color: var(--gold); 
+            padding: 8px 15px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-family: 'Kanit'; 
+            font-weight: bold; 
+            text-decoration: none; 
+            transition: 0.3s; 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+        .btn-home:hover { 
+            background: var(--gold); 
+            color: black; 
+            box-shadow: 0 0 15px rgba(255, 200, 49, 0.4); 
+        }
+
+        .main-layout { display: flex; gap: 25px; width: 95%; max-width: 1200px; margin-top: 30px; margin-bottom: 100px; align-items: flex-start; }
+        
+        .auction-main { flex: 2.5; background: var(--card-bg); border: 2px solid var(--gold); border-radius: 20px; padding: 30px; text-align: center; box-shadow: 0 0 40px rgba(255,200,49,0.15); }
+        
+        .timer { font-size: 3.5rem; color: #ff4757; font-weight: bold; margin: 10px 0; text-shadow: 0 0 15px rgba(255,71,87,0.5); }
+        .card-frame { width: 280px; height: 390px; margin: 20px auto; border-radius: 15px; overflow: hidden; border: 4px solid var(--gold); background: #000; box-shadow: 0 0 60px rgba(255, 200, 49, 0.25); position: relative; }
+        .card-frame img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .rarity-tag { padding: 8px 20px; border-radius: 5px; font-weight: bold; font-size: 1.2rem; margin: 10px 0; display: inline-block; text-transform: uppercase; color: #000; }
+        
+        .sidebar-right { flex: 1; display: flex; flex-direction: column; gap: 20px; }
+        .side-box { background: rgba(255, 255, 255, 0.03); border: 1px solid #333; border-radius: 20px; padding: 20px; text-align: center; }
+        
+        .winner-display-box { text-align: left; background: rgba(255, 200, 49, 0.05); border: 1px solid rgba(255,200,49,0.2); }
+        .winner-item { font-size: 0.9rem; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 2px; }
+        .winner-item:last-child { border-bottom: none; }
+
+        .bid-input { width: 100%; padding: 15px; border-radius: 12px; border: 2px solid var(--gold); background: rgba(0,0,0,0.8); color: white; font-size: 1.5rem; text-align: center; margin-bottom: 15px; box-sizing: border-box; }
+        .btn-bid { width: 100%; padding: 20px; background: linear-gradient(45deg, #ffc831, #ff9000); color: black; border: none; border-radius: 12px; font-weight: bold; font-size: 1.4rem; cursor: pointer; transition: 0.2s; }
+        .btn-bid:hover { transform: translateY(-3px); box-shadow: 0 5px 25px rgba(255,200,49,0.7); }
+
+        .pool-stats { margin-top: 15px; padding: 15px; background: rgba(255, 200, 49, 0.08); border-radius: 12px; border: 1px dashed var(--gold); }
+
+        .next-card-frame { width: 140px; height: 190px; margin: 15px auto; border: 1px solid #444; border-radius: 10px; overflow: hidden; }
+        .next-card-frame img { width: 100%; height: 100%; object-fit: cover; }
+
+        .swal2-popup { background: #12121a !important; color: white !important; border: 2px solid var(--gold) !important; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <a href="index.html" class="btn-home">🏠 หน้าแรก</a>
+        <div id="displayUserName" class="user-stat">LOADING...</div>
+    </div>
+    <div style="display: flex; gap: 20px;">
+        <div class="user-stat">💎 <span id="nav-diamonds">0</span></div>
+    </div>
+</nav>
+
+<div class="main-layout">
+    <div class="auction-main">
+        <h2 style="color: var(--gold); margin: 0; letter-spacing: 2px; text-transform: uppercase;">🏛️ HIGH-TIER AUCTION</h2>
+        <div id="timer" class="timer">00:00</div>
+        
+        <div class="card-frame">
+            <img id="cardImg" src="" alt="Premium Card">
+        </div>
+        
+        <h2 id="cardName" style="font-size: 2.2rem; margin: 5px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">---</h2>
+        <div id="rarityTag" class="rarity-tag">...</div>
+
+        <div style="margin-top: 30px;">
+            <input type="number" id="bidAmount" class="bid-input" placeholder="จำนวนเพชรที่จะประมูล 💎">
+            <button class="btn-bid" onclick="placeBid()">ยืนยันเพชรประมูล</button>
+            
+            <div class="pool-stats">
+                <div style="font-size: 1.1rem; color: var(--gold); opacity: 0.8;">กองกลางรอบนี้</div>
+                <div style="font-size: 2rem; font-weight: bold; color: var(--gold);">💎 <span id="totalPool">0</span></div>
+                <div style="font-size: 0.9rem; color: #fff; margin-top: 5px; opacity: 0.7;">คุณลงไปแล้ว: <span id="myTotalBid" style="color: #00ff88;">0</span> 💎</div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 20px; font-size: 1rem; color: #bbb;">
+            โอกาสชนะของคุณ: <span id="myChance" style="color: #00ff88; font-weight: bold;">0%</span> | 
+            ผู้เข้าร่วมทั้งหมด: <span id="totalBidders" style="color: #ff4757; font-weight: bold;">0</span> คน
+        </div>
+    </div>
+
+    <div class="sidebar-right">
+        <div class="side-box">
+            <h3 style="color: #777; margin: 0; font-size: 0.9rem;">ใบถัดไป...</h3>
+            <div class="next-card-frame">
+                <img id="nextCardImg" src="" alt="Next Card">
+            </div>
+            <div id="nextCardName" style="color: var(--gold); font-weight: bold; font-size: 0.85rem;">LOADING</div>
+        </div>
+
+        <div class="side-box winner-display-box">
+            <h3 style="color: var(--gold); margin: 0 0 10px 0; font-size: 1rem; border-bottom: 1px solid rgba(255,200,49,0.3); padding-bottom: 5px;">🏆 ผู้ชนะล่าสุด</h3>
+            <div id="winnerList">
+                <div style="color: #666; font-size: 0.8rem; text-align: center; padding: 10px;">รอข้อมูลผู้ชนะ...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, updateDoc, increment, arrayUnion, setDoc, collection, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = { 
+        apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM", 
+        authDomain: "sign-up-73f99.firebaseapp.com", 
+        projectId: "sign-up-73f99", 
+        storageBucket: "sign-up-73f99.appspot.com", 
+        messagingSenderId: "916335559099", 
+        appId: "1:916335559099:web:3a8ed896ba26e38991849e" 
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const rarityColors = { 'USEC': '#ff00ff', 'EXR': '#ff4d4d', 'SEC': '#ffac33', 'SSR': '#ffc831', 'SR': '#33aaff' };
+    const rarityAssets = {
+        'USEC': { name: 'เอรา นาคเกล็ดเขียว (USEC)', img: 'https://cdn.bangbon.app/cards/SL02-009.png' },
+        'EXR':  { name: 'White Lily (EXR)', img: 'https://cookierunbraverse.com/data/en_storage/olOZiU0Y2v2FxOl6yWDUrQ.webp' },
+        'SEC':  { name: 'Moon Rabbit Cookie (SEC)', img: 'https://cookierunbraverse.com/data/en_storage/ZiH3DAYad38ydqqiRu6M4w.webp' },
+        'SSR':  { name: 'Herb Cookie (SSR)', img: 'https://cookierunbraverse.com/data/en_storage/QhXEdn1RHleo_rigjpY2AQ.webp' },
+        'SR':   { name: 'Herb Cookie (SR)', img: 'https://cookierunbraverse.com/data/en_storage/slT6LU8WmAEuGLM8kH5XYQ.webp' }
+    };
+
+    let currentUID = null;
+    let userData = null;
+    let auctionData = null;
+    let isProcessing = false;
+
+    function getRandomRarity() {
+        const roll = Math.random() * 100;
+        if (roll <= 20) return 'SEC';
+        if (roll <= 0.4) return 'USEC';
+        if (roll <= 0.4) return 'EXR';
+        if (roll <= 30) return 'SSR';
+        return 'SR';
+    }
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUID = user.uid;
+            onSnapshot(doc(db, "users", currentUID), (snap) => {
+                if (snap.exists()) {
+                    userData = snap.data();
+                    document.getElementById("displayUserName").innerText = userData.username || "PLAYER";
+                    document.getElementById("nav-diamonds").innerText = (userData.diamonds || 0).toLocaleString();
+                }
+            });
+        } else { window.location.href = "login.html"; }
+    });
+
+    onSnapshot(doc(db, "auctions", "current"), (snap) => {
+        if (snap.exists()) {
+            auctionData = snap.data();
+            renderAuction();
+        }
+    });
+
+    onSnapshot(query(collection(db, "winnerLogs"), orderBy("time", "desc"), limit(3)), (snap) => {
+        const list = document.getElementById("winnerList");
+        list.innerHTML = "";
+        if (snap.empty) {
+            list.innerHTML = `<div style="color: #666; font-size: 0.8rem; text-align: center; padding: 10px;">รอข้อมูลผู้ชนะ...</div>`;
+            return;
+        }
+        snap.forEach(doc => {
+            const d = doc.data();
+            list.innerHTML += `<div class="winner-item">
+                <span style="color:var(--gold); font-weight:bold;">${d.username}</span>
+                <span style="color:${rarityColors[d.rarity] || '#fff'}; font-size:0.8rem;">ได้รับ [${d.rarity}] CARD</span>
+            </div>`;
+        });
+    });
+
+    function renderAuction() {
+        if (!auctionData) return;
+        const currentR = auctionData.rarity || 'SR';
+        const asset = rarityAssets[currentR] || rarityAssets['SR'];
+        document.getElementById("cardImg").src = asset.img;
+        document.getElementById("cardName").innerText = asset.name;
+        const rTag = document.getElementById("rarityTag");
+        rTag.innerText = currentR;
+        rTag.style.backgroundColor = rarityColors[currentR] || "#eee";
+
+        const nextR = (auctionData.nextCard && auctionData.nextCard.rarity) ? auctionData.nextCard.rarity : 'SSR';
+        const nextAsset = rarityAssets[nextR] || rarityAssets['SSR'];
+        document.getElementById("nextCardImg").src = nextAsset.img;
+        document.getElementById("nextCardName").innerText = nextAsset.name;
+
+        const participants = auctionData.participants || [];
+        const totalBid = participants.reduce((sum, p) => sum + p.bid, 0);
+        const myTotalBid = participants.filter(p => p.uid === currentUID).reduce((s, p) => s + p.bid, 0);
+        
+        document.getElementById("totalPool").innerText = totalBid.toLocaleString();
+        document.getElementById("myTotalBid").innerText = myTotalBid.toLocaleString();
+
+        document.getElementById("totalBidders").innerText = participants.length;
+        document.getElementById("myChance").innerText = totalBid > 0 ? ((myTotalBid/totalBid)*100).toFixed(1) + "%" : "0%";
+    }
+
+    window.placeBid = async () => {
+        const amount = parseInt(document.getElementById("bidAmount").value);
+        if (!amount || amount <= 0 || userData.diamonds < amount) return Swal.fire('ผิดพลาด', 'เพชรไม่พอหรือระบุจำนวนผิด', 'error');
+        try {
+            await updateDoc(doc(db, "users", currentUID), { diamonds: increment(-amount) });
+            await updateDoc(doc(db, "auctions", "current"), {
+                participants: arrayUnion({ uid: currentUID, name: userData.username, bid: amount })
+            });
+            Swal.fire({ title: 'ลงประมูลแล้ว!', icon: 'success', timer: 1000, showConfirmButton: false });
+            document.getElementById("bidAmount").value = "";
+        } catch (e) { console.error(e); }
+    };
+
+    async function handleEndAuction(data) {
+        if (isProcessing) return;
+        isProcessing = true;
+        
+        const participants = data.participants || [];
+        if (participants.length > 0) {
+            let pool = [];
+            participants.forEach(p => { for(let i = 0; i < p.bid; i++) pool.push(p.uid); });
+            const winnerIdx = Math.floor(Math.random() * pool.length);
+            const winnerUid = pool[winnerIdx];
+            const winnerInfo = participants.find(p => p.uid === winnerUid);
+
+            await setDoc(doc(collection(db, "winnerLogs")), {
+                username: winnerInfo.name,
+                rarity: data.rarity,
+                time: Date.now()
+            });
+
+            if (currentUID === winnerUid) {
+                const asset = rarityAssets[data.rarity] || rarityAssets['SR'];
+                await updateDoc(doc(db, "users", winnerUid), {
+                    collection: arrayUnion({ 
+                        name: asset.name, rarity: data.rarity, img: asset.img, 
+                        level: 1, stars: 0, obtainedAt: Date.now() 
+                    })
+                });
+                
+                let config = {
+                    title: `🎊 ยินดีด้วยคุณชนะได้รับ!`,
+                    html: `<img src="${asset.img}" style="width:200px; border-radius:10px; margin:15px 0;"><br>ได้รับ: ${asset.name}`,
+                    background: '#12121a',
+                    color: rarityColors[data.rarity],
+                    confirmButtonText: 'เก็บเข้าคลัง'
+                };
+                Swal.fire(config);
+            }
+        }
+
+        const nextRarity = (data.nextCard && data.nextCard.rarity) ? data.nextCard.rarity : getRandomRarity();
+        const futureRarity = getRandomRarity();
+
+        await setDoc(doc(db, "auctions", "current"), {
+            rarity: nextRarity,
+            endTime: Date.now() + 600000, 
+            participants: [],
+            nextCard: { rarity: futureRarity }
+        });
+        
+        isProcessing = false;
+    }
+
+    setInterval(() => {
+        if (!auctionData) return;
+        const remain = auctionData.endTime - Date.now();
+        if (remain <= 0) {
+            handleEndAuction(auctionData);
+        } else {
+            const m = Math.floor(remain / 60000);
+            const s = Math.floor((remain % 60000) / 1000);
+            document.getElementById("timer").innerText = `${m}:${s.toString().padStart(2,'0')}`;
+        }
+    }, 1000);
+</script>
+</body>
+</html>
