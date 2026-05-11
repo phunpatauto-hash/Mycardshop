@@ -159,8 +159,8 @@
     function getRandomRarity() {
         const roll = Math.random() * 100;
         if (roll <= 20) return 'SEC';
-        if (roll <= 0.4) return 'USEC';
-        if (roll <= 0.4) return 'EXR';
+        if (roll <= 1) return 'USEC';
+        if (roll <= 1) return 'EXR';
         if (roll <= 30) return 'SSR';
         return 'SR';
     }
