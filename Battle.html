@@ -548,7 +548,7 @@
                 oTotalPwr += oPwr;
             }
             const win = pTotalPwr >= oTotalPwr;
-            let trophyGain = 30; 
+            let trophyGain = 90; 
             const currentRankName = getRankInfo(userDoc.trophies || 0).name;
             if (currentRankName.includes("SILVER 1") || currentRankName.includes("GOLD") || currentRankName.includes("DIAMOND")) trophyGain = 120;
             else if (currentRankName.includes("MASTER")) trophyGain = 290;
