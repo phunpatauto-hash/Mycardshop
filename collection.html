@@ -222,23 +222,23 @@
     const sellValuesBase = { 'P': 10000, 'USEC': 90000, 'EXR': 55000, 'CBR': 50000, 'SEC': 25000, 'SUR': 15000, 'SSR': 15000, 'PR': 10000, 'UR': 1200, 'SR': 1000, 'R': 500, 'U': 200, 'C': 100 };
 
     const ACHIEVEMENTS_DATA = [
-        { id: 'starter_collector', tier: 'easy', title: 'นักสะสมมือใหม่', desc: 'สะสมการ์ดไม่ซ้ำแบบให้ครบ 10 ใบ', goal: 10, reward: { points: 1000, diamonds: 10 } },
-        { id: 'arena_starter', tier: 'easy', title: 'ผู้เริ่มต้นการต่อสู้', desc: 'ต่อสู้ใน Battle ARENA ครบ 10 ครั้ง', goal: 10, reward: { points: 500, diamonds: 5 } },
-        { id: 'lv80_easy', tier: 'easy', title: 'Easy Collector', desc: 'สะสมการ์ด Lv.80 และ 5 ดาว ครบ 10 ใบ', goal: 10, reward: { points: 50000, diamonds: 100 } },
+        { id: 'starter_collector', tier: 'easy', title: 'นักสะสมมือใหม่', desc: 'สะสมการ์ดไม่ซ้ำแบบให้ครบ 10 ใบ', goal: 10, reward: { points: 100000, diamonds: 10000 } },
+        { id: 'arena_starter', tier: 'easy', title: 'ผู้เริ่มต้นการต่อสู้', desc: 'ต่อสู้ใน Battle ARENA ครบ 10 ครั้ง', goal: 10, reward: { points: 500000, diamonds: 50000 } },
+        { id: 'lv80_easy', tier: 'easy', title: 'Easy Collector', desc: 'สะสมการ์ด Lv.80 และ 5 ดาว ครบ 10 ใบ', goal: 10, reward: { points: 500000, diamonds: 10000 } },
 
-        { id: 'expert_collector', tier: 'medium', title: 'นักสะสมผู้เชี่ยวชาญ', desc: 'สะสมการ์ดไม่ซ้ำแบบให้ครบ 50 ใบ', goal: 50, reward: { points: 5000, diamonds: 50 } },
-        { id: 'arena_adept', tier: 'medium', title: 'นักรบผู้ชำนาญ', desc: 'ต่อสู้ใน Battle ARENA ครบ 100 ครั้ง', goal: 100, reward: { points: 5000, diamonds: 50 } },
-        { id: 'lv80_medium', tier: 'medium', title: 'Medium Collector', desc: 'สะสมการ์ด Lv.80 และ 5 ดาว ครบ 30 ใบ', goal: 30, reward: { points: 150000, diamonds: 300 } },
+        { id: 'expert_collector', tier: 'medium', title: 'นักสะสมผู้เชี่ยวชาญ', desc: 'สะสมการ์ดไม่ซ้ำแบบให้ครบ 50 ใบ', goal: 50, reward: { points: 50000, diamonds: 15000 } },
+        { id: 'arena_adept', tier: 'medium', title: 'นักรบผู้ชำนาญ', desc: 'ต่อสู้ใน Battle ARENA ครบ 100 ครั้ง', goal: 100, reward: { points: 50000, diamonds: 15000 } },
+        { id: 'lv80_medium', tier: 'medium', title: 'Medium Collector', desc: 'สะสมการ์ด Lv.80 และ 5 ดาว ครบ 30 ใบ', goal: 30, reward: { points: 150000, diamonds: 300000 } },
 
-        { id: 'god_tier', tier: 'hard', title: 'เหนือคำบรรยาย', desc: 'สะสมการ์ดระดับ USEC หรือ EXR ได้สำเร็จ', goal: 1, reward: { points: 10000, diamonds: 100 } },
-        { id: 'arena_expert', tier: 'hard', title: 'จอมยุทธ์แห่งอารีน่า', desc: 'ต่อสู้ใน Battle ARENA ครบ 150 ครั้ง', goal: 150, reward: { points: 15000, diamonds: 150 } },
-        { id: 'lv80_hard', tier: 'hard', title: 'Hard Collector', desc: 'สะสมการ์ด Lv.80 และ 5 ดาว ครบ 40 ใบ', goal: 40, reward: { points: 300000, diamonds: 500 } },
+        { id: 'god_tier', tier: 'hard', title: 'เหนือคำบรรยาย', desc: 'สะสมการ์ดระดับ USEC หรือ EXR ได้สำเร็จ', goal: 1, reward: { points: 100000, diamonds: 100000 } },
+        { id: 'arena_expert', tier: 'hard', title: 'จอมยุทธ์แห่งอารีน่า', desc: 'ต่อสู้ใน Battle ARENA ครบ 150 ครั้ง', goal: 150, reward: { points: 150000, diamonds: 15000 } },
+        { id: 'lv80_hard', tier: 'hard', title: 'Hard Collector', desc: 'สะสมการ์ด Lv.80 และ 5 ดาว ครบ 40 ใบ', goal: 40, reward: { points: 300000, diamonds: 50000 } },
 
-        { id: 'rainbow_master', tier: 'impossible', title: 'ผู้พิชิตสีรุ้ง', desc: 'ทำ Full Power (LV.80 และ 5 ดาว) 1 ใบ', goal: 1, reward: { points: 50000, diamonds: 500 } },
-        { id: 'power_up4', tier: 'impossible', title: 'ผู้สูงสุดทุกอย่าง!!', desc: 'มีการ์ดเลเวล 80 ขึ้นไปอย่างน้อย 60 ใบ', goal: 60, reward: { points: 2000, diamonds: 20 } },
+        { id: 'rainbow_master', tier: 'impossible', title: 'ผู้พิชิตสีรุ้ง', desc: 'ทำ Full Power (LV.80 และ 5 ดาว) 1 ใบ', goal: 1, reward: { points: 500000, diamonds: 500000 } },
+        { id: 'power_up4', tier: 'impossible', title: 'ผู้สูงสุดทุกอย่าง!!', desc: 'มีการ์ดเลเวล 80 ขึ้นไปอย่างน้อย 60 ใบ', goal: 60, reward: { points: 200000, diamonds: 200000 } },
         { id: 'lv80_impossible', tier: 'impossible', title: 'Impossible Collector', desc: 'สะสมการ์ด Lv.80 และ 5 ดาว ครบ 80 ใบ', goal: 80, reward: { points: 1000000, diamonds: 2000 } },
 
-        { id: 'arena_divine', tier: 'divine', title: 'เหนือเกินความคาดหมาย',  desc: 'จิตวิญญาณแห่งการต่อสู้ ต่อสู้ใน Battle ARENA ครบ 500 ครั้ง', goal: 500, reward: { points: 2000000, diamonds: 5000 },rewardTitle: 'ราชันย์อารีน่าไร้พ่าย' },
+        { id: 'arena_divine', tier: 'divine', title: 'เหนือเกินความคาดหมาย',  desc: 'จิตวิญญาณแห่งการต่อสู้ ต่อสู้ใน Battle ARENA ครบ 500 ครั้ง', goal: 500, reward: { points: 2000000, diamonds: 50000 },rewardTitle: 'ราชันย์อารีน่าไร้พ่าย' },
 
         { id: 'whale_secret_usec', tier: 'secret', title: '???', desc: 'มีการ์ดระดับ USEC Full Power (LV.80 และ 5 ดาว) 10 ใบ', goal: 10, reward: { points: 60000000, diamonds: 60000000 } },
         { id: 'whale_secret_exr', tier: 'secret', title: '???', desc: 'มีการ์ดระดับ EXR Full Power (LV.80 และ 5 ดาว) 2 ใบ', goal: 2, reward: { points: 50000000, diamonds: 50000000 } },
