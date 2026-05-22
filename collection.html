@@ -214,7 +214,7 @@
     const db = getFirestore(app);
 
     let currentUID = null, userCards = [], currentFilter = 'ALL', searchQuery = '';
-    const MAX_LV = 100;
+    const MAX_LV = 80;
 
     const rarityOrder = { 'P': 13, 'USEC': 12, 'EXR': 11, 'CBR': 10, 'SEC': 9, 'SUR': 8, 'SSR': 7, 'PR': 6, 'UR': 5, 'SR': 4, 'R': 3, 'U': 2, 'C': 1 };
     const rarityColors = { 'P': '#ff00ff', 'USEC': '#ff00ff', 'EXR': '#ff4d4d', 'CBR': '#ff4d4d', 'SEC': '#ffac33', 'SUR': '#33ffad', 'SSR': '#ffc831', 'PR': '#ffc831', 'UR': '#bf40bf', 'SR': '#33aaff', 'R': '#33ff57', 'U': '#ffffff', 'C': '#ffffff' };
