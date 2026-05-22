@@ -357,7 +357,7 @@
             case 'whale_secret_usec': 
                 return collection.filter(c => 
                     (c.rarity || '').toUpperCase() === 'USEC' && 
-                    (c.level || 1) >= 80 && 
+                    (c.level || 1) >= 100 && 
                     (c.stars || 0) >= 5
                 ).length;
             case 'whale_secret_exr': 
