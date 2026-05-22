@@ -7,134 +7,272 @@
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* ==================== GLOBAL CYBERPUNK STYLES ==================== */
         body { 
-            font-family: 'Kanit', sans-serif; margin: 0; 
-            background: radial-gradient(circle at top, #1a1a2e 0%, #050505 100%); 
-            color: white; min-height: 100vh;
+            font-family: 'Kanit', sans-serif; 
+            margin: 0; 
+            background: radial-gradient(circle at top, #0d0e15 0%, #020205 100%); 
+            color: #e2e8f0; 
+            min-height: 100vh;
             overflow-x: hidden;
         }
-        .navbar { background: rgba(10, 10, 15, 0.9); padding: 15px 25px; border-bottom: 2px solid #ffc831; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; }
-        .container { max-width: 1000px; margin: auto; padding: 20px; }
         
+        /* Custom Scrollbar ให้เข้ากับธีม */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0a0f; }
+        ::-webkit-scrollbar-thumb { background: #ffc831; border-radius: 3px; }
+
+        .navbar { 
+            background: rgba(6, 6, 10, 0.85); 
+            padding: 15px 25px; 
+            border-bottom: 2px solid rgba(255, 200, 49, 0.8); 
+            box-shadow: 0 4px 20px rgba(255, 200, 49, 0.15);
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            backdrop-filter: blur(12px); 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            padding-left: 90px;
+        }
+
+        .container { max-width: 1000px; margin: auto; padding: 25px 15px; }
+        
+        /* ==================== PREMIUM UI ELEMENTS ==================== */
+        .season-timer { 
+            text-align: center; 
+            font-size: 0.85rem; 
+            color: #ff9000; 
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 20px; 
+            background: rgba(255, 144, 0, 0.08); 
+            padding: 8px 15px; 
+            border-radius: 30px; 
+            border: 1px solid rgba(255, 144, 0, 0.3); 
+            box-shadow: inset 0 0 10px rgba(255, 144, 0, 0.05);
+        }
+
         .rank-status { 
-            background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; 
-            border: 1px solid rgba(255,200,49,0.3); margin-bottom: 20px; 
-            display: flex; align-items: center; gap: 15px; cursor: pointer;
-            transition: 0.3s;
+            background: linear-gradient(135deg, rgba(20, 20, 35, 0.7) 0%, rgba(10, 10, 15, 0.9) 100%); 
+            padding: 20px; 
+            border-radius: 16px; 
+            border: 1px solid rgba(255, 200, 49, 0.25); 
+            margin-bottom: 25px; 
+            display: flex; 
+            align-items: center; 
+            gap: 20px; 
+            cursor: pointer;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
-        .rank-status:hover { background: rgba(255,255,255,0.1); border-color: #ffc831; }
-        .rank-icon { font-size: 2.5rem; }
-        .progress-bar { width: 100%; height: 8px; background: #222; border-radius: 4px; margin-top: 5px; overflow: hidden; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, #ffc831, #ff9000); width: 0%; transition: 1s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
-
-        .season-timer { text-align: center; font-size: 0.8rem; color: #aaa; margin-bottom: 10px; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 20px; border: 1px solid #333; }
-
-        @keyframes rainbowText {
-            0% { color: #ff0000; text-shadow: 0 0 10px #ff0000; }
-            20% { color: #ff8000; text-shadow: 0 0 10px #ff8000; }
-            40% { color: #ffff00; text-shadow: 0 0 10px #ffff00; }
-            60% { color: #00ff00; text-shadow: 0 0 10px #00ff00; }
-            80% { color: #0000ff; text-shadow: 0 0 10px #0000ff; }
-            100% { color: #8000ff; text-shadow: 0 0 10px #8000ff; }
+        .rank-status:hover { 
+            transform: translateY(-2px);
+            border-color: #ffc831; 
+            box-shadow: 0 12px 40px rgba(255, 200, 49, 0.15);
+            background: linear-gradient(135deg, rgba(30, 30, 50, 0.8) 0%, rgba(15, 15, 25, 0.95) 100%);
         }
-        .rank-rainbow {
-            animation: rainbowText 3s linear infinite;
-            font-weight: bold !important;
+        .rank-icon { font-size: 3rem; filter: drop-shadow(0 0 12px rgba(255,200,49,0.4)); }
+        
+        .progress-bar { width: 100%; height: 10px; background: #14141f; border-radius: 30px; margin-top: 8px; overflow: hidden; border: 1px solid #222; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #ff9000, #ffc831, #00ff88); width: 0%; transition: 1s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
+
+        /* Tabs Navigation แบบ Esports */
+        .tabs { display: flex; gap: 10px; margin-bottom: 25px; overflow-x: auto; padding-bottom: 5px; }
+        .tab { 
+            flex: 1; 
+            min-width: 100px; 
+            padding: 14px 10px; 
+            background: rgba(20, 20, 30, 0.6); 
+            border: 1px solid rgba(255,255,255,0.08); 
+            color: #a0aec0; 
+            cursor: pointer; 
+            border-radius: 12px; 
+            font-weight: 700; 
+            text-align: center; 
+            font-size: 0.95rem; 
+            transition: all 0.2s ease;
+            backdrop-filter: blur(5px);
+        }
+        .tab:hover { color: #fff; background: rgba(30, 30, 45, 0.8); border-color: rgba(255,255,255,0.2); }
+        .tab.active { 
+            background: linear-gradient(135deg, #ffc831 0%, #ff9000 100%); 
+            color: #050505; 
+            border-color: #ffc831; 
+            box-shadow: 0 6px 20px rgba(255, 200, 49, 0.35); 
         }
 
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); overflow-y: auto; }
-        .modal-content { background: #1a1a2e; margin: 5% auto; padding: 25px; border: 2px solid #ffc831; width: 90%; max-width: 600px; border-radius: 20px; position: relative; box-shadow: 0 0 30px rgba(255, 200, 49, 0.2); }
-        .close-modal { position: absolute; right: 20px; top: 15px; font-size: 1.8rem; cursor: pointer; color: #ffc831; }
-
-        .tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
-        .tab { flex: 1; min-width: 90px; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid #333; color: #888; cursor: pointer; border-radius: 10px; font-weight: bold; text-align: center; font-size: 0.9rem; transition: 0.2s; }
-        .tab.active { background: #ffc831; color: black; border-color: #ffc831; box-shadow: 0 4px 15px rgba(255, 200, 49, 0.3); }
-
-        .card-row { display: flex; gap: 8px; margin: 10px 0; justify-content: center; flex-wrap: wrap; }
-        .mini-card { width: 75px; aspect-ratio: 2/3; background: #222; border-radius: 8px; border: 1px solid #444; overflow: hidden; position: relative; transition: 0.3s; cursor: pointer; }
+        /* ==================== CARD STYLES ==================== */
+        .card-row { display: flex; gap: 10px; margin: 12px 0; justify-content: center; flex-wrap: wrap; }
+        .mini-card { 
+            width: 82px; 
+            aspect-ratio: 2/3; 
+            background: #11111a; 
+            border-radius: 10px; 
+            border: 1px solid #2d3748; 
+            overflow: hidden; 
+            position: relative; 
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
+            cursor: pointer; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .mini-card:hover { transform: translateY(-4px) scale(1.02); z-index: 10; }
         .mini-card img { width: 100%; height: 100%; object-fit: cover; }
         
-        .rarity-usec { border: 2px solid #ffc831 !important; box-shadow: 0 0 15px #ffc831; }
-        .rarity-exr { border: 2px solid #ff00ff !important; box-shadow: 0 0 10px #ff00ff; }
-        .rarity-cbr { border: 2px solid #00ffff !important; box-shadow: 0 0 10px #00ffff; }
-        .rarity-pr { border: 2px solid #00ff88 !important; box-shadow: 0 0 8px #00ff88; }
+        /* Rarity Neon Glow Effects */
+        .rarity-usec { border: 2px solid #ffc831 !important; box-shadow: 0 0 15px rgba(255, 200, 49, 0.6); }
+        .rarity-exr { border: 2px solid #ff00ff !important; box-shadow: 0 0 12px rgba(255, 0, 255, 0.5); }
+        .rarity-cbr { border: 2px solid #00ffff !important; box-shadow: 0 0 12px rgba(0, 255, 255, 0.5); }
+        .rarity-pr { border: 2px solid #00ff88 !important; box-shadow: 0 0 10px rgba(0, 255, 136, 0.4); }
 
-        .stat-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.8); display: flex; flex-direction: column; padding: 2px; font-size: 0.6rem; text-align: center; color: #ffc831; }
-        .lv-badge { position: absolute; top: 2px; right: 2px; background: #ffc831; color: black; font-size: 0.55rem; padding: 1px 4px; border-radius: 4px; font-weight: bold; z-index: 2; }
-        .selected-glow { border: 2.5px solid #ffc831 !important; transform: scale(1.05); z-index: 5; box-shadow: 0 0 20px #ffc831; }
+        .stat-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(6, 6, 10, 0.85); display: flex; flex-direction: column; padding: 4px 2px; font-size: 0.65rem; font-weight: bold; text-align: center; color: #ffc831; border-top: 1px solid rgba(255,255,255,0.05); }
+        .lv-badge { position: absolute; top: 4px; right: 4px; background: #ffc831; color: black; font-size: 0.6rem; padding: 2px 5px; border-radius: 5px; font-weight: bold; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .selected-glow { border: 2.5px solid #ffc831 !important; transform: scale(1.05); z-index: 5; box-shadow: 0 0 22px #ffc831 !important; }
 
         .elem-icon {
-            position: absolute;
-            top: 2px;
-            left: 4px;
-            font-size: 0.8rem;
-            z-index: 2;
-            filter: drop-shadow(0 0 2px black);
+            position: absolute; top: 4px; left: 5px; font-size: 0.85rem; z-index: 2;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
         }
 
-        .ui-card { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #333; transition: 0.3s; }
-        .btn-action { background: linear-gradient(45deg, #ffc831, #ff9000); color: black; border: none; padding: 14px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; transition: 0.2s; font-size: 1rem; }
+        /* Container UI แบบการ์ดโปร่งแสง */
+        .ui-card { 
+            background: rgba(15, 15, 25, 0.7); 
+            padding: 22px; 
+            border-radius: 18px; 
+            margin-bottom: 20px; 
+            border: 1px solid rgba(255,255,255,0.06); 
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative; 
+            overflow: hidden; 
+        }
+        
+        .btn-action { 
+            background: linear-gradient(135deg, #ffc831 0%, #ff9000 100%); 
+            color: #000; 
+            border: none; 
+            padding: 14px; 
+            border-radius: 12px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            width: 100%; 
+            margin-top: 12px; 
+            transition: all 0.2s ease; 
+            font-size: 1rem; 
+            box-shadow: 0 4px 15px rgba(255, 144, 0, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .btn-action:hover { filter: brightness(1.1); box-shadow: 0 6px 20px rgba(255, 144, 0, 0.45); }
         .btn-action:active { transform: scale(0.98); }
-        .btn-action:disabled { background: #444; color: #888; cursor: not-allowed; box-shadow: none; }
+        .btn-action:disabled { background: #2d3748; color: #718096; cursor: not-allowed; box-shadow: none; filter: none; }
 
-        .bot-tag { background: #ff4d4d; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; margin-left: 5px; }
+        .bot-tag { background: #ff4d4d; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; margin-left: 8px; font-weight: bold; letter-spacing: 0.5px; }
 
-        .battle-area { position: relative; overflow: hidden; min-height: 450px; display: flex; flex-direction: column; justify-content: center; }
-        .ready-up { animation: readyAni 0.6s ease-in-out infinite alternate; }
-        @keyframes readyAni {
-            from { transform: translateY(0) scale(1); filter: brightness(1); }
-            to { transform: translateY(5px) scale(1.02); filter: brightness(1.3); }
+        /* ==================== BATTLE AREA (คงโครงสร้างเดิมแต่เสริมมิติ) ==================== */
+        .battle-area { position: relative; overflow: hidden; min-height: 560px; display: flex; flex-direction: column; justify-content: center; padding: 30px 10px; }
+        
+        .battle-area .card-row { gap: -2px !important; justify-content: center; margin: 8px 0; }
+        .battle-area .mini-card {
+            width: 115px !important; 
+            height: 172px !important; 
+            border-radius: 0px !important;
+            clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%);
+            transform: skewX(-4deg);
+            transition: transform 0.3s ease;
+            margin: 0 -14px; 
         }
+        
+        .battle-area .mini-card .stat-overlay { clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%); font-size: 0.85rem; padding: 6px 2px; }
+        .battle-area .mini-card .elem-icon { font-size: 1.2rem; top: 5px; left: 26px; }
+        .battle-area .mini-card .lv-badge { top: 5px; right: 26px; font-size: 0.7rem; }
+        .battle-area .mini-card img { clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%); }
+
+        .battle-row-container { width: 100%; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        /* Animations & Shakes */
+        @keyframes slideFromLeft { 0% { transform: translateX(-100vw); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
+        .opp-entering { animation: slideFromLeft 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards; }
+
+        @keyframes slideFromRight { 0% { transform: translateX(100vw); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
+        .player-entering { animation: slideFromRight 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards; }
+
+        .ready-up { animation: readyAni 0.6s ease-in-out infinite alternate; }
+        @keyframes readyAni { from { transform: translateY(0); filter: brightness(1); } to { transform: translateY(6px); filter: brightness(1.25); } }
+
         .strike-player { animation: strikeP 0.4s cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards; }
         .strike-opp { animation: strikeO 0.4s cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards; }
-        @keyframes strikeP {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(-120px) scale(1.2); z-index: 10; }
-            100% { transform: translateY(0); }
-        }
-        @keyframes strikeO {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(120px) scale(1.2); z-index: 10; }
-            100% { transform: translateY(0); }
-        }
+        @keyframes strikeP { 0% { transform: translateY(0); } 50% { transform: translateY(-140px) scale(1.05); z-index: 10; } 100% { transform: translateY(0); } }
+        @keyframes strikeO { 0% { transform: translateY(0); } 50% { transform: translateY(140px) scale(1.05); z-index: 10; } 100% { transform: translateY(0); } }
+
         .arena-shake { animation: shakeEffect 0.4s ease-in-out; }
-        @keyframes shakeEffect {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-15px) rotate(-1deg); }
-            40% { transform: translateX(15px) rotate(1deg); }
-            60% { transform: translateX(-15px); }
-            80% { transform: translateX(15px); }
-        }
+        @keyframes shakeEffect { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-15px) rotate(-1deg); } 40% { transform: translateX(15px) rotate(1deg); } 60% { transform: translateX(-15px); } 80% { transform: translateX(15px); } }
         .clash-flash { position: absolute; inset: 0; background: white; opacity: 0; pointer-events: none; z-index: 50; }
         .flash-active { animation: flashAni 0.5s ease-out; }
         @keyframes flashAni { 0% { opacity: 0; } 10% { opacity: 0.8; } 100% { opacity: 0; } }
 
+        /* Rainbow Animation สำหรับ Rank สูงสุด */
+        @keyframes rainbowText {
+            0% { color: #ff3333; text-shadow: 0 0 12px rgba(255,51,51,0.6); }
+            25% { color: #ffff33; text-shadow: 0 0 12px rgba(255,255,51,0.6); }
+            50% { color: #33ff33; text-shadow: 0 0 12px rgba(51,255,51,0.6); }
+            75% { color: #3333ff; text-shadow: 0 0 12px rgba(51,51,255,0.6); }
+            100% { color: #ff3333; text-shadow: 0 0 12px rgba(255,51,51,0.6); }
+        }
+        .rank-rainbow { animation: rainbowText 4s linear infinite; font-weight: bold !important; }
+
         #view-defense, #view-history, #view-leaderboard, #view-battle { display: none; }
 
+        /* Back Button */
         .back-btn {
-            position: fixed; top: 5px; left: 20px; width: 45px; height: 45px;
-            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 200, 49, 0.5); border-radius: 50%;
+            position: fixed; top: 12px; left: 20px; width: 45px; height: 45px;
+            background: rgba(30, 30, 45, 0.7); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 200, 49, 0.4); border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
             color: #ffc831; text-decoration: none; font-size: 1.2rem; z-index: 1001; transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
+        .back-btn:hover { background: #ffc831; color: #000; transform: scale(1.1); box-shadow: 0 0 20px rgba(255, 200, 49, 0.5); }
 
-        .back-btn:hover {
-            background: #ffc831; color: #000; transform: scale(1.1);
-            box-shadow: 0 0 20px rgba(255, 200, 49, 0.4);
+        /* ==================== MODALS DESIGN ==================== */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(2, 2, 5, 0.85); backdrop-filter: blur(8px); overflow-y: auto; }
+        .modal-content { 
+            background: #0f0f1a; 
+            margin: 5% auto; 
+            padding: 30px 25px; 
+            border: 2px solid #ffc831; 
+            width: 90%; 
+            max-width: 600px; 
+            border-radius: 24px; 
+            position: relative; 
+            box-shadow: 0 0 40px rgba(255, 200, 49, 0.25);
+            animation: modalFade 0.3s ease-out;
         }
+        @keyframes modalFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .close-modal { position: absolute; right: 22px; top: 18px; font-size: 2rem; cursor: pointer; color: #ef4444; transition: 0.2s; }
+        .close-modal:hover { transform: scale(1.1); }
 
-        .navbar { padding-left: 90px; }
-        
         .reward-highlight {
-            background: rgba(0, 255, 136, 0.1);
-            padding: 20px;
-            border-radius: 15px;
+            background: rgba(0, 255, 136, 0.08);
+            padding: 25px;
+            border-radius: 16px;
             border: 1px solid #00ff88;
             margin: 20px 0;
             text-align: center;
+            box-shadow: inset 0 0 20px rgba(0,255,136,0.05);
         }
+
+        /* Leaderboard Background Particles Effect */
+        .particle-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: 1; }
+        .rank-particle { position: absolute; font-size: 14px; opacity: 0.25; animation: floatingIcons 5s linear infinite; }
+        @keyframes floatingIcons {
+            0% { transform: translateY(60px) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.4; }
+            90% { opacity: 0.4; }
+            100% { transform: translateY(-40px) rotate(360deg); opacity: 0; }
+        }
+        .ui-card-content { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center; width: 100%; }
     </style>
 </head>
 <body>
@@ -143,9 +281,9 @@
     </a>
 
     <nav class="navbar">
-        <div style="color: #ffc831; font-weight: bold; font-size: 1.2rem;">⚔️ Battle ARENA!!</div>
+        <div style="color: #ffc831; font-weight: bold; font-size: 1.3rem; text-shadow: 0 0 10px rgba(255,200,49,0.3);">⚔️ Battle ARENA!!</div>
         <div style="display: flex; gap: 15px;">
-            <div id="navbar-coins" style="color: #ffc831; font-weight: bold;">🪙 0</div>
+            <div id="navbar-coins" style="color: #ffc831; font-weight: bold; background: rgba(255,200,49,0.15); padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(255,200,49,0.3);">🪙 0</div>
         </div>
     </nav>
 
@@ -155,9 +293,9 @@
         <div class="rank-status" onclick="toggleModal('rankModal', true)">
             <div id="rank-icon" class="rank-icon">🥉</div>
             <div style="flex: 1;">
-                <div style="display:flex; justify-content:space-between; font-size: 0.9rem; font-weight: bold;">
+                <div style="display:flex; justify-content:space-between; font-size: 1rem; font-weight: 700;">
                     <span id="rank-name">BRONZE 3</span>
-                    <span>🏆 <span id="trophy-count">0</span></span>
+                    <span style="color: #ffc831;">🏆 <span id="trophy-count">0</span></span>
                 </div>
                 <div class="progress-bar"><div id="rank-progress" class="progress-fill"></div></div>
             </div>
@@ -170,32 +308,40 @@
             <button id="tab-history" class="tab" onclick="showView('history')">📜 ประวัติ</button>
         </div>
 
-        <div id="view-lobby"><div id="lobby-list" style="text-align: center; padding: 40px; color: #888;">กำลังโหลด...</div></div>
+        <div id="view-lobby"><div id="lobby-list" style="text-align: center; padding: 40px; color: #718096;">กำลังโหลด...</div></div>
         
         <div id="view-leaderboard">
-            <h3 style="color:#ffc831; text-align:center;">🏆 TOP 20 WARRIORS</h3>
+            <h3 style="color:#ffc831; text-align:center; font-size: 1.4rem; margin-bottom: 20px; letter-spacing: 1px;">🏆 TOP 20 WARRIORS</h3>
             <div id="leaderboard-list"></div>
         </div>
 
         <div id="view-defense" class="ui-card" style="text-align: center;">
-            <h3 style="color:#00ff88;">🛡️ จัดทีมตั้งรับ (Defense Team)</h3>
-            <p style="font-size: 0.8rem; color: #aaa;">ทีมนี้จะใช้ป้องกันเมื่อมีคนอื่นมาท้าดวลคุณ</p>
-            <div id="defense-slots" class="card-row" style="min-height: 120px; border: 1px dashed #444; border-radius: 10px; padding: 10px;"></div>
+            <h3 style="color:#00ff88; font-size: 1.3rem; margin-top: 5px;">🛡️ จัดทีมตั้งรับ (Defense Team)</h3>
+            <p style="font-size: 0.85rem; color: #a0aec0; margin-bottom: 20px;">ทีมนี้จะใช้ป้องกันเมื่อมีคนอื่นมาท้าดวลคุณ</p>
+            <div id="defense-slots" class="card-row" style="min-height: 120px; border: 2px dashed rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); border-radius: 14px; padding: 12px;"></div>
             <button class="btn-action" onclick="saveDefense()">💾 บันทึกทีมป้องกัน</button>
-            <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
+            <hr style="border:0; border-top:1px solid rgba(255,255,255,0.08); margin:25px 0;">
             <div id="defense-pool" class="card-row"></div>
         </div>
 
         <div id="view-history"><div id="history-list"></div></div>
 
         <div id="view-battle">
-            <div class="ui-card battle-area" id="arena-box" style="border: 2px solid #ffc831; background: url('https://www.transparenttextures.com/patterns/dark-matter.png');">
+            <div class="ui-card battle-area" id="arena-box" style="border: 2px solid #ffc831; background: radial-gradient(circle, rgba(26,26,46,0.9) 0%, rgba(5,5,10,0.95) 100%); box-shadow: 0 0 30px rgba(255,200,49,0.2);">
                 <div id="flash-effect" class="clash-flash"></div>
-                <div id="opp-battle-row" class="card-row"></div>
-                <h1 id="vs-label" style="text-align:center; color:#ffc831; margin:40px 0; transition: 0.3s; font-style: italic; font-size: 3rem; text-shadow: 0 0 15px rgba(255,200,49,0.5);">VS</h1>
-                <div id="player-battle-row" class="card-row"></div>
-                <div id="battle-status" style="text-align:center; min-height: 60px; margin-top: 20px; font-weight: bold;"></div>
-                <button id="exit-battle-btn" class="btn-action" style="display:none;" onclick="showView('lobby')">กลับสู่หน้าหลัก</button>
+                
+                <div id="opp-container" class="battle-row-container">
+                    <div id="opp-battle-row" class="card-row"></div>
+                </div>
+
+                <h1 id="vs-label" style="text-align:center; color:#ffc831; margin:25px 0; transition: 0.3s; font-style: italic; font-size: 3.5rem; text-shadow: 0 0 20px rgba(255,200,49,0.6); font-weight: bold; letter-spacing: 2px;">VS</h1>
+                
+                <div id="player-container" class="battle-row-container">
+                    <div id="player-battle-row" class="card-row"></div>
+                </div>
+
+                <div id="battle-status" style="text-align:center; min-height: 60px; margin-top: 25px; font-weight: bold; font-size: 1.1rem;"></div>
+                <button id="exit-battle-btn" class="btn-action" style="display:none; max-width: 250px; margin: 20px auto 0 auto;" onclick="showView('lobby')">กลับสู่หน้าหลัก</button>
             </div>
         </div>
     </div>
@@ -203,34 +349,35 @@
     <div id="rankModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="toggleModal('rankModal', false)">&times;</span>
-            <h3 style="color:#ffc831; text-align:center;">🎖️ อันดับและรางวัลซีซั่น</h3>
-            <div id="rank-details"></div>
+            <h3 style="color:#ffc831; text-align:center; font-size: 1.3rem; margin-bottom: 20px;">🎖️ อันดับและรางวัลซีซั่น</h3>
+            <div id="rank-details" style="max-height: 450px; overflow-y: auto; padding-right: 5px;"></div>
         </div>
     </div>
 
     <div id="prepModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="toggleModal('prepModal', false)">&times;</span>
-            <h3 style="color:#ffc831; text-align:center;">🚩 จัดทีมบุก (เลือก 5 ใบ)</h3>
-            <div id="prep-slots" class="card-row" style="min-height: 120px; border: 1px dashed #444; border-radius: 10px; padding: 10px;"></div>
+            <h3 style="color:#ffc831; text-align:center; font-size: 1.3rem;">🚩 จัดทีมบุก (เลือก 5 ใบ)</h3>
+            <div id="prep-slots" class="card-row" style="min-height: 120px; border: 2px dashed rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); border-radius: 14px; padding: 12px;"></div>
             <button id="start-btn" class="btn-action" disabled onclick="handleStartBattle()">⚔️ เริ่มการท้าดวล!</button>
-            <div id="prep-pool" class="card-row" style="margin-top:20px;"></div>
+            <div id="prep-pool" class="card-row" style="margin-top:25px; max-height: 250px; overflow-y: auto; padding-top: 5px;"></div>
         </div>
     </div>
 
     <div id="seasonRewardModal" class="modal">
-        <div class="modal-content" style="border-color: #00ff88;">
-            <h2 style="color: #00ff88; text-align: center;">🎉 สิ้นสุดการแข่งขัน!</h2>
-            <p style="text-align: center;">ครบกำหนดซีซั่น 20 วันแล้ว นี่คือผลลัพธ์ของคุณ:</p>
+        <div class="modal-content" style="border-color: #00ff88; box-shadow: 0 0 40px rgba(0,255,136,0.25);">
+            <h2 style="color: #00ff88; text-align: center; font-size: 1.6rem;">🎉 สิ้นสุดการแข่งขัน!</h2>
+            <p style="text-align: center; color: #a0aec0;">ครบกำหนดซีซั่น 20 วันแล้ว นี่คือผลลัพธ์ของคุณ:</p>
             <div class="reward-highlight">
-                <div id="final-rank-display" style="font-size: 1.5rem; margin-bottom: 10px; font-weight: bold;">--</div>
-                <div style="font-size: 1.2rem; color: #ffc831;">รางวัลที่ได้รับ: <b id="final-coin-reward">🪙 0</b></div>
+                <div id="final-rank-display" style="font-size: 1.6rem; margin-bottom: 12px; font-weight: bold;">--</div>
+                <div style="font-size: 1.3rem; color: #ffc831; font-weight: bold;">รางวัลที่ได้รับ: <span id="final-coin-reward">🪙 0</span></div>
             </div>
-            <button class="btn-action" onclick="claimSeasonReward()">รับรางวัลและเริ่มซีซั่นใหม่ ⚔️</button>
+            <button class="btn-action" style="background: linear-gradient(135deg, #00ff88 0%, #00b359 100%);" onclick="claimSeasonReward()">รับรางวัลและเริ่มซีซั่นใหม่ ⚔️</button>
         </div>
     </div>
 
 <script type="module">
+    // ==================== SYSTEM BACKEND LOGIC (UNTOUCHED) ====================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, onSnapshot, updateDoc, increment, collection, query, orderBy, limit, getDocs, getDoc, addDoc, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -248,7 +395,6 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // ตารางพลัง Rarity (เรียงลำดับตามที่คุณกำหนด)
     const RARITY_POWER = {
         "P":    { base: 5000, perLv: 1000 },
         "USEC": { base: 8500, perLv: 6500 }, 
@@ -287,7 +433,7 @@
         { name: "Supre MASTER 3 ", min: 15000, icon: "👑", color: "rainbow", reward: {coin: 2500000} },
         { name: "Supre MASTER 2 ", min: 17000, icon: "👑", color: "rainbow", reward: {coin: 2500000} },
         { name: "Supre MASTER 1 ", min: 19000, icon: "👑", color: "rainbow", reward: {coin: 2500000} },
-        { name: "Supre MASTER PRO!!", min: 20000, icon: "👑🔥", color: "rainbow", reward: {coin: 50000000} }
+        { name: "Supre MASTER PRO!!", min: 21000, icon: "👑🔥", color: "rainbow", reward: {coin: 50000000} }
     ];
 
     const ELEMENTS = {
@@ -321,7 +467,7 @@
     };
     
     const cardHTML = (c, selected = false) => {
-        if(!c) return `<div class="mini-card" style="border: 1px dashed #333; background: transparent;"></div>`;
+        if(!c) return `<div class="mini-card" style="border: 2px dashed rgba(255,255,255,0.1); background: transparent;"></div>`;
         const imgUrl = c.img || c.image || 'https://via.placeholder.com/150';
         if(!c.element) {
             const keys = Object.keys(ELEMENTS);
@@ -470,7 +616,7 @@
     async function loadLobby() {
         const list = document.getElementById("lobby-list");
         if(!list) return;
-        list.innerHTML = "<div style='padding:20px;'>🔍 กำลังค้นหาคู่ต่อสู้...</div>";
+        list.innerHTML = "<div style='padding:20px; color:#a0aec0;'>🔍 กำลังค้นหาคู่ต่อสู้ในสนามประลอง...</div>";
         try {
             const snap = await getDocs(query(collection(db, "users"), limit(10)));
             let players = [];
@@ -492,21 +638,21 @@
                 const div = document.createElement("div");
                 div.className = "ui-card";
                 div.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
                         <span>${rankDisplay} ${u.isBot ? '<span class="bot-tag">BOT</span>' : ''}</span>
-                        <span style="color:#aaa; font-size:0.8rem;">🏆 ${u.trophies || 0}</span>
+                        <span style="color:#ffc831; font-weight: bold; font-size:0.9rem;">🏆 ${u.trophies || 0}</span>
                     </div>
-                    <div class="card-row" style="justify-content:flex-start; transform: scale(0.85); transform-origin: left center;">
+                    <div class="card-row" style="justify-content:flex-start; transform: scale(0.9); transform-origin: left center; margin: 15px 0;">
                         ${u.defenseTeam.map(c => cardHTML(c)).join('')}
                     </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
-                        <span style="color:#ffc831; font-weight:bold;">DEF: ${pwr.toLocaleString()}</span>
-                        <button class="btn-action" style="width:120px; margin:0;" onclick="openPrep('${u.id}', ${u.isBot})">ท้าชิง ⚔️</button>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 8px;">
+                        <span style="color:#00ff88; font-weight:bold; font-size: 0.9rem;">DEF POWER: ${pwr.toLocaleString()}</span>
+                        <button class="btn-action" style="width:120px; margin:0; padding: 8px 10px; font-size:0.9rem;" onclick="openPrep('${u.id}', ${u.isBot})">ท้าชิง ⚔️</button>
                     </div>`;
                 list.appendChild(div);
                 if(u.isBot) window["bot_data_"+u.id] = u;
             });
-        } catch (err) { list.innerHTML = "Error: " + err.message; }
+        } catch (err) { list.innerHTML = "<div style='color:#ef4444;'>Error: " + err.message + "</div>"; }
     }
 
     window.openPrep = async function(id, isBot) {
@@ -516,27 +662,56 @@
     };
 
     window.handleStartBattle = async function() {
-        toggleModal('prepModal', false); showView('battle');
+        toggleModal('prepModal', false); 
+        showView('battle'); 
+        
         const log = document.getElementById("battle-status");
         const exit = document.getElementById("exit-battle-btn");
         const pRow = document.getElementById("player-battle-row");
         const oRow = document.getElementById("opp-battle-row");
+        const pContainer = document.getElementById("player-container");
+        const oContainer = document.getElementById("opp-container");
         const arena = document.getElementById("arena-box");
         const flash = document.getElementById("flash-effect");
         const vsLabel = document.getElementById("vs-label");
+        
         exit.style.display = "none";
-        log.innerHTML = "<span style='color:#aaa'>⚔️ เตรียมตัวเข้าสู่สนามประลอง...</span>";
+        log.innerHTML = "<span style='color:#a0aec0; text-transform:uppercase; letter-spacing:1px;'>⚔️ Connecting to Arena Grid...</span>";
         vsLabel.style.transform = "scale(1)";
+        
         oRow.innerHTML = targetOpp.defenseTeam.map(c => cardHTML(c)).join('');
         pRow.innerHTML = tempAtk.map(c => cardHTML(c)).join('');
-        setTimeout(() => { log.innerHTML = "<span style='color:#ffc831'>🔥 รวบรวมพลัง!</span>"; pRow.classList.add('ready-up'); oRow.classList.add('ready-up'); }, 800);
+        
+        // [STEP 1] จังหวะเปิดตัว สไลด์แยกซ้าย-ขวา
+        oContainer.className = "battle-row-container opp-entering";
+        pContainer.className = "battle-row-container player-entering";
+
+        // [STEP 2] วินาทีที่ 0.8: เพิ่มคลาสสั่นชาร์จพลังแนวตั้งก่อนปะทะ (ready-up)
+        setTimeout(() => { 
+            log.innerHTML = "<span style='color:#ffc831; text-shadow: 0 0 10px rgba(255,200,49,0.5);'>🔥 OVERCHARGING ENERGY MATRIX!</span>"; 
+            oContainer.classList.add('ready-up');
+            pContainer.classList.add('ready-up');
+        }, 800);
+
+        // [STEP 3] วินาทีที่ 2.0: นำสเตตัสพร้อมรบออก แล้วสั่งพุ่งชนกันแนวดิ่งทันที (Strike Attack)
         setTimeout(() => {
-            log.innerHTML = "<span style='color:#ff4d4d; font-size:1.5rem;'>EX-BURST ATTACK!!</span>";
-            pRow.classList.remove('ready-up'); oRow.classList.remove('ready-up');
-            pRow.classList.add('strike-player'); oRow.classList.add('strike-opp');
-            vsLabel.style.transform = "scale(1.5)"; vsLabel.style.color = "white";
+            log.innerHTML = "<span style='color:#ff4d4d; font-size:1.6rem; text-shadow: 0 0 15px #ff4d4d; font-weight:800; letter-spacing:1px;'>EX-BURST ATTACK!!</span>";
+            oContainer.classList.remove('ready-up');
+            pContainer.classList.remove('ready-up');
+            
+            pRow.classList.add('strike-player'); 
+            oRow.classList.add('strike-opp');    
+            vsLabel.style.transform = "scale(1.3)"; 
+            vsLabel.style.color = "#fff";
         }, 2000);
-        setTimeout(() => { arena.classList.add('arena-shake'); flash.classList.add('flash-active'); }, 2150);
+
+        // [STEP 4] วินาทีที่ 2.15: แฟลชจอขาวและหน้าจอสั่นสะเทือนเมื่อการ์ดปะทะชนกัน
+        setTimeout(() => { 
+            arena.classList.add('arena-shake'); 
+            flash.classList.add('flash-active'); 
+        }, 2150);
+
+        // [STEP 5] วินาทีที่ 2.8: คืนสไตล์กลับสภาพเดิม สรุปตรรกะพลังงานและบันทึกลงฐานข้อมูล
         setTimeout(async () => {
             let pTotalPwr = 0;
             let oTotalPwr = 0;
@@ -559,18 +734,26 @@
             const coinPrize = win ? 250 : 50;
             log.innerHTML = win ? `
                 <div style='animation: readyAni 0.3s infinite alternate'>
-                    <h2 style='color:#00ff88; margin:0; text-shadow: 0 0 15px #00ff88'>VICTORY !!</h2>
-                    <p style="color: #aaa; font-size:0.8rem;">PWR: ${Math.floor(pTotalPwr).toLocaleString()} vs ${Math.floor(oTotalPwr).toLocaleString()}</p>
-                    <p style="color: #ffc831; margin:5px 0;">+${trophyChange} 🏆 | 🪙 ${coinPrize}</p>
+                    <h2 style='color:#00ff88; margin:0; text-shadow: 0 0 15px #00ff88; font-size: 1.8rem;'>VICTORY !!</h2>
+                    <p style="color: #a0aec0; font-size:0.85rem; margin: 4px 0;">PWR: ${Math.floor(pTotalPwr).toLocaleString()} vs ${Math.floor(oTotalPwr).toLocaleString()}</p>
+                    <p style="color: #ffc831; margin:5px 0; font-size: 1.1rem; font-weight: bold;">+${trophyChange} 🏆 | 🪙 ${coinPrize}</p>
                 </div>` : `
                 <div>
-                    <h2 style='color:#ff4d4d; margin:0; text-shadow: 0 0 15px #ff4d4d'>DEFEAT</h2>
-                    <p style="color: #aaa; font-size:0.8rem;">PWR: ${Math.floor(pTotalPwr).toLocaleString()} vs ${Math.floor(oTotalPwr).toLocaleString()}</p>
-                    <p style="color: #aaa; margin:5px 0;">${trophyChange} 🏆</p>
+                    <h2 style='color:#ff4d4d; margin:0; text-shadow: 0 0 15px #ff4d4d; font-size: 1.8rem;'>DEFEAT</h2>
+                    <p style="color: #a0aec0; font-size:0.85rem; margin: 4px 0;">PWR: ${Math.floor(pTotalPwr).toLocaleString()} vs ${Math.floor(oTotalPwr).toLocaleString()}</p>
+                    <p style="color: #fc8181; margin:5px 0; font-size: 1.1rem; font-weight: bold;">${trophyChange} 🏆</p>
                 </div>`;
+            
             exit.style.display = "block";
-            pRow.classList.remove('strike-player'); oRow.classList.remove('strike-opp');
-            arena.classList.remove('arena-shake'); flash.classList.remove('flash-active');
+            
+            // เคลียร์คลาสเพื่อพร้อมรีรันแอนิเมชันในแมตช์ถัดไป
+            pRow.classList.remove('strike-player'); 
+            oRow.classList.remove('strike-opp');
+            oContainer.className = "battle-row-container";
+            pContainer.className = "battle-row-container";
+            arena.classList.remove('arena-shake'); 
+            flash.classList.remove('flash-active');
+            
             await updateDoc(doc(db, "users", auth.currentUser.uid), { trophies: Math.max(0, (userDoc.trophies || 0) + trophyChange), points: increment(coinPrize) });
             await addDoc(collection(db, "users", auth.currentUser.uid, "logs"), { type: "attack", oppName: targetOpp.username + (targetOpp.isBot ? " (Bot)" : ""), win, trophyChange: trophyChange, time: serverTimestamp() });
             if(!targetOpp.isBot) {
@@ -585,7 +768,7 @@
         const slots = document.getElementById("prep-slots");
         const pool = document.getElementById("prep-pool");
         slots.innerHTML = ""; pool.innerHTML = "";
-        for(let i=0; i<5; i++) { slots.innerHTML += tempAtk[i] ? cardHTML(tempAtk[i]) : `<div class="mini-card" style="border:1px dashed #444; background:transparent;"></div>`; }
+        for(let i=0; i<5; i++) { slots.innerHTML += tempAtk[i] ? cardHTML(tempAtk[i]) : `<div class="mini-card" style="border:2px dashed rgba(255,255,255,0.1); background:transparent;"></div>`; }
         const unique = {};
         (userDoc.collection || []).forEach(c => { if(!unique[c.name] || Number(c.level) > Number(unique[c.name].level)) unique[c.name] = c; });
         const sortedCollection = Object.values(unique).sort((a, b) => Number(b.level || 1) - Number(a.level || 1));
@@ -616,7 +799,7 @@
         const dPool = document.getElementById("defense-pool");
         if(!dSlots || !dPool) return;
         dSlots.innerHTML = ""; dPool.innerHTML = "";
-        for(let i=0; i<5; i++) { dSlots.innerHTML += tempDef[i] ? cardHTML(tempDef[i]) : `<div class="mini-card" style="border:1px dashed #444; background:transparent;"></div>`; }
+        for(let i=0; i<5; i++) { dSlots.innerHTML += tempDef[i] ? cardHTML(tempDef[i]) : `<div class="mini-card" style="border:2px dashed rgba(255,255,255,0.1); background:transparent;"></div>`; }
         const unique = {};
         (userDoc.collection || []).forEach(c => { if(!unique[c.name] || Number(c.level) > Number(unique[c.name].level)) unique[c.name] = c; });
         const sortedDefPool = Object.values(unique).sort((a, b) => Number(b.level || 1) - Number(a.level || 1));
@@ -644,9 +827,29 @@
             snap.forEach(d => {
                 const u = d.data(); const r = getRankInfo(u.trophies || 0);
                 const rankText = r.color === "rainbow" ? `<span class="rank-rainbow">${r.icon} ${u.username || 'Unknown'}</span>` : `<span>${r.icon} ${u.username || 'Unknown'}</span>`;
-                list.innerHTML += `<div class="ui-card" style="display:flex; justify-content:space-between; align-items:center; border-left: 4px solid ${r.color === 'rainbow' ? '#ff00ff' : r.color}"><span><b style="color:#aaa; margin-right:10px;">#${i++}</b> ${rankText}</span> <span style="color:#ffc831; font-weight:bold;">🏆 ${(u.trophies || 0).toLocaleString()}</span></div>`;
+                
+                let particleContainerHTML = "";
+                if (u.trophies >= 3100) {
+                    particleContainerHTML = `<div class="particle-container">`;
+                    for (let p = 0; p < 5; p++) {
+                        const randomLeft = Math.floor(Math.random() * 85);
+                        const randomDelay = (Math.random() * 4).toFixed(1);
+                        const randomDuration = (4 + Math.random() * 3).toFixed(1);
+                        particleContainerHTML += `<span class="rank-particle" style="left: ${randomLeft}%; animation-delay: -${randomDelay}s; animation-duration: ${randomDuration}s;">${r.icon}</span>`;
+                    }
+                    particleContainerHTML += `</div>`;
+                }
+
+                list.innerHTML += `
+                    <div class="ui-card" style="border-left: 4px solid ${r.color === 'rainbow' ? '#ff00ff' : r.color}; background: rgba(20,20,35,0.45); margin-bottom: 12px; padding: 15px 20px;">
+                        ${particleContainerHTML}
+                        <div class="ui-card-content">
+                            <span><b style="color:#718096; margin-right:12px; font-size: 1.1rem;">#${i++}</b> <span style="font-weight:600;">${rankText}</span></span> 
+                            <span style="color:#ffc831; font-weight:bold; font-size:1.1rem; text-shadow: 0 0 8px rgba(255,200,49,0.3);">🏆 ${(u.trophies || 0).toLocaleString()}</span>
+                        </div>
+                    </div>`;
             });
-        } catch (e) { list.innerHTML = "Error loading leaderboard"; }
+        } catch (e) { list.innerHTML = "<div style='color:#ef4444; text-align:center;'>Error loading leaderboard</div>"; }
     }
 
     async function loadHistory() {
@@ -654,20 +857,28 @@
         if(!list) return;
         try {
             const snap = await getDocs(query(collection(db, "users", auth.currentUser.uid, "logs"), orderBy("time", "desc"), limit(10)));
-            list.innerHTML = snap.empty ? "<p style='text-align:center; color:#555;'>ยังไม่มีประวัติการต่อสู้</p>" : "";
+            list.innerHTML = snap.empty ? "<p style='text-align:center; color:#718096; padding: 20px;'>ยังไม่มีประวัติการต่อสู้ในซีซั่นนี้</p>" : "";
             snap.forEach(d => {
                 const l = d.data(); const color = l.win ? '#00ff88' : '#ff4d4d';
-                list.innerHTML += `<div class="ui-card" style="border-left:5px solid ${color}; padding:10px 15px;"><div style="display:flex; justify-content:space-between;"><b>${l.type==='attack'?'⚔️ บุก':'🛡️ ป้องกัน'} - ${l.win?'ชนะ':'แพ้'}</b><span style="color:${color}">${l.trophyChange >= 0 ? '+' : ''}${l.trophyChange} 🏆</span></div><div style="font-size:0.8rem; color:#aaa;">คู่ต่อสู้: ${l.oppName}</div></div>`;
+                const bgLight = l.win ? 'rgba(0,255,136,0.03)' : 'rgba(255,77,77,0.03)';
+                list.innerHTML += `
+                    <div class="ui-card" style="border-left:5px solid ${color}; background: ${bgLight}; padding:14px 20px; margin-bottom:12px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <b style="font-size:1rem; letter-spacing:0.5px;">${l.type==='attack'?'⚔️ บุกโจมตี':'🛡️ ทีมตั้งรับ'} - <span style="color:${color}">${l.win?'ชนะ':'แพ้'}</span></b>
+                            <span style="color:${color}; font-weight:bold; font-size:1.05rem;">${l.trophyChange >= 0 ? '+' : ''}${l.trophyChange} 🏆</span>
+                        </div>
+                        <div style="font-size:0.85rem; color:#a0aec0; margin-top: 5px;">คู่ต่อสู้: <span style="color:#fff; font-weight:500;">${l.oppName}</span></div>
+                    </div>`;
             });
-        } catch (e) { list.innerHTML = "Error loading history"; }
+        } catch (e) { list.innerHTML = "<div style='color:#ef4444; text-align:center;'>Error loading history</div>"; }
     }
 
     window.toggleModal = function(id, show) {
         const el = document.getElementById(id); if(el) el.style.display = show ? "block" : "none";
         if(id === 'rankModal' && show) {
             document.getElementById("rank-details").innerHTML = `
-                <div style="background:rgba(255,200,49,0.1); padding:10px; border-radius:10px; margin-bottom:15px; font-size:0.85rem; border:1px dashed #ffc831; color:#ffc831; text-align:center;">
-                    🎁 รางวัลซีซั่นจะมอบให้เมื่อครบหลังจบซีซั่น
+                <div style="background:rgba(255,200,49,0.08); padding:12px; border-radius:12px; margin-bottom:20px; font-size:0.85rem; border:1px dashed #ffc831; color:#ffc831; text-align:center; font-weight:500;">
+                    🎁 รางวัลประจำซีซั่นจะจัดส่งให้โดยอัตโนมัติเมื่อสิ้นสุดช่วงเวลาแข่งขัน
                 </div>
             ` + [...RANKS].reverse().map(r => {
                 const nameStyle = r.color === "rainbow" ? `class=\"rank-rainbow\"` : `style=\"color:${r.color}\"`;
@@ -675,9 +886,9 @@
                 if (r.name.includes("SILVER 1") || r.name.includes("GOLD") || r.name.includes("DIAMOND")) winTrophy = 120;
                 if (r.name.includes("MASTER")) winTrophy = 290;
                 return `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; border-bottom:1px solid #333;">
-                    <div ${nameStyle}><b>${r.icon} ${r.name}</b><br><small style="color:#aaa;">${r.min}+ 🏆</small></div>
-                    <div style="text-align:right; font-size:0.85rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 8px; border-bottom:1px solid rgba(255,255,255,0.05);">
+                    <div ${nameStyle}><b>${r.icon} ${r.name}</b><br><small style="color:#718096; font-weight:normal;">คะแนนขั้นต่ำ: ${r.min.toLocaleString()} 🏆</small></div>
+                    <div style="text-align:right; font-size:0.85rem; font-weight:bold;">
                         <span style="color:#00ff88;">Win: +${winTrophy} 🏆</span><br>
                         <span style="color:#ffc831;">Coin: ${r.reward.coin.toLocaleString()}</span>
                     </div>
