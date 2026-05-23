@@ -586,7 +586,7 @@
     document.getElementById("sortSelect").onchange = () => renderCards();
     
     const fCon = document.getElementById("filterContainer");
-    ['ALL','P','USEC','EXR','CBR','SEC','SUR','SSR','PR','UR','SR','R','U','C'].forEach(r => {
+    ['ALL','secret','P','USEC','EXR','CBR','SEC','SUR','SSR','PR','UR','SR','R','U','C'].forEach(r => {
         const btn = document.createElement("button");
         btn.className = `filter-btn ${r === 'ALL' ? 'active' : ''}`;
         btn.innerText = r;
