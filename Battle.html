@@ -731,7 +731,7 @@
             const currentRankName = getRankInfo(userDoc.trophies || 0).name;
             if (currentRankName.includes("SILVER 1") || currentRankName.includes("GOLD") || currentRankName.includes("DIAMOND")) trophyGain = 120;
             else if (currentRankName.includes("MASTER")) trophyGain = 290;
-            else if (currentRankName.includes("Supre MASTER PRO!!") || currentRankName.includes("Supre challenge!!")) trophyGain = 550;
+            if (currentRankName.includes("Supre MASTER PRO!!") || currentRankName.includes("Supre challenge!!")) trophyGain = 550;
             const trophyChange = win ? trophyGain : -Math.floor(trophyGain / 2);
             const coinPrize = win ? 250 : 50;
             log.innerHTML = win ? `
