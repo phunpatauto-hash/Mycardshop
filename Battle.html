@@ -731,6 +731,7 @@
             const currentRankName = getRankInfo(userDoc.trophies || 0).name;
             if (currentRankName.includes("SILVER 1") || currentRankName.includes("GOLD") || currentRankName.includes("DIAMOND")) trophyGain = 120;
             else if (currentRankName.includes("MASTER")) trophyGain = 290;
+            else if (currentRankName.includes("Supre MASTER PRO!!") || currentRankName.includes("Supre challenge!!") trophyGain = 550;
             const trophyChange = win ? trophyGain : -Math.floor(trophyGain / 2);
             const coinPrize = win ? 250 : 50;
             log.innerHTML = win ? `
@@ -883,9 +884,10 @@
                 </div>
             ` + [...RANKS].reverse().map(r => {
                 const nameStyle = r.color === "rainbow" ? `class=\"rank-rainbow\"` : `style=\"color:${r.color}\"`;
-                let winTrophy = 50; 
+                let winTrophy = 90; 
                 if (r.name.includes("SILVER 1") || r.name.includes("GOLD") || r.name.includes("DIAMOND")) winTrophy = 120;
                 if (r.name.includes("MASTER")) winTrophy = 290;
+                if (r.name.includes("Supre MASTER PRO!!") || r.name.includes("Supre challenge!!") winTrophy = 550;
                 return `
                 <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 8px; border-bottom:1px solid rgba(255,255,255,0.05);">
                     <div ${nameStyle}><b>${r.icon} ${r.name}</b><br><small style="color:#718096; font-weight:normal;">คะแนนขั้นต่ำ: ${r.min.toLocaleString()} 🏆</small></div>
