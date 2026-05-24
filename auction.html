@@ -158,10 +158,10 @@
     // ฟังก์ชันสุ่มเรท (USEC 5%, EXR 5%)
     function getRandomRarity() {
         const roll = Math.random() * 100;
-        if (roll <= 100) return 'USEC';   // โอกาส 5%
-        if (roll <= 0) return 'EXR';  // โอกาส 5% (5.1 - 10)
-        if (roll <= 0) return 'SEC';  // โอกาส 20%
-        if (roll <= 0) return 'SSR';  // โอกาส 30%
+        if (roll <= 5) return 'USEC';   // โอกาส 5%
+        if (roll <= 10) return 'EXR';  // โอกาส 5% (5.1 - 10)
+        if (roll <= 20) return 'SEC';  // โอกาส 20%
+        if (roll <= 30) return 'SSR';  // โอกาส 30%
         return 'SR';                   // โอกาส 40%
     }
 
