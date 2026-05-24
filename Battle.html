@@ -886,7 +886,6 @@
                 let winTrophy = 50; 
                 if (r.name.includes("SILVER 1") || r.name.includes("GOLD") || r.name.includes("DIAMOND")) winTrophy = 120;
                 if (r.name.includes("MASTER")) winTrophy = 290;
-                if (r.name.includes("Supre MASTER PRO!!") || r.name.includes("Supre challenge!!")  winTrophy = 550;
                 return `
                 <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 8px; border-bottom:1px solid rgba(255,255,255,0.05);">
                     <div ${nameStyle}><b>${r.icon} ${r.name}</b><br><small style="color:#718096; font-weight:normal;">คะแนนขั้นต่ำ: ${r.min.toLocaleString()} 🏆</small></div>
