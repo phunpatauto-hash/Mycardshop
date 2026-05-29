@@ -59,6 +59,9 @@
         .col-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; transition: 0.3s; }
         .star-container { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); padding: 2px 6px; border-radius: 8px; color: #ffc831; font-size: 0.7rem; z-index: 5; backdrop-filter: blur(5px); }
         .card-count-badge { position: absolute; top: 8px; right: 8px; background: #ffc831; color: #000; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; font-weight: bold; z-index: 5; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        
+        /* Lock Indicator Badge */
+        .card-lock-badge { position: absolute; bottom: 75px; right: 8px; background: rgba(0,0,0,0.75); color: #ff4d4d; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; z-index: 5; border: 1px solid #ff4d4d; }
 
         /* Achievement Styles */
         .achievement-section { max-width: 1200px; margin: 60px auto 40px; padding: 0 20px; border-top: 1px solid #333; padding-top: 40px; }
@@ -83,7 +86,7 @@
         /* Modal */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(10px); }
         .modal-content { background: #0a0a0f; border-radius: 25px; max-width: 900px; width: 100%; display: flex; overflow: hidden; border: 1px solid #333; box-shadow: 0 0 50px rgba(0,0,0,1); }
-        .modal-left { width: 45%; background: #000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal-left { width: 45%; background: #000; display: flex; align-items: center; justify-content: center; padding: 20px; position: relative; }
         .modal-right { width: 55%; padding: 35px; display: flex; flex-direction: column; background: linear-gradient(135deg, #0a0a0f 0%, #111 100%); }
         .stat-item { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; border-left: 4px solid #ffc831; margin: 10px 0; }
         .stat-val { font-size: 1.8rem; font-weight: bold; display: block; color: #ffc831; }
@@ -95,18 +98,19 @@
         .btn-star { background: #ff9900; color: black; }
         .btn-sell-single { background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1.5px solid #ff4d4d; padding: 8px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .btn-sell-all { background: #ff4d4d; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .btn-lock { background: rgba(255, 255, 255, 0.08); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-lock.locked { background: rgba(255, 77, 77, 0.15); color: #ff4d4d; border-color: #ff4d4d; }
 
         @media (max-width: 768px) { .modal-content { flex-direction: column; overflow-y: auto; } .modal-left, .modal-right { width: 100%; } .search-input { width: 100%; } }
         .tier-divine {
-    border: 2px solid #00f2ff;
-    box-shadow: 0 0 15px rgba(0, 242, 255, 0.5);
-    background: linear-gradient(135deg, rgba(0, 242, 255, 0.1), rgba(186, 0, 255, 0.1));
-}
-
-.tier-divine .ach-title {
-    color: #00f2ff;
-    text-shadow: 0 0 5px #00f2ff;
-}
+            border: 2px solid #00f2ff;
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.5);
+            background: linear-gradient(135deg, rgba(0, 242, 255, 0.1), rgba(186, 0, 255, 0.1));
+        }
+        .tier-divine .ach-title {
+            color: #00f2ff;
+            text-shadow: 0 0 5px #00f2ff;
+        }
     </style>
 </head>
 <body>
@@ -158,8 +162,13 @@
                 <img id="modalImg" src="" style="max-width: 100%; max-height: 75vh; border-radius: 15px; object-fit: contain;">
             </div>
             <div class="modal-right">
-                <h2 id="modalName" style="margin:0; font-size: 2.2rem;">Name</h2>
-                <div id="modalRarity" style="font-weight: bold; letter-spacing: 2px; margin-bottom: 20px;">GRADE: -</div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <h2 id="modalName" style="margin:0; font-size: 2.2rem;">Name</h2>
+                        <div id="modalRarity" style="font-weight: bold; letter-spacing: 2px; margin-bottom: 20px;">GRADE: -</div>
+                    </div>
+                    <button id="btnLockCard" class="btn-lock">🔒 ล็อกการ์ด</button>
+                </div>
                 
                 <div class="stat-item">
                     <span class="stat-lbl">⚡ ARENA POWER</span>
@@ -216,37 +225,36 @@
     let currentUID = null, userCards = [], currentFilter = 'ALL', searchQuery = '';
     const MAX_LV = 80;
 
-    const rarityOrder = { 'P': 13, 'USEC': 12, 'EXR': 11, 'CBR': 10, 'SEC': 9, 'SUR': 8, 'SSR': 7, 'PR': 6, 'UR': 5, 'SR': 4, 'R': 3, 'U': 2, 'C': 1 };
-    const rarityColors = { 'P': '#ff00ff', 'USEC': '#ff00ff', 'EXR': '#ff4d4d', 'CBR': '#ff4d4d', 'SEC': '#ffac33', 'SUR': '#33ffad', 'SSR': '#ffc831', 'PR': '#ffc831', 'UR': '#bf40bf', 'SR': '#33aaff', 'R': '#33ff57', 'U': '#ffffff', 'C': '#ffffff' };
-    const RARITY_POWER = { "P": { base: 5000, perLv: 1000 }, "USEC": { base: 8500, perLv: 6500 }, "EXR": { base: 4000, perLv: 2500 }, "CBR": { base: 6600, perLv: 4000 }, "SEC": { base: 3500, perLv: 2000 }, "SUR": { base: 3000, perLv: 1800 }, "SSR": { base: 2500, perLv: 1500 }, "PR": { base: 2000, perLv: 1500 }, "UR": { base: 1500, perLv: 1200 }, "SR": { base: 1000, perLv: 1000 }, "R": { base: 600, perLv: 800 }, "U": { base: 300, perLv: 500 }, "C": { base: 100, perLv: 300 } };
-    const sellValuesBase = { 'P': 10000, 'USEC': 90000, 'EXR': 55000, 'CBR': 50000, 'SEC': 25000, 'SUR': 15000, 'SSR': 15000, 'PR': 10000, 'UR': 1200, 'SR': 1000, 'R': 500, 'U': 200, 'C': 100 };
+    const rarityOrder = { 'SECRET': 14, 'P': 13, 'USEC': 12, 'EXR': 11, 'CBR': 10, 'SEC': 9, 'SUR': 8, 'SSR': 7, 'PR': 6, 'UR': 5, 'SR': 4, 'R': 3, 'U': 2, 'C': 1 };
+    const rarityColors = { 'SECRET': '#D8BFD8', 'P': '#ff00ff', 'USEC': '#ff00ff', 'EXR': '#ff4d4d', 'CBR': '#ff4d4d', 'SEC': '#ffac33', 'SUR': '#33ffad', 'SSR': '#ffc831', 'PR': '#ffc831', 'UR': '#bf40bf', 'SR': '#33aaff', 'R': '#33ff57', 'U': '#ffffff', 'C': '#ffffff' };
+    const RARITY_POWER = { 'SECRET': { base: 100000, perLv: 100000 }, "P": { base: 5000, perLv: 1000 }, "USEC": { base: 8500, perLv: 6500 }, "EXR": { base: 4000, perLv: 2500 }, "CBR": { base: 6600, perLv: 4000 }, "SEC": { base: 3500, perLv: 2000 }, "SUR": { base: 3000, perLv: 1800 }, "SSR": { base: 2500, perLv: 1500 }, "PR": { base: 2000, perLv: 1500 }, "UR": { base: 1500, perLv: 1200 }, "SR": { base: 1000, perLv: 1000 }, "R": { base: 600, perLv: 800 }, "U": { base: 300, perLv: 500 }, "C": { base: 100, perLv: 300 } };
+    const sellValuesBase = { 'SECRET': 100000, 'P': 10000, 'USEC': 90000, 'EXR': 55000, 'CBR': 50000, 'SEC': 25000, 'SUR': 15000, 'SSR': 15000, 'PR': 10000, 'UR': 1200, 'SR': 1000, 'R': 500, 'U': 200, 'C': 100 };
 
     const ACHIEVEMENTS_DATA = [
-        { id: 'starter_collector', tier: 'easy', title: 'นักสะสมมือใหม่', desc: 'สะสมการ์ดไม่ซ้ำแบบให้ครบ 10 ใบ', goal: 10, reward: { points: 10000, diamonds: 1000 } },
-        { id: 'arena_starter', tier: 'easy', title: 'ผู้เริ่มต้นการต่อสู้', desc: 'ต่อสู้ใน Battle ARENA ครบ 10 ครั้ง', goal: 10, reward: { points: 5000, diamonds: 1500 } },
-        { id: 'lv80_easy', tier: 'easy', title: 'Easy Collector', desc: 'สะสมการ์ด Lv.80 และ 5 ดาว ครบ 10 ใบ', goal: 10, reward: { points: 10000, diamonds: 15000 } },
+        { id: 'starter_collector', tier: 'easy', title: 'นักสะสมมือใหม่', desc: 'สะสมการ์ดไม่ซ้ำแบบให้ครบ 10 ใบ', goal: 10, reward: { points: 1000, diamonds: 10 } },
+        { id: 'arena_starter', tier: 'easy', title: 'ผู้เริ่มต้นการต่อสู้', desc: 'ต่อสู้ใน Battle ARENA ครบ 10 ครั้ง', goal: 10, reward: { points: 500, diamonds: 5 } },
+        { id: 'lv80_easy', tier: 'easy', title: 'Easy Collector', desc: 'สะสมการ์ด Lv.80 และ 5 ดาว ครบ 10 ใบ', goal: 10, reward: { points: 50000, diamonds: 100 } },
 
-        { id: 'expert_collector', tier: 'medium', title: 'นักสะสมผู้เชี่ยวชาญ', desc: 'สะสมการ์ดไม่ซ้ำแบบให้ครบ 50 ใบ', goal: 50, reward: { points: 25000, diamonds: 15000 } },
-        { id: 'arena_adept', tier: 'medium', title: 'นักรบผู้ชำนาญ', desc: 'ต่อสู้ใน Battle ARENA ครบ 100 ครั้ง', goal: 100, reward: { points: 15000, diamonds: 15000 } },
-        { id: 'lv80_medium', tier: 'medium', title: 'Medium Collector', desc: 'สะสมการ์ด Lv.80 และ 5 ดาว ครบ 30 ใบ', goal: 30, reward: { points: 55000, diamonds: 30000 } },
+        { id: 'expert_collector', tier: 'medium', title: 'นักสะสมผู้เชี่ยวชาญ', desc: 'สะสมการ์ดไม่ซ้ำแบบให้ครบ 50 ใบ', goal: 50, reward: { points: 500, diamonds: 50 } },
+        { id: 'arena_adept', tier: 'medium', title: 'นักรบผู้ชำนาญ', desc: 'ต่อสู้ใน Battle ARENA ครบ 100 ครั้ง', goal: 100, reward: { points: 5000, diamonds: 50 } },
+        { id: 'lv80_medium', tier: 'medium', title: 'Medium Collector', desc: 'สะสมการ์ด Lv.80 และ 5 ดาว ครบ 30 ใบ', goal: 30, reward: { points: 150000, diamonds: 300 } },
 
-        { id: 'god_tier', tier: 'hard', title: 'เหนือคำบรรยาย', desc: 'สะสมการ์ดระดับ USEC หรือ EXR ได้สำเร็จ', goal: 1, reward: { points: 100000, diamonds: 100000 } },
-        { id: 'arena_expert', tier: 'hard', title: 'จอมยุทธ์แห่งอารีน่า', desc: 'ต่อสู้ใน Battle ARENA ครบ 150 ครั้ง', goal: 150, reward: { points: 150000, diamonds: 100000 } },
-        { id: 'lv80_hard', tier: 'hard', title: 'Hard Collector', desc: 'สะสมการ์ด Lv.80 และ 5 ดาว ครบ 40 ใบ', goal: 40, reward: { points: 20000, diamonds: 15000 } },
+        { id: 'god_tier', tier: 'hard', title: 'เหนือคำบรรยาย', desc: 'สะสมการ์ดระดับ USEC หรือ EXR ได้สำเร็จ', goal: 1, reward: { points: 10000, diamonds: 100 } },
+        { id: 'arena_expert', tier: 'hard', title: 'จอมยุทธ์แห่งอารีน่า', desc: 'ต่อสู้ใน Battle ARENA ครบ 150 ครั้ง', goal: 150, reward: { points: 15000, diamonds: 150 } },
+        { id: 'lv80_hard', tier: 'hard', title: 'Hard Collector', desc: 'สะสมการ์ด Lv.80 และ 5 ดาว ครบ 40 ใบ', goal: 40, reward: { points: 300000, diamonds: 500 } },
 
-        { id: 'rainbow_master', tier: 'impossible', title: 'ผู้พิชิตสีรุ้ง', desc: 'ทำ Full Power (LV.80 และ 5 ดาว) 1 ใบ', goal: 1, reward: { points: 10000, diamonds: 50000 } },
-        { id: 'power_up4', tier: 'impossible', title: 'ผู้สูงสุดทุกอย่าง!!', desc: 'มีการ์ดเลเวล 80 ขึ้นไปอย่างน้อย 60 ใบ', goal: 60, reward: { points: 200000, diamonds: 10000 } },
-        { id: 'lv80_impossible', tier: 'impossible', title: 'Impossible Collector', desc: 'สะสมการ์ด Lv.80 และ 5 ดาว ครบ 80 ใบ', goal: 80, reward: { points: 100000, diamonds: 20000 } },
+        { id: 'rainbow_master', tier: 'impossible', title: 'ผู้พิชิตสีรุ้ง', desc: 'ทำ Full Power (LV.80 และ 5 ดาว) 1 ใบ', goal: 1, reward: { points: 50000, diamonds: 500 } },
+        { id: 'power_up4', tier: 'impossible', title: 'ผู้สูงสุดทุกอย่าง!!', desc: 'มีการ์ดเลเวล 80 ขึ้นไปอย่างน้อย 60 ใบ', goal: 60, reward: { points: 2000, diamonds: 20 } },
+        { id: 'lv80_impossible', tier: 'impossible', title: 'Impossible Collector', desc: 'สะสมการ์ด Lv.80 และ 5 ดาว ครบ 80 ใบ', goal: 80, reward: { points: 1000000, diamonds: 2000 } },
 
-        { id: 'arena_divine', tier: 'divine', title: 'เหนือเกินความคาดหมาย',  desc: 'จิตวิญญาณแห่งการต่อสู้ ต่อสู้ใน Battle ARENA ครบ 500 ครั้ง', goal: 500, reward: { points: 250000, diamonds: 55000 } },
+        { id: 'arena_divine', tier: 'divine', title: 'เหนือเกินความคาดหมาย',  desc: 'จิตวิญญาณแห่งการต่อสู้ ต่อสู้ใน Battle ARENA ครบ 500 ครั้ง', goal: 500, reward: { points: 2000000, diamonds: 5000 }, rewardTitle: 'ราชันย์อารีน่าไร้พ่าย' },
 
-        { id: 'whale_secret_usec', tier: 'secret', title: '???', desc: 'มีการ์ดระดับ USEC Full Power (LV.80 และ 5 ดาว) 10 ใบ', goal: 10, reward: { points: 6000000, diamonds: 6000000 } },
-        { id: 'whale_secret_exr', tier: 'secret', title: '???', desc: 'มีการ์ดระดับ EXR Full Power (LV.80 และ 5 ดาว) 2 ใบ', goal: 2, reward: { points: 5000000, diamonds: 5000000 } },
-        { id: 'p_collector_secret', tier: 'secret', title: '???', desc: 'ครอบครองการ์ดระดับ P อย่างน้อย 1 ใบ', goal: 1, reward: { points: 100000, diamonds: 100000 } },
-        { id: 'arena_legend_secret', tier: 'secret', title: '???', desc: 'ตำนานแห่ง Battle ARENA ต่อสู้ครบ 1000 ครั้ง', goal: 1000, reward: { points: 5000000, diamonds: 5000000 } },
-        { id: 'whale_secret_coins', tier: 'secret', title: '???', desc: 'สะสม Coins ในตัวให้มากกว่า 1,000,000', goal: 1000000, reward: { points: 0, diamonds: 1000000 } },
-        { id: 'power_Full_Allcollector',tier: 'secret',title: '???', desc: 'สะสมการ์ด Level 80 และ 5 ดาวให้ครบทั้งหมด160',goal: 160,reward: { points: 10000000, diamonds: 10000000 } 
-    },
+        { id: 'whale_secret_usec', tier: 'secret', title: '???', desc: 'มีการ์ดระดับ USEC Full Power (LV.80 และ 5 ดาว) 6 ใบ', goal: 6, reward: { points: 60000000, diamonds: 60000000 } },
+        { id: 'whale_secret_exr', tier: 'secret', title: '???', desc: 'มีการ์ดระดับ EXR Full Power (LV.80 และ 5 ดาว) 2 ใบ', goal: 2, reward: { points: 50000000, diamonds: 50000000 } },
+        { id: 'p_collector_secret', tier: 'secret', title: '???', desc: 'ครอบครองการ์ดระดับ P อย่างน้อย 1 ใบ', goal: 1, reward: { points: 10000000, diamonds: 10000000 } },
+        { id: 'arena_legend_secret', tier: 'secret', title: '???', desc: 'ตำนานแห่ง Battle ARENA ต่อสู้ครบ 1000 ครั้ง', goal: 1000, reward: { points: 500000000, diamonds: 500000000 } },
+        { id: 'whale_secret_coins', tier: 'secret', title: '???', desc: 'สะสม Coins ในตัวให้มากกว่า 1,000,000', goal: 1000000, reward: { points: 0, diamonds: 100000000 } },
+        { id: 'power_Full_Allcollector', tier: 'secret', title: '???', desc: 'สะสมการ์ด Level 80 และ 5 ดาวให้ครบตามจำนวน', goal: 150, reward: { points: 100000000, diamonds: 100000000 } }
     ];
 
     function getArenaPower(card) {
@@ -256,14 +264,15 @@
     }
 
     function getDynamicSellValue(card) {
-        const base = sellValuesBase[(card.rarity||'C').toUpperCase()] || 100;
+        const r = (card.rarity||'C').toUpperCase();
+        const base = sellValuesBase[r] || 100;
         return Math.floor(base * (1 + ((card.level||1) - 1) * 0.1));
     }
 
     function getUpgradeRequirements(card) {
         const r = (card.rarity || 'C').toUpperCase();
         const lv = card.level || 1;
-        if (r === 'USEC' || r === 'EXR') {
+        if (r === 'USEC' || r === 'EXR' || r === 'SECRET') {
             if (lv <= 45) return { reqQty: 1, cost: 500 };
             return { reqQty: 2, cost: 1500 }; 
         }
@@ -278,12 +287,11 @@
             onSnapshot(doc(db, "users", user.uid), (snap) => {
                 if (snap.exists()) {
                     const data = snap.data();
-                    userCards = (data.collection || []).map(c => ({...c, level: c.level || 1, stars: c.stars || 0}));
+                    userCards = (data.collection || []).map(c => ({...c, level: c.level || 1, stars: c.stars || 0, isLocked: c.isLocked || false}));
                     document.getElementById("nav-points").innerText = (data.points || 0).toLocaleString();
                     document.getElementById("nav-diamonds").innerText = (data.diamonds || 0).toLocaleString();
                     document.getElementById("display-username").innerText = data.username || "COLLECTOR";
                     renderCards();
-                    // ดึงข้อมูล arenaBattles มาคำนวณ Achievement โดยตรง
                     renderAchievements(data);
                 }
             });
@@ -302,7 +310,10 @@
         let displayList = [];
         for (const key in grouped) {
             const copies = grouped[key];
-            copies.sort((a, b) => ((b.stars||0)*100 + b.level) - ((a.stars||0)*100 + a.level));
+            copies.sort((a, b) => {
+                if (a.isLocked !== b.isLocked) return b.isLocked ? 1 : -1;
+                return ((b.stars||0)*100 + b.level) - ((a.stars||0)*100 + a.level);
+            });
             displayList.push({...copies[0], count: copies.length});
         }
         if (currentFilter !== 'ALL') displayList = displayList.filter(c => (c.rarity||'C').toUpperCase() === currentFilter);
@@ -312,8 +323,16 @@
         displayList.sort((a, b) => {
             if (sortType === 'power_desc') return getArenaPower(b) - getArenaPower(a);
             if (sortType === 'power_asc') return getArenaPower(a) - getArenaPower(b);
-            if (sortType === 'rarity_desc') return rarityOrder[(b.rarity||'C').toUpperCase()] - rarityOrder[(a.rarity||'C').toUpperCase()];
-            if (sortType === 'rarity_asc') return rarityOrder[(a.rarity||'C').toUpperCase()] - rarityOrder[(b.rarity||'C').toUpperCase()];
+            if (sortType === 'rarity_desc') {
+                const rA = (a.rarity||'C').toUpperCase();
+                const rB = (b.rarity||'C').toUpperCase();
+                return (rarityOrder[rB] || 0) - (rarityOrder[rA] || 0);
+            }
+            if (sortType === 'rarity_asc') {
+                const rA = (a.rarity||'C').toUpperCase();
+                const rB = (b.rarity||'C').toUpperCase();
+                return (rarityOrder[rA] || 0) - (rarityOrder[rB] || 0);
+            }
             if (sortType === 'lv_desc') return b.level - a.level;
             if (sortType === 'lv_asc') return a.level - b.level;
             return 0;
@@ -323,14 +342,15 @@
             const r = (card.rarity||'C').toUpperCase();
             const div = document.createElement("div");
             div.className = `col-card ${card.level >= MAX_LV && card.stars >= 5 ? 'rainbow-effect' : ''}`;
-            div.style.border = `1px solid ${rarityColors[r]}44`;
+            div.style.border = `1px solid ${rarityColors[r] || '#fff'}44`;
             div.onclick = () => openModal(card);
             div.innerHTML = `
                 ${card.stars > 0 ? `<div class="star-container">${'⭐'.repeat(card.stars)}</div>` : ''}
                 ${card.count > 1 ? `<div class="card-count-badge">x${card.count}</div>` : ''}
+                ${card.isLocked ? `<div class="card-lock-badge">🔒</div>` : ''}
                 <img src="${card.img || card.image}">
                 <div style="padding:10px; background: rgba(0,0,0,0.8);">
-                    <div style="color:${rarityColors[r]}; font-size:0.75rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${card.name}</div>
+                    <div style="color:${rarityColors[r] || '#fff'}; font-size:0.75rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${card.name}</div>
                     <div style="color:#ffc831; font-size:0.8rem; font-weight:bold;">⚡ ${getArenaPower(card).toLocaleString()}</div>
                     <div style="color:#aaa; font-size:0.65rem;">LV. ${card.level}</div>
                 </div>`;
@@ -340,18 +360,17 @@
 
     function checkAchProgress(ach, userData) {
         const collection = userData.collection || [];
-        const uniqueCardsCount = new Set(collection.map(c => `${c.name}_${c.rarity}`)).size;
+        const uniqueCardsCount = new Set(collection.map(c => `${c.name}_${(c.rarity||'C').toUpperCase()}`)).size;
         const points = userData.points || 0;
-
         const arenaCount = userData.arenaBattles || 0; 
         
         switch(ach.id) {
             case 'starter_collector': return Math.min(uniqueCardsCount, ach.goal);
             case 'expert_collector': return Math.min(uniqueCardsCount, ach.goal);
-            case 'lv80_easy':return collection.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;
-            case 'lv80_medium':return collection.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;
-            case 'lv80_hard':return collection.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;
-            case 'lv80_impossible':return collection.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;
+            case 'lv80_easy': return collection.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;
+            case 'lv80_medium': return collection.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;
+            case 'lv80_hard': return collection.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;
+            case 'lv80_impossible': return collection.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;
             case 'god_tier': return collection.some(c => ['USEC', 'EXR'].includes((c.rarity||'').toUpperCase())) ? 1 : 0;
             case 'rainbow_master': return collection.some(c => (c.level||1) >= 80 && (c.stars||0) >= 5) ? 1 : 0;
             case 'whale_secret_usec': 
@@ -374,8 +393,8 @@
             case 'arena_legend_secret':
                 return Math.min(arenaCount, ach.goal);
             case 'whale_secret_coins': return points >= ach.goal ? ach.goal : points;
-            case 'power_Full_Allcollector':const fullMaxCount = collection.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;return fullMaxCount;
-            case 'arena_divine':return Math.min(arenaCount, 500);
+            case 'power_Full_Allcollector': return collection.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;
+            case 'arena_divine': return Math.min(arenaCount, 500);
             default: return 0;
         }
     }
@@ -441,15 +460,27 @@
     window.openModal = (card) => {
         const r = (card.rarity||'C').toUpperCase();
         const sameCards = userCards.filter(c => c.name === card.name && (c.rarity||'C').toUpperCase() === r);
+        
         document.getElementById("modalImg").src = card.img || card.image;
         document.getElementById("modalName").innerText = card.name;
         document.getElementById("modalRarity").innerText = "GRADE: " + r;
-        document.getElementById("modalRarity").style.color = rarityColors[r];
+        document.getElementById("modalRarity").style.color = rarityColors[r] || '#fff';
         document.getElementById("modalPower").innerText = getArenaPower(card).toLocaleString();
         document.getElementById("modalLvlDisplay").innerText = "LV. " + card.level;
         document.getElementById("lvlBarFill").style.width = (card.level/MAX_LV*100) + "%";
         document.getElementById("reqQty").innerText = sameCards.length;
         document.getElementById("modalSellPrice").innerText = getDynamicSellValue(card).toLocaleString() + " 🪙";
+
+        // Setup Lock Button
+        const lockBtn = document.getElementById("btnLockCard");
+        if (card.isLocked) {
+            lockBtn.innerText = "🔒 ล็อกอยู่";
+            lockBtn.classList.add("locked");
+        } else {
+            lockBtn.innerText = "🔓 ปลดล็อกอยู่";
+            lockBtn.classList.remove("locked");
+        }
+        lockBtn.onclick = () => handleToggleLock(card);
 
         const lvGroup = document.getElementById("lvUpgradeGroup"), starBtn = document.getElementById("btnUpgradeStar"), maxMsg = document.getElementById("maxLevelMessage");
         
@@ -474,6 +505,25 @@
         document.getElementById("cardModal").style.display = "flex";
     };
 
+    async function handleToggleLock(card) {
+        let updated = [...userCards];
+        const idx = updated.findIndex(c => c.name === card.name && (c.rarity||'').toUpperCase() === (card.rarity||'').toUpperCase() && c.level === card.level && c.stars === card.stars);
+        if (idx > -1) {
+            updated[idx].isLocked = !updated[idx].isLocked;
+            await updateDoc(doc(db, "users", currentUID), { collection: updated });
+            
+            // รีเฟรชสถานะปุ่มใน Modal ทันที
+            const lockBtn = document.getElementById("btnLockCard");
+            if (updated[idx].isLocked) {
+                lockBtn.innerText = "🔒 ล็อกอยู่";
+                lockBtn.classList.add("locked");
+            } else {
+                lockBtn.innerText = "🔓 ปลดล็อกอยู่";
+                lockBtn.classList.remove("locked");
+            }
+        }
+    }
+
     async function handleUpgrade(card, type, starCost = 0) {
         const userDocRef = doc(db, "users", currentUID);
         const userSnap = await getDoc(userDocRef);
@@ -484,7 +534,7 @@
         let currentPoints = data.points || 0;
         let currentDiamonds = data.diamonds || 0;
 
-        let mainIdx = collection.findIndex(c => c.name === card.name && c.rarity === card.rarity && (c.level||1) === card.level && (c.stars||0) === card.stars);
+        let mainIdx = collection.findIndex(c => c.name === card.name && (c.rarity||'').toUpperCase() === (card.rarity||'').toUpperCase() && (c.level||1) === card.level && (c.stars||0) === card.stars);
         if (mainIdx === -1) return alert("ไม่พบการ์ดหลัก");
 
         let totalCostPoints = 0;
@@ -496,14 +546,15 @@
                 const req = getUpgradeRequirements(collection[mainIdx]);
                 let materialIndices = [];
                 for (let i = 0; i < collection.length; i++) {
-                    if (i !== mainIdx && collection[i].name === card.name && collection[i].rarity === card.rarity) {
+                    // วัตถุดิบในการอัปเกรดจะต้องไม่ถูกล็อกไว้ (isLocked !== true)
+                    if (i !== mainIdx && collection[i].name === card.name && (collection[i].rarity||'').toUpperCase() === (card.rarity||'').toUpperCase() && !collection[i].isLocked) {
                         materialIndices.push(i);
                         if (materialIndices.length >= req.reqQty) break;
                     }
                 }
                 if (materialIndices.length < req.reqQty || currentPoints < (totalCostPoints + req.cost)) {
                     if (type === 'LV') {
-                        if (materialIndices.length < req.reqQty) alert(`ใบซ้ำไม่พอ (ต้องการ ${req.reqQty} ใบ)`);
+                        if (materialIndices.length < req.reqQty) alert(`ใบซ้ำที่ไม่ได้ล็อกมีไม่พอ (ต้องการ ${req.reqQty} ใบ)`);
                         else alert("Coins ไม่พอ");
                     }
                     break;
@@ -521,12 +572,12 @@
             let reqQty = 2;
             let materialIndices = [];
             for (let i = 0; i < collection.length; i++) {
-                if (i !== mainIdx && collection[i].name === card.name && collection[i].rarity === card.rarity) {
+                if (i !== mainIdx && collection[i].name === card.name && (collection[i].rarity||'').toUpperCase() === (card.rarity||'').toUpperCase() && !collection[i].isLocked) {
                     materialIndices.push(i);
                     if (materialIndices.length >= reqQty) break;
                 }
             }
-            if (materialIndices.length < reqQty) return alert("ต้องการใบซ้ำ 2 ใบเพื่ออัปดาว");
+            if (materialIndices.length < reqQty) return alert("ต้องการใบซ้ำที่ไม่ได้ล็อก 2 ใบเพื่ออัปดาว");
             if (currentDiamonds < starCost) return alert("Diamonds ไม่พอ");
             materialIndices.sort((a, b) => b - a).forEach(idx => {
                 collection.splice(idx, 1);
@@ -548,9 +599,10 @@
     }
 
     async function handleSingleSell(card) {
+        if (card.isLocked) return alert("❌ ไม่สามารถขายได้เนื่องจากเปิดระบบล็อกการ์ดไว้ ปลดล็อกก่อนทำการขาย!");
         if(!confirm(`ขายการ์ด ${card.name} หรือไม่?`)) return;
         let updated = [...userCards];
-        const idx = updated.findIndex(c => c.name === card.name && c.rarity === card.rarity && c.level === card.level && c.stars === card.stars);
+        const idx = updated.findIndex(c => c.name === card.name && (c.rarity||'').toUpperCase() === (card.rarity||'').toUpperCase() && c.level === card.level && c.stars === card.stars);
         if(idx > -1) {
             const gain = getDynamicSellValue(card);
             updated.splice(idx, 1);
@@ -560,7 +612,7 @@
     }
 
     document.getElementById("btnSellAll").onclick = async () => {
-        if (!confirm("ระบบจะเก็บการ์ดที่เลเวลและดาวสูงสุดไว้ 1 ใบ และขายใบที่เหลือทั้งหมด ยืนยันหรือไม่?")) return;
+        if (!confirm("ระบบจะเก็บการ์ดที่เลเวลและดาวสูงสุดไว้ 1 ใบ และขายใบซ้ำอื่นที่ไม่ได้ล็อกทิ้งทั้งหมด ยืนยันหรือไม่?")) return;
         const grouped = {};
         userCards.forEach(card => {
             const key = `${card.name}_${(card.rarity||'C').toUpperCase()}`;
@@ -571,22 +623,27 @@
         for (const key in grouped) {
             const copies = grouped[key];
             copies.sort((a, b) => ((b.stars||0)*100 + b.level) - ((a.stars||0)*100 + a.level));
-            newCollection.push(copies[0]); 
+            
+            newCollection.push(copies[0]); // ใบที่โหดสุดจะถูกเก็บไว้เสมอ
             for (let i = 1; i < copies.length; i++) {
-                totalGain += getDynamicSellValue(copies[i]);
-                sellCount++;
+                if (copies[i].isLocked) {
+                    newCollection.push(copies[i]); // ถ้าใบซ้ำถูกล็อกไว้ ระบบจะข้ามไม่เอาไปขาย
+                } else {
+                    totalGain += getDynamicSellValue(copies[i]);
+                    sellCount++;
+                }
             }
         }
-        if (sellCount === 0) return alert("ไม่มีใบซ้ำให้ขาย");
+        if (sellCount === 0) return alert("ไม่มีใบซ้ำที่ปลดล็อกเหลือให้ขาย");
         await updateDoc(doc(db, "users", currentUID), { collection: newCollection, points: increment(totalGain) });
-        alert(`ขายการ์ดทั้งหมด ${sellCount} ใบ ได้รับ ${totalGain.toLocaleString()} 🪙`);
+        alert(`ขายการ์ดซ้ำสำเร็จทั้งหมด ${sellCount} ใบ ได้รับ ${totalGain.toLocaleString()} 🪙`);
     };
 
     document.getElementById("searchInput").oninput = (e) => { searchQuery = e.target.value; renderCards(); };
     document.getElementById("sortSelect").onchange = () => renderCards();
     
     const fCon = document.getElementById("filterContainer");
-    ['ALL','secret','P','USEC','EXR','CBR','SEC','SUR','SSR','PR','UR','SR','R','U','C'].forEach(r => {
+    ['ALL','SECRET','P','USEC','EXR','CBR','SEC','SUR','SSR','PR','UR','SR','R','U','C'].forEach(r => {
         const btn = document.createElement("button");
         btn.className = `filter-btn ${r === 'ALL' ? 'active' : ''}`;
         btn.innerText = r;
