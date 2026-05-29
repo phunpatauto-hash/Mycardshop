@@ -396,6 +396,7 @@
     const db = getFirestore(app);
 
     const RARITY_POWER = {
+        "SECRET": { base: 8800, perLv: 9500 },
         "P":    { base: 5000, perLv: 1000 },
         "USEC": { base: 8500, perLv: 6500 }, 
         "EXR":  { base: 4000, perLv: 2500 }, 
@@ -765,29 +766,59 @@
         }, 2800);
     };
 
-    function renderPrep() {
+        function renderPrep() {
         if (!userDoc) return;
         const slots = document.getElementById("prep-slots");
         const pool = document.getElementById("prep-pool");
         slots.innerHTML = ""; pool.innerHTML = "";
-        for(let i=0; i<5; i++) { slots.innerHTML += tempAtk[i] ? cardHTML(tempAtk[i]) : `<div class="mini-card" style="border:2px dashed rgba(255,255,255,0.1); background:transparent;"></div>`; }
+        
+        // 1. แสดงการ์ดที่เลือกใน Slot (สูงสุด 5 ใบ)
+        for(let i=0; i<5; i++) { 
+            slots.innerHTML += tempAtk[i] ? cardHTML(tempAtk[i]) : `<div class="mini-card" style="border:2px dashed rgba(255,255,255,0.1); background:transparent;"></div>`; 
+        }
+        
+        // 2. คัดกรองการ์ดเวลสูงสุดในคลัง
         const unique = {};
         (userDoc.collection || []).forEach(c => { if(!unique[c.name] || Number(c.level) > Number(unique[c.name].level)) unique[c.name] = c; });
         const sortedCollection = Object.values(unique).sort((a, b) => Number(b.level || 1) - Number(a.level || 1));
-        sortedCollection.forEach(c => {
+        
+        // 3. วาดการ์ดในคลังและผูก Event แบบปลอดภัย (เว็บไม่ค้างแน่นอน)
+        sortedCollection.forEach((c, index) => {
             const isSel = tempAtk.some(t => t.name === c.name);
             const div = document.createElement("div");
             div.innerHTML = cardHTML(c, isSel);
+            
             div.onclick = () => {
                 const idx = tempAtk.findIndex(t => t.name === c.name);
-                if(idx > -1) tempAtk.splice(idx, 1);
-                else if(tempAtk.length < 5) tempAtk.push(c);
+                if(idx > -1) {
+                    // ถ้ารูปการ์ดถูกเลือกอยู่แล้ว -> เอาออกจากทีมบุก
+                    tempAtk.splice(idx, 1);
+                } else {
+                    // ─── [เงื่อนไขที่ 2] ตรวจสอบและบล็อกระดับ SECRET ───
+                    if (c.rarity === 'SECRET') {
+                        // นับจำนวนการ์ดระดับ SECRET ที่อยู่ในทีมบุก (tempAtk) ปัจจุบัน
+                        const secretCount = tempAtk.filter(t => t.rarity === 'SECRET').length;
+                        if (secretCount >= 1) {
+                            alert("❌ จำกัด! สามารถเลือกใช้การ์ดระดับ SECRET ได้สูงสุดเพียง 1 ใบเท่านั้นในทีมบุก");
+                            return; // สั่งหยุดทำงานทันที ไม่ยอมให้เพิ่มเข้าทีม
+                        }
+                    }
+
+                    // [เงื่อนไขที่ 1] ควบคุมให้ทีมรวมสูงสุดไม่เกิน 5 ใบ
+                    if(tempAtk.length < 5) {
+                        tempAtk.push(c);
+                    }
+                }
+                // รีเฟรชวาดหน้าจอใหม่หลังจากกดเลือกการ์ด
                 renderPrep();
             };
             pool.appendChild(div);
         });
-        document.getElementById("start-btn").disabled = tempAtk.length < 5;
+        
+        // ─── [เงื่อนไขที่ 1] ปลดล็อกให้ใส่กี่ใบก็ได้ (1-5 ใบ) ขอแค่ไม่เท่ากับ 0 ใบ ───
+        document.getElementById("start-btn").disabled = (tempAtk.length === 0);
     }
+
 
     window.saveDefense = async function() {
         if(tempDef.length < 5) return alert("กรุณาเลือกการ์ดป้องกันให้ครบ 5 ใบ!");
