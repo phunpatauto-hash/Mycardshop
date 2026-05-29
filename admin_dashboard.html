@@ -16,7 +16,8 @@
             --red: #ff4757;
             --blue: #1e90ff;
             --green: #2ed573;
-            --star: #ff9f43; /* เพิ่มสีเงินดวงดาว */
+            --star: #ff9f43; 
+            --orange: #ff6b81; /* สีสำหรับปุ่มรีเซ็ต */
         }
 
         body { 
@@ -176,6 +177,9 @@
         .btn-green { background: rgba(46, 213, 115, 0.1); color: var(--green); }
         .btn-green:hover { background: var(--green); color: white; }
 
+        .btn-orange { background: rgba(255, 107, 129, 0.1); color: #ff6b81; }
+        .btn-orange:hover { background: #ff6b81; color: white; }
+
         /* --- Tables --- */
         .table-container { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
@@ -205,6 +209,19 @@
             max-width: 300px;
             color: white;
             font-size: 0.9rem;
+        }
+
+        /* เอฟเฟกต์สีรุ้งสำหรับระดับ SECRET ตัวใหม่ */
+        @keyframes secretGlow {
+            0% { color: #ff4757; text-shadow: 0 0 5px rgba(255,71,87,0.5); }
+            33% { color: #00d2ff; text-shadow: 0 0 5px rgba(0,210,255,0.5); }
+            66% { color: #2ed573; text-shadow: 0 0 5px rgba(46,213,115,0.5); }
+            100% { color: #ff4757; text-shadow: 0 0 5px rgba(255,71,87,0.5); }
+        }
+        .secret-rainbow-opt {
+            animation: secretGlow 3s infinite linear;
+            font-weight: bold !important;
+            background-color: #080808 !important;
         }
     </style>
 </head>
@@ -306,7 +323,8 @@
                     <input type="text" id="reward-card-name" placeholder="ชื่อการ์ดรางวัล">
                     <select id="reward-card-rarity">
                         <option value="">-- ระดับความหายาก --</option>
-                        <option value="P" style="color: #ff4757; font-weight: bold;">P (Highest)</option>
+                        <option value="SECRET" class="secret-rainbow-opt" style="color: #ff4757;">SECRET (ลึกลับสูงสุด)</option>
+                        <option value="P" style="color: #ff4757; font-weight: bold;">P </option>
                         <option value="USEC" style="color: #ffc831;">USEC</option>
                         <option value="EXR" style="color: #ffc831;">EXR</option>
                         <option value="SSR" style="color: #ffa502;">SSR</option>
@@ -431,7 +449,7 @@
         const codeData = {
             rewardPoints: parseInt(document.getElementById("reward-points").value) || 0,
             rewardDiamonds: parseInt(document.getElementById("reward-diamonds").value) || 0,
-            rewardStars: parseInt(document.getElementById("reward-stars").value) || 0, // เพิ่ม Star
+            rewardStars: parseInt(document.getElementById("reward-stars").value) || 0,
             maxUse: parseInt(document.getElementById("max-use").value) || 0,
             usedCount: 0,
             rewardCard: cardName ? {
@@ -475,6 +493,7 @@
                             <button class="btn btn-action btn-blue" onclick="editVal('${d.id}', 'points', 'Gold')" title="Edit Gold"><i class="fas fa-coins"></i></button>
                             <button class="btn btn-action btn-blue" onclick="editVal('${d.id}', 'diamonds', 'Diamond')" title="Edit Diamond"><i class="fas fa-gem"></i></button>
                             <button class="btn btn-action btn-star" onclick="editVal('${d.id}', 'stars', 'Star')" title="Edit Star"><i class="fas fa-star"></i></button>
+                            <button class="btn btn-action btn-orange" onclick="resetUserEconomy('${d.id}', '${user.username || 'N/A'}')" title="Reset All Currencies"><i class="fas fa-sync-alt"></i></button>
                             <button class="btn btn-action ${user.isBanned ? 'btn-green' : 'btn-red'}" onclick="toggleBan('${d.id}', ${user.isBanned})" title="${user.isBanned ? 'Unban' : 'Ban'}">
                                 <i class="fas ${user.isBanned ? 'fa-user-check' : 'fa-user-slash'}"></i>
                             </button>
@@ -515,6 +534,23 @@
     window.editVal = async (uid, field, label) => {
         const val = prompt(`ระบุจำนวนที่ต้องการเพิ่ม/ลด ${label} (ใส่เลขลบเพื่อลด):`);
         if(val && !isNaN(val)) await updateDoc(doc(db, "users", uid), { [field]: increment(parseInt(val)) });
+    };
+
+    // ฟังก์ชันรีเซ็ตค่าเงิน ทอง และดาว ของผู้เล่นให้เป็น 0 ทันที
+    window.resetUserEconomy = async (uid, username) => {
+        if(confirm(`คุณต้องการรีเซ็ตค่าเงินทั้งหมด (ทอง, เพชร, ดาว) ของผู้เล่น "${username}" ให้เป็น 0 ใช่หรือไม่?`)) {
+            try {
+                await updateDoc(doc(db, "users", uid), {
+                    points: 0,
+                    diamonds: 0,
+                    stars: 0
+                });
+                alert(`รีเซ็ตระบบการเงินของคุณ ${username} สำเร็จ`);
+            } catch(error) {
+                console.error("Error resetting economy:", error);
+                alert("เกิดข้อผิดพลาด ไม่สามารถรีเซ็ตเงินได้");
+            }
+        }
     };
 
     window.toggleBan = async (uid, currentStatus) => {
