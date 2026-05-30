@@ -357,9 +357,9 @@
     <div id="prepModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="toggleModal('prepModal', false)">&times;</span>
-            <h3 style="color:#ffc831; text-align:center; font-size: 1.3rem;">🚩 จัดทีมบุก (เลือก 5 ใบ)</h3>
+            <h3 style="color:#ffc831; text-align:center; font-size: 1.3rem;">🚩 จัดทีมบุก (เลือกสูงสุด 5 ใบ)</h3>
             <div id="prep-slots" class="card-row" style="min-height: 120px; border: 2px dashed rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); border-radius: 14px; padding: 12px;"></div>
-            <button id="start-btn" class="btn-action" disabled onclick="handleStartBattle()">⚔️ เริ่มการท้าดวล!</button>
+            <button id="start-btn" class="btn-action" disabled>⚔️ เริ่มการท้าดวล!</button>
             <div id="prep-pool" class="card-row" style="margin-top:25px; max-height: 250px; overflow-y: auto; padding-top: 5px;"></div>
         </div>
     </div>
@@ -377,23 +377,21 @@
     </div>
 
 <script type="module">
-    // ==================== SYSTEM BACKEND LOGIC (UNTOUCHED) ====================
+    // ==================== SYSTEM BACKEND LOGIC ====================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, onSnapshot, updateDoc, increment, collection, query, orderBy, limit, getDocs, getDoc, addDoc, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    const firebaseConfig = { 
+    // Re-import อย่างถูกต้องเพื่อความเสถียรของระบบหลังบ้าน
+    const db = getFirestore(initializeApp({ 
         apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM", 
         authDomain: "sign-up-73f99.firebaseapp.com", 
         projectId: "sign-up-73f99", 
         storageBucket: "sign-up-73f99.appspot.com", 
         messagingSenderId: "916335559099", 
         appId: "1:916335559099:web:3a8ed896ba26e38991849e" 
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    }));
+    const auth = getAuth();
 
     const RARITY_POWER = {
         "SECRET": { base: 8800, perLv: 9500 },
@@ -430,12 +428,11 @@
         { name: "MASTER 3", min: 7200, icon: "⚔️", color: "#ff4500", reward: {coin: 450000} },
         { name: "MASTER 2", min: 8500, icon: "⚔️", color: "#ff4500", reward: {coin: 650000} },
         { name: "MASTER 1", min: 10000, icon: "🔥", color: "#ff0000", reward: {coin: 1000000} },
-        { name: "Supre MASTER 4 ", min: 12000, icon: "👑", color: "rainbow", reward: {coin: 2500000} },
-        { name: "Supre MASTER 3 ", min: 15000, icon: "👑", color: "rainbow", reward: {coin: 2500000} },
-        { name: "Supre MASTER 2 ", min: 17000, icon: "👑", color: "rainbow", reward: {coin: 2500000} },
-        { name: "Supre MASTER 1 ", min: 19000, icon: "👑", color: "rainbow", reward: {coin: 2500000} },
-        { name: "Supre MASTER PRO!!", min: 21000, icon: "👑🔥", color: "rainbow", reward: {coin: 50000000} },
-        { name: "Supre challenge!! ", min: 45000, icon: "🔥👑🔥", color: "rainbow", reward: {coin: 500000000} }
+        { name: "Supreme MASTER 4 ", min: 12000, icon: "👑", color: "rainbow", reward: {coin: 2500000} },
+        { name: "Supreme MASTER 3 ", min: 15000, icon: "👑", color: "rainbow", reward: {coin: 2500000} },
+        { name: "Supreme MASTER 2 ", min: 17000, icon: "👑", color: "rainbow", reward: {coin: 2500000} },
+        { name: "Supreme MASTER 1 ", min: 19000, icon: "👑", color: "rainbow", reward: {coin: 2500000} },
+        { name: "Supreme MASTER PRO!!", min: 21000, icon: "👑🔥", color: "rainbow", reward: {coin: 50000000} }
     ];
 
     const ELEMENTS = {
@@ -684,18 +681,15 @@
         oRow.innerHTML = targetOpp.defenseTeam.map(c => cardHTML(c)).join('');
         pRow.innerHTML = tempAtk.map(c => cardHTML(c)).join('');
         
-        // [STEP 1] จังหวะเปิดตัว สไลด์แยกซ้าย-ขวา
         oContainer.className = "battle-row-container opp-entering";
         pContainer.className = "battle-row-container player-entering";
 
-        // [STEP 2] วินาทีที่ 0.8: เพิ่มคลาสสั่นชาร์จพลังแนวตั้งก่อนปะทะ (ready-up)
         setTimeout(() => { 
             log.innerHTML = "<span style='color:#ffc831; text-shadow: 0 0 10px rgba(255,200,49,0.5);'>🔥 OVERCHARGING ENERGY MATRIX!</span>"; 
             oContainer.classList.add('ready-up');
             pContainer.classList.add('ready-up');
         }, 800);
 
-        // [STEP 3] วินาทีที่ 2.0: นำสเตตัสพร้อมรบออก แล้วสั่งพุ่งชนกันแนวดิ่งทันที (Strike Attack)
         setTimeout(() => {
             log.innerHTML = "<span style='color:#ff4d4d; font-size:1.6rem; text-shadow: 0 0 15px #ff4d4d; font-weight:800; letter-spacing:1px;'>EX-BURST ATTACK!!</span>";
             oContainer.classList.remove('ready-up');
@@ -707,34 +701,41 @@
             vsLabel.style.color = "#fff";
         }, 2000);
 
-        // [STEP 4] วินาทีที่ 2.15: แฟลชจอขาวและหน้าจอสั่นสะเทือนเมื่อการ์ดปะทะชนกัน
         setTimeout(() => { 
             arena.classList.add('arena-shake'); 
             flash.classList.add('flash-active'); 
         }, 2150);
 
-        // [STEP 5] วินาทีที่ 2.8: คืนสไตล์กลับสภาพเดิม สรุปตรรกะพลังงานและบันทึกลงฐานข้อมูล
         setTimeout(async () => {
             let pTotalPwr = 0;
             let oTotalPwr = 0;
-            for(let i=0; i<5; i++) {
+            
+            // หาจำนวนลูปสูงสุดระหว่างทีมผู้เล่น และ ทีมคู่ต่อสู้ ป้องกันอาการลูปค้าง
+            const maxLoops = Math.max(tempAtk.length, targetOpp.defenseTeam.length);
+            for(let i=0; i<maxLoops; i++) {
                 let pCard = tempAtk[i];
                 let oCard = targetOpp.defenseTeam[i];
-                let pPwr = getPower(pCard);
-                let oPwr = getPower(oCard);
-                if(ELEMENTS[pCard.element].beats === oCard.element) pPwr *= 1.25;
-                else if(ELEMENTS[oCard.element].beats === pCard.element) oPwr *= 1.25;
+                
+                let pPwr = pCard ? getPower(pCard) : 0;
+                let oPwr = oCard ? getPower(oCard) : 0;
+                
+                // คำนวณธาตุเมื่อมีการ์ดชนกันครบสองฝั่ง และใช้ตัวแปรที่ถูกต้องคือ pCard แทน c
+                if(pCard && oCard && ELEMENTS[pCard.element] && ELEMENTS[oCard.element]) {
+                    if(ELEMENTS[pCard.element].beats === oCard.element) pPwr *= 1.25;
+                    else if(ELEMENTS[oCard.element].beats === pCard.element) oPwr *= 1.25;
+                }
                 pTotalPwr += pPwr;
                 oTotalPwr += oPwr;
             }
+            
             const win = pTotalPwr >= oTotalPwr;
             let trophyGain = 90; 
             const currentRankName = getRankInfo(userDoc.trophies || 0).name;
             if (currentRankName.includes("SILVER 1") || currentRankName.includes("GOLD") || currentRankName.includes("DIAMOND")) trophyGain = 120;
             else if (currentRankName.includes("MASTER")) trophyGain = 290;
-            if (currentRankName.includes("Supre MASTER PRO!!") || currentRankName.includes("Supre challenge!!")) trophyGain = 550;
             const trophyChange = win ? trophyGain : -Math.floor(trophyGain / 2);
             const coinPrize = win ? 250 : 50;
+            
             log.innerHTML = win ? `
                 <div style='animation: readyAni 0.3s infinite alternate'>
                     <h2 style='color:#00ff88; margin:0; text-shadow: 0 0 15px #00ff88; font-size: 1.8rem;'>VICTORY !!</h2>
@@ -749,7 +750,6 @@
             
             exit.style.display = "block";
             
-            // เคลียร์คลาสเพื่อพร้อมรีรันแอนิเมชันในแมตช์ถัดไป
             pRow.classList.remove('strike-player'); 
             oRow.classList.remove('strike-opp');
             oContainer.className = "battle-row-container";
@@ -766,24 +766,21 @@
         }, 2800);
     };
 
-        function renderPrep() {
+    function renderPrep() {
         if (!userDoc) return;
         const slots = document.getElementById("prep-slots");
         const pool = document.getElementById("prep-pool");
         slots.innerHTML = ""; pool.innerHTML = "";
         
-        // 1. แสดงการ์ดที่เลือกใน Slot (สูงสุด 5 ใบ)
         for(let i=0; i<5; i++) { 
             slots.innerHTML += tempAtk[i] ? cardHTML(tempAtk[i]) : `<div class="mini-card" style="border:2px dashed rgba(255,255,255,0.1); background:transparent;"></div>`; 
         }
         
-        // 2. คัดกรองการ์ดเวลสูงสุดในคลัง
         const unique = {};
         (userDoc.collection || []).forEach(c => { if(!unique[c.name] || Number(c.level) > Number(unique[c.name].level)) unique[c.name] = c; });
         const sortedCollection = Object.values(unique).sort((a, b) => Number(b.level || 1) - Number(a.level || 1));
         
-        // 3. วาดการ์ดในคลังและผูก Event แบบปลอดภัย (เว็บไม่ค้างแน่นอน)
-        sortedCollection.forEach((c, index) => {
+        sortedCollection.forEach(c => {
             const isSel = tempAtk.some(t => t.name === c.name);
             const div = document.createElement("div");
             div.innerHTML = cardHTML(c, isSel);
@@ -791,34 +788,33 @@
             div.onclick = () => {
                 const idx = tempAtk.findIndex(t => t.name === c.name);
                 if(idx > -1) {
-                    // ถ้ารูปการ์ดถูกเลือกอยู่แล้ว -> เอาออกจากทีมบุก
                     tempAtk.splice(idx, 1);
                 } else {
-                    // ─── [เงื่อนไขที่ 2] ตรวจสอบและบล็อกระดับ SECRET ───
+                    // ดักเงื่อนไขการใส่การ์ดระดับ SECRET (สูงสุด 1 ใบ)
                     if (c.rarity === 'SECRET') {
-                        // นับจำนวนการ์ดระดับ SECRET ที่อยู่ในทีมบุก (tempAtk) ปัจจุบัน
                         const secretCount = tempAtk.filter(t => t.rarity === 'SECRET').length;
                         if (secretCount >= 1) {
                             alert("❌ จำกัด! สามารถเลือกใช้การ์ดระดับ SECRET ได้สูงสุดเพียง 1 ใบเท่านั้นในทีมบุก");
-                            return; // สั่งหยุดทำงานทันที ไม่ยอมให้เพิ่มเข้าทีม
+                            return;
                         }
                     }
-
-                    // [เงื่อนไขที่ 1] ควบคุมให้ทีมรวมสูงสุดไม่เกิน 5 ใบ
-                    if(tempAtk.length < 5) {
-                        tempAtk.push(c);
-                    }
+                    
+                    // บังคับจำนวนสูงสุดรวมไม่เกิน 5 ใบ
+                    if(tempAtk.length < 5) tempAtk.push(c);
                 }
-                // รีเฟรชวาดหน้าจอใหม่หลังจากกดเลือกการ์ด
                 renderPrep();
             };
             pool.appendChild(div);
         });
         
-        // ─── [เงื่อนไขที่ 1] ปลดล็อกให้ใส่กี่ใบก็ได้ (1-5 ใบ) ขอแค่ไม่เท่ากับ 0 ใบ ───
+        // ปลดล็อกให้ปุ่มเริ่มทำงานเมื่อใส่การ์ดอย่างน้อย 1 ใบขึ้นไป
         document.getElementById("start-btn").disabled = (tempAtk.length === 0);
     }
 
+    // ผูกปุ่มกดเริ่มเกมเข้ากับ Module Event Listener ของปุ่มแบบสมบูรณ์
+    document.getElementById("start-btn").addEventListener("click", () => {
+        window.handleStartBattle();
+    });
 
     window.saveDefense = async function() {
         if(tempDef.length < 5) return alert("กรุณาเลือกการ์ดป้องกันให้ครบ 5 ใบ!");
@@ -915,10 +911,9 @@
                 </div>
             ` + [...RANKS].reverse().map(r => {
                 const nameStyle = r.color === "rainbow" ? `class=\"rank-rainbow\"` : `style=\"color:${r.color}\"`;
-                let winTrophy = 90; 
+                let winTrophy = 50; 
                 if (r.name.includes("SILVER 1") || r.name.includes("GOLD") || r.name.includes("DIAMOND")) winTrophy = 120;
                 if (r.name.includes("MASTER")) winTrophy = 290;
-                if (r.name.includes("Supre MASTER PRO!!") || r.name.includes("Supre challenge!!")) winTrophy = 550;
                 return `
                 <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 8px; border-bottom:1px solid rgba(255,255,255,0.05);">
                     <div ${nameStyle}><b>${r.icon} ${r.name}</b><br><small style="color:#718096; font-weight:normal;">คะแนนขั้นต่ำ: ${r.min.toLocaleString()} 🏆</small></div>
