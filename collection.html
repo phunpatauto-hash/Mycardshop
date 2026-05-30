@@ -249,6 +249,7 @@
 
         { id: 'arena_divine', tier: 'divine', title: 'เหนือเกินความคาดหมาย',  desc: 'จิตวิญญาณแห่งการต่อสู้ ต่อสู้ใน Battle ARENA ครบ 500 ครั้ง', goal: 500, reward: { points: 2000000, diamonds: 5000 }, rewardTitle: 'ราชันย์อารีน่าไร้พ่าย' },
 
+        { id: 'whale_secret_SECRET', tier: 'secret', title: '???', desc: 'มีการ์ดระดับ SECRET Full Power (LV.80 และ 5 ดาว) 1 ใบ', goal: 1, reward: { points: 60000000, diamonds: 60000000 } },
         { id: 'whale_secret_usec', tier: 'secret', title: '???', desc: 'มีการ์ดระดับ USEC Full Power (LV.80 และ 5 ดาว) 6 ใบ', goal: 6, reward: { points: 60000000, diamonds: 60000000 } },
         { id: 'whale_secret_exr', tier: 'secret', title: '???', desc: 'มีการ์ดระดับ EXR Full Power (LV.80 และ 5 ดาว) 2 ใบ', goal: 2, reward: { points: 50000000, diamonds: 50000000 } },
         { id: 'p_collector_secret', tier: 'secret', title: '???', desc: 'ครอบครองการ์ดระดับ P อย่างน้อย 1 ใบ', goal: 1, reward: { points: 10000000, diamonds: 10000000 } },
@@ -382,6 +383,12 @@
             case 'whale_secret_exr': 
                 return collection.filter(c => 
                     (c.rarity || '').toUpperCase() === 'EXR' && 
+                    (c.level || 1) >= 80 && 
+                    (c.stars || 0) >= 5
+                ).length;
+            case 'whale_secret_SECRET': 
+                return collection.filter(c => 
+                    (c.rarity || '').toUpperCase() === 'SECRET' && 
                     (c.level || 1) >= 80 && 
                     (c.stars || 0) >= 5
                 ).length;
