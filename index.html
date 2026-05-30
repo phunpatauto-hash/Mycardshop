@@ -385,4 +385,121 @@
             document.getElementById("redeem-tab").style.display = "block";
             document.getElementById("daily-section").style.display = "block";
         } else {
-            docu
+            document.getElementById("profile-container").style.display = "none";
+            document.getElementById("daily-section").style.display = "none";
+        }
+    });
+
+    const nCon = document.getElementById("news-container");
+    onSnapshot(query(collection(db, "news"), orderBy("createdAt", "desc")), (snap) => {
+        nCon.innerHTML = "";
+        snap.forEach(d => {
+            const n = d.data();
+            nCon.innerHTML += `<div class="news-item"><b>${n.date || ''}</b> ${n.title}</div>`;
+        });
+    });
+
+    // ==================== LEADERBOARD SYSTEM LOGIC ====================
+    let currentFilter = "points"; // ค่าเริ่มต้น: ทองสูงสุด
+    const leaderboardContainer = document.getElementById("leaderboard-container");
+
+    async function fetchAndRenderLeaderboard() {
+        try {
+            // ดึงข้อมูลบัญชีผู้ใช้ทั้งหมดมาจัดการแบบ Client-side เพื่อประมวลผลความยาวของ Array สมุดสะสมการ์ด
+            const snapshot = await getDocs(collection(db, "users"));
+            let players = [];
+
+            snapshot.forEach(docSnap => {
+                const data = docSnap.data();
+                const totalCards = data.collection ? data.collection.length : 0;
+                
+                players.push({
+                    username: data.username || "ผู้เล่นไม่ประสงค์ออกนาม",
+                    points: data.points || 0,
+                    diamonds: data.diamonds || 0,
+                    cards: totalCards,
+                    avatar: data.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.username || 'default'}`
+                });
+            });
+
+            // ทำการเรียงลำดับข้อมูลตามแท็บตัวกรองที่เลือก
+            if (currentFilter === "points") {
+                players.sort((a, b) => b.points - a.points);
+            } else if (currentFilter === "diamonds") {
+                players.sort((a, b) => b.diamonds - a.diamonds);
+            } else if (currentFilter === "cards") {
+                players.sort((a, b) => b.cards - a.cards);
+            }
+
+            // แสดงผล Top 10 บนหน้าจอ
+            leaderboardContainer.innerHTML = "";
+            const topPlayers = players.slice(0, 10);
+
+            if (topPlayers.length === 0) {
+                leaderboardContainer.innerHTML = `<div style="text-align:center; padding:20px; color:#a0aec0;">📭 ยังไม่มีข้อมูลอันดับผู้เล่นในระบบ</div>`;
+                return;
+            }
+
+            topPlayers.forEach((player, index) => {
+                const currentRank = index + 1;
+                let rankMarkup = `<span class="leaderboard-rank">${currentRank}</span>`;
+                
+                // ตกแต่งไอคอนเหรียญรางวัลพิเศษสำหรับ Top 3
+                if (currentRank === 1) rankMarkup = `<span class="leaderboard-rank rank-1"><i class="fas fa-medal"></i></span>`;
+                else if (currentRank === 2) rankMarkup = `<span class="leaderboard-rank rank-2"><i class="fas fa-medal"></i></span>`;
+                else if (currentRank === 3) rankMarkup = `<span class="leaderboard-rank rank-3"><i class="fas fa-medal"></i></span>`;
+
+                let scoreMarkup = "";
+                if (currentFilter === "points") {
+                    scoreMarkup = `<span class="leaderboard-score score-points">🪙 ${player.points.toLocaleString()}</span>`;
+                } else if (currentFilter === "diamonds") {
+                    scoreMarkup = `<span class="leaderboard-score score-diamonds">💎 ${player.diamonds.toLocaleString()}</span>`;
+                } else if (currentFilter === "cards") {
+                    scoreMarkup = `<span class="leaderboard-score score-cards">🎴 ${player.cards.toLocaleString()} ใบ</span>`;
+                }
+
+                leaderboardContainer.innerHTML += `
+                    <div class="leaderboard-item">
+                        ${rankMarkup}
+                        <div class="leaderboard-info">
+                            <img src="${player.avatar}" class="leaderboard-avatar" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=fallback'">
+                            <span class="leaderboard-name">${player.username}</span>
+                        </div>
+                        ${scoreMarkup}
+                    </div>
+                `;
+            });
+
+        } catch (err) {
+            console.error("Leaderboard render error: ", err);
+            leaderboardContainer.innerHTML = `<div style="text-align:center; padding:20px; color:#ef4444;">❌ โหลดกระดานผู้นำล้มเหลว กรุณารีเฟรชหน้าเว็บ</div>`;
+        }
+    }
+
+    function initLeaderboardTabs() {
+        const tabs = {
+            "points": document.getElementById("tab-points"),
+            "diamonds": document.getElementById("tab-diamonds"),
+            "cards": document.getElementById("tab-cards")
+        };
+
+        Object.keys(tabs).forEach(filterType => {
+            tabs[filterType].addEventListener("click", () => {
+                // เคลียร์ปุ่ม active เก่าออกแล้วใส่ให้ปุ่มที่คลิกใหม่
+                Object.values(tabs).forEach(btn => btn.classList.remove("active"));
+                tabs[filterType].classList.add("active");
+
+                // เปลี่ยนตัวแปรกรองข้อมูลและสั่งให้ทำการดึงและคำนวณอันดับใหม่
+                currentFilter = filterType;
+                leaderboardContainer.innerHTML = `<div style="text-align:center; padding:20px; color:#a0aec0;">🔄 กำลังประมวลผลอันดับใหม่...</div>`;
+                fetchAndRenderLeaderboard();
+            });
+        });
+    }
+
+    // เริ่มทำงานระบบลีดเดอร์บอร์ดเมื่อเปิดหน้าเว็บ
+    initLeaderboardTabs();
+    fetchAndRenderLeaderboard();
+</script>
+</body>
+</html>
