@@ -78,6 +78,9 @@
         .btn-edit-name { background: none; border: none; color: var(--primary); cursor: pointer; font-size: 1.2rem; opacity: 0.6; }
         .btn-edit-name:hover { opacity: 1; transform: scale(1.1); }
         .uid-tag { color: var(--primary); font-size: 0.8rem; opacity: 0.7; font-family: monospace; }
+        
+        /* สัญลักษณ์แรงก์สูงสุด */
+        .max-rank-banner { display: inline-flex; align-items: center; gap: 6px; background: rgba(230, 57, 70, 0.15); border: 1px solid rgba(230, 57, 70, 0.4); color: #ff4d6d; padding: 4px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: bold; margin-top: 8px; }
 
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 25px; }
         .stat-card {
@@ -92,6 +95,7 @@
             z-index: 2; background: rgba(0,0,0,0.5); border-radius: 25px;
             border: 2px dashed var(--glass-border); display: flex; align-items: center;
             justify-content: center; position: relative; overflow: hidden;
+            cursor: pointer;
         }
         .featured-display img { width: 100%; height: 100%; object-fit: cover; }
         .featured-label {
@@ -123,26 +127,34 @@
 
         .card-item img { width: 100%; border-radius: 18px; aspect-ratio: 2/3; object-fit: cover; margin-bottom: 12px; }
         
-        .card-info .name { font-size: 0.85rem; font-weight: 400; margin-bottom: 8px; color: #ddd; }
+        .card-info .name { font-size: 0.85rem; font-weight: 400; margin-bottom: 8px; color: #ddd; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .rarity-pill {
             font-size: 0.65rem; font-weight: 800; padding: 3px 12px; border-radius: 8px;
-            display: inline-block; letter-spacing: 1px;
+            display: inline-block; letter-spacing: 1px; text-transform: uppercase;
         }
         
-        .rarity-EXR { background: linear-gradient(45deg, #ff0055, #ffdd00); color: #fff; box-shadow: 0 0 15px rgba(255,0,85,0.4); }
-        .rarity-SSR { background: var(--primary); color: #000; }
+        /* เพิ่มสีปุ่มระดับต่างๆ เพื่อความสวยงาม */
+        .rarity-SECRET { background: #D8BFD8; color: #000; }
+        .rarity-P, .rarity-USEC { background: #ff00ff; color: #fff; }
+        .rarity-EXR, .rarity-CBR { background: linear-gradient(45deg, #ff0055, #ffdd00); color: #fff; box-shadow: 0 0 15px rgba(255,0,85,0.4); }
+        .rarity-SEC { background: #ffac33; color: #000; }
+        .rarity-SUR { background: #33ffad; color: #000; }
+        .rarity-SSR, .rarity-PR { background: var(--primary); color: #000; }
+        .rarity-UR { background: #bf40bf; color: #fff; }
         .rarity-SR { background: var(--accent); color: #000; }
+        .rarity-R { background: #33ff57; color: #000; }
+        .rarity-U, .rarity-C { background: #ffffff; color: #000; }
 
         .lvl-tag {
             position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.8);
             font-size: 0.6rem; padding: 2px 8px; border-radius: 5px; color: var(--primary);
-            border: 1px solid var(--primary);
+            border: 1px solid var(--primary); z-index: 5;
         }
 
         .qty-badge {
             position: absolute; top: -5px; right: -5px; background: #fff; color: #000;
             width: 24px; height: 24px; border-radius: 50%; font-size: 0.7rem; font-weight: 800;
-            display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+            display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 10px rgba(0,0,0,0.3); z-index: 5;
         }
 
         /* --- Loader --- */
@@ -191,6 +203,10 @@
                 </button>
             </div>
             
+            <div class="max-rank-banner" id="max-rank-display">
+                <i class="fas fa-trophy"></i> สถิติสูงสุด: <span id="max-rank-text">UNRANKED (0 🏆)</span>
+            </div>
+            
             <div class="stats-grid">
                 <div class="stat-card">
                     <i class="fas fa-coins" style="color: var(--primary);"></i>
@@ -217,12 +233,11 @@
     </section>
 
     <div class="section-title">
-        <h2><i class="fas fa-clone"></i> คลังการ์ดสะสม</h2>
+        <h2><i class="fas fa-clone"></i> คลังการ์ดสะสม (เรียงตามระดับและเลเวลสูงสุด)</h2>
         <span id="collection-count" style="font-size: 0.8rem; color: var(--primary);">0 CARDS</span>
     </div>
 
-    <div class="grid-container" id="card-grid">
-        </div>
+    <div class="grid-container" id="card-grid"></div>
 </div>
 
 <script type="module">
@@ -245,6 +260,13 @@
 
     let userUID = null;
 
+    // ลำดับความหายากเพื่อใช้ในการจัดเรียงจากสูงไปต่ำ
+    const rarityOrder = { 
+        'SECRET': 15, 'P': 14, 'USEC': 13, 'EXR': 12, 'CBR': 11, 
+        'SEC': 10, 'SUR': 9, 'SSR': 8, 'PR': 7, 'UR': 6, 
+        'SR': 5, 'R': 4, 'U': 3, 'C': 2 
+    };
+
     onAuthStateChanged(auth, (user) => {
         if (user) {
             userUID = user.uid;
@@ -264,7 +286,6 @@
         }
     });
 
-    // --- ฟังก์ชันแก้ไขชื่อผู้ใช้งาน ---
     window.editUsername = async () => {
         const { value: newName } = await Swal.fire({
             title: 'เปลี่ยนชื่อผู้เล่น',
@@ -278,9 +299,7 @@
             cancelButtonColor: '#444',
             confirmButtonText: 'ตกลง',
             cancelButtonText: 'ยกเลิก',
-            inputAttributes: {
-                maxlength: 15
-            },
+            inputAttributes: { maxlength: 15 },
             inputValidator: (value) => {
                 if (!value || value.trim() === "") {
                     return 'กรุณาใส่ชื่อด้วยนะ!'
@@ -290,9 +309,7 @@
 
         if (newName && newName.trim() !== "") {
             try {
-                await updateDoc(doc(db, "users", userUID), {
-                    username: newName.trim()
-                });
+                await updateDoc(doc(db, "users", userUID), { username: newName.trim() });
                 Swal.fire({
                     icon: 'success',
                     title: 'สำเร็จ!',
@@ -327,13 +344,24 @@
         document.getElementById("stat-diamonds").innerText = (data.diamonds || 0).toLocaleString();
         document.getElementById("stat-stars").innerText = (data.stars || 0).toLocaleString();
         
+        // แสดงผลแรงก์สูงสุด
+        if (data.maxRank && data.maxRank !== "UNRANKED") {
+            document.getElementById("max-rank-text").innerText = `${data.maxRank} (${(data.maxTrophies || 0).toLocaleString()} 🏆)`;
+        } else {
+            document.getElementById("max-rank-text").innerText = "UNRANKED (0 🏆)";
+        }
+
         const avatar = document.getElementById("user-avatar");
         avatar.src = data.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.username}`;
 
-        if (data.featuredCard) {
-            const feat = document.getElementById("featured-card");
+        // โชว์รูปการ์ดที่ตกแต่ง Showcase
+        const feat = document.getElementById("featured-card");
+        if (data.featuredCard && data.featuredCard.img) {
             feat.innerHTML = `<img src="${data.featuredCard.img}"><span class="featured-label">FEATURED</span>`;
             feat.style.borderColor = data.featuredCard.rarity === 'EXR' ? '#ff0055' : 'var(--primary)';
+        } else {
+            feat.innerHTML = `<i class="fas fa-plus" style="opacity: 0.2; font-size: 2rem;"></i><span class="featured-label">SHOWCASE</span>`;
+            feat.style.borderColor = "var(--glass-border)";
         }
 
         const collection = data.collection || [];
@@ -345,29 +373,120 @@
             return;
         }
 
-        const cardMap = {};
+        // จัดกลุ่มการ์ดที่ชื่อและระดับเดียวกัน
+        const grouped = {};
         collection.forEach(c => {
-            const key = c.name + c.rarity;
-            if (!cardMap[key]) cardMap[key] = { ...c, qty: 1 };
-            else cardMap[key].qty++;
+            const rStyle = (c.rarity || 'C').toUpperCase();
+            const key = `${c.name}_${rStyle}`;
+            if (!grouped[key]) grouped[key] = [];
+            grouped[key].push(c);
         });
 
-        grid.innerHTML = Object.values(cardMap).map(c => `
-            <div class="card-item" onclick="setFeatured('${c.img}', '${c.rarity}')">
-                <div class="lvl-tag">LV.${c.lv || 1}</div>
-                ${c.qty > 1 ? `<div class="qty-badge">${c.qty}</div>` : ''}
-                <img src="${c.img}" onerror="this.src='https://via.placeholder.com/150x225?text=Card'">
-                <div class="card-info">
-                    <div class="name">${c.name}</div>
-                    <div class="rarity-pill rarity-${c.rarity}">${c.rarity}</div>
+        // คัดแยกใบที่ดีที่สุดในกลุ่ม และนับจำนวนใบซ้ำ
+        let displayList = [];
+        for (const key in grouped) {
+            const copies = grouped[key];
+            // เรียงใบที่ดาวสูงสุด และเลเวลสูงสุดขึ้นมาก่อนในกลุ่ม
+            copies.sort((a, b) => {
+                const lvA = parseInt(a.level || a.lv || 1);
+                const lvB = parseInt(b.level || b.lv || 1);
+                const starA = parseInt(a.stars || 0);
+                const starB = parseInt(b.stars || 0);
+                return (starB * 100 + lvB) - (starA * 100 + lvA);
+            });
+            
+            const bestCard = copies[0];
+            const currentLv = parseInt(bestCard.level || bestCard.lv || 1);
+            displayList.push({
+                ...bestCard,
+                finalLv: currentLv,
+                qty: copies.length
+            });
+        }
+
+        // ทำการจัดเรียงลำดับ: เรียงตามระดับ Rarity (สูง->ต่ำ) -> ถ้าระดับเท่ากัน เรียงตาม Level (มาก->น้อย)
+        displayList.sort((a, b) => {
+            const rA = (a.rarity || 'C').toUpperCase();
+            const rB = (b.rarity || 'C').toUpperCase();
+            
+            const orderA = rarityOrder[rA] || 0;
+            const orderB = rarityOrder[rB] || 0;
+
+            if (orderB !== orderA) {
+                return orderB - orderA; // เรียงระดับจากสูงไปต่ำ
+            }
+            return b.finalLv - a.finalLv; // ถ้าระดับเท่ากัน เรียงเลเวลจากมากไปน้อย
+        });
+
+        // แสดงผลลัพธ์ลงใน Grid HTML
+        grid.innerHTML = displayList.map(c => {
+            const rDisplay = (c.rarity || 'C').toUpperCase();
+            // แปลงอ็อบเจ็กต์ให้อยู่ในรูป string ปลอดภัยเพื่อส่งเข้าพารามิเตอร์ฟังก์ชัน
+            const safeImg = c.img || c.image || '';
+            const safeName = (c.name || 'Unknown Card').replace(/'/g, "\\'");
+            const safeAtk = c.atk || c.attack || 0;
+            const safeDef = c.def || c.defense || 0;
+
+            return `
+                <div class="card-item" onclick="setFeatured('${safeImg}', '${rDisplay}', '${safeName}', ${safeAtk}, ${safeDef})">
+                    <div class="lvl-tag">LV.${c.finalLv}</div>
+                    ${c.qty > 1 ? `<div class="qty-badge">x${c.qty}</div>` : ''}
+                    <img src="${safeImg}" onerror="this.src='https://via.placeholder.com/150x225?text=Card'">
+                    <div class="card-info">
+                        <div class="name">${c.name}</div>
+                        <div class="rarity-pill rarity-${rDisplay}">${rDisplay}</div>
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
-    window.setFeatured = async (img, rarity) => {
-        if (confirm("ต้องการตั้งการ์ดใบนี้เป็น Showcase หรือไม่?")) {
-            await updateDoc(doc(db, "users", userUID), { featuredCard: { img, rarity } });
+    // 🌟 ขยายระบบเซ็ต Showcase: อัปเดตทั้งก้อน featuredCard และ decoratedCard ไปพร้อมกันเพื่อให้หน้าแรกดึงข้อมูลไปแสดงใน Popup ได้ครบถ้วน 🌟
+    window.setFeatured = async (img, rarity, name, atk, def) => {
+        if (!img) return;
+        
+        const result = await Swal.fire({
+            title: 'ตั้งค่าการ์ดโชว์',
+            text: `ต้องการนำการ์ด "${name}" ใบนี้ไปตั้งเป็นหน้าตาทับโปรไฟล์หลักของคุณใช่หรือไม่?`,
+            icon: 'question',
+            showCancelButton: true,
+            background: '#1a1a1c',
+            color: '#fff',
+            confirmButtonColor: '#ffc831',
+            cancelButtonColor: '#444',
+            confirmButtonText: 'ตกลง',
+            cancelButtonText: 'ยกเลิก'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const cardPayload = {
+                    img: img,
+                    rarity: rarity,
+                    name: name,
+                    atk: atk,
+                    def: def
+                };
+
+                // บันทึกข้อมูลทั้ง 2 ฟิลด์หลักเพื่อรองรับการดึงข้อมูลจากหน้าเว็บจุดต่างๆ 
+                await updateDoc(doc(db, "users", userUID), { 
+                    featuredCard: cardPayload,
+                    decoratedCard: cardPayload 
+                });
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'ตั้งค่าสำเร็จ!',
+                    text: 'อัปเดตการ์ดโชว์บนหน้าโปรไฟล์เรียบร้อยแล้ว',
+                    timer: 1500,
+                    showConfirmButton: false,
+                    background: '#1a1a1c',
+                    color: '#fff'
+                });
+            } catch (err) {
+                console.error("Set featured card error:", err);
+                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถบันทึกการ์ดโชว์ได้', 'error');
+            }
         }
     };
 
