@@ -40,17 +40,18 @@
             padding: 10px 22px; border-radius: 12px; font-weight: 600; cursor: pointer; border: none; color: white; text-decoration: none;
         }
 
-        /* --- Admin Modal --- */
-        .admin-modal {
+        /* --- Global Modal Style (Admin & Profile Popup) --- */
+        .admin-modal, .profile-popup-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
             z-index: 9999; justify-content: center; align-items: center;
         }
         .modal-content {
-            background: #1e1e1e; padding: 30px; border-radius: 20px; border: 1px solid #ffc831;
-            width: 90%; max-width: 350px; text-align: center; box-shadow: 0 0 30px rgba(255,200,49,0.2);
+            background: #1e1e1e; padding: 25px; border-radius: 24px; border: 1px solid #ffc831;
+            width: 95%; max-width: 440px; text-align: center; box-shadow: 0 0 30px rgba(255,200,49,0.2);
+            position: relative; max-height: 90vh; overflow-y: auto;
         }
-        .modal-content h2 { margin-top: 0; color: #ffc831; font-size: 1.2rem; }
+        .modal-content h2 { margin-top: 0; color: #ffc831; font-size: 1.3rem; }
         .modal-content input {
             width: 100%; padding: 12px; margin: 15px 0; border-radius: 10px; border: 1px solid #444;
             background: #111; color: white; text-align: center; font-size: 1.1rem;
@@ -59,6 +60,32 @@
         .btn-confirm { flex: 2; background: #ffc831; color: #000; border: none; padding: 10px; border-radius: 10px; font-weight: 700; cursor: pointer; }
         .btn-cancel { flex: 1; background: #333; color: white; border: none; padding: 10px; border-radius: 10px; cursor: pointer; }
         
+        /* --- User Profile Popup Custom Style --- */
+        .popup-header-info { display: flex; align-items: center; gap: 15px; text-align: left; margin-bottom: 20px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); }
+        .popup-avatar { width: 75px; height: 75px; border-radius: 50%; border: 3px solid #ffc831; object-fit: cover; background: #222; }
+        .popup-username { font-size: 1.3rem; font-weight: 700; color: #fff; margin: 0; }
+        .popup-max-rank { font-size: 0.85rem; color: #e63946; font-weight: bold; margin-top: 4px; display: flex; align-items: center; gap: 5px; }
+
+        .popup-section-title { font-size: 0.95rem; color: #ffc831; font-weight: bold; text-align: left; margin: 15px 0 8px 0; display: flex; align-items: center; gap: 6px; }
+        
+        .popup-info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; text-align: left; }
+        .popup-info-item { background: rgba(0,0,0,0.3); padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.03); display: flex; flex-direction: column; }
+        .popup-info-label { color: #a0aec0; font-size: 0.75rem; margin-bottom: 2px; }
+        .popup-info-value { font-weight: bold; font-size: 0.95rem; }
+
+        /* การ์ดที่ตกแต่งไว้ (Pinned Card Style) */
+        .popup-decorated-card { background: linear-gradient(135deg, #2d1f10 0%, #1a120b 100%); border: 2px solid #ffc831; border-radius: 16px; padding: 12px; display: flex; align-items: center; gap: 15px; text-align: left; box-shadow: inset 0 0 15px rgba(255,200,49,0.1); }
+        .popup-card-img { width: 65px; height: 90px; border-radius: 8px; object-fit: cover; background: #111; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .popup-card-name { font-weight: bold; color: #fff; font-size: 1rem; margin: 0; }
+        .popup-card-stat { font-size: 0.8rem; color: #ff477e; font-weight: bold; margin-top: 4px; }
+
+        /* ประวัติอารีน่า (Arena History) */
+        .popup-history-list { background: rgba(0,0,0,0.4); border-radius: 14px; border: 1px solid rgba(255,255,255,0.05); max-height: 120px; overflow-y: auto; padding: 5px; }
+        .popup-history-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.85rem; }
+        .popup-history-item:last-child { border-bottom: none; }
+        .history-date { color: #a0aec0; font-size: 0.75rem; }
+        .history-rank { color: #00e5ff; font-weight: bold; }
+
         /* --- Hero --- */
         .hero { 
             height: 400px; display: flex; flex-direction: column; justify-content: center; align-items: center; 
@@ -152,6 +179,7 @@
             display: flex; align-items: center; justify-content: space-between; padding: 12px 20px;
             background: rgba(255,255,255,0.02); border-radius: 16px; border: 1px solid rgba(255,255,255,0.03);
             transition: transform 0.2s, background-color 0.2s;
+            cursor: pointer;
         }
         .leaderboard-item:hover { transform: scale(1.008); background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.08); }
         .leaderboard-rank { font-size: 1.2rem; font-weight: bold; width: 40px; text-align: center; }
@@ -191,6 +219,54 @@
                 <button class="btn-cancel" onclick="closeAdminModal()">ยกเลิก</button>
                 <button class="btn-confirm" onclick="checkAdminPass()">ยืนยัน</button>
             </div>
+        </div>
+    </div>
+
+    <div id="profileModal" class="profile-popup-modal">
+        <div class="modal-content">
+            <h2><i class="fas fa-id-card"></i> ข้อมูลโปรไฟล์ผู้เล่น</h2>
+            
+            <div class="popup-header-info">
+                <img src="" id="popup-user-avatar" class="popup-avatar">
+                <div>
+                    <div id="popup-username" class="popup-username">กำลังโหลด...</div>
+                    <div id="popup-max-rank" class="popup-max-rank">
+                        <i class="fas fa-trophy"></i> อันดับสูงสุด: <span id="popup-txt-max-rank">ไม่มีข้อมูล</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="popup-section-title"><i class="fas fa-star"></i> การ์ดที่ตกแต่งไว้โชว์</div>
+            <div id="popup-card-display" class="popup-decorated-card">
+                <img src="https://via.placeholder.com/65x90?text=No+Card" id="popup-card-img" class="popup-card-img">
+                <div>
+                    <h4 id="popup-card-name" class="popup-card-name">ไม่ได้ตั้งค่าการ์ดโชว์</h4>
+                    <div id="popup-card-stat" class="popup-card-stat">ATK: -- / DEF: --</div>
+                </div>
+            </div>
+
+            <div class="popup-section-title"><i class="fas fa-wallet"></i> คลังทรัพย์สิน</div>
+            <div class="popup-info-grid">
+                <div class="popup-info-item">
+                    <span class="popup-info-label">🪙 ทองทั้งหมด</span>
+                    <span class="popup-info-value score-points" id="popup-user-points">0</span>
+                </div>
+                <div class="popup-info-item">
+                    <span class="popup-info-label">💎 เพชรทั้งหมด</span>
+                    <span class="popup-info-value score-diamonds" id="popup-user-diamonds">0</span>
+                </div>
+                <div class="popup-info-item" style="grid-column: span 2;">
+                    <span class="popup-info-label">🎴 การ์ดในคอลเลกชัน</span>
+                    <span class="popup-info-value score-cards" id="popup-user-cards">0 ใบ</span>
+                </div>
+            </div>
+
+            <div class="popup-section-title"><i class="fas fa-history"></i> ประวัติอันดับใน Battle Arena</div>
+            <div class="popup-history-list" id="popup-history-container">
+                <div style="text-align:center; padding:15px; color:#a0aec0; font-size:0.8rem;">ไม่มีประวัติการบันทึกอันดับ</div>
+            </div>
+            
+            <button class="btn-cancel" style="width: 100%; padding: 12px; margin-top: 20px; font-weight: bold; border-radius: 12px;" onclick="closeProfileModal()">ปิดหน้าต่าง</button>
         </div>
     </div>
 
@@ -245,7 +321,7 @@
             </div>
 
             <div class="modern-banner" style="background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white;" onclick="window.location.href='trading.html'">
-                <h3>🤝 แลกเปลี่ยนการ์ด</h3>
+                <h3>🤝 แแลกเปลี่ยนการ์ด</h3>
                 <p>สร้างห้องแลกเปลี่ยนกับผู้ใช่ผู้อื่น</p>
                 <i class="fas fa-handshake main-icon"></i>
             </div>
@@ -291,7 +367,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, onSnapshot, updateDoc, increment, collection, query, orderBy, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, updateDoc, increment, collection, query, orderBy, addDoc, getDocs, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
@@ -308,12 +384,17 @@
 
     const profileContainer = document.getElementById("profile-container");
     const adminModal = document.getElementById("adminModal");
+    const profileModal = document.getElementById("profileModal"); 
     let pressTimer;
     let isLongPress = false;
 
     window.closeAdminModal = () => {
         adminModal.style.display = "none";
         document.getElementById("adminPass").value = "";
+    };
+
+    window.closeProfileModal = () => {
+        profileModal.style.display = "none";
     };
 
     window.checkAdminPass = () => {
@@ -345,6 +426,46 @@
         if (!isLongPress) window.location.href = 'profile.html';
     });
 
+    // 🌟 ฟังก์ชันระบบตรวจจับและอัปเดตการรีซีซั่นอารีน่าอัตโนมัติ 🌟
+    async function checkSeasonReset(userUid, userData) {
+        const systemCurrentSeason = 4; // กำหนดเลขซีซั่นปัจจุบันของเซิร์ฟเวอร์ (เช่น SS4)
+        const userLastPlayedSeason = userData.lastPlayedSeason || 3; // ดึงซีซั่นล่าสุดที่เขาเคยเข้าเล่น
+
+        // ถ้าซีซั่นของระบบเดินหน้าไปแล้ว แสดงว่าผู้เล่นพึ่งเคยเข้าเว็บหลังรีซีซั่น!
+        if (systemCurrentSeason > userLastPlayedSeason) {
+            const lastSeasonRank = userData.currentRank || "UNRANKED";
+            const lastSeasonTrophies = userData.currentTrophies || 0;
+            const todayDate = new Date().toLocaleDateString('th-TH');
+
+            // บันทึกสถิติซีซั่นเก่าเป็นแถวข้อมูลวัตถุใหม่
+            const newHistoryRecord = {
+                rankName: `จบ Season ${userLastPlayedSeason}: ${lastSeasonRank}`,
+                trophies: lastSeasonTrophies,
+                date: todayDate
+            };
+
+            let updatedFields = {
+                lastPlayedSeason: systemCurrentSeason, // เปลี่ยนค่าบันทึกให้ตรงระบบเพื่อไม่ให้แจ้งซ้ำ
+                currentRank: "UNRANKED", // รีเซ็ตอันดับสำหรับซีซั่นใหม่
+                currentTrophies: 1000,    // รีเซ็ตถ้วยรางวัลเริ่มต้นตามกฎของคุณ
+                arenaHistory: arrayUnion(newHistoryRecord) // ดันประวัติเก่าเข้าสู่อาเรย์
+            };
+
+            // เช็คว่าคะแนนซีซั่นที่พึ่งจบไปนี้ มากกว่า All-time High (maxTrophies) หรือไม่
+            if (lastSeasonTrophies >= (userData.maxTrophies || 0)) {
+                updatedFields.maxRank = lastSeasonRank;
+                updatedFields.maxTrophies = lastSeasonTrophies;
+                
+                alert(`🎉 ยินดีด้วย! Season ${userLastPlayedSeason} ที่ผ่านมาคุณสร้างสถิติสูงสุดใหม่สำเร็จ:\n🏆 อันดับสูงสุดตลอดกาลกลายเป็น: ${lastSeasonRank}`);
+            } else {
+                alert(`🏁 สิ้นสุดฤดูกาล Arena Season ${userLastPlayedSeason}!\nสรุปผลอันดับของคุณ: ${lastSeasonRank} (${lastSeasonTrophies.toLocaleString()} 🏆)\nระบบบันทึกประวัติและทำการรีเซ็ตเข้าสู่ซีซั่นใหม่เรียบร้อยแล้ว!`);
+            }
+
+            // สั่งเขียนชุดข้อมูลทับส่งไปบันทึกบนฐานข้อมูล Firebase
+            await updateDoc(doc(db, "users", userUid), updatedFields);
+        }
+    }
+
     onAuthStateChanged(auth, (user) => {
         if (user) {
             onSnapshot(doc(db, "users", user.uid), (docSnap) => {
@@ -361,6 +482,9 @@
                         document.getElementById("nav-avatar-img").src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.username}`;
                     }
                     
+                    // เรียกใช้งานระบบเช็ครีซีซั่นอัตโนมัติ
+                    checkSeasonReset(user.uid, data);
+
                     const today = new Date().toDateString();
                     const btn = document.getElementById("spin-btn");
                     btn.disabled = (data.lastClaimDate === today);
@@ -375,7 +499,6 @@
                             lastClaimDate: today
                         });
                         alert(`ยินดีด้วย! ได้รับ 🪙 ${p} และ 💎 ${d}`);
-                        // ดึงข้อมูลลีดเดอร์บอร์ดใหม่ทันทีเมื่อกดรับรางวัลสำเร็จ
                         fetchAndRenderLeaderboard();
                     };
                 }
@@ -400,12 +523,11 @@
     });
 
     // ==================== LEADERBOARD SYSTEM LOGIC ====================
-    let currentFilter = "points"; // ค่าเริ่มต้น: ทองสูงสุด
+    let currentFilter = "points"; 
     const leaderboardContainer = document.getElementById("leaderboard-container");
 
     async function fetchAndRenderLeaderboard() {
         try {
-            // ดึงข้อมูลบัญชีผู้ใช้ทั้งหมดมาจัดการแบบ Client-side เพื่อประมวลผลความยาวของ Array สมุดสะสมการ์ด
             const snapshot = await getDocs(collection(db, "users"));
             let players = [];
 
@@ -418,11 +540,15 @@
                     points: data.points || 0,
                     diamonds: data.diamonds || 0,
                     cards: totalCards,
-                    avatar: data.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.username || 'default'}`
+                    avatar: data.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.username || 'default'}`,
+                    // ดึงชุดข้อมูลโปรไฟล์ที่ผูกกับหน้า profile.html มารองรับไว้ในหน้าแรก
+                    maxRank: data.maxRank || "UNRANKED",
+                    maxTrophies: data.maxTrophies || 0,
+                    decoratedCard: data.decoratedCard || null, 
+                    arenaHistory: data.arenaHistory || []      
                 });
             });
 
-            // ทำการเรียงลำดับข้อมูลตามแท็บตัวกรองที่เลือก
             if (currentFilter === "points") {
                 players.sort((a, b) => b.points - a.points);
             } else if (currentFilter === "diamonds") {
@@ -431,7 +557,6 @@
                 players.sort((a, b) => b.cards - a.cards);
             }
 
-            // แสดงผล Top 10 บนหน้าจอ
             leaderboardContainer.innerHTML = "";
             const topPlayers = players.slice(0, 10);
 
@@ -444,7 +569,6 @@
                 const currentRank = index + 1;
                 let rankMarkup = `<span class="leaderboard-rank">${currentRank}</span>`;
                 
-                // ตกแต่งไอคอนเหรียญรางวัลพิเศษสำหรับ Top 3
                 if (currentRank === 1) rankMarkup = `<span class="leaderboard-rank rank-1"><i class="fas fa-medal"></i></span>`;
                 else if (currentRank === 2) rankMarkup = `<span class="leaderboard-rank rank-2"><i class="fas fa-medal"></i></span>`;
                 else if (currentRank === 3) rankMarkup = `<span class="leaderboard-rank rank-3"><i class="fas fa-medal"></i></span>`;
@@ -458,16 +582,76 @@
                     scoreMarkup = `<span class="leaderboard-score score-cards">🎴 ${player.cards.toLocaleString()} ใบ</span>`;
                 }
 
-                leaderboardContainer.innerHTML += `
-                    <div class="leaderboard-item">
-                        ${rankMarkup}
-                        <div class="leaderboard-info">
-                            <img src="${player.avatar}" class="leaderboard-avatar" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=fallback'">
-                            <span class="leaderboard-name">${player.username}</span>
-                        </div>
-                        ${scoreMarkup}
+                const itemDiv = document.createElement("div");
+                itemDiv.className = "leaderboard-item";
+                itemDiv.innerHTML = `
+                    ${rankMarkup}
+                    <div class="leaderboard-info">
+                        <img src="${player.avatar}" class="leaderboard-avatar" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=fallback'">
+                        <span class="leaderboard-name">${player.username}</span>
                     </div>
+                    ${scoreMarkup}
                 `;
+
+                // 🌟 เมื่อคลิกเปิดดู Popup จะดึงข้อมูลการ์ดและประวัติสูงสุดมาเรนเดอร์ 🌟
+                itemDiv.addEventListener("click", () => {
+                    document.getElementById("popup-user-avatar").src = player.avatar;
+                    document.getElementById("popup-username").innerText = player.username;
+                    document.getElementById("popup-user-points").innerText = "🪙 " + player.points.toLocaleString();
+                    document.getElementById("popup-user-diamonds").innerText = "💎 " + player.diamonds.toLocaleString();
+                    document.getElementById("popup-user-cards").innerText = "🎴 " + player.cards.toLocaleString() + " ใบ";
+                    
+                    // 1. เรนเดอร์อันดับอารีน่าสูงสุด
+                    if(player.maxRank !== "UNRANKED") {
+                        document.getElementById("popup-txt-max-rank").innerText = `${player.maxRank} (${player.maxTrophies.toLocaleString()} 🏆)`;
+                    } else {
+                        document.getElementById("popup-txt-max-rank").innerText = "UNRANKED (0 🏆)";
+                    }
+
+                    // 2. เรนเดอร์การ์ดที่ตกแต่งโชว์ไว้
+                    if (player.decoratedCard && player.decoratedCard.name) {
+                        document.getElementById("popup-card-img").src = player.decoratedCard.img || "https://via.placeholder.com/65x90?text=Card";
+                        document.getElementById("popup-card-name").innerText = player.decoratedCard.name;
+                        document.getElementById("popup-card-stat").innerText = `ATK: ${player.decoratedCard.atk || 0} / DEF: ${player.decoratedCard.def || 0}`;
+                    } else {
+                        document.getElementById("popup-card-img").src = "https://via.placeholder.com/65x90?text=No+Card";
+                        document.getElementById("popup-card-name").innerText = "ไม่ได้ตั้งค่าการ์ดโชว์";
+                        document.getElementById("popup-card-stat").innerText = "ATK: -- / DEF: --";
+                    }
+
+                    // 3. เรนเดอร์ประวัติการทำอันดับทั้งหมดที่บันทึกไว้ในโปรไฟล์
+                    const historyContainer = document.getElementById("popup-history-container");
+                    historyContainer.innerHTML = ""; 
+
+                    if (player.arenaHistory && player.arenaHistory.length > 0) {
+                        player.arenaHistory.forEach(hist => {
+                            const histDiv = document.createElement("div");
+                            histDiv.className = "popup-history-item";
+                            histDiv.innerHTML = `
+                                <span class="history-rank"><i class="fas fa-shield-alt"></i> ${hist.rankName}</span>
+                                <span>🏆 ${hist.trophies.toLocaleString()}</span>
+                                <span class="history-date">${hist.date || ''}</span>
+                            `;
+                            historyContainer.appendChild(histDiv);
+                        });
+                    } else {
+                        if(player.maxRank !== "UNRANKED") {
+                            historyContainer.innerHTML = `
+                                <div class="popup-history-item">
+                                    <span class="history-rank"><i class="fas fa-shield-alt"></i> ${player.maxRank}</span>
+                                    <span>🏆 ${player.maxTrophies.toLocaleString()}</span>
+                                    <span class="history-date">สถิติสูงสุดปัจจุบัน</span>
+                                </div>
+                            `;
+                        } else {
+                            historyContainer.innerHTML = `<div style="text-align:center; padding:15px; color:#a0aec0; font-size:0.8rem;">ไม่มีประวัติการบันทึกอันดับ</div>`;
+                        }
+                    }
+                    
+                    profileModal.style.display = "flex";
+                });
+
+                leaderboardContainer.appendChild(itemDiv);
             });
 
         } catch (err) {
@@ -485,11 +669,9 @@
 
         Object.keys(tabs).forEach(filterType => {
             tabs[filterType].addEventListener("click", () => {
-                // เคลียร์ปุ่ม active เก่าออกแล้วใส่ให้ปุ่มที่คลิกใหม่
                 Object.values(tabs).forEach(btn => btn.classList.remove("active"));
                 tabs[filterType].classList.add("active");
 
-                // เปลี่ยนตัวแปรกรองข้อมูลและสั่งให้ทำการดึงและคำนวณอันดับใหม่
                 currentFilter = filterType;
                 leaderboardContainer.innerHTML = `<div style="text-align:center; padding:20px; color:#a0aec0;">🔄 กำลังประมวลผลอันดับใหม่...</div>`;
                 fetchAndRenderLeaderboard();
@@ -497,7 +679,6 @@
         });
     }
 
-    // เริ่มทำงานระบบลีดเดอร์บอร์ดเมื่อเปิดหน้าเว็บ
     initLeaderboardTabs();
     fetchAndRenderLeaderboard();
 </script>
