@@ -133,6 +133,39 @@
             transform: rotate(0deg) scale(1.1);
         }
 
+        /* --- LEADERBOARD CUSTOM STYLES --- */
+        .leaderboard-section {
+            background: linear-gradient(135deg, #16161a 0%, #1e1e24 100%); 
+            border-radius: 24px; padding: 30px; margin-bottom: 40px;
+            border: 1px solid rgba(255, 200, 49, 0.15); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .leaderboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+        .leaderboard-title { font-size: 1.6rem; color: #ffc831; font-weight: bold; margin: 0; display: flex; align-items: center; gap: 10px; }
+        .leaderboard-tabs { display: flex; gap: 8px; background: rgba(0,0,0,0.4); padding: 5px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
+        .leaderboard-tab {
+            background: transparent; color: #a0aec0; border: none; padding: 8px 16px; border-radius: 8px;
+            font-weight: bold; font-family: 'Kanit', sans-serif; cursor: pointer; transition: 0.2s; font-size: 0.85rem;
+        }
+        .leaderboard-tab.active { background: #ffc831; color: #000; box-shadow: 0 4px 12px rgba(255,200,49,0.3); }
+        .leaderboard-list { display: flex; flex-direction: column; gap: 10px; min-height: 120px; }
+        .leaderboard-item {
+            display: flex; align-items: center; justify-content: space-between; padding: 12px 20px;
+            background: rgba(255,255,255,0.02); border-radius: 16px; border: 1px solid rgba(255,255,255,0.03);
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .leaderboard-item:hover { transform: scale(1.008); background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.08); }
+        .leaderboard-rank { font-size: 1.2rem; font-weight: bold; width: 40px; text-align: center; }
+        .rank-1 { color: #ffd700; font-size: 1.5rem; }
+        .rank-2 { color: #c0c0c0; font-size: 1.4rem; }
+        .rank-3 { color: #cd7f32; font-size: 1.3rem; }
+        .leaderboard-info { display: flex; align-items: center; gap: 15px; flex: 1; margin-left: 10px; }
+        .leaderboard-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.1); object-fit: cover; background: #222; }
+        .leaderboard-name { font-weight: bold; font-size: 1rem; color: #fff; }
+        .leaderboard-score { font-weight: bold; font-size: 1.1rem; text-align: right; }
+        .score-points { color: #ffc831; }
+        .score-diamonds { color: #00e5ff; }
+        .score-cards { color: #ff477e; }
+
         .news-item { 
             background: #1a1a1a; border-radius: 18px; padding: 20px; 
             display: flex; align-items: center; gap: 20px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05);
@@ -142,6 +175,9 @@
         @media (max-width: 768px) {
             .banner-grid { grid-template-columns: 1fr; }
             .modern-banner { grid-column: span 1 !important; }
+            .leaderboard-header { flex-direction: column; align-items: flex-start; }
+            .leaderboard-tabs { width: 100%; justify-content: space-between; }
+            .leaderboard-tab { flex: 1; text-align: center; padding: 8px 5px; }
         }
     </style>
 </head>
@@ -233,6 +269,19 @@
             </div>
         </div>
 
+        <section class="leaderboard-section">
+            <div class="leaderboard-header">
+                <h2 class="leaderboard-title"><i class="fas fa-crown"></i> กระดานผู้นำสูงสุด (Leaderboard)</h2>
+                <div class="leaderboard-tabs">
+                    <button class="leaderboard-tab active" id="tab-points">🪙 ทองสูงสุด</button>
+                    <button class="leaderboard-tab" id="tab-diamonds">💎 เพชรสูงสุด</button>
+                    <button class="leaderboard-tab" id="tab-cards">🎴 การ์ดมากที่สุด</button>
+                </div>
+            </div>
+            <div class="leaderboard-list" id="leaderboard-container">
+                <div style="text-align:center; padding:20px; color:#a0aec0;">📡 กำลังประมวลผลอันดับผู้เล่น...</div>
+            </div>
+        </section>
         <section class="news-section">
             <h2>ข่าวสารล่าสุด</h2>
             <div id="news-container"></div>
@@ -242,7 +291,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, onSnapshot, updateDoc, increment, collection, query, orderBy, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, updateDoc, increment, collection, query, orderBy, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
@@ -326,6 +375,8 @@
                             lastClaimDate: today
                         });
                         alert(`ยินดีด้วย! ได้รับ 🪙 ${p} และ 💎 ${d}`);
+                        // ดึงข้อมูลลีดเดอร์บอร์ดใหม่ทันทีเมื่อกดรับรางวัลสำเร็จ
+                        fetchAndRenderLeaderboard();
                     };
                 }
             });
@@ -334,19 +385,4 @@
             document.getElementById("redeem-tab").style.display = "block";
             document.getElementById("daily-section").style.display = "block";
         } else {
-            document.getElementById("profile-container").style.display = "none";
-            document.getElementById("daily-section").style.display = "none";
-        }
-    });
-
-    const nCon = document.getElementById("news-container");
-    onSnapshot(query(collection(db, "news"), orderBy("createdAt", "desc")), (snap) => {
-        nCon.innerHTML = "";
-        snap.forEach(d => {
-            const n = d.data();
-            nCon.innerHTML += `<div class="news-item"><b>${n.date || ''}</b> ${n.title}</div>`;
-        });
-    });
-</script>
-</body>
-</html>
+            docu
