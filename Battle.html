@@ -444,6 +444,19 @@
 
     let userDoc = null, tempAtk = [], tempDef = [], targetOpp = null;
     const SEASON_LIMIT = 20 * 24 * 60 * 60 * 1000;
+    // ฟังก์ชันคำนวณเวลาจบซีซั่นส่วนกลาง โดยอิงจากรอบละ 20 วัน นับจากจุดเริ่มต้นจุดเดียวกัน
+function getGlobalSeasonEndTime() {
+    // กำหนดเวลาเริ่มต้นระบบเป็นศูนย์กลาง (ในตัวอย่างใช้ 1 มกราคม 2026)
+    const SYSTEM_START_TIME = new Date("2026-01-01T00:00:00Z").getTime(); 
+    const now = Date.now();
+    
+    // คำนวณว่าผ่านมาแล้วกี่ซีซั่น
+    const elapsedSinceStart = now - SYSTEM_START_TIME;
+    const currentSeasonNumber = Math.floor(elapsedSinceStart / SEASON_LIMIT);
+    
+    // เวลาจบซีซั่นปัจจุบัน = เวลาเริ่มต้นระบบ + (จำนวนซีซั่นที่ผ่านมาแล้ว + 1) * ระยะเวลาซีซั่น
+    return SYSTEM_START_TIME + (currentSeasonNumber + 1) * SEASON_LIMIT;
+}
 
     const getPower = (c) => {
         if(!c) return 0;
@@ -510,35 +523,88 @@
     });
 
     async function checkSeasonStatus() {
-        if (!userDoc.seasonStartTime) {
-            await updateDoc(doc(db, "users", auth.currentUser.uid), { seasonStartTime: Date.now() });
-            return;
-        }
-        const now = Date.now();
-        const elapsed = now - userDoc.seasonStartTime;
-        if (elapsed >= SEASON_LIMIT) {
-            const currentRank = getRankInfo(userDoc.trophies || 0);
-            document.getElementById("final-rank-display").innerText = `${currentRank.icon} ${currentRank.name}`;
-            document.getElementById("final-coin-reward").innerText = `🪙 ${currentRank.reward.coin.toLocaleString()}`;
-            toggleModal("seasonRewardModal", true);
-        }
+    const now = Date.now();
+    const globalEndTime = getGlobalSeasonEndTime();
+    const globalStartTime = globalEndTime - SEASON_LIMIT;
+
+    // ตรวจสอบว่าผู้ใช้คนนี้เคยรับรางวัลของซีซั่นปัจจุบันไปหรือยัง 
+    // โดยดูว่ารอบที่เริ่มเล่นล่าสุด (lastSeasonChecked) ตรงกับซีซั่นปัจจุบันไหม
+    if (userDoc.lastSeasonChecked && userDoc.lastSeasonChecked === globalStartTime) {
+        return; // ถ้ารับไปแล้ว หรือบันทึกรอบปัจจุบันแล้ว ไม่ต้องทำอะไร
     }
+
+    // กรณีที่เวลาปัจจุบันเลยกำหนด หรือข้ามซีซั่นมาแล้ว และยังไม่ได้เคลียร์ถ้วยรางวัล
+    // (สำหรับคนเพิ่งเข้าเกมมาหลังจากซีซั่นส่วนกลางตัดรอบ)
+    if (userDoc.trophies > 0 && (!userDoc.lastSeasonChecked || userDoc.lastSeasonChecked < globalStartTime)) {
+        const currentRank = getRankInfo(userDoc.trophies || 0);
+        document.getElementById("final-rank-display").innerText = `${currentRank.icon} ${currentRank.name}`;
+        document.getElementById("final-coin-reward").innerText = `🪙 ${currentRank.reward.coin.toLocaleString()}`;
+        toggleModal("seasonRewardModal", true);
+    } else {
+        // สำหรับผู้เล่นใหม่ หรือผู้เล่นที่เคลียร์รอบไปแล้ว ให้บันทึกสถานะซีซั่นปัจจุบันไว้
+        await updateDoc(doc(db, "users", auth.currentUser.uid), { 
+            lastSeasonChecked: globalStartTime 
+        });
+    }
+}
+
+window.claimSeasonReward = async function() {
+    const currentRank = getRankInfo(userDoc.trophies || 0);
+    const globalEndTime = getGlobalSeasonEndTime();
+    const globalStartTime = globalEndTime - SEASON_LIMIT;
+    
+    // 1. เพิ่มบรรทัดนี้เพื่อแปลงแรงค์เป็นข้อความพร้อมไอคอน เช่น "🥇 Grandmaster"
+    const rankString = `${currentRank.icon} ${currentRank.name}`;
+    
+    try {
+        await updateDoc(doc(db, "users", auth.currentUser.uid), {
+            points: increment(currentRank.reward.coin),
+            trophies: 0,
+            lastSeasonChecked: globalStartTime,
+            
+            // 2. เพิ่มฟิลด์นี้เข้าไปใน updateDoc เพื่อบันทึกลง Firestore
+            lastSeasonRank: rankString 
+        });
+        
+        toggleModal("seasonRewardModal", false);
+        alert("รับรางวัลสำเร็จ!");
+        
+        // 3. (แถม) เพิ่มบรรทัดนี้เพื่อให้หน้าโปรไฟล์อัปเดตทันทีหลังจากกดรับรางวัล
+        if (typeof updateProfileUI === "function") { updateProfileUI(); }
+
+    } catch (e) {
+        alert("เกิดข้อผิดพลาด");
+    }
+}
 
     window.claimSeasonReward = async function() {
-        const currentRank = getRankInfo(userDoc.trophies || 0);
-        try {
-            await updateDoc(doc(db, "users", auth.currentUser.uid), {
-                points: increment(currentRank.reward.coin),
-                trophies: 0,
-                seasonStartTime: Date.now()
-            });
-            toggleModal("seasonRewardModal", false);
-            alert("รับรางวัลสำเร็จ! ถ้วยรางวัลถูกรีเซ็ตเพื่อเริ่มซีซั่นใหม่");
-        } catch (e) {
-            alert("เกิดข้อผิดพลาดในการรับรางวัล");
-        }
-    }
+    const currentRank = getRankInfo(userDoc.trophies || 0);
+    const globalEndTime = getGlobalSeasonEndTime();
+    const globalStartTime = globalEndTime - SEASON_LIMIT;
+    
+    // 1. เพิ่มบรรทัดนี้เพื่อแปลงแรงค์เป็นข้อความพร้อมไอคอน เช่น "🥇 Grandmaster"
+    const rankString = `${currentRank.icon} ${currentRank.name}`;
+    
+    try {
+        await updateDoc(doc(db, "users", auth.currentUser.uid), {
+            points: increment(currentRank.reward.coin),
+            trophies: 0,
+            lastSeasonChecked: globalStartTime,
+            
+            // 2. เพิ่มฟิลด์นี้เข้าไปใน updateDoc เพื่อบันทึกลง Firestore
+            lastSeasonRank: rankString 
+        });
+        
+        toggleModal("seasonRewardModal", false);
+        alert("รับรางวัลสำเร็จ!");
+        
+        // 3. (แถม) เพิ่มบรรทัดนี้เพื่อให้หน้าโปรไฟล์อัปเดตทันทีหลังจากกดรับรางวัล
+        if (typeof updateProfileUI === "function") { updateProfileUI(); }
 
+    } catch (e) {
+        alert("เกิดข้อผิดพลาด");
+    }
+}
     function updateUI() {
         if(!userDoc) return;
         document.getElementById("trophy-count").innerText = (userDoc.trophies || 0).toLocaleString();
@@ -556,20 +622,24 @@
         } else { progEl.style.width = "100%"; }
     }
 
-    function startSeasonTimer() {
-        setInterval(() => {
-            if (!userDoc || !userDoc.seasonStartTime) return;
-            const endTime = userDoc.seasonStartTime + SEASON_LIMIT;
-            const diff = endTime - Date.now();
-            const el = document.getElementById("season-countdown");
-            if (diff <= 0) { el.innerText = "จบซีซั่น!"; return; }
-            const d = Math.floor(diff/86400000);
-            const h = Math.floor((diff%86400000)/3600000).toString().padStart(2,'0');
-            const m = Math.floor((diff%3600000)/60000).toString().padStart(2,'0');
-            const s = Math.floor((diff%60000)/1000).toString().padStart(2,'0');
-            el.innerText = `${d} วัน ${h}:${m}:${s}`;
-        }, 1000);
-    }
+  function startSeasonTimer() {
+    setInterval(() => {
+        if (!userDoc) return;
+        
+        // ดึงเวลาสิ้นสุดซีซั่นส่วนกลางมาใช้คำนวณหน้าจอ
+        const endTime = getGlobalSeasonEndTime();
+        const diff = endTime - Date.now();
+        
+        const el = document.getElementById("season-countdown");
+        if (diff <= 0) { el.innerText = "กำลังรีเซ็ตซีซั่น..."; return; }
+        
+        const d = Math.floor(diff/86400000);
+        const h = Math.floor((diff%86400000)/3600000).toString().padStart(2,'0');
+        const m = Math.floor((diff%3600000)/60000).toString().padStart(2,'0');
+        const s = Math.floor((diff%60000)/1000).toString().padStart(2,'0');
+        el.innerText = `${d} วัน ${h}:${m}:${s}`;
+    }, 1000);
+}
 
     async function generateBot() {
         const botNames = ["Shadow_King", "Zero_Bot", "Arena_Master", "Ghost_Rider", "Cyber_Slayer"];
