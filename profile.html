@@ -14,6 +14,9 @@
             --bg-dark: #0a0a0c;
             --card-bg: rgba(255, 255, 255, 0.04);
             --glass-border: rgba(255, 255, 255, 0.1);
+            
+            /* ตัวแปรควบคุมธีมพื้นหลังการ์ดโปรไฟล์เริ่มต้น */
+            --theme-glow: conic-gradient(from 0deg, transparent, rgba(255,200,49,0.05), transparent);
         }
 
         * { box-sizing: border-box; transition: all 0.25s ease; }
@@ -47,13 +50,25 @@
             margin-bottom: 40px; position: relative; overflow: hidden;
         }
 
+        /* ใช้ตัวแปร --theme-glow ในการเปลี่ยนสีแสงหมุนพื้นหลัง */
         .hero-section::before {
             content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: conic-gradient(from 0deg, transparent, rgba(255,200,49,0.05), transparent);
+            background: var(--theme-glow);
             animation: rotate 10s linear infinite; pointer-events: none;
         }
 
         @keyframes rotate { 100% { transform: rotate(360deg); } }
+
+        /* ปุ่มเปลี่ยนสีธีมพื้นหลังการ์ดโปรไฟล์ */
+        .theme-btn {
+            position: absolute; top: 20px; right: 20px; z-index: 10;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
+            color: #fff; width: 40px; height: 40px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+        }
+        .theme-btn:hover {
+            background: #fff; color: #000; transform: scale(1.05);
+        }
 
         /* Avatar */
         .pfp-container { position: relative; z-index: 2; justify-self: center; }
@@ -81,6 +96,9 @@
         
         /* สัญลักษณ์แรงก์สูงสุด */
         .max-rank-banner { display: inline-flex; align-items: center; gap: 6px; background: rgba(230, 57, 70, 0.15); border: 1px solid rgba(230, 57, 70, 0.4); color: #ff4d6d; padding: 4px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: bold; margin-top: 8px; }
+        
+        /* 🔥 สไตล์กล่องอันดับซีซั่นล่าสุดที่เพิ่มเข้ามา */
+        .last-rank-banner { display: inline-flex; align-items: center; gap: 6px; background: rgba(0, 229, 255, 0.12); border: 1px solid rgba(0, 229, 255, 0.3); color: #00e5ff; padding: 4px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: bold; margin-top: 8px; margin-left: 8px; }
 
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 25px; }
         .stat-card {
@@ -169,6 +187,8 @@
             .hero-section { grid-template-columns: 1fr; text-align: center; padding: 30px; }
             .stats-grid { grid-template-columns: 1fr 1fr 1fr; }
             .featured-display { height: 250px; width: 180px; margin: 20px auto 0; }
+            .last-rank-banner { margin-left: 0; }
+            .theme-btn { top: 15px; right: 15px; }
         }
     </style>
 </head>
@@ -185,7 +205,11 @@
         <button onclick="logout()" class="back-btn" style="color: #ff5e5e; border-color: rgba(255,94,94,0.2);"><i class="fas fa-sign-out-alt"></i></button>
     </header>
 
-    <section class="hero-section">
+    <section class="hero-section" id="hero-profile-card">
+        <button class="theme-btn" onclick="openThemeSelector()" title="ตกแต่งพื้นหลัง">
+            <i class="fas fa-palette"></i>
+        </button>
+
         <div class="pfp-container">
             <div class="pfp-frame">
                 <img id="user-avatar" src="" alt="Avatar">
@@ -205,6 +229,10 @@
             
             <div class="max-rank-banner" id="max-rank-display">
                 <i class="fas fa-trophy"></i> สถิติสูงสุด: <span id="max-rank-text">UNRANKED (0 🏆)</span>
+            </div>
+
+            <div class="last-rank-banner">
+                <i class="fas fa-calendar-check"></i> อารีน่าซีซั่นล่าสุด: <span id="profile-last-rank">ไม่มีประวัติซีซั่นก่อนหน้า</span>
             </div>
             
             <div class="stats-grid">
@@ -260,6 +288,15 @@
 
     let userUID = null;
 
+    // รายชื่อ Preset ธีมสีพื้นหลังการ์ดโปรไฟล์
+    const themePresets = {
+        'default': 'conic-gradient(from 0deg, transparent, rgba(255,200,49,0.05), transparent)',
+        'cyber-aqua': 'conic-gradient(from 0deg, transparent, rgba(0,229,255,0.08), transparent)',
+        'neon-red': 'conic-gradient(from 0deg, transparent, rgba(230,57,70,0.08), transparent)',
+        'matrix-green': 'conic-gradient(from 0deg, transparent, rgba(51,255,87,0.06), transparent)',
+        'pastels-pink': 'conic-gradient(from 0deg, transparent, rgba(255,0,255,0.06), transparent)'
+    };
+
     // ลำดับความหายากเพื่อใช้ในการจัดเรียงจากสูงไปต่ำ
     const rarityOrder = { 
         'SECRET': 15, 'P': 14, 'USEC': 13, 'EXR': 12, 'CBR': 11, 
@@ -276,6 +313,7 @@
                 if (snap.exists()) {
                     const userData = snap.data();
                     updateUI(userData);
+                    updateProfileUI(userData); // เรียกใช้ฟังก์ชันอัปเดตแรงค์ซีซั่นล่าสุดตรงนี้
                     hideLoader();
                 }
             });
@@ -285,6 +323,59 @@
             window.location.href = "login.html";
         }
     });
+
+    // ฟังก์ชันอัปเดตแรงค์ซีซั่นล่าสุดที่ได้รับการแก้ไขและผูกตัวแปรให้ทำงานอัตโนมัติแล้ว
+    function updateProfileUI(userData) {
+        if (!userData) return;
+        const profileRankEl = document.getElementById("profile-last-rank");
+        if (profileRankEl) {
+            profileRankEl.innerText = userData.lastSeasonRank ? userData.lastSeasonRank : "ไม่มีประวัติซีซั่นก่อนหน้า";
+        }
+    } 
+
+    // ฟังก์ชันเปิดกล่องเปลี่ยนธีมโปรไฟล์
+    window.openThemeSelector = async () => {
+        const { value: selectedTheme } = await Swal.fire({
+            title: '🎨 ตกแต่งการ์ดโปรไฟล์',
+            text: 'เลือกสไตล์แสงเอฟเฟกต์หมุนพื้นหลังที่คุณชื่นชอบ:',
+            input: 'select',
+            inputOptions: {
+                'default': '🏆 สีทองดั้งเดิม (Classic Gold)',
+                'cyber-aqua': '💎 ฟ้าอนาคต (Cyber Aqua)',
+                'neon-red': '🔥 แดงเดือด (Neon Red)',
+                'matrix-green': '🟢 เขียวดิจิทัล (Matrix Green)',
+                'pastels-pink': '🌸 ชมพูนีออน (Pastel Pink)'
+            },
+            inputPlaceholder: '-- เลือกธีมสี --',
+            showCancelButton: true,
+            background: '#1a1a1c',
+            color: '#fff',
+            confirmButtonColor: '#ffc831',
+            cancelButtonColor: '#444',
+            confirmButtonText: 'บันทินสี',
+            cancelButtonText: 'ยกเลิก',
+            inputValidator: (value) => {
+                if (!value) return 'กรุณาเลือกธีมก่อนนะ!';
+            }
+        });
+
+        if (selectedTheme) {
+            try {
+                await updateDoc(doc(db, "users", userUID), { profileTheme: selectedTheme });
+                Swal.fire({
+                    icon: 'success',
+                    title: 'เปลี่ยนธีมสำเร็จ!',
+                    timer: 1000,
+                    showConfirmButton: false,
+                    background: '#1a1a1c',
+                    color: '#fff'
+                });
+            } catch (err) {
+                console.error("Change theme error:", err);
+                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถเปลี่ยนธีมได้', 'error');
+            }
+        }
+    };
 
     window.editUsername = async () => {
         const { value: newName } = await Swal.fire({
@@ -344,6 +435,11 @@
         document.getElementById("stat-diamonds").innerText = (data.diamonds || 0).toLocaleString();
         document.getElementById("stat-stars").innerText = (data.stars || 0).toLocaleString();
         
+        // อัปเดตสีพื้นหลังการ์ดโปรไฟล์ตามค่าที่เซฟไว้ใน Firestore
+        const currentThemeKey = data.profileTheme || 'default';
+        const targetGlow = themePresets[currentThemeKey] || themePresets['default'];
+        document.documentElement.style.setProperty('--theme-glow', targetGlow);
+
         // แสดงผลแรงก์สูงสุด
         if (data.maxRank && data.maxRank !== "UNRANKED") {
             document.getElementById("max-rank-text").innerText = `${data.maxRank} (${(data.maxTrophies || 0).toLocaleString()} 🏆)`;
@@ -386,7 +482,6 @@
         let displayList = [];
         for (const key in grouped) {
             const copies = grouped[key];
-            // เรียงใบที่ดาวสูงสุด และเลเวลสูงสุดขึ้นมาก่อนในกลุ่ม
             copies.sort((a, b) => {
                 const lvA = parseInt(a.level || a.lv || 1);
                 const lvB = parseInt(b.level || b.lv || 1);
@@ -413,15 +508,14 @@
             const orderB = rarityOrder[rB] || 0;
 
             if (orderB !== orderA) {
-                return orderB - orderA; // เรียงระดับจากสูงไปต่ำ
+                return orderB - orderA;
             }
-            return b.finalLv - a.finalLv; // ถ้าระดับเท่ากัน เรียงเลเวลจากมากไปน้อย
+            return b.finalLv - a.finalLv;
         });
 
         // แสดงผลลัพธ์ลงใน Grid HTML
         grid.innerHTML = displayList.map(c => {
             const rDisplay = (c.rarity || 'C').toUpperCase();
-            // แปลงอ็อบเจ็กต์ให้อยู่ในรูป string ปลอดภัยเพื่อส่งเข้าพารามิเตอร์ฟังก์ชัน
             const safeImg = c.img || c.image || '';
             const safeName = (c.name || 'Unknown Card').replace(/'/g, "\\'");
             const safeAtk = c.atk || c.attack || 0;
@@ -441,7 +535,6 @@
         }).join('');
     }
 
-    // 🌟 ขยายระบบเซ็ต Showcase: อัปเดตทั้งก้อน featuredCard และ decoratedCard ไปพร้อมกันเพื่อให้หน้าแรกดึงข้อมูลไปแสดงใน Popup ได้ครบถ้วน 🌟
     window.setFeatured = async (img, rarity, name, atk, def) => {
         if (!img) return;
         
@@ -468,7 +561,6 @@
                     def: def
                 };
 
-                // บันทึกข้อมูลทั้ง 2 ฟิลด์หลักเพื่อรองรับการดึงข้อมูลจากหน้าเว็บจุดต่างๆ 
                 await updateDoc(doc(db, "users", userUID), { 
                     featuredCard: cardPayload,
                     decoratedCard: cardPayload 
