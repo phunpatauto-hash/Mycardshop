@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Gacha System - ตู้ว่างเปล่า (Empty Showcase)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Style คงเดิมทั้งหมดเพื่อความต่อเนื่องของหน้าเว็บ --- */
+        * { box-sizing: border-box; }
+        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: #050505; color: white; text-align: center; overflow-x: hidden; }
+        .navbar { background-color: rgba(15, 15, 15, 0.9); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; }
+        .nav-left { display: flex; align-items: center; gap: 15px; }
+        .btn-nav { background: #1a1a1a; color: #ffc831; border: 1px solid #ffc831; padding: 8px 16px; border-radius: 10px; text-decoration: none; font-size: 0.9rem; font-weight: bold; transition: 0.3s; cursor: pointer; }
+        .btn-nav:hover { background: #ffc831; color: #000; }
+        
+        .wallet-group { display: flex; gap: 10px; align-items: center; }
+        .points-box { background: #000; color: #ffc831; border: 1px solid #ffc831; padding: 8px 20px; border-radius: 25px; font-weight: bold; }
+        .diamond-box { background: #000; color: #00d4ff; border: 1px solid #00d4ff; padding: 8px 20px; border-radius: 25px; font-weight: bold; }
+        .ticket-normal-box { background: #000; color: #e2e8f0; border: 1px solid #a8b2bd; padding: 8px 20px; border-radius: 25px; font-weight: bold; }
+        .ticket-premium-box { background: #000; color: #ff3366; border: 1px solid #ff3366; padding: 8px 20px; border-radius: 25px; font-weight: bold; }
+
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .main-layout { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; align-items: flex-start; }
+        .gacha-box { flex: 2; background-color: #111; border-radius: 30px; padding: 30px; border: 1px solid #222; min-height: 500px; position: relative; background-image: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%); min-width: 320px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; }
+        
+        /* สไตล์ข้อความตู้ว่าง */
+        .empty-status-box { margin: auto; padding: 40px; border: 2px dashed #333; border-radius: 20px; max-width: 400px; background: rgba(26,26,26,0.5); }
+        .empty-title { color: #888; font-size: 1.5rem; margin-bottom: 10px; font-weight: bold; }
+        .empty-desc { color: #555; font-size: 0.9rem; }
+
+        .btn-pull { padding: 12px 25px; border-radius: 15px; font-weight: bold; cursor: not-allowed; border: none; background: #444 !important; color: #888 !important; margin: 5px; opacity: 0.6; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="index.html" class="btn-nav">🏠 เมนูหลัก</a>
+            <a href="collection.html" class="btn-nav" style="border-color: #fff; color: #fff;">📖 สมุดสะสม</a>
+        </div>
+        <div class="wallet-group">
+            <div class="points-box">🪙 <span id="balance">0</span></div>
+            <div class="diamond-box">💎 <span id="diamond">0</span></div>
+            <div class="ticket-normal-box">🎫 <span id="ticket-normal">0</span></div>
+            <div class="ticket-premium-box">🎟️ <span id="ticket-premium">0</span></div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="main-layout">
+            <div class="gacha-box">
+                <h2 style="color: #666; margin-bottom: 20px;">ตู้สุ่มพิเศษ: (ยังไม่เปิดใช้งาน)</h2>
+                
+                <div class="empty-status-box">
+                    <div class="empty-title">📭 ตู้สุ่มนี้ยังไม่มีสินค้า</div>
+                    <div class="empty-desc">ขณะนี้ยังไม่มีการ์ดหรือไอเทมเปิดให้สุ่มในตู้นี้ โปรดติดตามอัปเดตกิจกรรมจากทางระบบในเร็วๆ นี้</div>
+                </div>
+                
+                <div class="btn-group" style="width: 100%;">
+                    <button id="pull-5" class="btn-pull" disabled>สุ่ม 5 ครั้ง (100) | 🎫 10 หรือ 🎟️ 5</button>
+                    <button id="pull-10" class="btn-pull" disabled>สุ่ม 10 ครั้ง (500) | 🎫 15 หรือ 🎟️ 10</button>
+                    <button id="pull-50" class="btn-pull" disabled>สุ่ม 50 ครั้ง (1000) | 🎫 30 หรือ 🎟️ 20</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // ใช้คอนฟิก Firebase เดิมของคุณเพื่อให้เชื่อมต่อระบบกระเป๋าเงินได้
+    const firebaseConfig = {
+        apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
+        authDomain: "sign-up-73f99.firebaseapp.com",
+        projectId: "sign-up-73f99",
+        storageBucket: "sign-up-73f99.appspot.com",
+        messagingSenderId: "916335559099",
+        appId: "1:916335559099:web:3a8ed896ba26e38991849e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let userData = null;
+
+    // ตรวจสอบล็อกอินและดึงข้อมูลมาแสดงบน Navbar ตามปกติ
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            const userRef = doc(db, "users", user.uid);
+            onSnapshot(userRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    userData = docSnap.data();
+                    updateUI();
+                }
+            });
+        } else {
+            window.location.href = 'login.html';
+        }
+    });
+
+    function updateUI() {
+        if (!userData) return;
+        document.getElementById("balance").innerText = (userData.points || 0).toLocaleString();
+        document.getElementById("diamond").innerText = (userData.diamonds || 0).toLocaleString();
+        document.getElementById("ticket-normal").innerText = (userData.normal_tickets || 0).toLocaleString();
+        document.getElementById("ticket-premium").innerText = (userData.premium_tickets || 0).toLocaleString();
+    }
+</script>
+</body>
+</html>
