@@ -45,7 +45,8 @@
         /* --- Hero Profile Section --- */
         .hero-section {
             display: grid; grid-template-columns: 280px 1fr 220px; gap: 30px;
-            background: var(--card-bg); border: 1px solid var(--glass-border);
+            background: rgba(27, 41, 46, 0.877);
+            border: 1px solid var(--glass-border);
             padding: 40px; border-radius: 35px; backdrop-filter: blur(20px);
             margin-bottom: 40px; position: relative; overflow: hidden;
         }
@@ -97,8 +98,49 @@
         /* สัญลักษณ์แรงก์สูงสุด */
         .max-rank-banner { display: inline-flex; align-items: center; gap: 6px; background: rgba(230, 57, 70, 0.15); border: 1px solid rgba(230, 57, 70, 0.4); color: #ff4d6d; padding: 4px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: bold; margin-top: 8px; }
         
-        /* 🔥 สไตล์กล่องอันดับซีซั่นล่าสุดที่เพิ่มเข้ามา */
+        /* สัญลักษณ์แรงก์ซีซั่นล่าสุด */
         .last-rank-banner { display: inline-flex; align-items: center; gap: 6px; background: rgba(0, 229, 255, 0.12); border: 1px solid rgba(0, 229, 255, 0.3); color: #00e5ff; padding: 4px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: bold; margin-top: 8px; margin-left: 8px; }
+
+        /* 🔥 สไตล์กล่องฉายา ออร่าทองเรืองแสง (รองรับการเปลี่ยนสีตามระดับฉายา) */
+        .whale-title-banner {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 165, 0, 0.2) 100%);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            color: #ffd700;
+            padding: 5px 14px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-top: 10px;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+            animation: titlePulse 2s infinite alternate;
+        }
+        
+        /* สไตล์พิเศษสำหรับฉายา "กำหนดผู้ชนะ" (สีม่วง-แดงระดับเทพ) */
+        .whale-title-banner.rank-pro {
+            background: linear-gradient(135deg, rgba(255, 0, 255, 0.2) 0%, rgba(255, 51, 51, 0.2) 100%);
+            border: 1px solid rgba(255, 0, 255, 0.5);
+            color: #ff00ff;
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.4);
+            text-shadow: 0 0 5px rgba(255, 0, 255, 0.6);
+        }
+
+        /* สไตล์พิเศษสำหรับฉายา "ผู้พิชิตศึกสงคราม" (สีส้มทองเข้มขลัง) */
+        .whale-title-banner.rank-master {
+            background: linear-gradient(135deg, rgba(255, 200, 49, 0.2) 0%, rgba(255, 144, 0, 0.2) 100%);
+            border: 1px solid rgba(255, 144, 0, 0.5);
+            color: #ff9000;
+            box-shadow: 0 0 15px rgba(255, 144, 0, 0.4);
+            text-shadow: 0 0 5px rgba(255, 144, 0, 0.6);
+        }
+
+        @keyframes titlePulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.02); }
+        }
 
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 25px; }
         .stat-card {
@@ -151,7 +193,7 @@
             display: inline-block; letter-spacing: 1px; text-transform: uppercase;
         }
         
-        /* เพิ่มสีปุ่มระดับต่างๆ เพื่อความสวยงาม */
+        /* สีปุ่มระดับต่างๆ */
         .rarity-SECRET { background: #D8BFD8; color: #000; }
         .rarity-P, .rarity-USEC { background: #ff00ff; color: #fff; }
         .rarity-EXR, .rarity-CBR { background: linear-gradient(45deg, #ff0055, #ffdd00); color: #fff; box-shadow: 0 0 15px rgba(255,0,85,0.4); }
@@ -190,6 +232,47 @@
             .last-rank-banner { margin-left: 0; }
             .theme-btn { top: 15px; right: 15px; }
         }
+
+        /* 💠 กรอบโปรไฟล์สีฟ้าสุดหรู (Blue Luxury Frame) */
+        .pfp-frame.blue-luxury-frame {
+            background: linear-gradient(135deg, #00d4ff, #0077ff, #00ff87);
+            background-size: 300% 300%;
+            animation: rotateFrameGradient 4s ease infinite;
+            box-shadow: 0 0 25px rgba(30, 218, 255, 0.87);
+        }
+
+        @keyframes rotateFrameGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* ✨ เอฟเฟกต์พื้นหลังเปิดใช้งานโหมดเพชรร่วง */
+        body.diamond-waterfall-bg {
+            position: relative;
+            background-color: #050508 !important;
+            overflow-x: hidden;
+        }
+
+        /* สไตล์ของเม็ดเพชรแต่ละอันที่จะถูกเสกขึ้นมา */
+        .falling-diamond {
+            position: fixed;
+            top: -50px; 
+            z-index: -1; 
+            font-size: 1.5rem; 
+            pointer-events: none;
+            user-select: none;
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.6), 0 0 20px rgba(0, 229, 255, 0.3);
+            opacity: 0.7;
+            animation: diamondDrop linear forwards;
+        }
+
+        @keyframes diamondDrop {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.7; }
+            90% { opacity: 0.7; }
+            100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
+        }
     </style>
 </head>
 <body>
@@ -222,17 +305,28 @@
             <span class="uid-tag" id="uid-display">UID: 000000000000</span>
             <div class="name-wrapper">
                 <h1 id="username-display">COLLECTOR</h1>
-                <button onclick="editUsername()" class="btn-edit-name">
+                <button onclick="editUsername()" class="btn-edit-name" title="เปลี่ยนชื่อ">
                     <i class="fas fa-edit"></i>
                 </button>
-            </div>
-            
-            <div class="max-rank-banner" id="max-rank-display">
-                <i class="fas fa-trophy"></i> สถิติสูงสุด: <span id="max-rank-text">UNRANKED (0 🏆)</span>
+                <button onclick="openTitleSelector()" class="btn-edit-name" style="color: #ffd700;" title="เปลี่ยนฉายา">
+                    <i class="fas fa-crown"></i>
+                </button>
             </div>
 
-            <div class="last-rank-banner">
-                <i class="fas fa-calendar-check"></i> อารีน่าซีซั่นล่าสุด: <span id="profile-last-rank">ไม่มีประวัติซีซั่นก่อนหน้า</span>
+            <div id="whale-title-container" style="display: none; text-align: left;">
+                <div class="whale-title-banner" id="whale-title-banner-main">
+                    <i class="fas fa-hands-holding-circle"></i> ฉายา: <span id="whale-title-text">ผู้ใหญ่ใจบุญ</span>
+                </div>
+            </div>
+
+            <div style="margin-top: 5px;">
+                <div class="max-rank-banner" id="max-rank-display">
+                    <i class="fas fa-trophy"></i> สถิติสูงสุด: <span id="max-rank-text">UNRANKED (0 🏆)</span>
+                </div>
+
+                <div class="last-rank-banner">
+                    <i class="fas fa-calendar-check"></i> อารีน่าซีซั่นล่าสุด: <span id="profile-last-rank">ไม่มีประวัติซีซั่นก่อนหน้า</span>
+                </div>
             </div>
             
             <div class="stats-grid">
@@ -271,7 +365,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
@@ -288,7 +382,6 @@
 
     let userUID = null;
 
-    // รายชื่อ Preset ธีมสีพื้นหลังการ์ดโปรไฟล์
     const themePresets = {
         'default': 'conic-gradient(from 0deg, transparent, rgba(255,200,49,0.05), transparent)',
         'cyber-aqua': 'conic-gradient(from 0deg, transparent, rgba(0,229,255,0.08), transparent)',
@@ -297,7 +390,6 @@
         'pastels-pink': 'conic-gradient(from 0deg, transparent, rgba(255,0,255,0.06), transparent)'
     };
 
-    // ลำดับความหายากเพื่อใช้ในการจัดเรียงจากสูงไปต่ำ
     const rarityOrder = { 
         'SECRET': 15, 'P': 14, 'USEC': 13, 'EXR': 12, 'CBR': 11, 
         'SEC': 10, 'SUR': 9, 'SSR': 8, 'PR': 7, 'UR': 6, 
@@ -313,7 +405,7 @@
                 if (snap.exists()) {
                     const userData = snap.data();
                     updateUI(userData);
-                    updateProfileUI(userData); // เรียกใช้ฟังก์ชันอัปเดตแรงค์ซีซั่นล่าสุดตรงนี้
+                    updateProfileUI(userData);
                     hideLoader();
                 }
             });
@@ -324,7 +416,6 @@
         }
     });
 
-    // ฟังก์ชันอัปเดตแรงค์ซีซั่นล่าสุดที่ได้รับการแก้ไขและผูกตัวแปรให้ทำงานอัตโนมัติแล้ว
     function updateProfileUI(userData) {
         if (!userData) return;
         const profileRankEl = document.getElementById("profile-last-rank");
@@ -333,47 +424,143 @@
         }
     } 
 
-    // ฟังก์ชันเปิดกล่องเปลี่ยนธีมโปรไฟล์
+    // 👑 ฟังก์ชันระบบเลือกสลับฉายา (ดึงเงื่อนไขตรวจสอบจากฐานข้อมูล)
+    window.openTitleSelector = async () => {
+        if (!userUID) return;
+        
+        try {
+            const userSnap = await getDoc(doc(db, "users", userUID));
+            if (!userSnap.exists()) return;
+            const userData = userSnap.data();
+
+            // ตัวเลือกเริ่มต้นแบบฟรี
+            const availableTitles = {
+                'none': '❌ ไม่แสดงฉายา'
+            };
+
+            // 1. ตรวจสอบเงื่อนไขฉายาเติมเงิน "ผู้ใหญ่ใจบุญ"
+            if (userData.title_prefix === "ผู้ใหญ่ใจบุญ" || userData.bought_daddy_pack === true) {
+                availableTitles['ผู้ใหญ่ใจบุญ'] = '✨ [ผู้ใหญ่ใจบุญ] (ปลดล็อกแล้ว)';
+            }
+
+            // 2. ดึงประวัติฉายาที่เคยปลดล็อกมาจากหน้า Battle.html (ฟิลด์ซีซั่น titles แบบ Array)
+            const unlockedTitles = userData.titles || [];
+            
+            if (unlockedTitles.includes("ผู้พิชิตศึกสงคราม")) {
+                availableTitles['ผู้พิชิตศึกสงคราม'] = '🔥 [ผู้พิชิตศึกสงคราม] (ปลดล็อกประจำแรงค์)';
+            }
+            if (unlockedTitles.includes("กำหนดผู้ชนะ")) {
+                availableTitles['กำหนดผู้ชนะ'] = '👑 [กำหนดผู้ชนะ] (ปลดล็อกระดับแชมป์)';
+            }
+
+            const { value: selectedTitle } = await Swal.fire({
+                title: '👑 เลือกฉายาของคุณ',
+                input: 'select',
+                inputOptions: availableTitles,
+                inputPlaceholder: '-- เลือกฉายาที่จะสวมใส่ --',
+                showCancelButton: true,
+                background: '#1a1a1c',
+                color: '#fff',
+                confirmButtonColor: '#ffd700',
+                cancelButtonText: 'ยกเลิก',
+            });
+
+            if (selectedTitle) {
+                await updateDoc(doc(db, "users", userUID), { currentTitle: selectedTitle });
+                Swal.fire({ icon: 'success', title: 'เปลี่ยนฉายาเรียบร้อย!', timer: 1000, showConfirmButton: false, background: '#1a1a1c', color: '#fff' });
+            }
+        } catch (error) {
+            console.error("Error loading titles:", error);
+            Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถโหลดข้อมูลคลังฉายาได้', 'error');
+        }
+    };
+
+    // 💠 ฟังก์ชันสลับธีม และไอเทมตกแต่งพิเศษ (กรอบรูป & พื้นหลังเพชรไหล)
     window.openThemeSelector = async () => {
-        const { value: selectedTheme } = await Swal.fire({
-            title: '🎨 ตกแต่งการ์ดโปรไฟล์',
-            text: 'เลือกสไตล์แสงเอฟเฟกต์หมุนพื้นหลังที่คุณชื่นชอบ:',
-            input: 'select',
-            inputOptions: {
-                'default': '🏆 สีทองดั้งเดิม (Classic Gold)',
-                'cyber-aqua': '💎 ฟ้าอนาคต (Cyber Aqua)',
-                'neon-red': '🔥 แดงเดือด (Neon Red)',
-                'matrix-green': '🟢 เขียวดิจิทัล (Matrix Green)',
-                'pastels-pink': '🌸 ชมพูนีออน (Pastel Pink)'
-            },
-            inputPlaceholder: '-- เลือกธีมสี --',
+        if (!userUID) return;
+
+        const { value: menuChoice } = await Swal.fire({
+            title: '🎨 คลังตกแต่งโปรไฟล์',
+            text: 'คุณต้องการเปลี่ยนส่วนไหนของโปรไฟล์?',
+            icon: 'palette',
             showCancelButton: true,
             background: '#1a1a1c',
             color: '#fff',
             confirmButtonColor: '#ffc831',
             cancelButtonColor: '#444',
-            confirmButtonText: 'บันทินสี',
-            cancelButtonText: 'ยกเลิก',
-            inputValidator: (value) => {
-                if (!value) return 'กรุณาเลือกธีมก่อนนะ!';
-            }
+            confirmButtonText: '✨ ไอเทมพิเศษที่ซื้อมา',
+            cancelButtonText: '🎨 เปลี่ยนสีแสงหมุน (ฟรี)',
         });
 
-        if (selectedTheme) {
-            try {
+        // กรณีเลือกเปลี่ยนสีแสงหมุนแบบปกติ (ปุ่มเทา)
+        if (menuChoice === false) {
+            const { value: selectedTheme } = await Swal.fire({
+                title: '🎨 เลือกสีแสงหมุน',
+                input: 'select',
+                inputOptions: {
+                    'default': '🟡 แสงสีทองดั้งเดิม',
+                    'cyber-aqua': '🔵 แสงไซเบอร์ฟ้า',
+                    'neon-red': '🔴 แสงนีออนแดง',
+                    'matrix-green': '🟢 แสงแมทริกซ์เขียว',
+                    'pastels-pink': '🟣 แสงพาสเทลชมพู'
+                },
+                inputPlaceholder: '-- เลือกสีธีมแสง --',
+                showCancelButton: true,
+                background: '#1a1a1c',
+                color: '#fff',
+                confirmButtonColor: '#ffc831'
+            });
+
+            if (selectedTheme) {
                 await updateDoc(doc(db, "users", userUID), { profileTheme: selectedTheme });
-                Swal.fire({
-                    icon: 'success',
-                    title: 'เปลี่ยนธีมสำเร็จ!',
-                    timer: 1000,
-                    showConfirmButton: false,
-                    background: '#1a1a1c',
-                    color: '#fff'
-                });
-            } catch (err) {
-                console.error("Change theme error:", err);
-                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถเปลี่ยนธีมได้', 'error');
+                Swal.fire({ icon: 'success', title: 'เปลี่ยนแสงหมุนสำเร็จ!', timer: 1000, showConfirmButton: false, background: '#1a1a1c', color: '#fff' });
             }
+        } 
+        // กรณีเลือกไอเทมตกแต่งพิเศษที่ได้จากร้านค้า/กาชา (ปุ่มเหลือง)
+        else if (menuChoice === true) {
+            onSnapshot(doc(db, "users", userUID), async (snap) => {
+                if (!snap.exists()) return;
+                const userData = snap.data();
+                
+                const decorationOptions = {
+                    'default_clean': '❌ ถอดไอเทมตกแต่งทั้งหมดกลับเป็นค่าเริ่มต้น'
+                };
+
+                if (userData.unlocked_profile_frame === "blue_luxury_frame") {
+                    decorationOptions['frame_blue'] = '💠 สวมกรอบโปรไฟล์สีฟ้าสุดหรู';
+                }
+                if (userData.unlocked_profile_bg === "diamond_waterfall_bg") {
+                    decorationOptions['bg_diamond'] = '✨ เปิดใช้งานพื้นหลังลายเพชรไหล';
+                }
+                if (userData.unlocked_profile_frame === "blue_luxury_frame" && userData.unlocked_profile_bg === "diamond_waterfall_bg") {
+                    decorationOptions['both'] = '👑 เปิดใช้งานทั้งกรอบฟ้า + พื้นหลังเพชร';
+                }
+
+                const { value: selectedDecoration } = await Swal.fire({
+                    title: '💠 เลือกสวมใส่ไอเทมความงาม',
+                    input: 'select',
+                    inputOptions: decorationOptions,
+                    inputPlaceholder: '-- เลือกการแต่งตัว --',
+                    showCancelButton: true,
+                    background: '#1a1a1c',
+                    color: '#fff',
+                    confirmButtonColor: '#00e5ff'
+                });
+
+                if (selectedDecoration) {
+                    let payload = { currentFrame: 'none', currentBg: 'none' };
+                    
+                    if (selectedDecoration === 'frame_blue') payload.currentFrame = 'blue_luxury_frame';
+                    if (selectedDecoration === 'bg_diamond') payload.currentBg = 'diamond_waterfall_bg';
+                    if (selectedDecoration === 'both') {
+                        payload.currentFrame = 'blue_luxury_frame';
+                        payload.currentBg = 'diamond_waterfall_bg';
+                    }
+
+                    await updateDoc(doc(db, "users", userUID), payload);
+                    Swal.fire({ icon: 'success', title: 'อัปเดตสไตล์สำเร็จ!', timer: 1000, showConfirmButton: false, background: '#1a1a1c', color: '#fff' });
+                }
+            });
         }
     };
 
@@ -429,18 +616,55 @@
         };
     }
 
+    // ฟังก์ชันอัปเดตข้อมูล UI หลักเมื่อมีการสตรีมสถานะมาจาก Firebase
     function updateUI(data) {
         document.getElementById("username-display").innerText = data.username || "COLLECTOR";
         document.getElementById("stat-points").innerText = (data.points || 0).toLocaleString();
         document.getElementById("stat-diamonds").innerText = (data.diamonds || 0).toLocaleString();
         document.getElementById("stat-stars").innerText = (data.stars || 0).toLocaleString();
         
-        // อัปเดตสีพื้นหลังการ์ดโปรไฟล์ตามค่าที่เซฟไว้ใน Firestore
+        // 👑 1. ตรวจสอบและแสดงผลฉายาปัจจุบันพร้อมเปลี่ยนสีตามระดับ
+        const titleContainer = document.getElementById("whale-title-container");
+        const titleBanner = document.getElementById("whale-title-banner-main");
+        
+        if (data.currentTitle && data.currentTitle !== "none") {
+            document.getElementById("whale-title-text").innerText = data.currentTitle;
+            titleContainer.style.display = "block";
+            
+            // เคลียร์คลาสตกแต่งเดิมออกก่อนเพื่อไม่ให้ทับกัน
+            titleBanner.classList.remove("rank-pro", "rank-master");
+            
+            if (data.currentTitle === "กำหนดผู้ชนะ") {
+                titleBanner.classList.add("rank-pro");
+            } else if (data.currentTitle === "ผู้พิชิตศึกสงคราม") {
+                titleBanner.classList.add("rank-master");
+            }
+        } else {
+            titleContainer.style.display = "none";
+        }
+
+        // 💠 2. ตรวจสอบและสวมกรอบรูปโปรไฟล์
+        const pfpFrame = document.querySelector(".pfp-frame");
+        if (pfpFrame) {
+            if (data.currentFrame === "blue_luxury_frame") {
+                pfpFrame.classList.add("blue-luxury-frame");
+            } else {
+                pfpFrame.classList.remove("blue-luxury-frame");
+            }
+        }
+
+        // ✨ 3. ตรวจสอบและเปิดใช้งานเอฟเฟกต์พื้นหลังลายเพชรไหลเลื่อนลงมาบนหน้าจอ
+        if (data.currentBg === "diamond_waterfall_bg") {
+            document.body.classList.add("diamond-waterfall-bg");
+        } else {
+            document.body.classList.remove("diamond-waterfall-bg");
+        }
+
+        // 🟡 4. ตั้งค่าแสงหมุนหลังการ์ดโปรไฟล์ปกติ
         const currentThemeKey = data.profileTheme || 'default';
         const targetGlow = themePresets[currentThemeKey] || themePresets['default'];
         document.documentElement.style.setProperty('--theme-glow', targetGlow);
 
-        // แสดงผลแรงก์สูงสุด
         if (data.maxRank && data.maxRank !== "UNRANKED") {
             document.getElementById("max-rank-text").innerText = `${data.maxRank} (${(data.maxTrophies || 0).toLocaleString()} 🏆)`;
         } else {
@@ -450,7 +674,6 @@
         const avatar = document.getElementById("user-avatar");
         avatar.src = data.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.username}`;
 
-        // โชว์รูปการ์ดที่ตกแต่ง Showcase
         const feat = document.getElementById("featured-card");
         if (data.featuredCard && data.featuredCard.img) {
             feat.innerHTML = `<img src="${data.featuredCard.img}"><span class="featured-label">FEATURED</span>`;
@@ -469,7 +692,36 @@
             return;
         }
 
-        // จัดกลุ่มการ์ดที่ชื่อและระดับเดียวกัน
+        // ✨ ระบบเสกเม็ดเพชรดิ่งลงมาทีละอันแบบแรนดอม
+        if (window.diamondInterval) {
+            clearInterval(window.diamondInterval);
+        }
+
+        if (data.currentBg === "diamond_waterfall_bg") {
+            document.body.classList.add("diamond-waterfall-bg");
+            
+            window.diamondInterval = setInterval(() => {
+                const diamond = document.createElement('div');
+                diamond.classList.add('falling-diamond');
+                diamond.innerText = '💎';
+                
+                diamond.style.left = Math.random() * 100 + 'vw';
+                const duration = Math.random() * 4 + 4;
+                diamond.style.animationDuration = duration + 's';
+                diamond.style.fontSize = (Math.random() * 0.8 + 0.8) + 'rem';
+                
+                document.body.appendChild(diamond);
+                
+                setTimeout(() => {
+                    diamond.remove();
+                }, duration * 1000);
+                
+            }, 300);
+            
+        } else {
+            document.body.classList.remove("diamond-waterfall-bg");
+        }
+
         const grouped = {};
         collection.forEach(c => {
             const rStyle = (c.rarity || 'C').toUpperCase();
@@ -478,7 +730,6 @@
             grouped[key].push(c);
         });
 
-        // คัดแยกใบที่ดีที่สุดในกลุ่ม และนับจำนวนใบซ้ำ
         let displayList = [];
         for (const key in grouped) {
             const copies = grouped[key];
@@ -499,7 +750,6 @@
             });
         }
 
-        // ทำการจัดเรียงลำดับ: เรียงตามระดับ Rarity (สูง->ต่ำ) -> ถ้าระดับเท่ากัน เรียงตาม Level (มาก->น้อย)
         displayList.sort((a, b) => {
             const rA = (a.rarity || 'C').toUpperCase();
             const rB = (b.rarity || 'C').toUpperCase();
@@ -513,7 +763,6 @@
             return b.finalLv - a.finalLv;
         });
 
-        // แสดงผลลัพธ์ลงใน Grid HTML
         grid.innerHTML = displayList.map(c => {
             const rDisplay = (c.rarity || 'C').toUpperCase();
             const safeImg = c.img || c.image || '';
