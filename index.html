@@ -34,6 +34,9 @@
         .currency-display { display: flex; gap: 12px; font-size: 0.85rem; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 12px; pointer-events: none; }
         .point-text { color: #ffc831; font-weight: bold; }
         .diamond-text { color: #00e5ff; font-weight: bold; }
+        /* สไตล์สีข้อความของตั๋วบน Navbar */
+        .ticket-normal-text { color: #cbd5e1; font-weight: bold; }
+        .ticket-premium-text { color: #ffc831; font-weight: bold; }
 
         .btn-blue { 
             background: linear-gradient(135deg, #2b52ff, #1a36b1); 
@@ -207,6 +210,48 @@
             .leaderboard-tabs { width: 100%; justify-content: space-between; }
             .leaderboard-tab { flex: 1; text-align: center; padding: 8px 5px; }
         }
+        /* 💠 กรอบโปรไฟล์สีฟ้าวิบวับสไตล์ Luxury สำหรับหน้าแรก */
+.nav-avatar.blue-luxury-frame {
+    border: 2px solid #00e5ff !important;
+    box-shadow: 0 0 12px rgba(0, 229, 255, 0.8);
+    animation: bluePulse 2s infinite alternate;
+}
+
+@keyframes bluePulse {
+    0% { box-shadow: 0 0 8px rgba(0, 229, 255, 0.5); }
+    100% { box-shadow: 0 0 18px rgba(0, 229, 255, 0.9); }
+}
+
+/* 👑 สไตล์กล่องฉายาสีเหลืองทองวิบวับ */
+.nav-whale-title {
+    background: linear-gradient(135deg, rgba(255, 200, 49, 0.2), rgba(255, 159, 0, 0.2));
+    border: 1px solid #ffc831;
+    color: #ffc831;
+    font-size: 0.65rem;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+    margin-left: 6px;
+    display: inline-block;
+    text-shadow: 0 0 4px rgba(255, 200, 49, 0.5);
+}
+/* 💎 สไตล์ปุ่มร้านค้าเพชรพรีเมียม (Diamond Shop Banner) */
+.banner-diamond-shop {
+    background: linear-gradient(135deg, #091a3a 0%, #0055ff 50%, #00e5ff 100%);
+    color: white;
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.1);
+}
+
+.banner-diamond-shop:hover {
+    border-color: #00e5ff;
+    box-shadow: 0 0 25px rgba(0, 229, 255, 0.4);
+}
+
+.banner-diamond-shop .shop-glow-icon {
+    color: #00e5ff;
+    text-shadow: 0 0 15px rgba(0, 229, 255, 0.8);
+}
     </style>
 </head>
 <body>
@@ -255,6 +300,14 @@
                     <span class="popup-info-label">💎 เพชรทั้งหมด</span>
                     <span class="popup-info-value score-diamonds" id="popup-user-diamonds">0</span>
                 </div>
+                <div class="popup-info-item">
+                    <span class="popup-info-label">🎫 ตั๋วปกติ</span>
+                    <span class="popup-info-value ticket-normal-text" id="popup-user-ticket-normal">0</span>
+                </div>
+                <div class="popup-info-item">
+                    <span class="popup-info-label">🎟️ ตั๋วพรีเมี่ยม</span>
+                    <span class="popup-info-value ticket-premium-text" id="popup-user-ticket-premium">0</span>
+                </div>
                 <div class="popup-info-item" style="grid-column: span 2;">
                     <span class="popup-info-label">🎴 การ์ดในคอลเลกชัน</span>
                     <span class="popup-info-value score-cards" id="popup-user-cards">0 ใบ</span>
@@ -283,10 +336,14 @@
                     <div>
                         <div style="display: flex; align-items: center;">
                             <span id="user-display" style="color: #fff; font-weight: 700; font-size: 0.85rem;"></span>
+                            <span id="user-title-display" class="nav-whale-title" style="display: none;"></span>
                         </div>
                         <div class="currency-display">
                             <span class="point-text">🪙 <span id="user-points">0</span></span>
                             <span class="diamond-text">💎 <span id="user-diamonds">0</span></span>
+                            <span class="ticket-normal-text">🎫 <span id="user-ticket-normal">0</span></span>
+                            <span class="ticket-premium-text">🎟️ <span id="user-ticket-premium">0</span></span>
+                            <span id="user-display" style="color: #fff; font-weight: 700; font-size: 0.85rem;"></span>
                         </div>
                     </div>
                 </div>
@@ -327,14 +384,26 @@
             </div>
 
             <div class="modern-banner" style="background: linear-gradient(135deg, #00d4ff, #0055ff); color: white;" onclick="window.location.href='Exchange.html'">
-                <h3>💎 แลกเปลี่ยนเพชร</h3>
+                <h3>💎 แแลกเปลี่ยนเพชร</h3>
                 <p>แลกเปลี่ยนทองให้กลายเป็นเพชร</p>
                 <i class="fas fa-gem main-icon"></i>
+            </div>
+
+            <div class="modern-banner banner-diamond-shop" onclick="window.location.href='DIAMOND SHOP.html'">
+                <h3><i class="fas fa-shopping-basket"></i> DIAMOND SHOP</h3>
+                <p>ร้านค้าเพชรและไอเทมสุดพิเศษ!</p>
+                <i class="fas fa-gem main-icon shop-glow-icon"></i>
             </div>
 
             <div class="modern-banner" style="background: linear-gradient(135deg, #ffc831, #ff8c00); color: #000;" onclick="window.location.href='Pass (Battle Pass).html'">
                 <h3>🏆 Battle Pass SS4 ป่าขยะหน้าบ้าน</h3>
                 <p>ปลดล็อกของรางวัลสุดพรีเมียม</p>
+                <i class="fas fa-trophy main-icon"></i>
+            </div>
+
+            <div class="modern-banner" style="background: linear-gradient(135deg, #ffffff, #fffaf4); color: #000;" onclick="window.location.href=''">
+                <h3>coming soon</h3>
+                <p>coming soon</p>
                 <i class="fas fa-trophy main-icon"></i>
             </div>
 
@@ -426,18 +495,15 @@
         if (!isLongPress) window.location.href = 'profile.html';
     });
 
-    // 🌟 ฟังก์ชันระบบตรวจจับและอัปเดตการรีซีซั่นอารีน่าอัตโนมัติ 🌟
     async function checkSeasonReset(userUid, userData) {
-        const systemCurrentSeason = 4; // กำหนดเลขซีซั่นปัจจุบันของเซิร์ฟเวอร์ (เช่น SS4)
-        const userLastPlayedSeason = userData.lastPlayedSeason || 3; // ดึงซีซั่นล่าสุดที่เขาเคยเข้าเล่น
+        const systemCurrentSeason = 4; 
+        const userLastPlayedSeason = userData.lastPlayedSeason || 3; 
 
-        // ถ้าซีซั่นของระบบเดินหน้าไปแล้ว แสดงว่าผู้เล่นพึ่งเคยเข้าเว็บหลังรีซีซั่น!
         if (systemCurrentSeason > userLastPlayedSeason) {
             const lastSeasonRank = userData.currentRank || "UNRANKED";
             const lastSeasonTrophies = userData.currentTrophies || 0;
             const todayDate = new Date().toLocaleDateString('th-TH');
 
-            // บันทึกสถิติซีซั่นเก่าเป็นแถวข้อมูลวัตถุใหม่
             const newHistoryRecord = {
                 rankName: `จบ Season ${userLastPlayedSeason}: ${lastSeasonRank}`,
                 trophies: lastSeasonTrophies,
@@ -445,13 +511,12 @@
             };
 
             let updatedFields = {
-                lastPlayedSeason: systemCurrentSeason, // เปลี่ยนค่าบันทึกให้ตรงระบบเพื่อไม่ให้แจ้งซ้ำ
-                currentRank: "UNRANKED", // รีเซ็ตอันดับสำหรับซีซั่นใหม่
-                currentTrophies: 1000,    // รีเซ็ตถ้วยรางวัลเริ่มต้นตามกฎของคุณ
-                arenaHistory: arrayUnion(newHistoryRecord) // ดันประวัติเก่าเข้าสู่อาเรย์
+                lastPlayedSeason: systemCurrentSeason, 
+                currentRank: "UNRANKED", 
+                currentTrophies: 1000,    
+                arenaHistory: arrayUnion(newHistoryRecord) 
             };
 
-            // เช็คว่าคะแนนซีซั่นที่พึ่งจบไปนี้ มากกว่า All-time High (maxTrophies) หรือไม่
             if (lastSeasonTrophies >= (userData.maxTrophies || 0)) {
                 updatedFields.maxRank = lastSeasonRank;
                 updatedFields.maxTrophies = lastSeasonTrophies;
@@ -461,7 +526,6 @@
                 alert(`🏁 สิ้นสุดฤดูกาล Arena Season ${userLastPlayedSeason}!\nสรุปผลอันดับของคุณ: ${lastSeasonRank} (${lastSeasonTrophies.toLocaleString()} 🏆)\nระบบบันทึกประวัติและทำการรีเซ็ตเข้าสู่ซีซั่นใหม่เรียบร้อยแล้ว!`);
             }
 
-            // สั่งเขียนชุดข้อมูลทับส่งไปบันทึกบนฐานข้อมูล Firebase
             await updateDoc(doc(db, "users", userUid), updatedFields);
         }
     }
@@ -476,13 +540,16 @@
                     document.getElementById("user-points").innerText = (data.points || 0).toLocaleString();
                     document.getElementById("user-diamonds").innerText = (data.diamonds || 0).toLocaleString();
                     
+                    // ปรับชื่อฟิลด์เป็น normal_tickets และ premium_tickets ให้ตรงตามไฟล์กาชาเพื่ออัปเดตค่าแบบ Realtime บนหน้าแรก
+                    document.getElementById("user-ticket-normal").innerText = (data.normal_tickets || 0).toLocaleString();
+                    document.getElementById("user-ticket-premium").innerText = (data.premium_tickets || 0).toLocaleString();
+                    
                     if (data.userPhoto) {
                         document.getElementById("nav-avatar-img").src = data.userPhoto;
                     } else {
                         document.getElementById("nav-avatar-img").src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.username}`;
                     }
                     
-                    // เรียกใช้งานระบบเช็ครีซีซั่นอัตโนมัติ
                     checkSeasonReset(user.uid, data);
 
                     const today = new Date().toDateString();
@@ -501,6 +568,31 @@
                         alert(`ยินดีด้วย! ได้รับ 🪙 ${p} และ 💎 ${d}`);
                         fetchAndRenderLeaderboard();
                     };
+                    document.getElementById("profile-container").style.display = "flex";
+document.getElementById("user-display").innerText = data.username;
+document.getElementById("user-points").innerText = (data.points || 0).toLocaleString();
+document.getElementById("user-diamonds").innerText = (data.diamonds || 0).toLocaleString();
+
+// 💠 1. ดึงสิทธิ์กรอบโปรไฟล์สีฟ้ามาใส่ที่รูป Avatar บน Navbar
+const navAvatar = document.getElementById("nav-avatar-img");
+if (navAvatar) {
+    if (data.currentBg === "diamond_waterfall_bg") { // หรือถ้าใช้ชื่อฟิลด์ currentFrame ให้แก้เป็น data.currentFrame === "blue_luxury_frame" ครับ
+        navAvatar.classList.add("blue-luxury-frame");
+    } else {
+        navAvatar.classList.remove("blue-luxury-frame");
+    }
+}
+
+// 👑 2. ดึงฉายาปัจจุบันมาแสดงข้างๆ ชื่อเล่นบน Navbar
+const titleDisplay = document.getElementById("user-title-display");
+if (titleDisplay) {
+    if (data.currentTitle && data.currentTitle !== "none") {
+        titleDisplay.innerText = data.currentTitle;
+        titleDisplay.style.display = "inline-block";
+    } else {
+        titleDisplay.style.display = "none";
+    }
+}
                 }
             });
             document.getElementById("auth-btn").innerText = "ออกจากระบบ";
@@ -539,9 +631,11 @@
                     username: data.username || "ผู้เล่นไม่ประสงค์ออกนาม",
                     points: data.points || 0,
                     diamonds: data.diamonds || 0,
+                    // ปรับชื่อฟิลด์ตรงนี้ให้ดึงข้อมูลตั๋วที่ถูกต้องไปคำนวณในหน้าต่าง Popup โปรไฟล์ของ Leaderboard
+                    normal_tickets: data.normal_tickets || 0,
+                    premium_tickets: data.premium_tickets || 0,
                     cards: totalCards,
                     avatar: data.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.username || 'default'}`,
-                    // ดึงชุดข้อมูลโปรไฟล์ที่ผูกกับหน้า profile.html มารองรับไว้ในหน้าแรก
                     maxRank: data.maxRank || "UNRANKED",
                     maxTrophies: data.maxTrophies || 0,
                     decoratedCard: data.decoratedCard || null, 
@@ -593,22 +687,24 @@
                     ${scoreMarkup}
                 `;
 
-                // 🌟 เมื่อคลิกเปิดดู Popup จะดึงข้อมูลการ์ดและประวัติสูงสุดมาเรนเดอร์ 🌟
                 itemDiv.addEventListener("click", () => {
                     document.getElementById("popup-user-avatar").src = player.avatar;
                     document.getElementById("popup-username").innerText = player.username;
                     document.getElementById("popup-user-points").innerText = "🪙 " + player.points.toLocaleString();
                     document.getElementById("popup-user-diamonds").innerText = "💎 " + player.diamonds.toLocaleString();
+                    
+                    // ปรับชื่อตัวแปรที่ดึงมาใส่ในหน้า Popup โปรไฟล์ย่อยตอนคลิกผ่านหน้า Leaderboard
+                    document.getElementById("popup-user-ticket-normal").innerText = "🎫 " + player.normal_tickets.toLocaleString();
+                    document.getElementById("popup-user-ticket-premium").innerText = "🎟️ " + player.premium_tickets.toLocaleString();
+                    
                     document.getElementById("popup-user-cards").innerText = "🎴 " + player.cards.toLocaleString() + " ใบ";
                     
-                    // 1. เรนเดอร์อันดับอารีน่าสูงสุด
                     if(player.maxRank !== "UNRANKED") {
                         document.getElementById("popup-txt-max-rank").innerText = `${player.maxRank} (${player.maxTrophies.toLocaleString()} 🏆)`;
                     } else {
                         document.getElementById("popup-txt-max-rank").innerText = "UNRANKED (0 🏆)";
                     }
 
-                    // 2. เรนเดอร์การ์ดที่ตกแต่งโชว์ไว้
                     if (player.decoratedCard && player.decoratedCard.name) {
                         document.getElementById("popup-card-img").src = player.decoratedCard.img || "https://via.placeholder.com/65x90?text=Card";
                         document.getElementById("popup-card-name").innerText = player.decoratedCard.name;
@@ -619,7 +715,6 @@
                         document.getElementById("popup-card-stat").innerText = "ATK: -- / DEF: --";
                     }
 
-                    // 3. เรนเดอร์ประวัติการทำอันดับทั้งหมดที่บันทึกไว้ในโปรไฟล์
                     const historyContainer = document.getElementById("popup-history-container");
                     historyContainer.innerHTML = ""; 
 
