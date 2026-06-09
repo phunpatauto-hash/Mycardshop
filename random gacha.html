@@ -17,6 +17,11 @@
         .btn-nav:hover { background: #ffc831; color: #000; }
         .points-box { background: #000; color: #ffc831; border: 1px solid #ffc831; padding: 8px 20px; border-radius: 25px; font-weight: bold; }
         .diamond-box { background: #000; color: #00d4ff; border: 1px solid #00d4ff; padding: 8px 20px; border-radius: 25px; font-weight: bold; margin-left: 10px; }
+        
+        /* สไตล์กล่องตั๋วสุ่มที่เพิ่มเข้ามา */
+        .ticket-box { background: #000; color: #cbd5e1; border: 1px solid #cbd5e1; padding: 8px 20px; border-radius: 25px; font-weight: bold; margin-left: 10px; }
+        .premium-ticket-box { background: #000; color: #ffc831; border: 1px solid #ffc831; padding: 8px 20px; border-radius: 25px; font-weight: bold; margin-left: 10px; }
+
         .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
         .main-layout { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; align-items: flex-start; }
         .gacha-box { flex: 2; background-color: #111; border-radius: 30px; padding: 30px; border: 1px solid #222; min-height: 500px; position: relative; background-image: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%); min-width: 320px; }
@@ -37,7 +42,7 @@
         .color-ur { color: #39ff14; text-shadow: 0 0 5px #39ff14; }
         .color-ssr { color: #ff4444; }
         .color-sr { color: #ffc831; }
-        .color-r { color: #007bff; text-shadow: 0 0 5px #007bff; } /* สีน้ำเงินสำหรับ R */
+        .color-r { color: #007bff; text-shadow: 0 0 5px #007bff; }
         .color-uc { color: #aaaaaa; }
 
         .pity-area { max-width: 500px; margin: 0 auto 20px auto; display: flex; flex-direction: column; gap: 10px; }
@@ -65,7 +70,7 @@
 </head>
 <body id="body-main">
 
-    <div id="cutscene-overlay"><div class="cutscene-text" style="font-size:3rem; font-weight:bold; text-shadow: 0 0 20px #ffc831; color: white;">EXR EVOLUTION</div></div>
+    <div id="cutscene-overlay"><div class="cutscene-text" style="font-size:3rem; font-weight:bold; text-shadow: 0 0 20px #ffc831; color: white;">Warmth of Compassion</div></div>
 
     <div id="rateModal" class="modal">
         <div class="modal-content">
@@ -83,6 +88,8 @@
         <div style="display: flex; align-items: center;">
             <div class="points-box" style="margin-left: 10px;">🪙 <span id="balance">0</span></div>
             <div class="diamond-box">💎 <span id="user-diamonds">0</span></div>
+            <div class="ticket-box">🎫 <span id="user-normal-tickets">0</span></div>
+            <div class="premium-ticket-box">🎟️ <span id="user-premium-tickets">0</span></div>
         </div>
     </nav>
 
@@ -97,9 +104,9 @@
                 </div>
                 <div id="display" class="card-grid"></div>
                 <div class="btn-group">
-                    <button id="pull-5" class="btn-pull" onclick="pull(5)">สุ่ม 5 ใบ (100) | +500 EXP</button>
-                    <button id="pull-10" class="btn-pull" style="background: #ff00ff; color: white;" onclick="pull(10)">สุ่ม 10 ใบ (500) | +1000 EXP</button>
-                    <button id="pull-50" class="btn-pull" style="background: #00d4ff; color: white;" onclick="pull(50)">สุ่ม 50 ใบ (1000) | +1500 EXP</button>
+                    <button id="pull-5" class="btn-pull" onclick="pull(5)">สุ่ม 5 ครั้ง (100) | 🎫10 หรือ 🎟️5</button>
+                    <button id="pull-10" class="btn-pull" style="background: #ff00ff; color: white;" onclick="pull(10)">สุ่ม 10 ครั้ง (500) | 🎫15 หรือ 🎟️10</button>
+                    <button id="pull-50" class="btn-pull" style="background: #00d4ff; color: white;" onclick="pull(50)">สุ่ม 50 ครั้ง (1000) | 🎫30 หรือ 🎟️20</button>
                 </div>
             </div>
             
@@ -109,14 +116,14 @@
                 
                 <div class="quick-rate-table">
                     <div style="font-size: 0.7rem; color: #666; margin-bottom: 8px;">RATE BY RARITY</div>
-                    <div class="rate-row"><span class="rate-label color-exr">EXR (Extreme)</span><span>1%เพิ่มโอกาสออก!!</span></div>
-                    <div class="rate-row"><span class="rate-label color-sec">SEC (Secret)</span><span>0.1%</span></div>
-                    <div class="rate-row"><span class="rate-label color-sur">SUR (Special UR)</span><span>1.75%</span></div> 
-                    <div class="rate-row"><span class="rate-label color-ur">UR (Ultra Rare)</span><span>2.3%</span></div> 
+                    <div class="rate-row"><span class="rate-label color-exr">EXR </span><span>1%เพิ่มโอกาสออก!!</span></div>
+                    <div class="rate-row"><span class="rate-label color-sec">SEC </span><span>0.1%</span></div>
+                    <div class="rate-row"><span class="rate-label color-sur">SUR </span><span>1.75%</span></div> 
+                    <div class="rate-row"><span class="rate-label color-ur">UR </span><span>2.3%</span></div> 
                     <div class="rate-row"><span class="rate-label color-ssr">SSR</span><span>2.0%</span></div>
                     <div class="rate-row"><span class="rate-label color-sr">SR</span><span>6.25%</span></div>
-                    <div class="rate-row"><span class="rate-label color-r">R (Rare)</span><span>10.0%</span></div>
-                    <div class="rate-row"><span class="rate-label color-uc">U / C (Normal)</span><span>25.0-35.85%</span></div>
+                    <div class="rate-row"><span class="rate-label color-r">R </span><span>10.0%</span></div>
+                    <div class="rate-row"><span class="rate-label color-uc">U / C </span><span>25.0-35.85%</span></div>
                 </div>
                 <button class="btn-nav" style="width: 100%; font-size: 0.8rem;" onclick="openModal()">ℹ️ ดูเรทแยกใบ</button>
             </div>
@@ -145,7 +152,7 @@
     let currentUserUID = null;
     let isPulling = false;
 
-    // --- Card Database (ปรับเรทใหม่รวมเป็น 100%) ---
+    // --- Card Database ---
     const allCards = [
         { id: 2, rarity: "EXR", name: "Pure Vanilla", rate: 1, img: "https://cookierunbraverse.com/data/en_storage/eXN_QVTcLFL7hr0_HG0jVg.webp" },
         
@@ -173,8 +180,8 @@
         { id: 8, rarity: "SSR", name: "Pure Vanilla Cookie", rate: 2.0, img: "https://cookierunbraverse.com/data/en_storage/FLfwxLrQcMCD7Y51Wu5UvA.webp" },
         { id: 9, rarity: "SSR", name: "Milky Way Cookie", rate: 2.0, img: "https://assets.cookierunbraverse.com/braverse/images/card_webp/card/en/BS4_092@1.png.webp" },
         { id: 10, rarity: "SSR", name: "Cookiemals", rate: 2.0, img: "https://assets.cookierunbraverse.com/braverse/images/card_webp/card/en/BS4_059@1.png.webp" },
-        {id: 10, rarity: "SSR", name: "Wind Archer Cookie", rate: 2.0, img: "https://cookierunbraverse.com/data/en_storage/zu03wvQnUMKJwWsre6Phow.webp" },
-        {id: 10, rarity: "SSR", name: "Golden Cheese Cookie", rate: 2.0, img: "https://cookierunbraverse.com/data/en_storage/myHJ_NNKIX2pLS3YG2fVXg.webp" },
+        { id: 10, rarity: "SSR", name: "Wind Archer Cookie", rate: 2.0, img: "https://cookierunbraverse.com/data/en_storage/zu03wvQnUMKJwWsre6Phow.webp" },
+        { id: 10, rarity: "SSR", name: "Golden Cheese Cookie", rate: 2.0, img: "https://cookierunbraverse.com/data/en_storage/myHJ_NNKIX2pLS3YG2fVXg.webp" },
 
         { id: 11, rarity: "SR", name: "White Lily (SR)", rate: 6.25, img: "https://cookierunbraverse.com/data/en_storage/4jRaQLO9rqksjrgbkvLDMg.webp" },
         { id: 12, rarity: "SR", name: "Pure Vanilla Cookie (SR)", rate: 6.25, img: "https://cookierunbraverse.com/data/en_storage/qwIOz3Udf_iFsoy3efogQw.webp" },
@@ -183,7 +190,6 @@
         { id: 14, rarity: "SR", name: "Wind Archer Cookie (SR)", rate: 6.25, img: "https://cookierunbraverse.com/data/en_storage/RwYYQACXldPCLvuIOWhK5g.webp" },
         { id: 14, rarity: "SR", name: "Golden Cheese Cookie (SR)", rate: 6.25, img: "https://cookierunbraverse.com/data/en_storage/0rGbl8x0NNYi5rwR7zKvyQ.webp" },
 
-        // --- R (Rare) ใหม่ ---
         { id: 20, rarity: "R", name: "Elder Faerie Cookie", rate: 10.0, img: "https://cookierunbraverse.com/data/en_storage/vCZh6kv-DX6oUMyZNf0Diw.webp" },
         { id: 21, rarity: "R", name: "Cookiemals", rate: 10.0, img: "https://cookierunbraverse.com/data/en_storage/42B7jdp_oeDaOkv42opZ-A.webp" },
         { id: 21, rarity: "R", name: "Towerkeeper Cookie", rate: 10.0, img: "https://cookierunbraverse.com/data/en_storage/Qng3HoV7sowfcPNIIdtksA.webp" },
@@ -201,7 +207,6 @@
         { id: 19, rarity: "C", name: "Butter Roll Cookie", rate: 35.85, img: "https://cookierunbraverse.com/data/en_storage/ZqqRlBuIetxgNZWb80AS6A.webp" },
         { id: 19, rarity: "C", name: "Candy Diver Cookie", rate: 35.85, img: "https://cookierunbraverse.com/data/en_storage/JnQqr_u7YzEhX8tTzfbfvQ.webp" },
         { id: 19, rarity: "C", name: "Prophet Cookie", rate: 35.85, img: "https://cookierunbraverse.com/data/en_storage/FielnNkIkNhNo9NpemKLMg.webp" }
-
     ];
 
     onAuthStateChanged(auth, (user) => {
@@ -217,6 +222,11 @@
         if (!userData) return;
         document.getElementById("balance").innerText = (userData.points || 0).toLocaleString();
         document.getElementById("user-diamonds").innerText = (userData.diamonds || 0).toLocaleString();
+        
+        // อัปเดตจำนวนตั๋วบน UI (ดึงจาก field: normal_tickets และ premium_tickets)
+        document.getElementById("user-normal-tickets").innerText = (userData.normal_tickets || 0).toLocaleString();
+        document.getElementById("user-premium-tickets").innerText = (userData.premium_tickets || 0).toLocaleString();
+
         const ps = userData.pitySEC || 0, pe = userData.pityEXR || 0;
         document.getElementById("pity-bar-sec").style.width = (Math.min(ps, 550) / 550 * 100) + "%";
         document.getElementById("pity-text-sec").innerText = `${ps} / 550`;
@@ -226,10 +236,60 @@
 
     window.pull = async (amount) => {
         if (isPulling || !userData) return;
-        let cost = amount === 5 ? 100 : (amount === 10 ? 500 : 1000);
-        let exp = amount === 5 ? 50 : (amount === 500 ? 1500 : 1000);
-        if (userData.points < cost) return alert("แต้มไม่พอ!");
 
+        // ดึงจำนวนเงินและตั๋วปัจจุบันจากก้อน object
+        let currentPoints = userData.points || 0;
+        let normalTickets = userData.normal_tickets || 0;
+        let premiumTickets = userData.premium_tickets || 0;
+
+        // ประกาศตัวแปรฟิลด์ที่จะใช้สำหรับส่งอัปเดตไปที่ Firebase
+        let updateFields = {};
+        let costPoints = 0;
+        let exp = amount === 5 ? 50 : (amount === 50 ? 1500 : 1000); // แก้บั๊ก EXP สุ่ม 10/50 สลับกันจากโค้ดเดิม
+
+        // ==================== 🎫 ระบบคำนวณและเช็คเงื่อนไขตั๋วสุ่ม 🎫 ====================
+        if (amount === 5) {
+            if (normalTickets >= 10) {
+                // บังคับใช้ตั๋วปกติก่อนตามเงื่อนไข (10 ใบ = สุ่ม 5 ครั้ง)
+                updateFields["normal_tickets"] = increment(-10);
+            } else if (premiumTickets >= 5) {
+                // ถ้าตั๋วปกติไม่พอ เช็คตั๋วพรีเมียมต่อ (5 ใบ = สุ่ม 5 ครั้ง)
+                updateFields["premium_tickets"] = increment(-5);
+            } else {
+                // ถ้าตั๋วไม่มีเลย หรือไม่พอ ให้กลับไปใช้แต้ม Point
+                costPoints = 100;
+                if (currentPoints < costPoints) return alert("แต้มหรือตั๋วสุ่มของคุณไม่เพียงพอ!");
+                updateFields["points"] = increment(-costPoints);
+            }
+        } 
+        else if (amount === 10) {
+            if (normalTickets >= 15) {
+                // บังคับใช้ตั๋วปกติก่อน (15 ใบ = สุ่ม 10 ครั้ง)
+                updateFields["normal_tickets"] = increment(-15);
+            } else if (premiumTickets >= 10) {
+                // ใช้ตั๋วพรีเมียม (10 ใบ = สุ่ม 10 ครั้ง)
+                updateFields["premium_tickets"] = increment(-10);
+            } else {
+                costPoints = 500;
+                if (currentPoints < costPoints) return alert("แต้มหรือตั๋วสุ่มของคุณไม่เพียงพอ!");
+                updateFields["points"] = increment(-costPoints);
+            }
+        } 
+        else if (amount === 50) {
+            if (normalTickets >= 30) {
+                // บังคับใช้ตั๋วปกติก่อน (30 ใบ = สุ่ม 50 ครั้ง)
+                updateFields["normal_tickets"] = increment(-30);
+            } else if (premiumTickets >= 20) {
+                // ใช้ตั๋วพรีเมียม (20 ใบ = สุ่ม 50 ครั้ง)
+                updateFields["premium_tickets"] = increment(-20);
+            } else {
+                costPoints = 1000;
+                if (currentPoints < costPoints) return alert("แต้มหรือตั๋วสุ่มของคุณไม่เพียงพอ!");
+                updateFields["points"] = increment(-costPoints);
+            }
+        }
+
+        // เริ่มต้นอนิเมชั่นการสุ่ม
         isPulling = true; toggleButtons(true);
         const display = document.getElementById("display");
         display.innerHTML = "";
@@ -261,10 +321,15 @@
             else if (["SEC", "SUR", "SSR", "UR"].includes(win.rarity)) triggerShake();
         }
 
-        await updateDoc(doc(db, "users", currentUserUID), {
-            points: increment(-cost), pitySEC: ps, pityEXR: pe, passExp: increment(exp),
-            collection: arrayUnion(...results)
-        });
+        // อัปเดตข้อมูล Pity และ EXP เข้าก้อนที่จะส่งอัปเดตไป Firebaseคราวเดียว
+        updateFields["pitySEC"] = ps;
+        updateFields["pityEXR"] = pe;
+        updateFields["passExp"] = increment(exp);
+        updateFields["collection"] = arrayUnion(...results);
+
+        // บันทึกการเปลี่ยนแปลงลงฐานข้อมูล Firebase
+        await updateDoc(doc(db, "users", currentUserUID), updateFields);
+        
         isPulling = false; toggleButtons(false);
     }
 
@@ -278,8 +343,8 @@
     }
 
     function triggerShake() {
-        document.getElementById("body-main").classList.add("shake-heavy");
-        setTimeout(() => document.getElementById("body-main").classList.remove("shake-heavy"), 500);
+        document.body.classList.add("shake-heavy");
+        setTimeout(() => document.body.classList.remove("shake-heavy"), 500);
     }
 
     function toggleButtons(d) {
