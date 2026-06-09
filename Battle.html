@@ -553,56 +553,128 @@ window.claimSeasonReward = async function() {
     const globalEndTime = getGlobalSeasonEndTime();
     const globalStartTime = globalEndTime - SEASON_LIMIT;
     
-    // 1. เพิ่มบรรทัดนี้เพื่อแปลงแรงค์เป็นข้อความพร้อมไอคอน เช่น "🥇 Grandmaster"
     const rankString = `${currentRank.icon} ${currentRank.name}`;
     
+    // ==================== [ระบบฉายา & รางวัลซ้ำแบบใหม่] ====================
+    let titleReward = null; // ฉายาที่จะได้รับในซีซั่นนี้
+    let finalCoinReward = currentRank.reward.coin; // ค่าเริ่มต้นคอยน์รางวัลประจำแรงค์
+    let titleCompensationBonus = 0; // เงินชดเชยกรณีฉายาซ้ำ
+
+    // ตรวจสอบระดับ Rank เพื่อแจกฉายา
+    if (currentRank.name.includes("Supreme MASTER PRO!!")) {
+        titleReward = "กำหนดผู้ชนะ";
+    } else if (
+        currentRank.name.includes("Supreme MASTER 1") ||
+        currentRank.name.includes("Supreme MASTER 2") ||
+        currentRank.name.includes("Supreme MASTER 3") ||
+        currentRank.name.includes("Supreme MASTER 4")
+    ) {
+        titleReward = "ผู้พิชิตศึกสงคราม";
+    }
+
+    // โครงสร้างฟิลด์อัปเดตข้อมูลที่จะส่งไป Firestore
+    let updateData = {
+        points: increment(finalCoinReward),
+        trophies: 0,
+        lastSeasonChecked: globalStartTime,
+        lastSeasonRank: rankString
+    };
+
+    // อาร์เรย์เก็บฉายาเดิมของผู้เล่น (ถ้ายังไม่มีในระบบให้ตั้งเป็นอาร์เรย์ว่าง)
+    let currentTitles = userDoc.titles || [];
+
+    if (titleReward) {
+        // ตรวจสอบว่าผู้เล่นเคยได้รับฉายานี้ไปแล้วหรือยัง
+        if (currentTitles.includes(titleReward)) {
+            titleCompensationBonus = 1000000; // ได้เงิน 1,000,000 แทนฉายาเดิม
+            updateData.points = increment(finalCoinReward + titleCompensationBonus);
+            alert(`🎉 คุณมีฉายา "${titleReward}" อยู่แล้ว! ระบบจึงเปลี่ยนฉายาเป็นเงินรางวัลมูลค่า 🪙 1,000,000 แทน`);
+        } else {
+            // ถ้ายังไม่เคยมี ให้ทำการเพิ่มฉายาใหม่เข้าไปใน Array
+            currentTitles.push(titleReward);
+            updateData.titles = currentTitles;
+            alert(`🎉 ยินดีด้วย! คุณได้รับฉายาใหม่: [${titleReward}]`);
+        }
+    }
+    // ==================================================================
+
     try {
-        await updateDoc(doc(db, "users", auth.currentUser.uid), {
-            points: increment(currentRank.reward.coin),
-            trophies: 0,
-            lastSeasonChecked: globalStartTime,
-            
-            // 2. เพิ่มฟิลด์นี้เข้าไปใน updateDoc เพื่อบันทึกลง Firestore
-            lastSeasonRank: rankString 
-        });
+        // อัปเดตข้อมูลลงฐานข้อมูล Firebase Firestore
+        await updateDoc(doc(db, "users", auth.currentUser.uid), updateData);
         
         toggleModal("seasonRewardModal", false);
-        alert("รับรางวัลสำเร็จ!");
+        alert("รับรางวัลประจำซีซั่นเสร็จสิ้นแล้ว!");
         
-        // 3. (แถม) เพิ่มบรรทัดนี้เพื่อให้หน้าโปรไฟล์อัปเดตทันทีหลังจากกดรับรางวัล
         if (typeof updateProfileUI === "function") { updateProfileUI(); }
 
     } catch (e) {
-        alert("เกิดข้อผิดพลาด");
+        console.error("Error claiming season reward:", e);
+        alert("เกิดข้อผิดพลาดในการรับรางวัล กรุณาลองใหม่อีกครั้ง");
     }
 }
 
-    window.claimSeasonReward = async function() {
+window.claimSeasonReward = async function() {
     const currentRank = getRankInfo(userDoc.trophies || 0);
     const globalEndTime = getGlobalSeasonEndTime();
     const globalStartTime = globalEndTime - SEASON_LIMIT;
     
-    // 1. เพิ่มบรรทัดนี้เพื่อแปลงแรงค์เป็นข้อความพร้อมไอคอน เช่น "🥇 Grandmaster"
     const rankString = `${currentRank.icon} ${currentRank.name}`;
     
+    // ==================== [ระบบฉายา & รางวัลซ้ำแบบใหม่] ====================
+    let titleReward = null; // ฉายาที่จะได้รับในซีซั่นนี้
+    let finalCoinReward = currentRank.reward.coin; // ค่าเริ่มต้นคอยน์รางวัลประจำแรงค์
+    let titleCompensationBonus = 0; // เงินชดเชยกรณีฉายาซ้ำ
+
+    // ตรวจสอบระดับ Rank เพื่อแจกฉายา
+    if (currentRank.name.includes("Supreme MASTER PRO!!")) {
+        titleReward = "กำหนดผู้ชนะ";
+    } else if (
+        currentRank.name.includes("Supreme MASTER 1") ||
+        currentRank.name.includes("Supreme MASTER 2") ||
+        currentRank.name.includes("Supreme MASTER 3") ||
+        currentRank.name.includes("Supreme MASTER 4")
+    ) {
+        titleReward = "ผู้พิชิตศึกสงคราม";
+    }
+
+    // โครงสร้างฟิลด์อัปเดตข้อมูลที่จะส่งไป Firestore
+    let updateData = {
+        points: increment(finalCoinReward),
+        trophies: 0,
+        lastSeasonChecked: globalStartTime,
+        lastSeasonRank: rankString
+    };
+
+    // อาร์เรย์เก็บฉายาเดิมของผู้เล่น (ถ้ายังไม่มีในระบบให้ตั้งเป็นอาร์เรย์ว่าง)
+    let currentTitles = userDoc.titles || [];
+
+    if (titleReward) {
+        // ตรวจสอบว่าผู้เล่นเคยได้รับฉายานี้ไปแล้วหรือยัง
+        if (currentTitles.includes(titleReward)) {
+            titleCompensationBonus = 1000000; // ได้เงิน 1,000,000 แทนฉายาเดิม
+            updateData.points = increment(finalCoinReward + titleCompensationBonus);
+            alert(`🎉 คุณมีฉายา "${titleReward}" อยู่แล้ว! ระบบจึงเปลี่ยนฉายาเป็นเงินรางวัลมูลค่า 🪙 1,000,000 แทน`);
+        } else {
+            // ถ้ายังไม่เคยมี ให้ทำการเพิ่มฉายาใหม่เข้าไปใน Array
+            currentTitles.push(titleReward);
+            updateData.titles = currentTitles;
+            alert(`🎉 ยินดีด้วย! คุณได้รับฉายาใหม่: [${titleReward}]`);
+        }
+    }
+    // ==================================================================
+
     try {
-        await updateDoc(doc(db, "users", auth.currentUser.uid), {
-            points: increment(currentRank.reward.coin),
-            trophies: 0,
-            lastSeasonChecked: globalStartTime,
-            
-            // 2. เพิ่มฟิลด์นี้เข้าไปใน updateDoc เพื่อบันทึกลง Firestore
-            lastSeasonRank: rankString 
-        });
+        // อัปเดตข้อมูลลงฐานข้อมูล Firebase Firestore
+        await updateDoc(doc(db, "users", auth.currentUser.uid), updateData);
         
         toggleModal("seasonRewardModal", false);
-        alert("รับรางวัลสำเร็จ!");
+        alert("รับรางวัลประจำซีซั่นเสร็จสิ้นแล้ว!");
         
-        // 3. (แถม) เพิ่มบรรทัดนี้เพื่อให้หน้าโปรไฟล์อัปเดตทันทีหลังจากกดรับรางวัล
         if (typeof updateProfileUI === "function") { updateProfileUI(); }
 
     } catch (e) {
-        alert("เกิดข้อผิดพลาด");
+        console.error("Error claiming season reward:", e);
+        alert("เกิดข้อผิดพลาดในการรับรางวัล กรุณาลองใหม่อีกครั้ง");
     }
 }
     function updateUI() {
