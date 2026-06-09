@@ -66,6 +66,40 @@
         .pity-info { color: rgba(255,255,255,0.3); font-size: 0.7rem; font-weight: 400; text-align: right; }
         .banner-item::before { content: ""; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent); transition: 0.5s; z-index: 5; }
         .banner-item:hover::before { left: 150%; }
+
+        /* ==================== 🌟 ส่วนที่เพิ่ม/แก้ไขใหม่: ป้ายเพิ่มโอกาส (Rate Up Badge) 🌟 ==================== */
+        .rate-up-badge {
+            position: absolute;
+            top: 65px; /* อยู่ใต้ป้ายประเภทตู้พอดี */
+            left: 25px;
+            background: linear-gradient(135deg, #00ff87, #60efff);
+            color: #000;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 5px 15px rgba(0, 255, 135, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: floatArrow 1.5s ease-in-out infinite alternate;
+        }
+
+        /* แอนิเมชันลูกศรและป้ายขยับขึ้นลงเบาๆ ให้ดูมีไดนามิก */
+        @keyframes floatArrow {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-4px); }
+        }
+        .rate-up-badge i {
+            font-size: 0.8rem;
+            animation: arrowPush 0.8s ease-in-out infinite alternate;
+        }
+        @keyframes arrowPush {
+            0% { transform: scale(0.9); }
+            100% { transform: scale(1.2); }
+        }
     </style>
 </head>
 <body>
@@ -82,7 +116,7 @@
         <div class="announcement-board">
             <div class="ann-title"><i class="fas fa-star"></i> กิจกรรมใหม่</div>
             <div class="ann-text">
-                <span class="marquee">เพิ่มโอกาการ์ดระดับ USEC และ EXR มาง่ายขึ้นไปสู่มได้แล้ววันนี้ </span>
+                <span class="marquee">เพิ่มโอกาสการ์ดระดับ USEC และ EXR มาง่ายขึ้นไปสุ่มได้แล้ววันนี้ </span>
             </div>
         </div>
     </div>
@@ -91,44 +125,38 @@
         <h1>เลือกตู้ <span>เสี่ยงโชค</span></h1>
         <p class="subtitle">เลือกตู้ที่คุณต้องการเพื่อค้นหาการ์ดระดับ EXR และ USEC ในตำนาน</p>
         <div class="banner-grid">
-            <a href="random gacha6.html" class="banner-item">
-                <span class="banner-type type-event" style="background: linear-gradient(135deg, #ff4757, #ff6b81);">New</span>
-                <div class="banner-img-wrapper"><img src="https://pbs.twimg.com/profile_images/1623215070254866432/ACx-b_Dt_400x400.jpg" class="banner-img"></div>
+
+            <a href="random gacha7.html" class="banner-item">
+                <div class="rate-up-badge"><i class="fas fa-arrow-up"></i> เพิ่มโอกาสสำเร็จ!</div>
+                <span class="banner-type type-event" style="background: linear-gradient(135deg, #79ffd7, #64dbff);">Operation Timeguard การเวลาที่ไม่หยุดยิ่ง</span>
+                <div class="banner-img-wrapper"><img src="https://cookierunbraverse.com/data/en_storage/04Ahr1eXIerfTtIvinvqqA.webp" class="banner-img"></div>
                 <div class="banner-content">
-                    <h3 class="banner-title">Battle of Talingchan</h3>
-                    <p class="banner-desc">Battle of Talingchanสึกประชันใครคือสุดยอดพระเจ้า!!!!!</p>
-                    <div class="banner-footer">
-                        <span class="price-tag">🪙 100 <small style="font-size: 0.7rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
-                        <div class="pity-info">การันตี USEC ที่ 900 รอบ<br>การันตี SEC ที่ 550 รอบ</div>
-                    </div>
-                </div>
-            </a>
-             <a href="random gacha5.html" class="banner-item">
-                <span class="banner-type type-event" style="background: linear-gradient(135deg, #ff4757, #ff6b81);">New</span>
-                <div class="banner-img-wrapper"><img src="https://pbs.twimg.com/profile_images/1623215070254866432/ACx-b_Dt_400x400.jpg" class="banner-img"></div>
-                <div class="banner-content">
-                    <h3 class="banner-title">Battle of Talingchan</h3>
-                    <p class="banner-desc">Battle of Talingchanสึกประชันใครคือสุดยอดพระเจ้า!!!!!</p>
-                    <div class="banner-footer">
-                        <span class="price-tag">🪙 100 <small style="font-size: 0.7rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
-                        <div class="pity-info">การันตี USEC ที่ 900 รอบ<br>การันตี SEC ที่ 550 รอบ</div>
-                    </div>
-                </div>
-            </a>
-            <a href="random gacha.html" class="banner-item">
-                <span class="banner-type type-standard">Special Rate Up</span>
-                <div class="banner-img-wrapper"><img src="https://cookierunbraverse.com/data/en_storage/eXN_QVTcLFL7hr0_HG0jVg.webp" class="banner-img"></div>
-                <div class="banner-content">
-                    <h3 class="banner-title">The Awakened One of Truth</h3>
-                    <p class="banner-desc">Cookie Pure Vanilla ผู้ตื่นรู้แห่งความจริง และการเผชิญหน้ากับความเท็จของ Shadow Milk</p>
+                    <h3 class="banner-title">Operation Timeguard</h3>
+                    <p class="banner-desc">เส้นเวลาที่ไม่หยุดยิ่งอตีดและอนาคตกำลังรอคุรอยู่!!</p>
                     <div class="banner-footer">
                         <span class="price-tag">🪙 100 <small style="font-size: 0.7rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
                         <div class="pity-info">การันตี EXR ที่ 900 รอบ<br>การันตี SEC ที่ 550 รอบ</div>
                     </div>
                 </div>
             </a>
+
+            <a href="" class="banner-item">
+                <span class="banner-type type-event" style="background: linear-gradient(135deg, #79ffd7, #64dbff);">???</span>
+                <div class="banner-img-wrapper"><img src="https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/coming-soon.png" class="banner-img"></div>
+                <div class="banner-content">
+                    <h3 class="banner-title">coming soon</h3>
+                    <p class="banner-desc">coming soon</p>
+                    <div class="banner-footer">
+                        <span class="price-tag">🪙 ??? <small style="font-size: 0.7rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
+                        <div class="pity-info">???</div>
+                    </div>
+                </div>
+            </a>
+
             <a href="random gacha2.html" class="banner-item">
-                <span class="banner-type type-event">Dark Cacao</span>
+                <span class="banner-type type-event">New!!Dark Cacao</span>
+                <div class="rate-up-badge"><i class="fas fa-arrow-up"></i> เพิ่มโอกาสสำเร็จ!</div>
+
                 <div class="banner-img-wrapper"><img src="https://cookierunbraverse.com/data/en_storage/-UZDTp8mPp0-5ubqd_qcIg.webp" class="banner-img"></div>
                 <div class="banner-content">
                     <h3 class="banner-title">Shadows of the Battle</h3>
@@ -139,8 +167,56 @@
                     </div>
                 </div>
             </a>
+            
+            <a href="random gacha6.html" class="banner-item">
+                <span class="banner-type type-event" style="background: linear-gradient(135deg, #ff4757, #ff6b81);">Talingchan</span>
+                <div class="rate-up-badge"><i class="fas fa-arrow-up"></i> เพิ่มโอกาสสำเร็จ!</div>
+                
+                <div class="banner-img-wrapper"><img src="https://pbs.twimg.com/profile_images/1623215070254866432/ACx-b_Dt_400x400.jpg" class="banner-img"></div>
+                <div class="banner-content">
+                    <h3 class="banner-title">Battle of Talingchan</h3>
+                    <p class="banner-desc">Battle of Talingchan ศึกประชันใครคือสุดยอดพระเจ้า!!!!!</p>
+                    <div class="banner-footer">
+                        <span class="price-tag">🪙 100 <small style="font-size: 0.7rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
+                        <div class="pity-info">การันตี USEC ที่ 900 รอบ<br>การันตี SEC ที่ 550 รอบ</div>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="random gacha5.html" class="banner-item">
+                <span class="banner-type type-event" style="background: linear-gradient(135deg, #ff4757, #ff6b81);">Talingchan</span>
+                <div class="rate-up-badge"><i class="fas fa-arrow-up"></i> เพิ่มโอกาสสำเร็จ!</div>
+                
+                <div class="banner-img-wrapper"><img src="https://pbs.twimg.com/profile_images/1623215070254866432/ACx-b_Dt_400x400.jpg" class="banner-img"></div>
+                <div class="banner-content">
+                    <h3 class="banner-title">Battle of Talingchan</h3>
+                    <p class="banner-desc">Battle of Talingchan ศึกประชันใครคือสุดยอดพระเจ้า!!!!!</p>
+                    <div class="banner-footer">
+                        <span class="price-tag">🪙 100 <small style="font-size: 0.7rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
+                        <div class="pity-info">การันตี USEC ที่ 900 รอบ<br>การันตี SEC ที่ 550 รอบ</div>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="random gacha.html" class="banner-item">
+                <span class="banner-type type-standard">Welcome to the world of falsehood</span>
+                <div class="rate-up-badge"><i class="fas fa-arrow-up"></i> เพิ่มโอกาสสำเร็จ!</div>
+                
+                <div class="banner-img-wrapper"><img src="https://cookierunbraverse.com/data/en_storage/eXN_QVTcLFL7hr0_HG0jVg.webp" class="banner-img"></div>
+                <div class="banner-content">
+                    <h3 class="banner-title">The Awakened One of Truth</h3>
+                    <p class="banner-desc">Cookie Pure Vanilla ผู้ตื่นรู้แห่งความจริง และการเผชิญหน้ากับความเท็จของ Shadow Milk</p>
+                    <div class="banner-footer">
+                        <span class="price-tag">🪙 100 <small style="font-size: 0.7rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
+                        <div class="pity-info">การันตี EXR ที่ 900 รอบ<br>การันตี SEC ที่ 550 รอบ</div>
+                    </div>
+                </div>
+            </a>
+            
             <a href="random gacha3.html" class="banner-item">
                 <span class="banner-type type-event" style="background: linear-gradient(135deg, #79ffd7, #64dbff);">Arena of Glory</span>
+                <div class="rate-up-badge"><i class="fas fa-arrow-up"></i> เพิ่มโอกาสสำเร็จ!</div>
+
                 <div class="banner-img-wrapper"><img src="https://cookierunbraverse.com/data/en_storage/DNtDIrN3TmeWtjC_LAFoiA.webp" class="banner-img"></div>
                 <div class="banner-content">
                     <h3 class="banner-title">Arena of Glory</h3>
@@ -151,30 +227,7 @@
                     </div>
                 </div>
             </a>
-            <a href="empty-gacha.html" class="banner-item">
-                <span class="banner-type type-event" style="background: linear-gradient(135deg, #79ffd7, #64dbff);">???</span>
-                <div class="banner-img-wrapper"><img src="https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/coming-soon.png" class="banner-img"></div>
-                <div class="banner-content">
-                    <h3 class="banner-title">coming soon</h3>
-                    <p class="banner-desc">coming soon</p>
-                    <div class="banner-footer">
-                        <span class="price-tag">🪙 ??? <small style="font-size: 0.7rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
-                        <div class="pity-info">???</div>
-                    </div>
-                </div>
-            </a>
-            <a href="empty-gacha.html" class="banner-item">
-                <span class="banner-type type-event" style="background: linear-gradient(135deg, #79ffd7, #64dbff);">???</span>
-                <div class="banner-img-wrapper"><img src="https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/coming-soon.png" class="banner-img"></div>
-                <div class="banner-content">
-                    <h3 class="banner-title">coming soon</h3>
-                    <p class="banner-desc">coming soon</p>
-                    <div class="banner-footer">
-                        <span class="price-tag">🪙 ??? <small style="font-size: 0.7rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
-                        <div class="pity-info">???</div>
-                    </div>
-                </div>
-            </a>
+            
         </div>
     </div>
 
@@ -196,15 +249,12 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // ติดตามสถานะการเข้าสู่ระบบ
         onAuthStateChanged(auth, (user) => {
             const pointsElement = document.getElementById("nav-points");
             if (user) {
-                // เชื่อมต่อข้อมูลจาก Collection "users" ตาม UID
                 onSnapshot(doc(db, "users", user.uid), (snap) => {
                     if (snap.exists()) {
                         const userData = snap.data();
-                        // ตรวจสอบว่าใช้ชื่อ field 'points' หรือ 'point' (ดึงมาแสดงผล)
                         const currentPoints = userData.points || userData.point || 0;
                         pointsElement.innerText = currentPoints.toLocaleString();
                     } else {
@@ -216,7 +266,6 @@
                     pointsElement.innerText = "Error";
                 });
             } else {
-                // ถ้ายังไม่ได้ Login
                 pointsElement.innerText = "Guest";
             }
         });
