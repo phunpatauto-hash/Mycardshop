@@ -230,6 +230,13 @@
     const RARITY_POWER = { 'SECRET': { base: 8000, perLv: 9500 }, "P": { base: 5000, perLv: 1000 }, "USEC": { base: 8500, perLv: 6500 }, "EXR": { base: 4000, perLv: 2500 }, "CBR": { base: 6600, perLv: 4000 }, "SEC": { base: 3500, perLv: 2000 }, "SUR": { base: 3000, perLv: 1800 }, "SSR": { base: 2500, perLv: 1500 }, "PR": { base: 2000, perLv: 1500 }, "UR": { base: 1500, perLv: 1200 }, "SR": { base: 1000, perLv: 1000 }, "R": { base: 600, perLv: 800 }, "U": { base: 300, perLv: 500 }, "C": { base: 100, perLv: 300 } };
     const sellValuesBase = { 'SECRET': 99000, 'P': 10000, 'USEC': 90000, 'EXR': 55000, 'CBR': 50000, 'SEC': 25000, 'SUR': 15000, 'SSR': 15000, 'PR': 10000, 'UR': 1200, 'SR': 1000, 'R': 500, 'U': 200, 'C': 100 };
 
+    // ฐานข้อมูลรูปภาพรองรับการดึงข้อมูลอัตโนมัติจากการ์ดตู้ร้านค้า DIAMOND SHOP ลิมิเต็ด และโปรโมชั่นจำกัดเวลา
+    const SHOP_CARDS_ARTWORK = {
+        "Madeleine Cookie": "https://cookierunbraverse.com/data/en_storage/NzPPk1Xsrr-yPGfQWS_RBw.webp",
+        "Elder Faerie Cookie": "https://cookierunbraverse.com/data/en_storage/hImMNhdyGhIiH4RvujTudw.webp",
+        "Rambutan Cookie": "https://cookierunbraverse.com/data/en_storage/Wsr3Lhvv0OeAWXa_XQHDUQ.webp"
+    };
+
     const ACHIEVEMENTS_DATA = [
         { id: 'starter_collector', tier: 'easy', title: 'นักสะสมมือใหม่', desc: 'สะสมการ์ดไม่ซ้ำแบบให้ครบ 10 ใบ', goal: 10, reward: { points: 1000, diamonds: 10 } },
         { id: 'arena_starter', tier: 'easy', title: 'ผู้เริ่มต้นการต่อสู้', desc: 'ต่อสู้ใน Battle ARENA ครบ 10 ครั้ง', goal: 10, reward: { points: 500, diamonds: 5 } },
@@ -288,7 +295,41 @@
             onSnapshot(doc(db, "users", user.uid), (snap) => {
                 if (snap.exists()) {
                     const data = snap.data();
-                    userCards = (data.collection || []).map(c => ({...c, level: c.level || 1, stars: c.stars || 0, isLocked: c.isLocked || false}));
+                    
+                    // --- ⚙️ เริ่มการผสานระบบ Hybrid Sync ระหว่าง collection และ cards_inventory ---
+                    let rawCollection = data.collection || [];
+                    let cardsInventory = data.cards_inventory || {};
+
+                    // แปลงไอเทมในคลังสินค้า (cards_inventory) ทั้งจากหน้า DIAMOND SHOP และโปรโมชั่น ให้กลายเป็นการ์ดปกติ
+                    let parsedInventoryCards = [];
+                    for (const [cardName, quantity] of Object.entries(cardsInventory)) {
+                        if (quantity > 0) {
+                            // แตกตัวการ์ดออกตามจำนวนจริงที่มี เพื่อแยกเก็บสะสมซ้ำและแก้ไขบั๊กนับจำนวนให้ตรงกับความจริง
+                            for (let i = 0; i < quantity; i++) {
+                                parsedInventoryCards.push({
+                                    name: cardName,
+                                    rarity: "SUR", // ร้านค้าเพชรและโปรโมชั่นแจกการ์ดระดับ SUR เป็นหลัก
+                                    level: 1,
+                                    stars: 0,
+                                    isLocked: false,
+                                    img: SHOP_CARDS_ARTWORK[cardName] || "https://cookierunbraverse.com/data/en_storage/NzPPk1Xsrr-yPGfQWS_RBw.webp"
+                                });
+                            }
+                        }
+                    }
+
+                    // มัดรวมการ์ดทั่วไป, การ์ดจากระบบ Pass และการ์ดจากหน้าร้านค้า/โปรโมชั่นเข้าไว้ด้วยกันอย่างเป็นระบบ
+                    let combinedCards = [...rawCollection, ...parsedInventoryCards];
+
+                    // ตรวจสอบและแมปข้อมูลพื้นฐานของการ์ดทุกใบให้ครบถ้วนเพื่อความเสถียร
+                    userCards = combinedCards.map(c => ({
+                        ...c, 
+                        level: c.level || 1, 
+                        stars: c.stars || 0, 
+                        isLocked: c.isLocked || false,
+                        img: c.img || c.image
+                    }));
+                    
                     document.getElementById("nav-points").innerText = (data.points || 0).toLocaleString();
                     document.getElementById("nav-diamonds").innerText = (data.diamonds || 0).toLocaleString();
                     document.getElementById("display-username").innerText = data.username || "COLLECTOR";
@@ -303,11 +344,13 @@
         const grid = document.getElementById("grid");
         grid.innerHTML = "";
         const grouped = {};
+        
         userCards.forEach(card => {
             const key = `${card.name}_${(card.rarity||'C').toUpperCase()}`;
             if (!grouped[key]) grouped[key] = [];
             grouped[key].push(card);
         });
+        
         let displayList = [];
         for (const key in grouped) {
             const copies = grouped[key];
@@ -360,47 +403,46 @@
     }
 
     function checkAchProgress(ach, userData) {
-        const collection = userData.collection || [];
-        const uniqueCardsCount = new Set(collection.map(c => `${c.name}_${(c.rarity||'C').toUpperCase()}`)).size;
+        const uniqueCardsCount = new Set(userCards.map(c => `${c.name}_${(c.rarity||'C').toUpperCase()}`)).size;
         const points = userData.points || 0;
         const arenaCount = userData.arenaBattles || 0; 
         
         switch(ach.id) {
             case 'starter_collector': return Math.min(uniqueCardsCount, ach.goal);
             case 'expert_collector': return Math.min(uniqueCardsCount, ach.goal);
-            case 'lv80_easy': return collection.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;
-            case 'lv80_medium': return collection.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;
-            case 'lv80_hard': return collection.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;
-            case 'lv80_impossible': return collection.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;
-            case 'god_tier': return collection.some(c => ['USEC', 'EXR'].includes((c.rarity||'').toUpperCase())) ? 1 : 0;
-            case 'rainbow_master': return collection.some(c => (c.level||1) >= 80 && (c.stars||0) >= 5) ? 1 : 0;
+            case 'lv80_easy': return userCards.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;
+            case 'lv80_medium': return userCards.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;
+            case 'lv80_hard': return userCards.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;
+            case 'lv80_impossible': return userCards.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;
+            case 'god_tier': return userCards.some(c => ['USEC', 'EXR'].includes((c.rarity||'').toUpperCase())) ? 1 : 0;
+            case 'rainbow_master': return userCards.some(c => (c.level||1) >= 80 && (c.stars||0) >= 5) ? 1 : 0;
             case 'whale_secret_usec': 
-                return collection.filter(c => 
+                return userCards.filter(c => 
                     (c.rarity || '').toUpperCase() === 'USEC' && 
                     (c.level || 1) >= 80 && 
                     (c.stars || 0) >= 5
                 ).length;
             case 'whale_secret_exr': 
-                return collection.filter(c => 
+                return userCards.filter(c => 
                     (c.rarity || '').toUpperCase() === 'EXR' && 
                     (c.level || 1) >= 80 && 
                     (c.stars || 0) >= 5
                 ).length;
             case 'whale_secret_SECRET': 
-                return collection.filter(c => 
+                return userCards.filter(c => 
                     (c.rarity || '').toUpperCase() === 'SECRET' && 
                     (c.level || 1) >= 80 && 
                     (c.stars || 0) >= 5
                 ).length;
             case 'p_collector_secret':
-                return collection.some(c => (c.rarity || '').toUpperCase() === 'P') ? 1 : 0;
+                return userCards.some(c => (c.rarity || '').toUpperCase() === 'P') ? 1 : 0;
             case 'arena_starter':
             case 'arena_adept':
             case 'arena_expert':
             case 'arena_legend_secret':
                 return Math.min(arenaCount, ach.goal);
             case 'whale_secret_coins': return points >= ach.goal ? ach.goal : points;
-            case 'power_Full_Allcollector': return collection.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;
+            case 'power_Full_Allcollector': return userCards.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;
             case 'arena_divine': return Math.min(arenaCount, 500);
             default: return 0;
         }
@@ -478,7 +520,6 @@
         document.getElementById("reqQty").innerText = sameCards.length;
         document.getElementById("modalSellPrice").innerText = getDynamicSellValue(card).toLocaleString() + " 🪙";
 
-        // Setup Lock Button
         const lockBtn = document.getElementById("btnLockCard");
         if (card.isLocked) {
             lockBtn.innerText = "🔒 ล็อกอยู่";
@@ -512,14 +553,41 @@
         document.getElementById("cardModal").style.display = "flex";
     };
 
+    // 🔄 ฟังก์ชันบันทึกกลับระดับลึก: เซฟข้อมูลกลับเข้า DB โครงสร้างเดิมโดยแยกส่วนอย่างถูกต้องและปลอดภัย
+    async function saveStateToFirebase(updatedLocalCollection) {
+        const userDocRef = doc(db, "users", currentUID);
+        
+        let finalCollection = [];
+        let finalInventory = {};
+
+        updatedLocalCollection.forEach(card => {
+            // คัดแยกประเภทการ์ดที่เป็นไอเทมของตู้ DIAMOND SHOP หรือโปรโมชั่นจำกัดเวลา
+            if (card.rarity === "SUR" && SHOP_CARDS_ARTWORK[card.name]) {
+                // หากเป็นการ์ดเริ่มต้นดั้งเดิม (Lv.1 / 0 ดาว / ไม่ได้ล็อก) ให้เก็บกลับเข้าคลังร้านค้าตามเดิม
+                if (card.level === 1 && card.stars === 0 && !card.isLocked) {
+                    finalInventory[card.name] = (finalInventory[card.name] || 0) + 1;
+                } else {
+                    // แต่ถ้าผู้เล่นนำไปอัพเกรดหรือล็อกการ์ดไว้แล้ว ให้ดึงมาเซฟเข้าอาร์เรย์คลังหลักแยกเป็นใบเดี่ยว เพื่อความถูกต้อง
+                    finalCollection.push(card);
+                }
+            } else {
+                finalCollection.push(card);
+            }
+        });
+
+        await updateDoc(userDocRef, {
+            collection: finalCollection,
+            cards_inventory: finalInventory
+        });
+    }
+
     async function handleToggleLock(card) {
         let updated = [...userCards];
         const idx = updated.findIndex(c => c.name === card.name && (c.rarity||'').toUpperCase() === (card.rarity||'').toUpperCase() && c.level === card.level && c.stars === card.stars);
         if (idx > -1) {
             updated[idx].isLocked = !updated[idx].isLocked;
-            await updateDoc(doc(db, "users", currentUID), { collection: updated });
+            await saveStateToFirebase(updated);
             
-            // รีเฟรชสถานะปุ่มใน Modal ทันที
             const lockBtn = document.getElementById("btnLockCard");
             if (updated[idx].isLocked) {
                 lockBtn.innerText = "🔒 ล็อกอยู่";
@@ -537,11 +605,12 @@
         if (!userSnap.exists()) return;
         
         let data = userSnap.data();
-        let collection = [...(data.collection || [])];
         let currentPoints = data.points || 0;
         let currentDiamonds = data.diamonds || 0;
 
-        let mainIdx = collection.findIndex(c => c.name === card.name && (c.rarity||'').toUpperCase() === (card.rarity||'').toUpperCase() && (c.level||1) === card.level && (c.stars||0) === card.stars);
+        let localCollection = [...userCards];
+
+        let mainIdx = localCollection.findIndex(c => c.name === card.name && (c.rarity||'').toUpperCase() === (card.rarity||'').toUpperCase() && (c.level||1) === card.level && (c.stars||0) === card.stars);
         if (mainIdx === -1) return alert("ไม่พบการ์ดหลัก");
 
         let totalCostPoints = 0;
@@ -549,12 +618,11 @@
         let upgraded = false;
 
         if (type === 'LV' || type === 'BULK') {
-            while (collection[mainIdx].level < MAX_LV) {
-                const req = getUpgradeRequirements(collection[mainIdx]);
+            while (localCollection[mainIdx].level < MAX_LV) {
+                const req = getUpgradeRequirements(localCollection[mainIdx]);
                 let materialIndices = [];
-                for (let i = 0; i < collection.length; i++) {
-                    // วัตถุดิบในการอัปเกรดจะต้องไม่ถูกล็อกไว้ (isLocked !== true)
-                    if (i !== mainIdx && collection[i].name === card.name && (collection[i].rarity||'').toUpperCase() === (card.rarity||'').toUpperCase() && !collection[i].isLocked) {
+                for (let i = 0; i < localCollection.length; i++) {
+                    if (i !== mainIdx && localCollection[i].name === card.name && (localCollection[i].rarity||'').toUpperCase() === (card.rarity||'').toUpperCase() && !localCollection[i].isLocked) {
                         materialIndices.push(i);
                         if (materialIndices.length >= req.reqQty) break;
                     }
@@ -567,10 +635,10 @@
                     break;
                 }
                 materialIndices.sort((a, b) => b - a).forEach(idx => {
-                    collection.splice(idx, 1);
+                    localCollection.splice(idx, 1);
                     if (idx < mainIdx) mainIdx--;
                 });
-                collection[mainIdx].level = (collection[mainIdx].level || 1) + 1;
+                localCollection[mainIdx].level = (localCollection[mainIdx].level || 1) + 1;
                 totalCostPoints += req.cost;
                 upgraded = true;
                 if (type === 'LV') break;
@@ -578,8 +646,8 @@
         } else if (type === 'STAR') {
             let reqQty = 2;
             let materialIndices = [];
-            for (let i = 0; i < collection.length; i++) {
-                if (i !== mainIdx && collection[i].name === card.name && (collection[i].rarity||'').toUpperCase() === (card.rarity||'').toUpperCase() && !collection[i].isLocked) {
+            for (let i = 0; i < localCollection.length; i++) {
+                if (i !== mainIdx && localCollection[i].name === card.name && (localCollection[i].rarity||'').toUpperCase() === (card.rarity||'').toUpperCase() && !localCollection[i].isLocked) {
                     materialIndices.push(i);
                     if (materialIndices.length >= reqQty) break;
                 }
@@ -587,17 +655,17 @@
             if (materialIndices.length < reqQty) return alert("ต้องการใบซ้ำที่ไม่ได้ล็อก 2 ใบเพื่ออัปดาว");
             if (currentDiamonds < starCost) return alert("Diamonds ไม่พอ");
             materialIndices.sort((a, b) => b - a).forEach(idx => {
-                collection.splice(idx, 1);
+                localCollection.splice(idx, 1);
                 if (idx < mainIdx) mainIdx--;
             });
-            collection[mainIdx].stars = (collection[mainIdx].stars || 0) + 1;
+            localCollection[mainIdx].stars = (localCollection[mainIdx].stars || 0) + 1;
             totalCostDiamonds = starCost;
             upgraded = true;
         }
 
         if (upgraded) {
+            await saveStateToFirebase(localCollection);
             await updateDoc(userDocRef, { 
-                collection: collection, 
                 points: increment(-totalCostPoints),
                 diamonds: increment(-totalCostDiamonds)
             });
@@ -613,7 +681,8 @@
         if(idx > -1) {
             const gain = getDynamicSellValue(card);
             updated.splice(idx, 1);
-            await updateDoc(doc(db, "users", currentUID), { collection: updated, points: increment(gain) });
+            await saveStateToFirebase(updated);
+            await updateDoc(doc(db, "users", currentUID), { points: increment(gain) });
             document.getElementById("cardModal").style.display = "none";
         }
     }
@@ -631,10 +700,10 @@
             const copies = grouped[key];
             copies.sort((a, b) => ((b.stars||0)*100 + b.level) - ((a.stars||0)*100 + a.level));
             
-            newCollection.push(copies[0]); // ใบที่โหดสุดจะถูกเก็บไว้เสมอ
+            newCollection.push(copies[0]); 
             for (let i = 1; i < copies.length; i++) {
                 if (copies[i].isLocked) {
-                    newCollection.push(copies[i]); // ถ้าใบซ้ำถูกล็อกไว้ ระบบจะข้ามไม่เอาไปขาย
+                    newCollection.push(copies[i]); 
                 } else {
                     totalGain += getDynamicSellValue(copies[i]);
                     sellCount++;
@@ -642,7 +711,9 @@
             }
         }
         if (sellCount === 0) return alert("ไม่มีใบซ้ำที่ปลดล็อกเหลือให้ขาย");
-        await updateDoc(doc(db, "users", currentUID), { collection: newCollection, points: increment(totalGain) });
+        
+        await saveStateToFirebase(newCollection);
+        await updateDoc(doc(db, "users", currentUID), { points: increment(totalGain) });
         alert(`ขายการ์ดซ้ำสำเร็จทั้งหมด ${sellCount} ใบ ได้รับ ${totalGain.toLocaleString()} 🪙`);
     };
 
