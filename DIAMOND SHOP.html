@@ -61,7 +61,6 @@
             gap: 10px;
         }
         .section-title.offer { border-left-color: #ff9f00; text-shadow: 0 0 10px rgba(255,159,0,0.2); }
-        .section-title.limited { border-left-color: #ff4b2b; text-shadow: 0 0 10px rgba(255, 75, 43, 0.2); }
 
         /* Timer Board */
         .timer-board {
@@ -89,21 +88,6 @@
         .btn-instant-refresh:hover { transform: scale(1.05); box-shadow: 0 8px 20px rgba(255,200,49,0.5); }
         .btn-instant-refresh:disabled { background: #4a5568; color: #a0aec0; cursor: not-allowed; box-shadow: none; transform: none; }
 
-        /* Limited Time Banner Board */
-        .limited-timer-board {
-            background: rgba(255, 75, 43, 0.05);
-            border: 1px solid rgba(255, 75, 43, 0.3);
-            padding: 15px 25px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 5px 20px rgba(255, 75, 43, 0.1);
-        }
-        .limited-timer-title { font-size: 1.2rem; font-weight: bold; color: #ff4b2b; display: flex; align-items: center; gap: 10px; }
-        .limited-countdown { font-size: 1.5rem; font-weight: bold; color: #fff; font-family: monospace; background: rgba(0,0,0,0.3); padding: 5px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); }
-
         /* Shop Grid */
         .shop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 35px; justify-content: center; max-width: 1200px; margin: 0 auto 30px; }
         .shop-item { 
@@ -115,17 +99,6 @@
         .shop-item:hover { border-color: #00d4ff; transform: translateY(-5px); }
         .shop-item.offer-item:hover { border-color: #ff9f00; box-shadow: 0 15px 35px rgba(255,159,0,0.15); }
         
-        /* ⏰ ธีมกรอบเรืองแสงสีส้มแดงสำหรับโปรโมชั่นจำกัดเวลา */
-        .shop-item.limited-theme {
-            background: linear-gradient(145deg, #2b1212 0%, #140909 100%) !important;
-            border: 2px solid #ff4b2b !important;
-            box-shadow: 0 15px 40px rgba(255, 75, 43, 0.25), inset 0 0 20px rgba(255, 75, 43, 0.1) !important;
-        }
-        .shop-item.limited-theme:hover {
-            border-color: #ff6b50 !important;
-            box-shadow: 0 15px 45px rgba(255, 75, 43, 0.45) !important;
-        }
-
         /* 👑 ธีมกรอบเรืองแสงสีม่วงทองสำหรับแพ็คผู้ใหญ่ใจป๋า */
         .shop-item.whale-theme {
             background: linear-gradient(145deg, #1b1236 0%, #0e091f 100%) !important;
@@ -161,7 +134,6 @@
         .shop-item[data-type="vip-pack"] .item-icon-wrapper { border-color: #ff3366; box-shadow: inset 0 0 20px rgba(255, 51, 102, 0.2); }
         .shop-item[data-type="whale-pack"] .item-icon-wrapper { border-color: #a855f7; box-shadow: inset 0 0 25px rgba(168, 85, 247, 0.5); }
         .shop-item[data-type="beauty-pack"] .item-icon-wrapper { border-color: #00d4ff; box-shadow: inset 0 0 25px rgba(0, 212, 255, 0.5); }
-        .shop-item[data-type="limited-pack"] .item-icon-wrapper { border-color: #ff4b2b; box-shadow: inset 0 0 25px rgba(255, 75, 43, 0.5); overflow: hidden; }
         
         .ticket-icon { font-size: 4.5rem; }
         .multi-tickets { display: flex; position: relative; justify-content: center; align-items: center; width: 100%; height: 100%; }
@@ -194,12 +166,6 @@
         .beauty-pack-layout i.b-ticket-normal { position: absolute; font-size: 3.6rem; color: #cbd5e1; transform: rotate(-12deg) translateX(-15px) translateY(8px); z-index: 2; }
         .beauty-pack-layout i.b-ticket-premium { position: absolute; font-size: 3.9rem; color: #ffc831; transform: rotate(12deg) translateX(15px) translateY(4px); z-index: 3; filter: drop-shadow(0 0 10px rgba(255,200,49,0.4)); }
 
-        /* ⏰ ไอคอนสำหรับแพ็คจำกัดเวลา */
-        .limited-pack-layout { position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
-        .limited-pack-layout .l-card-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
-        .shop-item.limited-theme:hover .l-card-img { transform: scale(1.08); }
-        .limited-pack-layout .l-sur-badge { position: absolute; background: linear-gradient(45deg, #ff0055, #ff5500); color: white; font-size: 0.75rem; font-weight: bold; padding: 3px 8px; border-radius: 4px; bottom: 8px; right: 8px; z-index: 4; border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 0 10px rgba(255, 0, 85, 0.8); }
-
         .special-select-layout { position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
         .special-select-layout i.fa-id-card { position: absolute; font-size: 4.8rem; color: #00ff87; text-shadow: 0 0 20px rgba(0, 255, 135, 0.4); z-index: 1; transform: translateY(-5px); }
         .special-select-layout i.normal-front-t { position: absolute; font-size: 3.5rem; color: #cbd5e1; text-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 2; transform: rotate(-20deg) translateX(-25px) translateY(15px); }
@@ -215,7 +181,6 @@
         .shop-item.offer-item .price-box { color: #ff9f00; }
         .shop-item.whale-theme .price-box { color: #d8b4fe !important; text-shadow: 0 0 10px rgba(168,85,247,0.4); }
         .shop-item.beauty-theme .price-box { color: #93e9ff !important; text-shadow: 0 0 10px rgba(0,212,255,0.4); }
-        .shop-item.limited-theme .price-box { color: #ff8a75 !important; text-shadow: 0 0 10px rgba(255,75,43,0.4); }
         .original-price { font-size: 0.9rem; text-decoration: line-through; color: #718096; margin-left: 5px; font-weight: 400; }
 
         /* Quantity Selector */
@@ -242,10 +207,6 @@
         .shop-item.beauty-theme .btn-buy { background: linear-gradient(135deg, #00d4ff, #00a3ff) !important; color: white !important; }
         .shop-item.beauty-theme .btn-buy:hover { background: linear-gradient(135deg, #33e1ff, #33b5ff) !important; box-shadow: 0 0 15px rgba(0,212,255,0.6) !important; }
 
-        /* ปุ่มซื้อสไตล์จำกัดเวลา */
-        .shop-item.limited-theme .btn-buy { background: linear-gradient(135deg, #ff4b2b, #ff7b50) !important; color: white !important; }
-        .shop-item.limited-theme .btn-buy:hover { background: linear-gradient(135deg, #ff6344, #ff9068) !important; box-shadow: 0 0 15px rgba(255,75,43,0.6) !important; }
-
         .btn-buy:disabled { background: #2d3748 !important; color: #718096 !important; cursor: not-allowed; letter-spacing: normal; box-shadow: none !important; }
 
         /* Sold Out Overlays */
@@ -257,9 +218,6 @@
 
         .beauty-theme .sold-out-overlay { border-color: #00d4ff !important; }
         .beauty-theme .sold-out-text { color: #33e1ff !important; border-color: #33e1ff !important; }
-
-        .limited-theme .sold-out-overlay { border-color: #ff4b2b !important; }
-        .limited-theme .sold-out-text { color: #ff7b50 !important; border-color: #ff7b50 !important; }
     
         /* Modal Style (ทั่วไปสำหรับหน้าเลือกการ์ด) */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 1000; }
@@ -285,7 +243,7 @@
         .btn-confirm-select:disabled { background: #2d3748; color: #4a5568; cursor: not-allowed; box-shadow: none; transform: none; border: 1px solid rgba(255,255,255,0.05); }
 
         /* ============================================================ */
-        /* 🆕 NEW MODAL STYLES: แพ็คเกจรายละเอียดสินค้าแบบแยกฝั่ง (ซ้าย-ขวา) */
+        /* PACK-MODAL SYSTEM */
         /* ============================================================ */
         .pack-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); display: none; align-items: center; justify-content: center; z-index: 2000; }
         .pack-modal-container { 
@@ -332,24 +290,6 @@
         .card-preview-img-frame { width: 100%; aspect-ratio: 2/2.7; background: rgba(0,0,0,0.4); border-radius: 8px; overflow: hidden; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.03); }
         .card-preview-img-frame img { width: 100%; height: 100%; object-fit: cover; }
         .card-preview-name { font-size: 0.8rem; font-weight: bold; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* 🎫 สไตล์เพิ่มเติมสำหรับหมวดหมู่การ์ดจาก Pass */
-        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 35px; justify-content: center; max-width: 1200px; margin: 0 auto 30px; }
-        .pass-category-title { grid-column: 1 / -1; font-size: 1.5rem; color: #ffc831; margin-top: 40px; margin-bottom: 10px; border-left: 4px solid #ffc831; padding-left: 15px; text-shadow: 0 0 10px rgba(255, 200, 49, 0.3); }
-        
-        .card-sec { border: 2px solid #ff007f !important; box-shadow: 0 0 15px rgba(255, 0, 127, 0.3); background: linear-gradient(135deg, #160714 0%, #0c0d14 100%) !important; }
-        .badge-sec { background: linear-gradient(45deg, #ff007f, #7928ca); color: white; }
-        .card-ssr { border: 2px solid #ffd700 !important; box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); background: linear-gradient(135deg, #1a1505 0%, #0c0d14 100%) !important; }
-        .badge-ssr { background: linear-gradient(45deg, #ffd700, #f97316); color: white; }
-        .card-sr { border: 2px solid #a855f7 !important; box-shadow: 0 0 12px rgba(168, 85, 247, 0.2); background: linear-gradient(135deg, #0e071a 0%, #0c0d14 100%) !important; }
-        .badge-sr { background: linear-gradient(45deg, #a855f7, #6366f1); color: white; }
-
-        .pass-rarity-badge { position: absolute; top: 15px; right: 15px; padding: 3px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; letter-spacing: 1px; z-index: 2; }
-        .product-icon { width: 130px; height: 130px; background: rgba(0,0,0,0.3); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border: 2px solid rgba(255,255,255,0.05); position: relative; font-size: 4.5rem; overflow: hidden; }
-        .card-art { width: 100%; height: 100%; object-fit: cover; }
-        .card-sec .product-icon { border-color: #ff007f; box-shadow: inset 0 0 20px rgba(255, 0, 127, 0.2); text-shadow: 0 0 15px rgba(255, 0, 127, 0.4); }
-        .card-ssr .product-icon { border-color: #ffd700; box-shadow: inset 0 0 20px rgba(255, 215, 0, 0.2); text-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
-        .card-sr .product-icon { border-color: #a855f7; box-shadow: inset 0 0 20px rgba(168, 85, 247, 0.2); text-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
     </style>
 </head>
 <body>
@@ -374,15 +314,6 @@
                 <i class="fas fa-bolt"></i> รีสต็อกสินค้าทันที (ใช้ 💎 10,000)
             </button>
         </div>
-
-        <!-- ==================== 🔥 NEW SECTION: โปรโมชั่นจำกัดเวลา (1 เดือน) 🔥 ==================== -->
-        <div class="section-title limited"><i class="fas fa-clock"></i> หมวดหมู่: โปรโมชั่นจำกัดเวลา (ซื้อได้ครั้งเดียว)</div>
-        <div class="limited-timer-board">
-            <div class="limited-timer-title"><i class="fas fa-hourglass-half fa-spin"></i> สิ้นสุดโปรโมชั่นพิเศษนี้ภายใน:</div>
-            <div class="limited-countdown" id="limited-promo-timer">00วัน 00ชม. 00นาที 00วิ</div>
-        </div>
-        
-        <div class="shop-grid" id="limited-promo-grid"></div>
 
         <!-- ==================== SECTION 1: ตั๋วสุ่มแยกใบ ==================== -->
         <div class="section-title"><i class="fas fa-ticket-alt"></i> ตั๋วสุ่มแยกใบ</div>
@@ -443,7 +374,7 @@
                 <p class="item-desc">รับตั๋วสุ่มทั่วไป <span style="color:#00d4ff; font-weight:bold;">x550 ใบ</span>, ตั๋วพรีเมี่ยม <span style="color:#ffc831; font-weight:bold;">x330 ใบ</span> มัดรวมพร้อม <span style="color:#00ff87; font-weight:bold;">"พื้นหลังลายเพชรไหลลงมา"</span> และ <span style="color:#33e1ff; font-weight:bold;">"กรอบโปรไฟล์สีฟ้าสุดหรู"</span></p>
                 <div class="item-stock" style="color: #00d4ff;">สิทธิ์การซื้อ: <span id="stock-pack-beauty-text" style="color:#ff3366;">1</span> ครั้งเท่านั้น</div>
                 <div class="price-box">💎 1,290,000</div>
-                <button class="btn-buy" id="btn-buy-pack-beauty">ซื้อแพ็คความสวยงาม</button>
+                <button class="btn-buy" id="btn-buy-pack-beauty" onclick="event.stopPropagation(); buyOneTimeBeautyPack()">ซื้อแพ็คความสวยงาม</button>
             </div>
 
             <!-- 👑 แพ็คผู้ใหญ่ใจป๋า -->
@@ -461,7 +392,7 @@
                 <p class="item-desc">รับตั๋วสุ่มทั่วไป <span style="color:#00d4ff; font-weight:bold;">x1,100 ใบ</span>, ตั๋วพรีเมี่ยม <span style="color:#ffc831; font-weight:bold;">x990 ใบ</span> พร้อมรับฉายาพิเศษ <span style="color:#00ff87; font-weight:bold;">"ผู้ใหญ่ใจบุญ"</span></p>
                 <div class="item-stock" style="color: #c084fc;">สิทธิ์การซื้อ: <span id="stock-pack-daddy-text" style="color:#ff3366;">1</span> ครั้งเท่านั้น</div>
                 <div class="price-box">💎 1,500,000</div>
-                <button class="btn-buy" id="btn-buy-pack-daddy">ซื้อแพ็คผู้ใหญ่ใจป๋า</button>
+                <button class="btn-buy" id="btn-buy-pack-daddy" onclick="event.stopPropagation(); buyOneTimeWhalePack()">ซื้อแพ็คผู้ใหญ่ใจป๋า</button>
             </div>
 
             <!-- แพ็คตั๋วทั่วไป x10 ใบ -->
@@ -478,7 +409,7 @@
                 <p class="item-desc">เหมาะสำหรับการเปิดกิ๊ฟต์เซ็ตชุดใหญ่ การันตียกแพ็คในราคาที่ถูกลง</p>
                 <div class="item-stock">คงเหลือ: <span id="stock-pack-normal-text">5</span>/5 แพ็ค</div>
                 <div class="price-box">💎 10,200 <span class="original-price">💎12,000</span></div>
-                <button class="btn-buy" id="btn-buy-pack-normal">ซื้อแพ็คเกจ</button>
+                <div class="btn-buy" id="btn-buy-pack-normal" onclick="event.stopPropagation(); buyItem('pack_normal_10', 10200, 10)">ซื้อแพ็คเกจ</div>
             </div>
 
             <!-- แพ็คคู่หู Starter Combo -->
@@ -495,7 +426,7 @@
                 <p class="item-desc">ได้รับตั๋วทั่วไป x3 ใบ และ ตั๋วพรีเมียม x1 ใบ มัดรวมราคาพิเศษสุด!</p>
                 <div class="item-stock">คงเหลือ: <span id="stock-pack-combo-text">3</span>/3 แพ็ค</div>
                 <div class="price-box">💎 5,900 <span class="original-price">💎7,100</span></div>
-                <button class="btn-buy" id="btn-buy-pack-combo">ซื้อแพ็คเกจ</button>
+                <button class="btn-buy" id="btn-buy-pack-combo" onclick="event.stopPropagation(); buyItem('pack_combo', 5900, 1)">ซื้อแพ็คเกจ</button>
             </div>
 
             <!-- Super Pack -->
@@ -512,7 +443,7 @@
                 <p class="item-desc">มัดรวมเซ็ตใหญ่! รับตั๋วทั่วไป <span style="color:#00d4ff; font-weight:bold;">x100 ใบ</span> และตั๋วพรีเมียม <span style="color:#ffc831; font-weight:bold;">x50 ใบ</span></p>
                 <div class="item-stock">คงเหลือ: <span id="stock-pack-super-text">3</span>/3 แพ็ค</div>
                 <div class="price-box">💎 220,000</div>
-                <button class="btn-buy" id="btn-buy-pack-super">ซื้อซูเปอร์แพ็ค</button>
+                <button class="btn-buy" id="btn-buy-pack-super" onclick="event.stopPropagation(); buyItem('pack_super', 220000, 1)">ซื้อซูเปอร์แพ็ค</button>
             </div>
 
             <!-- Mega Pack -->
@@ -531,7 +462,7 @@
                 <p class="item-desc">คลังแสงตั๋วถล่มทลาย! ตั๋วทั่วไป <span style="color:#00d4ff; font-weight:bold;">x500 ใบ</span> และตั๋วพรีเมียม <span style="color:#ffc831; font-weight:bold;">x150 ใบ</span></p>
                 <div class="item-stock">คงเหลือ: <span id="stock-pack-mega-text">3</span>/3 แพ็ค</div>
                 <div class="price-box">💎 850,000</div>
-                <button class="btn-buy" id="btn-buy-pack-mega">ซื้อเมกาแพ็ค</button>
+                <button class="btn-buy" id="btn-buy-pack-mega" onclick="event.stopPropagation(); buyItem('pack_mega', 850000, 1)">ซื้อเมกาแพ็ค</button>
             </div>
 
             <!-- Special Pack -->
@@ -549,55 +480,12 @@
                 <p class="item-desc">ตั๋วทั่วไป <span style="color:#00d4ff; font-weight:bold;">x550 ใบ</span> + พรีเมียม <span style="color:#ffc831; font-weight:bold;">x150 ใบ</span> พร้อมเลือกรับการ์ดระดับ SUR 1 ใบ</p>
                 <div class="item-stock">คงเหลือ: <span id="stock-pack-special-select-text">4</span>/4 แพ็ค</div>
                 <div class="price-box">💎 990,000</div>
-                <button class="btn-buy" id="btn-buy-pack-special-select">ซื้อแพ็คเกจเลือกการ์ด</button>
-            </div>
-        </div>
-
-        <!-- ==================== SECTION 3: การ์ดจาก Pass EXCLUSIVE ==================== -->
-        <div class="section-title" style="color: #ffc831;"><i class="fas fa-id-card"></i> หมวดหมู่: การ์ดจาก Pass EXCLUSIVE</div>
-        <div class="card-grid">
-            <!-- Card 1: SEC -->
-            <div class="shop-item card-sec" onclick="buyPassCard('pass_card_sec', 5000, 'SEC', 'stock-pass-sec')">
-                <div class="pass-rarity-badge badge-sec">SEC</div>
-                <div class="product-icon">
-                    <img src="https://cookierunbraverse.com/data/en_storage/9xGtHu8TqLH6eMRVCj0rBg.webp" alt="การ์ดรางวัล Pass (SEC)" class="card-art">
-                </div>
-                <h3 class="item-title">การ์ดรางวัล Pass (SEC)</h3>
-                <p class="item-desc">การ์ดระดับ(SEC)จากแบทเทิลพาสประจำซีซัน1"ดินแดนที่สงบ"</p>
-                <p class="item-stock">สิทธิ์คงเหลือวันนี้: <span id="stock-pass-sec">300</span> ชิ้น</p>
-                <div class="price-box">💎 5,000</div>
-                <button class="btn-buy" id="btn-buy-pass-sec">ซื้อการ์ด</button>
-            </div>
-
-            <!-- Card 2: SSR -->
-            <div class="shop-item card-ssr" onclick="buyPassCard('pass_card_ssr', 2500, 'SSR', 'stock-pass-ssr')">
-                <div class="pass-rarity-badge badge-ssr">SSR</div>
-                <div class="product-icon">
-                    <img src="https://cookierunbraverse.com/data/en_storage/Zjseu_FlFypzT3-hXxMdBA.webp" alt="การ์ดรางวัล Pass (SSR)" class="card-art">
-                </div>
-                <h3 class="item-title">การ์ดรางวัล Pass (SSR)</h3>
-                <p class="item-desc">การ์ดระดับ(SSR)จากแบทเทิลพาสประจำซีซัน1"ดินแดนที่สงบ"</p>
-                <p class="item-stock">สิทธิ์คงเหลือวันนี้: <span id="stock-pass-ssr">300</span> ชิ้น</p>
-                <div class="price-box">💎 2,500</div>
-                <button class="btn-buy" id="btn-buy-pass-ssr" style="background: linear-gradient(135deg, #ffd700, #f97316); color: black;">ซื้อการ์ด</button>
-            </div>
-
-            <!-- Card 3: SR -->
-            <div class="shop-item card-sr" onclick="buyPassCard('pass_card_sr', 1000, 'SR', 'stock-pass-sr')">
-                <div class="pass-rarity-badge badge-sr">SR</div>
-                <div class="product-icon">
-                    <img src="https://cookierunbraverse.com/data/en_storage/9dSROSHeCW45pKTUSOYTCQ.webp" alt="การ์ดรางวัล Pass (SR)" class="card-art">
-                </div>
-                <h3 class="item-title">การ์ดรางวัล Pass (SR)</h3>
-                <p class="item-desc">การ์ดระดับ(SR)จากแบทเทิลพาสประจำซีซัน1"ดินแดนที่สงบ"</p>
-                <p class="item-stock">สิทธิ์คงเหลือวันนี้: <span id="stock-pass-sr">300</span> ชิ้น</p>
-                <div class="price-box">💎 1,000</div>
-                <button class="btn-buy" id="btn-buy-pass-sr" style="background: linear-gradient(135deg, #a855f7, #6366f1); color: white;">ซื้อการ์ด</button>
+                <button class="btn-buy" id="btn-buy-pack-special-select" onclick="event.stopPropagation(); buyItem('pack_special_select', 990000, 1)">ซื้อแพ็คเกจเลือกการ์ด</button>
             </div>
         </div>
     </div>
 
-    <!-- ==================== 🆕 NEW POP-UP: หน้าต่างแสดงรายละเอียดสินค้าตอนกดที่แพ็ค ==================== -->
+    <!-- ==================== POP-UP: หน้าต่างแสดงรายละเอียดสินค้าตอนกดที่แพ็ค ==================== -->
     <div class="pack-modal-overlay" id="pack-detail-modal" onclick="closePackDetailModal()">
         <div class="pack-modal-container" onclick="event.stopPropagation()">
             <div class="close-pack-modal" onclick="closePackDetailModal()">&times;</div>
@@ -606,9 +494,7 @@
                 <!-- 📦 ฝั่งซ้าย: ของที่จะได้รับทั้งหมด -->
                 <div class="pack-modal-left">
                     <div class="pack-modal-left-title"><i class="fas fa-box-open"></i> ไอเทมที่คุณจะได้รับทั้งหมด</div>
-                    <div class="rewards-list-grid" id="pack-rewards-display">
-                        <!-- โครงสร้างไอเทมตัวอย่าง (Render โดย JS แบบไดนามิก) -->
-                    </div>
+                    <div class="rewards-list-grid" id="pack-rewards-display"></div>
                 </div>
                 
                 <!-- 📝 ฝั่งขวา: รายละเอียดสินค้าและปุ่มซื้อ -->
@@ -629,32 +515,28 @@
                 </div>
             </div>
 
-            <!-- 🃏 ส่วนล่าง: ช่องใส่การ์ดเพิ่ม 4 รูปพร้อมชื่อ (คุณสามารถนำไปใส่ src รูปและการ์ดเองได้ตามใจชอบ) -->
+            <!-- 🃏 ส่วนล่าง: ช่องใส่การ์ดเพิ่ม 4 รูปพร้อมชื่อ -->
             <div class="pack-modal-bottom-cards">
                 <div class="pack-modal-bottom-title"><i class="fas fa-images"></i> รายชื่อการ์ดแถมพิเศษภายในตู้นี้ (4 ลาย)</div>
                 <div class="cards-preview-grid">
-                    <!-- การ์ดใบที่ 1 -->
                     <div class="card-preview-slot">
                         <div class="card-preview-img-frame">
                             <img src="https://cookierunbraverse.com/data/en_storage/WxI7hREeWwwuAN_MsApBAQ.webp" alt="Card 1">
                         </div>
                         <div class="card-preview-name">Timekeeper Cookie(RED) (SUR)</div>
                     </div>
-                    <!-- การ์ดใบที่ 2 -->
                     <div class="card-preview-slot">
                         <div class="card-preview-img-frame">
                             <img src="https://cookierunbraverse.com/data/en_storage/QQpFIFtz2H_QQTalhH7e3g.webp" alt="Card 2">
                         </div>
                         <div class="card-preview-name">Timekeeper Cookie(YELLOW) (SUR)</div>
                     </div>
-                    <!-- การ์ดใบที่ 3 -->
                     <div class="card-preview-slot">
                         <div class="card-preview-img-frame">
                             <img src="https://cookierunbraverse.com/data/en_storage/kbr0TRQ4vjQsPAmGKqyW2Q.webp" alt="Card 3">
                         </div>
                         <div class="card-preview-name">Timekeeper Cookie(GREEN) (SUR)</div>
                     </div>
-                    <!-- การ์ดใบที่ 4 -->
                     <div class="card-preview-slot">
                         <div class="card-preview-img-frame">
                             <img src="https://cookierunbraverse.com/data/en_storage/1GZuxasYChokPNKC_29SwA.webp" alt="Card 4">
@@ -727,12 +609,10 @@
 
         let currentUser = null;
         let userDiamonds = 0;
+        let diamondFieldKey = "diamonds";
         let hasPurchasedDaddyPack = false;
         let hasPurchasedBeautyPack = false; 
         let selectedCardName = "";
-        
-        let hasBoughtNewLaunchVo1 = false;
-        let hasBoughtNewLaunchVo2 = false;
 
         const DEFAULT_STOCK = { 
             normal: 50, 
@@ -750,135 +630,31 @@
         const DADDY_PACK_PRICE = 1500000;
         const BEAUTY_PACK_PRICE = 1290000; 
 
-        // ============================================================
-        // 🛠️ ฟังก์ชันสร้าง HTML แสดงผลแพ็คโปรโมชั่นแบบไดนามิก (Vo.1 / Vo.2) พร้อมระบบเปิดรายละเอียด Popup
-        // ============================================================
-        function renderLimitedPromoPack() {
-            const container = document.getElementById("limited-promo-grid");
-            if (!container) return;
-            
-            let htmlContent = "";
-
-            if (!hasBoughtNewLaunchVo1) {
-                htmlContent = `
-                    <div class="shop-item limited-theme" data-type="limited-pack" id="item-new-launch-vo1" onclick="openPackDetailModal(1, 650000)">
-                        <div class="sold-out-overlay" id="sold-new-launch-vo1"><div class="sold-out-text">ซื้อแล้ว</div></div>
-                        <span style="position:absolute; top:15px; right:15px; background:linear-gradient(135deg, #ff4b2b, #ff7b50); color:#fff; padding:5px 12px; border-radius:8px; font-size:0.75rem; font-weight:bold; z-index: 6;">จำกัด 1 ครั้ง</span>
-                        <div class="item-icon-wrapper">
-                            <div class="limited-pack-layout">
-                                <img src="https://cookierunbraverse.com/data/en_storage/WxI7hREeWwwuAN_MsApBAQ.webp" alt="New Launch Vo.1" class="l-card-img">
-                                <span class="l-sur-badge">ตู้ใหม่ Vo.1</span>
-                            </div>
-                        </div>
-                        <h3 class="item-title" style="color: #ff8a75;">แพ็คฉลองเปิดตัวตู้ใหม่ Vo.1</h3>
-                        <p class="item-desc">รับตั๋วปกติ <span style="color:#00d4ff; font-weight:bold;">400 ใบ</span>, ตั๋วพรีเมี่ยม <span style="color:#ffc831; font-weight:bold;">150 ใบ</span> และการ์ดของตู้ <span style="color:#00ff87; font-weight:bold;">250 ใบ (4 ลาย)</span></p>
-                        <div class="price-box">💎 650,000</div>
-                        <button class="btn-buy" id="btn-buy-new-launch-vo1" onclick="event.stopPropagation(); openPackDetailModal(1, 650000)">ดูรายละเอียดสินค้า</button>
-                    </div>
-                `;
-            } else if (!hasBoughtNewLaunchVo2) {
-                htmlContent = `
-                    <div class="shop-item limited-theme" data-type="limited-pack" id="item-new-launch-vo2" onclick="openPackDetailModal(2, 1200000)">
-                        <div class="sold-out-overlay" id="sold-new-launch-vo2"><div class="sold-out-text">ซื้อแล้ว</div></div>
-                        <span style="position:absolute; top:15px; right:15px; background:linear-gradient(135deg, #ff9f00, #ffc831); color:#000; padding:5px 12px; border-radius:8px; font-size:0.75rem; font-weight:bold; z-index: 6;">ข้อเสนอถัดไป!</span>
-                        <div class="item-icon-wrapper">
-                            <div class="limited-pack-layout">
-                                <img src="https://cookierunbraverse.com/data/en_storage/WxI7hREeWwwuAN_MsApBAQ.webp" alt="New Launch Vo.2" class="l-card-img">
-                                <span class="l-sur-badge" style="background:linear-gradient(45deg,#ff9f00,#ffc831); color:#000;">ตู้ใหม่ Vo.2</span>
-                            </div>
-                        </div>
-                        <h3 class="item-title" style="color: #ffb333;">แพ็คฉลองเปิดตัวตู้ใหม่ Vo.2</h3>
-                        <p class="item-desc">รับตั๋วปกติ <span style="color:#00d4ff; font-weight:bold;">990 ใบ</span>, ตั๋วพรีเมี่ยม <span style="color:#ffc831; font-weight:bold;">770 ใบ</span> และการ์ดของตู้ <span style="color:#00ff87; font-weight:bold;">300 ใบ (4 ลาย)</span></p>
-                        <div class="price-box">💎 1,200,000</div>
-                        <button class="btn-buy" id="btn-buy-new-launch-vo2" onclick="event.stopPropagation(); openPackDetailModal(2, 1200000)">ดูรายละเอียดสินค้า</button>
-                    </div>
-                `;
-            } else {
-                htmlContent = `
-                    <div style="grid-column: 1 / -1; padding: 40px; background: rgba(255,255,255,0.02); border-radius: 20px; border: 1px dashed rgba(255,255,255,0.1); color: #a0aec0;">
-                        🎉 คุณได้สิทธิ์ซื้อแพ็คฉลองเปิดตัวตู้ใหม่ครบทุกระดับซีรีส์แล้วขอบคุณสำหรับการสนับสนุน!
-                    </div>
-                `;
-            }
-
-            container.innerHTML = htmlContent;
-        }
-
-        // ============================================================
-        // 🆕 NEW FUNCTIONS: ควบคุมการเปิด/ปิด และส่งค่าไปยังกล่องรายละเอียดสินค้าแบบฝั่งซ้าย-ขวา
-        // ============================================================
-        window.openPackDetailModal = function(version, price) {
-            let normalTickets = version === 1 ? 400 : 990;
-            let premiumTickets = version === 1 ? 150 : 770;
-            let cardCount = version === 1 ? 250 : 300;
-
-            document.getElementById("pack-popup-title").innerText = `แพ็คฉลองเปิดตัวตู้ใหม่ Vo.${version}`;
-            document.getElementById("pack-popup-badge").innerText = version === 1 ? "โปรโมชั่นจำกัดเวลา" : "ข้อเสนอพิเศษต่อเนื่อง";
-            document.getElementById("pack-popup-desc").innerText = `แพ็คเกจเฉลิมฉลองสุดพิเศษสำหรับการเปิดตัวเซ็ตการ์ดชุดใหม่ล่าสุด มัดรวมไอเทมที่จะช่วยให้คุณจัดเด็คได้เร็วขึ้น ประกอบไปด้วยตั๋วสุ่มจำนวนมาก และการ์ดประจำตู้ลายพิเศษที่มีโอกาสได้รับระดับสูงทันที!`;
-            document.getElementById("pack-popup-price").innerText = `💎 ${price.toLocaleString()}`;
-            
-            // Render ไอเทมฝั่งซ้ายแบบกล่องสไตล์โมเดิร์น
-            const rewardsContainer = document.getElementById("pack-rewards-display");
-            rewardsContainer.innerHTML = `
-                <div class="reward-item-box">
-                    <div class="reward-item-icon" style="color: #cbd5e1;"><i class="fas fa-ticket-alt"></i></div>
-                    <div class="reward-item-info">
-                        <div class="reward-item-name">ตั๋วสุ่มทั่วไป</div>
-                        <div class="reward-item-qty">x${normalTickets} ใบ</div>
-                    </div>
-                </div>
-                <div class="reward-item-box">
-                    <div class="reward-item-icon" style="color: #ffc831;"><i class="fas fa-ticket-alt"></i></div>
-                    <div class="reward-item-info">
-                        <div class="reward-item-name">ตั๋วสุ่มพรีเมียม</div>
-                        <div class="reward-item-qty">x${premiumTickets} ใบ</div>
-                    </div>
-                </div>
-                <div class="reward-item-box" style="grid-column: 1 / -1;">
-                    <div class="reward-item-icon" style="color: #00ff87;"><i class="fas fa-id-card"></i></div>
-                    <div class="reward-item-info">
-                        <div class="reward-item-name">การ์ดสุ่มพิเศษประจำตู้ (คละแบบ)</div>
-                        <div class="reward-item-qty">x${cardCount} ใบ</div>
-                    </div>
-                </div>
-            `;
-
-            // กำหนด Event ปุ่มกดซื้อในหน้าพรีวิวให้ผูกกับฟังชั่นซื้อตัวจริง
-            const buyBtn = document.getElementById("btn-pack-popup-confirm");
-            buyBtn.onclick = function() {
-                closePackDetailModal();
-                buyNewLaunchPack(version, price);
-            };
-
-            document.getElementById("pack-detail-modal").style.display = "flex";
-        }
-
-        window.closePackDetailModal = function() {
-            document.getElementById("pack-detail-modal").style.display = "none";
-        }
-
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
                 onSnapshot(doc(db, "users", user.uid), (snap) => {
                     if (snap.exists()) {
                         const data = snap.data();
-                        
                         const currentPoints = data.points !== undefined ? data.points : (data.point !== undefined ? data.point : 0);
                         document.getElementById("nav-points").innerText = currentPoints.toLocaleString();
                         
-                        userDiamonds = data.diamonds !== undefined ? data.diamonds : (data.diamond !== undefined ? data.diamond : 50000);
+                        if (data.diamonds !== undefined) {
+                            userDiamonds = data.diamonds;
+                            diamondFieldKey = "diamonds";
+                        } else if (data.diamond !== undefined) {
+                            userDiamonds = data.diamond;
+                            diamondFieldKey = "diamond";
+                        } else {
+                            userDiamonds = 0;
+                            diamondFieldKey = "diamonds";
+                        }
+                        
                         document.getElementById("nav-diamonds").innerText = userDiamonds.toLocaleString();
-
                         hasPurchasedDaddyPack = data.bought_daddy_pack === true;
                         hasPurchasedBeautyPack = data.bought_beauty_pack === true; 
-                        
-                        hasBoughtNewLaunchVo1 = data.bought_new_launch_vo1 === true;
-                        hasBoughtNewLaunchVo2 = data.bought_new_launch_vo2 === true;
 
                         updateUI();
-                        updatePassCardsUI();
-                        renderLimitedPromoPack();
                     }
                 });
             } else {
@@ -889,7 +665,6 @@
 
         const RESTOCK_TIME_KEY = "gacha_shop_restock_target";
         const STOCK_KEY = "gacha_shop_current_stock_v3";
-        const LIMITED_PROMO_TIME_KEY = "gacha_shop_limited_promo_target";
 
         function initShopSystem() {
             const savedStock = localStorage.getItem(STOCK_KEY);
@@ -905,21 +680,9 @@
                 localStorage.setItem(RESTOCK_TIME_KEY, targetTime);
             }
 
-            let limitedTargetTime = localStorage.getItem(LIMITED_PROMO_TIME_KEY);
-            if (!limitedTargetTime) {
-                limitedTargetTime = Date.now() + (30 * 24 * 60 * 60 * 1000); 
-                localStorage.setItem(LIMITED_PROMO_TIME_KEY, limitedTargetTime);
-            }
-
-            if (localStorage.getItem("stock_pass_card_sec") === null) localStorage.setItem("stock_pass_card_sec", 300);
-            if (localStorage.getItem("stock_pass_card_ssr") === null) localStorage.setItem("stock_pass_card_ssr", 300);
-            if (localStorage.getItem("stock_pass_card_sr") === null) localStorage.setItem("stock_pass_card_sr", 300);
-
             updateUI();
             updateNormalPriceUI();
             updatePremiumPriceUI();
-            updatePassCardsUI();
-            renderLimitedPromoPack();
             
             setInterval(() => {
                 const now = Date.now();
@@ -931,26 +694,8 @@
                     const hours = Math.floor(distance / (1000 * 60 * 60));
                     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
                     document.getElementById("restock-timer").innerText = 
                         `${hours.toString().padStart(2,'0')}ชม. ${minutes.toString().padStart(2,'0')}นาที ${seconds.toString().padStart(2,'0')}วิ`;
-                }
-
-                const limitedDistance = limitedTargetTime - now;
-                if (limitedDistance <= 0) {
-                    document.getElementById("limited-promo-timer").innerText = "หมดเวลาโปรโมชั่นแล้ว";
-                    const btnVo1 = document.getElementById('btn-buy-new-launch-vo1');
-                    const btnVo2 = document.getElementById('btn-buy-new-launch-vo2');
-                    if(btnVo1) btnVo1.disabled = true;
-                    if(btnVo2) btnVo2.disabled = true;
-                } else {
-                    const lDays = Math.floor(limitedDistance / (1000 * 60 * 60 * 24));
-                    const lHours = Math.floor((limitedDistance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const lMinutes = Math.floor((limitedDistance % (1000 * 60 * 60)) / (1000 * 60));
-                    const lSeconds = Math.floor((limitedDistance % (1000 * 60)) / 1000);
-
-                    document.getElementById("limited-promo-timer").innerText = 
-                        `${lDays}วัน ${lHours.toString().padStart(2,'0')}ชม. ${lMinutes.toString().padStart(2,'0')}นาที ${lSeconds.toString().padStart(2,'0')}วิ`;
                 }
             }, 1000);
         }
@@ -958,13 +703,8 @@
         function restockProducts() {
             currentStock = { ...DEFAULT_STOCK };
             localStorage.setItem(STOCK_KEY, JSON.stringify(currentStock));
-            
             const newTarget = Date.now() + (1 * 24 * 60 * 60 * 1000);
             localStorage.setItem(RESTOCK_TIME_KEY, newTarget);
-            
-            localStorage.setItem("stock_pass_card_sec", 300);
-            localStorage.setItem("stock_pass_card_ssr", 300);
-            localStorage.setItem("stock_pass_card_sr", 300);
 
             document.getElementById("custom-qty-input").value = 1;
             document.getElementById("premium-qty-input").value = 1;
@@ -972,8 +712,7 @@
             updateUI();
             updateNormalPriceUI();
             updatePremiumPriceUI();
-            updatePassCardsUI();
-            alert("📦 สินค้าปกติและการ์ดรางวัลในคลังได้รับการรีสต็อกใหม่เรียบร้อยแล้ว!");
+            alert("📦 สินค้าปกติในคลังได้รับการรีสต็อกใหม่เรียบร้อยแล้ว!");
             window.location.reload();
         }
 
@@ -1027,76 +766,6 @@
             document.getElementById("btn-force-refresh").disabled = !isAllSoldOut;
         }
 
-        function updatePassCardsUI() {
-            const secStock = parseInt(localStorage.getItem("stock_pass_card_sec") ?? 300);
-            const ssrStock = parseInt(localStorage.getItem("stock_pass_card_ssr") ?? 300);
-            const srStock = parseInt(localStorage.getItem("stock_pass_card_sr") ?? 300);
-
-            if(document.getElementById("stock-pass-sec")) {
-                document.getElementById("stock-pass-sec").innerText = secStock;
-                document.getElementById("btn-buy-pass-sec").disabled = secStock <= 0;
-                if(secStock <= 0) document.getElementById("btn-buy-pass-sec").innerText = "หมดแล้ว";
-                else document.getElementById("btn-buy-pass-sec").innerText = "ซื้อการ์ด";
-            }
-            if(document.getElementById("stock-pass-ssr")) {
-                document.getElementById("stock-pass-ssr").innerText = ssrStock;
-                document.getElementById("btn-buy-pass-ssr").disabled = ssrStock <= 0;
-                if(ssrStock <= 0) document.getElementById("btn-buy-pass-ssr").innerText = "หมดแล้ว";
-                else document.getElementById("btn-buy-pass-ssr").innerText = "ซื้อการ์ด";
-            }
-            if(document.getElementById("stock-pass-sr")) {
-                document.getElementById("stock-pass-sr").innerText = srStock;
-                document.getElementById("btn-buy-pass-sr").disabled = srStock <= 0;
-                if(srStock <= 0) document.getElementById("btn-buy-pass-sr").innerText = "หมดแล้ว";
-                else document.getElementById("btn-buy-pass-sr").innerText = "ซื้อการ์ด";
-            }
-        }
-
-        window.buyNewLaunchPack = async function(version, price) {
-            if (!currentUser) { alert("❌ กรุณาเข้าสู่ระบบก่อนทำการสั่งซื้อ"); return; }
-            
-            let limitedTargetTime = localStorage.getItem(LIMITED_PROMO_TIME_KEY);
-            if (limitedTargetTime && Date.now() > parseInt(limitedTargetTime)) {
-                alert("❌ ขออภัย โปรโมชั่นพิเศษแบบจำกัดเวลานี้สิ้นสุดลงแล้ว!");
-                return;
-            }
-
-            if (version === 1 && hasBoughtNewLaunchVo1) return;
-            if (version === 2 && hasBoughtNewLaunchVo2) return;
-            if (userDiamonds < price) { alert("❌ เพชรของคุณไม่เพียงพอสำหรับการสั่งซื้อแพ็คเกจนี้!"); return; }
-
-            let normalTickets = version === 1 ? 400 : 990;
-            let premiumTickets = version === 1 ? 150 : 770;
-            let cardCount = version === 1 ? 250 : 300;
-
-            if (confirm(`คุณต้องการใช้ 💎 ${price.toLocaleString()} เพื่อซื้อ "แพ็คฉลองเปิดตัวตู้ใหม่ Vo.${version}" ใช่หรือไม่?\n(ตั๋วปกติ ${normalTickets} ใบ, ตั๋วพรีเมี่ยม ${premiumTickets} ใบ และการ์ดตู้ลายพิเศษ ${cardCount} ใบ)`)) {
-                try {
-                    const userRef = doc(db, "users", currentUser.uid);
-                    const targetField = (userDiamonds === currentUser.diamond) ? "diamond" : "diamonds";
-
-                    await updateDoc(userRef, {
-                        [targetField]: increment(-price),
-                        normal_tickets: increment(normalTickets),
-                        premium_tickets: increment(premiumTickets),
-                        [`cards_inventory.NewLaunch_Promo_Vo${version}_Card`]: increment(cardCount),
-                        [`bought_new_launch_vo${version}`]: true
-                    });
-
-                    if (version === 1) {
-                        hasBoughtNewLaunchVo1 = true;
-                    } else {
-                        hasBoughtNewLaunchVo2 = true;
-                    }
-
-                    renderLimitedPromoPack();
-                    alert(`🎉 ซื้อแพ็คฉลองเปิดตัวตู้ใหม่ Vo.${version} สำเร็จ! การ์ดจำนวน ${cardCount} ใบถูกบันทึกเข้าสมุดสะสมเรียบร้อยแล้ว`);
-                } catch (error) { 
-                    alert("เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูลระบบ"); 
-                    console.error(error);
-                }
-            }
-        }
-
         window.buyOneTimeBeautyPack = async function() {
             if (!currentUser) { alert("❌ กรุณาเข้าสู่ระบบก่อนทำการสั่งซื้อ"); return; }
             if (hasPurchasedBeautyPack) { alert("❌ ไอดีนี้เคยซื้อแพ็คเกจความสวยงามไปแล้ว ไม่สามารถซื้อซ้ำได้!"); return; }
@@ -1105,17 +774,14 @@
             if (confirm(`คุณต้องการใช้ 💎 ${BEAUTY_PACK_PRICE.toLocaleString()} เพื่อซื้อ "แพ็คความสวยงาม" ใช่หรือไม่?`)) {
                 try {
                     const userRef = doc(db, "users", currentUser.uid);
-                    const targetField = (userDiamonds === currentUser.diamond) ? "diamond" : "diamonds";
-
                     await updateDoc(userRef, {
-                        [targetField]: increment(-BEAUTY_PACK_PRICE),
+                        [diamondFieldKey]: increment(-BEAUTY_PACK_PRICE),
                         normal_tickets: increment(550),
                         premium_tickets: increment(330),
                         unlocked_profile_frame: "blue_luxury_frame", 
                         unlocked_profile_bg: "diamond_waterfall_bg", 
                         bought_beauty_pack: true 
                     });
-
                     hasPurchasedBeautyPack = true;
                     updateUI();
                     alert("✨ ซื้อสำเร็จ! ระบบทำการส่งตั๋วเรียบร้อยแล้ว!");
@@ -1131,16 +797,13 @@
             if (confirm(`คุณต้องการใช้ 💎 ${DADDY_PACK_PRICE.toLocaleString()} เพื่อซื้อ "แพ็คผู้ใหญ่ใจป๋า" ใช่หรือไม่?`)) {
                 try {
                     const userRef = doc(db, "users", currentUser.uid);
-                    const targetField = (userDiamonds === currentUser.diamond) ? "diamond" : "diamonds";
-
                     await updateDoc(userRef, {
-                        [targetField]: increment(-DADDY_PACK_PRICE),
+                        [diamondFieldKey]: increment(-DADDY_PACK_PRICE),
                         normal_tickets: increment(1100),
                         premium_tickets: increment(990),
                         title_prefix: "ผู้ใหญ่ใจบุญ", 
                         bought_daddy_pack: true 
                     });
-
                     hasPurchasedDaddyPack = true;
                     updateUI();
                     alert("👑 ซื้อสำเร็จ! ระบบทำการส่งตั๋วเรียบร้อยแล้ว!");
@@ -1154,7 +817,6 @@
             let newVal = currentVal + amount;
             if(newVal < 1) newVal = 1;
             if(newVal > currentStock.normal) newVal = currentStock.normal;
-            if(currentStock.normal <= 0) newVal = 1;
             qtyInput.value = newVal;
             updateNormalPriceUI();
         }
@@ -1179,7 +841,6 @@
             let newVal = currentVal + amount;
             if(newVal < 1) newVal = 1;
             if(newVal > currentStock.premium) newVal = currentStock.premium;
-            if(currentStock.premium <= 0) newVal = 1;
             qtyInput.value = newVal;
             updatePremiumPriceUI();
         }
@@ -1211,10 +872,8 @@
             if (confirm(`คุณต้องการใช้ 💎 ${totalPrice.toLocaleString()} เพื่อซื้อตั๋วสุ่มทั่วไปจำนวน ${qtyToBuy} ใบ ใช่หรือไม่?`)) {
                 try {
                     const userRef = doc(db, "users", currentUser.uid);
-                    const targetField = (userDiamonds === currentUser.diamond) ? "diamond" : "diamonds";
-                    
                     await updateDoc(userRef, { 
-                        [targetField]: increment(-totalPrice),
+                        [diamondFieldKey]: increment(-totalPrice),
                         normal_tickets: increment(qtyToBuy) 
                     });
 
@@ -1241,10 +900,8 @@
             if (confirm(`คุณต้องการใช้ 💎 ${totalPrice.toLocaleString()} เพื่อซื้อตั๋วสุ่มพรีเมียมจำนวน ${qtyToBuy} ใบ ใช่หรือไม่?`)) {
                 try {
                     const userRef = doc(db, "users", currentUser.uid);
-                    const targetField = (userDiamonds === currentUser.diamond) ? "diamond" : "diamonds";
-
                     await updateDoc(userRef, { 
-                        [targetField]: increment(-totalPrice),
+                        [diamondFieldKey]: increment(-totalPrice),
                         premium_tickets: increment(qtyToBuy) 
                     });
 
@@ -1266,8 +923,7 @@
             if (confirm(`คุณต้องการใช้ 💎 ${price.toLocaleString()} เพื่อสั่งซื้อใช่หรือไม่?`)) {
                 try {
                     const userRef = doc(db, "users", currentUser.uid);
-                    const targetField = (userDiamonds === currentUser.diamond) ? "diamond" : "diamonds";
-                    let updateData = { [targetField]: increment(-price) };
+                    let updateData = { [diamondFieldKey]: increment(-price) };
 
                     if (type === 'pack_normal_10') { updateData['normal_tickets'] = increment(10); } 
                     else if (type === 'pack_combo') { updateData['normal_tickets'] = increment(3); updateData['premium_tickets'] = increment(1); } 
@@ -1321,43 +977,19 @@
             if (confirm(`ใช้ 💎 10,000 เพชร เพื่อรีสต็อกสินค้าทั้งหมดทันทีใช่หรือไม่?`)) {
                 try {
                     const userRef = doc(db, "users", currentUser.uid);
-                    const targetField = (userDiamonds === currentUser.diamond) ? "diamond" : "diamonds";
-                    await updateDoc(userRef, { [targetField]: increment(-refreshCost) });
+                    await updateDoc(userRef, { [diamondFieldKey]: increment(-refreshCost) });
                     restockProducts();
-                } catch (error) { alert("ระบบฐานข้อมูลขัดข้อง"); }
+                } catch (error) { alert("เกิดความผิดพลาดระบบระบบเซิร์ฟเวอร์"); }
             }
-        } 
+        }
 
-        window.buyPassCard = async function(productId, price, rarityName, stockElementId) {
-            if (!currentUser) { alert("❌ กรุณาเข้าสู่ระบบก่อนทำการสั่งซื้อ"); return; }
+        window.closePackDetailModal = function() {
+            document.getElementById("pack-detail-modal").style.display = "none";
+        }
 
-            let currentStockNum = parseInt(localStorage.getItem(`stock_${productId}`) ?? 300);
-            if (currentStockNum <= 0) { alert("❌ สินค้าชิ้นนี้หมดแล้ว! รอระบบรีสต็อกในวันถัดไป"); return; }
-            if (userDiamonds < price) { alert(`❌ เพชรไม่เพียงพอ! ขาดอีก ${(price - userDiamonds).toLocaleString()} เพชร`); return; }
-
-            if (confirm(`คุณต้องการใช้ 💎 ${price.toLocaleString()} เพชร เพื่อซื้อ การ์ดจาก Pass ระดับ [${rarityName}] ใช่หรือไม่?`)) {
-                try {
-                    const userRef = doc(db, "users", currentUser.uid);
-                    const targetField = (userDiamonds === currentUser.diamond) ? "diamond" : "diamonds";
-                    
-                    await updateDoc(userRef, {
-                        [targetField]: increment(-price),
-                        [`cards_inventory.Pass_EXCLUSIVE_${rarityName}_Card`]: increment(1)
-                    });
-
-                    currentStockNum -= 1;
-                    localStorage.setItem(`stock_${productId}`, currentStockNum);
-                    
-                    const el = document.getElementById(stockElementId);
-                    if(el) el.innerText = currentStockNum;
-
-                    alert(`🎉 ซื้อสำเร็จ! การ์ดรางวัล Pass [${rarityName}] ถูกเพิ่มเข้าสู่สมุดสะสมของคุณเรียบร้อยแล้ว`);
-                    updatePassCardsUI();
-                } catch (error) { alert("เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล"); }
-            }
+        window.onload = function() {
+            initShopSystem();
         };
-
-        window.onload = () => { initShopSystem(); };
     </script>
 </body>
 </html>
