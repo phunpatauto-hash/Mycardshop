@@ -3,425 +3,1064 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CARD TRADE CENTER - ระบบแลกเปลี่ยน (8 Slots + Multi-Stack)</title>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>CARD TRADE CENTER - ระบบแลกเปลี่ยนสุดล้ำ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --gold: #ffc831; --blue: #00d2ff; --bg: #0f0f13; }
-        body { font-family: 'Kanit', sans-serif; background: var(--bg); color: white; margin: 0; }
+        :root { 
+            --gold: #ffc831; 
+            --gold-glow: rgba(255, 200, 49, 0.3);
+            --blue: #00d2ff; 
+            --blue-glow: rgba(0, 210, 255, 0.3);
+            --bg: #060713; 
+            --card-bg: rgba(15, 18, 36, 0.7);
+            --border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        * { box-sizing: border-box; font-family: 'Kanit', sans-serif; }
         
-        /* เพิ่มสไตล์ส่วนปุ่มนำทาง */
+        body { 
+            background: radial-gradient(circle at center, #111430 0%, var(--bg) 100%);
+            color: #f0f2f5; 
+            margin: 0; 
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+        /* Navbar & Header */
         .nav-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 20px;
-            background: rgba(26, 26, 32, 0.9);
-            border-bottom: 1px solid #333;
+            padding: 15px 30px;
+            background: rgba(10, 11, 26, 0.85);
+            border-bottom: 2px solid var(--gold);
             position: sticky;
             top: 0;
             z-index: 1000;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 5px 25px rgba(0,0,0,0.5);
         }
-        .nav-btns { display: flex; gap: 10px; }
-        .btn-nav {
-            background: #2a2a35;
-            color: white;
-            border: 1px solid #444;
-            padding: 8px 15px;
-            border-radius: 8px;
+        .nav-title { font-size: 1.4rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 12px; }
+        .nav-title i { color: var(--gold); text-shadow: 0 0 10px var(--gold-glow); }
+        .nav-buttons { display: flex; gap: 12px; }
+        .btn-nav { 
+            background: rgba(255,255,255,0.05); 
+            color: #fff; 
+            border: 1px solid var(--border-color); 
+            padding: 10px 20px; 
+            border-radius: 12px; 
+            text-decoration: none; 
+            font-size: 0.9rem; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+        .btn-nav:hover { background: rgba(255,255,255,0.12); transform: translateY(-2px); border-color: #fff; }
+
+        /* Main Container Layout */
+        .main-container {
+            max-width: 1600px;
+            margin: 25px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 25px;
+        }
+
+        /* Sidebar Control Panel */
+        .sidebar-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            height: fit-content;
+        }
+        .section-title { font-size: 1.1rem; font-weight: 700; margin: 0 0 10px 0; color: #ffc831; display: flex; align-items: center; gap: 8px; }
+        
+        .input-group { display: flex; flex-direction: column; gap: 8px; }
+        .input-group label { font-size: 0.85rem; color: #aaa; font-weight: 500; }
+        .styled-input {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 12px;
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: 0.25s;
+        }
+        .styled-input:focus { border-color: var(--gold); box-shadow: 0 0 10px var(--gold-glow); }
+
+        .btn-action {
+            background: linear-gradient(135deg, var(--gold), #ff9000);
+            color: #000;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 700;
             cursor: pointer;
-            text-decoration: none;
-            font-size: 0.9rem;
             transition: 0.3s;
             display: flex;
+            justify-content: center;
             align-items: center;
             gap: 8px;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px var(--gold-glow);
         }
-        .btn-nav:hover { background: var(--gold); color: black; border-color: var(--gold); }
+        .btn-action:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 6px 20px var(--gold-glow); }
+        .btn-action:disabled { background: #333; color: #777; cursor: not-allowed; box-shadow: none; transform: none; }
+        .btn-secondary { background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-color); box-shadow: none; }
+        .btn-secondary:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); box-shadow: none; }
 
-        .lobby-container { max-width: 500px; margin: 60px auto; text-align: center; padding: 20px; background: #1a1a20; border-radius: 20px; border: 1px solid #333; }
-        .input-group { margin: 20px 0; }
-        input { background: #000; border: 1px solid #444; color: white; padding: 12px; border-radius: 10px; width: 80%; font-size: 1.2rem; text-align: center; }
-        .btn-main { background: var(--gold); color: black; border: none; padding: 12px 30px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 85%; margin-top: 10px; }
-        
-        .trade-screen { display: none; padding: 20px; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1200px; margin: auto; }
-        .trade-box { background: #1a1a20; border-radius: 15px; padding: 20px; border: 2px solid #333; position: relative; }
-        .trade-box.active { border-color: var(--gold); box-shadow: 0 0 15px rgba(255, 200, 49, 0.2); }
-        .user-info { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; }
-        
-        .offer-area { min-height: 220px; background: rgba(0,0,0,0.3); border-radius: 10px; padding: 15px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; align-content: start; }
-        .offered-card-wrapper { position: relative; width: 100%; cursor: pointer; transition: 0.2s; }
-        .offered-card-wrapper:hover { transform: scale(1.05); filter: brightness(1.2); }
-        .offered-card { width: 100%; border-radius: 5px; border: 1px solid var(--gold); }
-        
-        .resource-offer { margin-top: 15px; font-size: 1.1rem; color: var(--blue); }
-        .total-value-tag { background: rgba(255, 200, 49, 0.1); border: 1px dashed var(--gold); padding: 5px 10px; border-radius: 8px; margin-top: 10px; font-size: 0.9rem; color: var(--gold); display: flex; justify-content: space-between; }
+        /* Trading Arena Map */
+        .trading-arena {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
 
-        .confirm-btn { background: #444; color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; margin-top: 20px; cursor: pointer; transition: 0.3s; }
-        .confirm-btn.ready { background: #2ed573; color: black; }
-        .cancel-btn { background: #ff4757; color: white; border: none; padding: 10px; width: 100%; border-radius: 10px; font-weight: bold; margin-top: 10px; cursor: pointer; }
-        
-        .status-tag { position: absolute; top: 10px; right: 10px; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; }
-        .status-waiting { background: #ff4757; }
-        .status-ready { background: #2ed573; color: black; }
+        /* Split Arena (Me vs Peer) */
+        .split-arena-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
 
-        .inventory-drawer { grid-column: span 2; background: #1a1a20; padding: 20px; border-radius: 15px; margin-top: 20px; border: 1px solid #333; }
-        .inv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 15px; max-height: 450px; overflow-y: auto; padding: 10px; }
-        .inv-item { cursor: pointer; transition: 0.2s; position: relative; background: rgba(255,255,255,0.03); padding: 5px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); }
-        .inv-item:hover { transform: translateY(-5px); background: rgba(255,255,255,0.08); }
-        .inv-item img { width: 100%; border-radius: 8px; display: block; }
+        .player-zone {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 25px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            transition: 0.3s;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+        .player-zone.my-side { border-top: 4px solid var(--gold); }
+        .player-zone.peer-side { border-top: 4px solid var(--blue); }
         
-        .count-badge { position: absolute; top: -5px; right: -5px; color: white; font-size: 0.75rem; padding: 2px 8px; border-radius: 50px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.5); z-index: 5; }
-        .rarity-tag { position: absolute; bottom: 35px; right: 10px; font-size: 0.65rem; padding: 1px 5px; border-radius: 4px; background: rgba(0,0,0,0.8); font-weight: bold; }
+        .player-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .player-meta { display: flex; align-items: center; gap: 12px; }
+        .player-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            border: 2px solid #555;
+        }
+        .my-side .player-avatar { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 10px var(--gold-glow); }
+        .peer-side .player-avatar { border-color: var(--blue); color: var(--blue); box-shadow: 0 0 10px var(--blue-glow); }
         
-        #countdownOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; }
-        #timerText { font-size: 8rem; color: var(--gold); font-weight: bold; }
-        .remove-hint { font-size: 0.7rem; color: #666; margin-top: 5px; text-align: center; display: block; }
+        .player-name { font-weight: 700; font-size: 1.15rem; }
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(255,255,255,0.05);
+            color: #aaa;
+        }
+        .status-badge.ready { background: rgba(0, 255, 136, 0.15); color: #00ff88; border: 1px solid rgba(0,255,136,0.3); }
+
+        /* Currency Offer Bar */
+        .currency-offer-bar {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .currency-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 14px;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .currency-label { font-size: 0.85rem; color: #aaa; display: flex; align-items: center; gap: 6px; }
+        .currency-value { font-weight: 700; font-size: 1.1rem; }
+        .currency-value.gold-text { color: var(--gold); }
+        .currency-value.diamond-text { color: var(--blue); }
+
+        /* Trading Slots (8 Slots Layout) */
+        .slots-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        .trade-slot {
+            aspect-ratio: 2/3;
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px dashed rgba(255,255,255,0.1);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            overflow: hidden;
+        }
+        .trade-slot:hover { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.02); }
+        .my-side .trade-slot:hover { border-color: var(--gold); box-shadow: inset 0 0 10px var(--gold-glow); }
+        
+        .slot-empty-icon { font-size: 1.3rem; color: rgba(255,255,255,0.15); margin-bottom: 4px; }
+        .slot-empty-text { font-size: 0.65rem; color: rgba(255,255,255,0.25); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* Filled Card Item Design */
+        .slot-card-img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+        .slot-card-info {
+            position: absolute;
+            bottom: 0;
+            inset-x: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.95) 40%, transparent);
+            padding: 8px;
+            font-size: 0.7rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .slot-card-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+        .slot-card-meta { display: flex; justify-content: space-between; margin-top: 2px; color: var(--gold); font-weight: bold; }
+        .slot-card-count {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: var(--gold);
+            color: #000;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+            z-index: 2;
+        }
+
+        /* Central Control Deal Action Bar */
+        .deal-action-bar {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .deal-status-text { font-size: 1.05rem; font-weight: 500; color: #aaa; display: flex; align-items: center; gap: 10px; }
+        .deal-buttons-group { display: flex; gap: 15px; }
+        .btn-deal { padding: 12px 35px; border-radius: 14px; font-size: 1.05rem; font-weight: 700; }
+
+        /* Inventory Bottom Drawer */
+        .inventory-drawer {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+        .inventory-search-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 20px;
+        }
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 15px;
+            max-height: 380px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        .inv-card {
+            background: rgba(0,0,0,0.3);
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.06);
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.25s;
+            position: relative;
+            aspect-ratio: 2/3;
+        }
+        .inv-card:hover { transform: translateY(-5px); border-color: var(--gold); box-shadow: 0 5px 15px rgba(255,200,49,0.15); }
+        .inv-card img { width: 100%; height: 100%; object-fit: cover; }
+        .inv-card-info {
+            position: absolute;
+            bottom: 0;
+            inset-x: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 50%, transparent);
+            padding: 8px;
+        }
+        .inv-card-name { font-size: 0.75rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+        .inv-card-power { font-size: 0.7rem; color: var(--gold); font-weight: bold; margin-top: 2px; }
+        .inv-card-badge { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.75); color: #fff; border: 1px solid rgba(255,255,255,0.2); font-size: 0.7rem; font-weight: 600; padding: 2px 6px; border-radius: 6px; }
+
+        /* Chat Window styling inside Sidebar */
+        .chat-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            height: 220px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; }
+        .msg-item { background: rgba(255,255,255,0.05); padding: 6px 10px; border-radius: 8px; line-height: 1.4; word-break: break-all; }
+        .msg-user { font-weight: 700; color: var(--gold); margin-right: 4px; }
+        .chat-input-row { display: flex; border-top: 1px solid rgba(255,255,255,0.05); }
+        .chat-input-row input { flex: 1; background: transparent; border: none; padding: 10px; color: #fff; outline: none; font-size: 0.85rem; }
+        .btn-send-chat { background: transparent; border: none; color: var(--gold); padding: 0 15px; cursor: pointer; transition: 0.2s; }
+        .btn-send-chat:hover { color: #fff; }
+
+        /* Dialog/Modal for Currency Input */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-box {
+            background: #0f1224;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-top: 3px solid var(--gold);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            padding: 25px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .modal-title { font-size: 1.2rem; font-weight: 700; color: #fff; margin: 0 0 15px 0; display: flex; align-items: center; gap: 8px; }
+        .modal-buttons { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+        .modal-btn { padding: 8px 18px; border-radius: 10px; font-weight: 600; cursor: pointer; border: none; font-size: 0.9rem; }
+
+        @media (max-width: 1024px) {
+            .main-container { grid-template-columns: 1fr; }
+            .split-arena-grid { grid-template-columns: 1fr; }
+            .slots-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+        @media (max-width: 600px) {
+            .slots-grid { grid-template-columns: repeat(2, 1fr); }
+        }
     </style>
 </head>
 <body>
 
-    <div class="nav-header">
-        <div class="nav-btns">
-            <a href="index.html" class="btn-nav">
-                <i class="fas fa-home"></i> หน้าแรก
-            </a>
+    <nav class="nav-header">
+        <div class="nav-title"><i class="fa-solid fa-right-left"></i> CARD TRADE CENTER</div>
+        <div class="nav-buttons">
+            <a href="index.html" class="btn-nav"><i class="fa-solid fa-house"></i> หน้าหลัก</a>
+            <a href="collection.html" class="btn-nav"><i class="fa-solid fa-folder-open"></i> คอลเลกชัน</a>
         </div>
-        <div style="color: var(--gold); font-weight: bold; font-size: 1.2rem;">TRADE CENTER</div>
-    </div>
+    </nav>
 
-    <div id="countdownOverlay">
-        <h2 style="color: white;">กำลังดำเนินการแลกเปลี่ยน...</h2>
-        <div id="timerText">5</div>
-        <p style="color: #aaa;">ห้ามปิดหน้านี้จนกว่าจะสำเร็จ</p>
-    </div>
-
-    <div id="lobby" class="lobby-container">
-        <h2 style="color: var(--gold);"><i class="fas fa-sync-alt"></i> ระบบแลกเปลี่ยนการ์ด</h2>
-        <div class="input-group">
-            <button class="btn-main" onclick="createRoom()">สร้างห้องใหม่</button>
-            <p style="color: #666;">--- หรือ ---</p>
-            <input type="text" id="roomInput" placeholder="ใส่รหัสห้อง 6 หลัก">
-            <button class="btn-main" style="background: var(--blue);" onclick="joinRoom()">เข้าห้องแลกเปลี่ยน</button>
-        </div>
-    </div>
-
-    <div id="tradeScreen" class="trade-screen">
-        <h2 style="grid-column: span 2; text-align: center; color: var(--gold);">ROOM ID: <span id="displayRoomId">------</span></h2>
+    <main class="main-container">
         
-        <div class="trade-box active" id="mySide">
-            <div id="myStatus" class="status-tag status-waiting">รอยืนยัน</div>
-            <div class="user-info">
-                <i class="fas fa-user-circle fa-2x"></i>
-                <div><b>คุณ (ฉัน)</b></div>
+        <aside class="sidebar-panel">
+            <div>
+                <h3 class="section-title"><i class="fa-solid fa-circle-nodes"></i> ห้องแลกเปลี่ยน</h3>
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
+                    <button id="btnCreateRoom" class="btn-action"><i class="fa-solid fa-plus"></i> ตั้งห้องเทรดใหม่</button>
+                    <div style="text-align: center; color: #555; font-size: 0.85rem; font-weight: bold; margin: 2px 0;">— หรือเข้าร่วม —</div>
+                    <div class="input-group">
+                        <input type="text" id="inputRoomID" class="styled-input" placeholder="กรอกรหัสคีย์ห้อง...">
+                    </div>
+                    <button id="btnJoinRoom" class="btn-action btn-secondary"><i class="fa-solid fa-right-to-bracket"></i> เข้าร่วมห้อง</button>
+                </div>
             </div>
-            <div class="offer-area" id="myOffers"></div>
-            <small class="remove-hint">* คลิกที่การ์ดเพื่อลดจำนวน/เอาออก</small>
-            <div class="resource-offer">
-                🪙 <span id="myGoldOffer">0</span> | 💎 <span id="myDiaOffer">0</span>
-                <button onclick="setResources()" style="font-size: 0.7rem; background: none; border: 1px solid #555; color: #aaa; cursor: pointer; margin-left: 10px; padding: 2px 8px; border-radius: 5px;">แก้ไข</button>
-            </div>
-            <div class="total-value-tag">
-                <span>ประเมินมูลค่า:</span>
-                <span>✨ <span id="myTotalValue">0</span></span>
-            </div>
-            <button class="confirm-btn" id="myConfirmBtn" onclick="toggleReady()">ยืนยันข้อเสนอ</button>
-            <button class="cancel-btn" onclick="cancelTrade()"><i class="fas fa-times"></i> ยกเลิกและลบห้อง</button>
-        </div>
 
-        <div class="trade-box" id="peerSide">
-            <div id="peerStatus" class="status-tag status-waiting">รอยืนยัน</div>
-            <div class="user-info">
-                <i class="fas fa-user-friends fa-2x"></i>
-                <div id="peerName">รออีกฝ่าย...</div>
+            <div id="roomInfoSection" style="display:none; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 15px;">
+                <h3 class="section-title" style="color:var(--blue);"><i class="fa-solid fa-info-circle"></i> ข้อมูลคีย์ห้อง</h3>
+                <div class="styled-input" id="displayRoomID" style="text-align: center; font-weight: 700; letter-spacing: 1px; background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.05); font-size: 1.1rem; color: var(--blue);">-------</div>
+                <button id="btnLeaveRoom" class="btn-action btn-secondary" style="width: 100%; margin-top: 12px; color: #ff4d4d; border-color: rgba(255,77,77,0.2);"><i class="fa-solid fa-arrow-right-from-bracket"></i> ออกจากห้อง</button>
             </div>
-            <div class="offer-area" id="peerOffers"></div>
-            <div class="resource-offer">
-                🪙 <span id="peerGoldOffer">0</span> | 💎 <span id="peerDiaOffer">0</span>
-            </div>
-            <div class="total-value-tag">
-                <span>ประเมินมูลค่า:</span>
-                <span>✨ <span id="peerTotalValue">0</span></span>
-            </div>
-        </div>
 
-        <div class="inventory-drawer">
-            <h3 style="margin-top: 0;"><i class="fas fa-th-large"></i> เลือกการ์ดในสมุดสะสมของคุณ (สูงสุด 8 ช่อง)</h3>
-            <div id="myInventory" class="inv-grid"></div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 15px;">
+                <h3 class="section-title"><i class="fa-solid fa-comments"></i> บอร์ดสนทนา</h3>
+                <div class="chat-box">
+                    <div class="chat-messages" id="chatMessages">
+                        <div style="color: #666; font-style: italic; text-align: center; margin-top: auto;">เข้าสู่ระบบห้องเพื่อพิมพ์แชท</div>
+                    </div>
+                    <div class="chat-input-row">
+                        <input type="text" id="chatInput" placeholder="พิมพ์ข้อความที่นี่..." disabled>
+                        <button id="btnSendChat" class="btn-send-chat" disabled><i class="fa-solid fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <section class="trading-arena">
+            
+            <div class="split-arena-grid">
+                
+                <div class="player-zone my-side">
+                    <div class="player-header">
+                        <div class="player-meta">
+                            <div class="player-avatar"><i class="fa-solid fa-user-shield"></i></div>
+                            <div>
+                                <div class="player-name" id="myName">ตัวฉันเอง</div>
+                                <div style="font-size: 0.75rem; color: #888;">ผู้เสนอข้อตกลง</div>
+                            </div>
+                        </div>
+                        <div class="status-badge" id="myReadyBadge">กําลังเลือกของ</div>
+                    </div>
+
+                    <div class="currency-offer-bar">
+                        <div class="currency-box" onclick="openOfferCurrencyModal('gold')" style="cursor: pointer;">
+                            <span class="currency-label">🪙 ทองคํา</span>
+                            <span class="currency-value gold-text" id="myOfferGold">0</span>
+                        </div>
+                        <div class="currency-box" onclick="openOfferCurrencyModal('diamonds')" style="cursor: pointer;">
+                            <span class="currency-label">💎 เพชร</span>
+                            <span class="currency-value diamond-text" id="myOfferDiamonds">0</span>
+                        </div>
+                    </div>
+
+                    <div class="slots-grid" id="mySlotsGrid">
+                        </div>
+                </div>
+
+                <div class="player-zone peer-side">
+                    <div class="player-header">
+                        <div class="player-meta">
+                            <div class="player-avatar"><i class="fa-solid fa-user-astronaut"></i></div>
+                            <div>
+                                <div class="player-name" id="peerName">รอผู้เล่นอื่น...</div>
+                                <div style="font-size: 0.75rem; color: #888;">ผู้ร่วมแลกเปลี่ยน</div>
+                            </div>
+                        </div>
+                        <div class="status-badge" id="peerReadyBadge">ไม่ได้เชื่อมต่อ</div>
+                    </div>
+
+                    <div class="currency-offer-bar">
+                        <div class="currency-box">
+                            <span class="currency-label">🪙 ทองคํา</span>
+                            <span class="currency-value gold-text" id="peerOfferGold">0</span>
+                        </div>
+                        <div class="currency-box">
+                            <span class="currency-label">💎 เพชร</span>
+                            <span class="currency-value diamond-text" id="peerOfferDiamonds">0</span>
+                        </div>
+                    </div>
+
+                    <div class="slots-grid" id="peerSlotsGrid">
+                        </div>
+                </div>
+            </div>
+
+            <div class="deal-action-bar">
+                <div class="deal-status-text" id="dealStatusText">
+                    <i class="fa-solid fa-hourglass-start" style="color:var(--gold);"></i> <span>โปรดสร้างห้องหรือเข้าร่วมรหัสห้องเทรดการ์ด</span>
+                </div>
+                <div class="deal-buttons-group">
+                    <button id="btnReady" class="btn-action btn-deal" style="background: linear-gradient(135deg, #00ff88, #00b359);" disabled><i class="fa-solid fa-check-circle"></i> พร้อมเทรด</button>
+                </div>
+            </div>
+
+            <div class="inventory-drawer">
+                <div class="inventory-search-row">
+                    <h3 class="section-title" style="margin:0;"><i class="fa-solid fa-box-open"></i> คลังการ์ดในตัวของคุณ (เลือกการ์ดขึ้นกระดานเทรด)</h3>
+                    <input type="text" id="invSearchInput" class="styled-input" style="width: 250px; padding: 8px 15px; font-size: 0.85rem;" placeholder="🔍 ค้นชื่อการ์ด...">
+                </div>
+                <div class="inventory-grid" id="myInventoryGrid">
+                    </div>
+            </div>
+
+        </section>
+    </main>
+
+    <div class="modal-overlay" id="currencyModal">
+        <div class="modal-box">
+            <h3 class="modal-title" id="currencyModalTitle">เสนอหน่วยเงิน</h3>
+            <div class="input-group" style="margin-top: 15px;">
+                <label id="currencyModalLabel">จํานวนเงินที่ต้องการใส่ข้อเสนอ:</label>
+                <input type="number" id="inputCurrencyAmount" class="styled-input" value="0" min="0">
+                <div style="font-size: 0.8rem; color:#888; margin-top:2px;" id="currencyModalMaxText">มีทั้งหมดในตัว: 0</div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn" style="background: rgba(255,255,255,0.08); color: #fff;" onclick="closeOfferCurrencyModal()">ยกเลิก</button>
+                <button class="modal-btn" style="background: var(--gold); color:#000;" id="btnConfirmCurrency">ตกลงเสนอ</button>
+            </div>
         </div>
     </div>
-    
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, setDoc, onSnapshot, updateDoc, deleteDoc, getDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, updateDoc, increment, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
-        authDomain: "sign-up-73f99.firebaseapp.com",
-        projectId: "sign-up-73f99",
-        storageBucket: "sign-up-73f99.appspot.com",
-        messagingSenderId: "916335559099",
-        appId: "1:916335559099:web:3a8ed896ba26e38991849e"
+    const firebaseConfig = { 
+        apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM", 
+        authDomain: "sign-up-73f99.firebaseapp.com", 
+        projectId: "sign-up-73f99", 
+        storageBucket: "sign-up-73f99.appspot.com", 
+        messagingSenderId: "916335559099", 
+        appId: "1:916335559099:web:3a8ed896ba26e38991849e" 
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    let uid, userData, roomId;
-    let isCreator = false;
-    let myOffer = { cards: [], gold: 0, diamonds: 0, ready: false };
-    window.isTradingAction = false;
-    let countdownActive = false;
+    let currentUser = null;
+    let userDataStore = { points: 0, diamonds: 0, username: "Player", collection: [] };
+    let currentRoomID = null;
+    let unsubscribeRoom = null;
+    
+    let isCreator = false; 
+    let currentActiveCurrencyType = 'gold'; 
 
-    const cardPriceMap = {
-        'SECRET': 99000,'P': 10000,'USEC': 90000,'EXR': 90000,'CBR': 50000,'SEC': 50000, 'SUR': 15000, 'SSR': 15000, 
-        'PR': 10000,'UR': 1200, 'SR': 1000, 'R': 500, 'U': 200, 'C': 100
-    };
+    // Offer structures local caching models
+    let myOfferFinal = { gold: 0, diamonds: 0, cards: [], ready: false, username: "" };
+    let peerOfferFinal = { gold: 0, diamonds: 0, cards: [], ready: false, username: "" };
 
-    const rarityColors = {
-        'SECRET': '#D8BFD8','P': '#ff4757', 'EXR': '#ff4757', 'SEC': '#ff9f43',
-        'SUR': '#ffc831', 'SSR': '#ffc831', 'UR': '#00d2ff',
-        'SR': '#a29bfe', 'R': '#2ed573', 'U': '#747d8c', 'C': '#ffffff'
-    };
+    const RARITY_POWER_SET = { 'SECRET': 8000, "P": 5000, "USEC": 8500, "EXR": 4000, "CBR": 6600, "SEC": 3500, "SUR": 3000, "SSR": 2500, "PR": 2000, "UR": 1500, "SR": 1000, "R": 600, "U": 300, "C": 100 };
+    const rarityColors = { 'SECRET': '#ff00ff', 'P': '#ff00ff', 'USEC': '#ff00ff', 'EXR': '#ff4d4d', 'CBR': '#ff4d4d', 'SEC': '#ffac33', 'SUR': '#33ffad', 'SSR': '#ffc831', 'PR': '#ffc831', 'UR': '#bf40bf', 'SR': '#33aaff', 'R': '#33ff57', 'U': '#ffffff', 'C': '#ffffff' };
 
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            uid = user.uid;
-            onSnapshot(doc(db, "users", uid), (snap) => {
-                if (snap.exists()) {
-                    userData = snap.data();
-                    renderInventory(); 
-                }
-            });
-        } else { window.location.href = "login.html"; }
+    function calculatePower(card) {
+        const base = RARITY_POWER_SET[(card.rarity || 'C').toUpperCase()] || 100;
+        return Math.floor((base + ((card.level || 1) * 300)) * (1 + ((card.stars || 0) * 0.1)));
+    }
+
+    // Window Setup Initializer Listeners
+    window.addEventListener("DOMContentLoaded", () => {
+        initSlotsGrid();
+        
+        document.getElementById("btnCreateRoom").addEventListener("click", createTradeRoom);
+        document.getElementById("btnJoinRoom").addEventListener("click", joinTradeRoom);
+        document.getElementById("btnLeaveRoom").addEventListener("click", leaveTradeRoom);
+        document.getElementById("btnReady").addEventListener("click", toggleReadyState);
+        document.getElementById("btnConfirmCurrency").addEventListener("click", saveCurrencyOffer);
+        document.getElementById("btnSendChat").addEventListener("click", sendChatMessage);
+        document.getElementById("chatInput").addEventListener("keypress", (e) => { if(e.key === "Enter") sendChatMessage(); });
+        document.getElementById("invSearchInput").addEventListener("input", renderUserInventoryGrid);
     });
 
-    function renderInventory() {
-        const invGrid = document.getElementById("myInventory");
-        invGrid.innerHTML = "";
-        const userCards = userData.collection || [];
-        const stacked = {};
-
-        userCards.forEach(c => {
-            const key = `${(c.name || "Unknown").trim()}_${(c.rarity || 'C').toUpperCase().trim()}`;
-            const num = Number(c.count) || 1;
-            if (!stacked[key]) {
-                stacked[key] = { ...c, totalQty: num, rarity: (c.rarity || 'C').toUpperCase().trim() };
-            } else { stacked[key].totalQty += num; }
-        });
-
-        // แก้ไข: ดึงการ์ดทั้งหมดที่มีอย่างน้อย 1 ใบ (ไม่กรองเฉพาะใบซ้ำ)
-        const allCards = Object.values(stacked);
-        
-        if (allCards.length === 0) {
-            invGrid.innerHTML = `<div style="grid-column: span 4; text-align: center; color: #666; padding: 40px;">ไม่พบการ์ดในสมุดสะสม</div>`;
-            return;
-        }
-
-        allCards.forEach((card) => {
-            const div = document.createElement("div");
-            div.className = "inv-item";
-            const color = rarityColors[card.rarity] || '#333';
-            div.onclick = () => addToOffer(card);
-            div.innerHTML = `
-                <div style="position: relative;">
-                    <img src="${card.img || card.image}" onerror="this.src='https://via.placeholder.com/150'">
-                    <div class="count-badge" style="background: ${color};">x${card.totalQty}</div>
-                    <div class="rarity-tag" style="color: ${color}">${card.rarity}</div>
-                </div>
-                <div style="font-size: 10px; color: #fff; text-align: center; margin-top: 8px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">${card.name}</div>
-            `;
-            invGrid.appendChild(div);
-        });
-    }
-
-    function calculateTotalValue(offer) {
-        let cardValue = offer.cards.reduce((sum, card) => sum + ((cardPriceMap[card.rarity] || 0) * (card.count || 1)), 0);
-        return cardValue + (offer.gold || 0) + ((offer.diamonds || 0) * 10);
-    }
-
-    window.addToOffer = (card) => {
-        const existingIdx = myOffer.cards.findIndex(c => c.name === card.name && c.rarity === card.rarity);
-        const currentInOffer = existingIdx > -1 ? myOffer.cards[existingIdx].count : 0;
-        
-        // กฎความปลอดภัย: ป้องกันไม่ให้แลกจนใบสุดท้ายหายไป
-        if (currentInOffer >= card.totalQty - 1) return alert("คุณต้องเหลือการ์ดใบนี้ไว้อย่างน้อย 1 ใบในสมุดสะสม");
-
-        if (existingIdx > -1) {
-            myOffer.cards[existingIdx].count += 1;
-        } else {
-            if (myOffer.cards.length >= 8) return alert("เต็ม 8 ช่องแล้ว");
-            myOffer.cards.push({ ...card, count: 1 });
-        }
-        
-        myOffer.ready = false;
-        syncOffer();
-    };
-
-    window.removeFromOffer = (index) => {
-        if (myOffer.cards[index].count > 1) {
-            myOffer.cards[index].count -= 1;
-        } else {
-            myOffer.cards.splice(index, 1);
-        }
-        myOffer.ready = false;
-        syncOffer();
-    };
-
-    window.createRoom = async () => {
-        roomId = Math.floor(100000 + Math.random() * 900000).toString();
-        isCreator = true;
-        await setDoc(doc(db, "rooms", roomId), {
-            p1: { uid, name: userData.username, offer: myOffer },
-            p2: null, status: "waiting", createdAt: new Date()
-        });
-        startTrade();
-    };
-
-    window.joinRoom = async () => {
-        roomId = document.getElementById("roomInput").value;
-        if(!roomId) return alert("ใส่รหัสห้อง");
-        const roomRef = doc(db, "rooms", roomId);
-        const snap = await getDoc(roomRef);
-        if (snap.exists() && !snap.data().p2) {
-            isCreator = false;
-            await updateDoc(roomRef, {
-                p2: { uid, name: userData.username, offer: myOffer },
-                status: "active"
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUser = user;
+            onSnapshot(doc(db, "users", user.uid), (snap) => {
+                if (snap.exists()) {
+                    const data = snap.data();
+                    userDataStore.points = data.points || 0;
+                    userDataStore.diamonds = data.diamonds || 0;
+                    userDataStore.username = data.username || "Player";
+                    userDataStore.collection = data.collection || [];
+                    
+                    document.getElementById("myName").innerText = userDataStore.username + " (ตัวฉัน)";
+                    myOfferFinal.username = userDataStore.username;
+                    renderUserInventoryGrid();
+                }
             });
-            startTrade();
-        } else { alert("ไม่พบห้อง หรือห้องเต็มแล้ว"); }
-    };
+        } else {
+            alert("กรุณาเข้าสู่ระบบก่อนใช้งาน!");
+            window.location.href = "index.html";
+        }
+    });
 
-    function startTrade() {
-        document.getElementById("lobby").style.display = "none";
-        document.getElementById("tradeScreen").style.display = "grid";
-        document.getElementById("displayRoomId").innerText = roomId;
-        listenToRoom();
+    function initSlotsGrid() {
+        const myGrid = document.getElementById("mySlotsGrid");
+        const peerGrid = document.getElementById("peerSlotsGrid");
+        myGrid.innerHTML = "";
+        peerGrid.innerHTML = "";
+
+        for (let i = 0; i < 8; i++) {
+            myGrid.appendChild(createEmptySlotElement(i, true));
+            peerGrid.appendChild(createEmptySlotElement(i, false));
+        }
     }
 
-    window.cancelTrade = async () => {
-        if (confirm("ต้องการยกเลิกการแลกเปลี่ยนและลบห้องนี้ใช่หรือไม่?")) {
-            await deleteDoc(doc(db, "rooms", roomId));
-            window.location.reload(); 
+    function createEmptySlotElement(index, isMySide) {
+        const slot = document.createElement("div");
+        slot.className = "trade-slot";
+        slot.id = isMySide ? `mySlot_${index}` : `peerSlot_${index}`;
+        slot.innerHTML = `
+            <div class="slot-empty-icon"><i class="fa-regular fa-square-plus"></i></div>
+            <div class="slot-empty-text">ว่าง</div>
+        `;
+        if (isMySide) {
+            slot.onclick = () => removeCardFromOffer(index);
         }
-    };
+        return slot;
+    }
 
-    function listenToRoom() {
-        onSnapshot(doc(db, "rooms", roomId), (snapshot) => {
-            const data = snapshot.data();
-            if (!data) { alert("ห้องถูกยกเลิก"); window.location.reload(); return; }
-            const me = isCreator ? data.p1 : data.p2;
-            const peer = isCreator ? data.p2 : data.p1;
-            if (peer) {
-                document.getElementById("peerName").innerText = peer.name;
-                updateOfferUI("peer", peer.offer);
+    // Render User Personal Deck Inventory list
+    function renderUserInventoryGrid() {
+        const grid = document.getElementById("myInventoryGrid");
+        grid.innerHTML = "";
+        const search = document.getElementById("invSearchInput").value.toLowerCase();
+
+        // Pack cards aggregation map counting
+        const aggregated = {};
+        userDataStore.collection.forEach(card => {
+            if (card.isLocked) return; // Skip locked records
+            const key = `${card.name}_${(card.rarity||'C').toUpperCase()}_${card.level || 1}_${card.stars || 0}`;
+            if (!aggregated[key]) { aggregated[key] = { ...card, count: 0 }; }
+            aggregated[key].count++;
+        });
+
+        // Calculate available inventory minus cards currently locked on offer grid slots
+        myOfferFinal.cards.forEach(cOut => {
+            const key = `${cOut.name}_${cOut.rarity.toUpperCase()}_${cOut.level}_${cOut.stars}`;
+            if (aggregated[key]) { aggregated[key].count -= cOut.count; }
+        });
+
+        Object.values(aggregated).forEach(card => {
+            if (card.count <= 0) return;
+            if (search && !card.name.toLowerCase().includes(search)) return;
+
+            const div = document.createElement("div");
+            div.className = "inv-card";
+            const r = (card.rarity || 'C').toUpperCase();
+            div.style.border = `1px solid ${rarityColors[r] || '#fff'}44`;
+            div.onclick = () => addCardToOfferBoard(card);
+
+            div.innerHTML = `
+                <div class="inv-card-badge">x${card.count}</div>
+                <img src="${card.img || card.image || 'https://via.placeholder.com/150'}">
+                <div class="inv-card-info">
+                    <div class="inv-card-name">${card.name}</div>
+                    <div class="inv-card-power">⚡ ${calculatePower(card).toLocaleString()}</div>
+                </div>
+            `;
+            grid.appendChild(div);
+        });
+    }
+
+    // Logic management adding to trade layout matrix
+    async function addCardToOfferBoard(card) {
+        if (!currentRoomID) return alert("โปรดเชื่อมต่อห้องแลกเปลี่ยนก่อน!");
+        if (myOfferFinal.ready) return alert("ปลดสถานะ 'พร้อมเทรด' ก่อนแก้ไขข้อเสนอ!");
+        if (myOfferFinal.cards.reduce((sum, c) => sum + c.count, 0) >= 8) {
+            return alert("ช่องกระดานแลกเปลี่ยนเต็มแล้ว! บรรจุได้สูงสุด 8 ใบ");
+        }
+
+        const r = (card.rarity || 'C').toUpperCase();
+        const existingIdx = myOfferFinal.cards.findIndex(c => c.name === card.name && c.rarity === r && c.level === (card.level||1) && c.stars === (card.stars||0));
+        
+        if (existingIdx > -1) {
+            myOfferFinal.cards[existingIdx].count++;
+        } else {
+            myOfferFinal.cards.push({
+                name: card.name,
+                rarity: r,
+                level: card.level || 1,
+                stars: card.stars || 0,
+                img: card.img || card.image || '',
+                count: 1
+            });
+        }
+        await syncOfferToFirebase();
+        renderUserInventoryGrid();
+    }
+
+    async function removeCardFromOffer(index) {
+        if (myOfferFinal.ready) return alert("ปลดสถานะ 'พร้อมเทรด' ก่อนแก้ไขข้อเสนอ!");
+        
+        let flatCards = [];
+        myOfferFinal.cards.forEach(c => {
+            for (let i = 0; i < c.count; i++) {
+                flatCards.push({ ...c, count: 1 });
             }
-            updateOfferUI("my", me.offer);
-            if (data.p1.offer.ready && data.p2?.offer.ready && !countdownActive) {
-                startCountdown(data);
+        });
+
+        if (!flatCards[index]) return; // empty slot hit
+        flatCards.splice(index, 1);
+
+        // Re-pack matrix map aggregate state back
+        const repack = [];
+        flatCards.forEach(fc => {
+            const idx = repack.findIndex(r => r.name === fc.name && r.rarity === fc.rarity && r.level === fc.level && r.stars === fc.stars);
+            if (idx > -1) repack[idx].count++;
+            else repack.push(fc);
+        });
+
+        myOfferFinal.cards = repack;
+        await syncOfferToFirebase();
+        renderUserInventoryGrid();
+    }
+
+    // Modal Control Windows handler triggers
+    window.openOfferCurrencyModal = function(type) {
+        if (!currentRoomID) return alert("โปรดเข้าสู่ห้องเทรดก่อนปรับราคา!");
+        if (myOfferFinal.ready) return alert("ปลดสถานะ 'พร้อมเทรด' ก่อนแก้ไขข้อเสนอ!");
+        
+        currentActiveCurrencyType = type;
+        const modal = document.getElementById("currencyModal");
+        const title = document.getElementById("currencyModalTitle");
+        const maxText = document.getElementById("currencyModalMaxText");
+        const input = document.getElementById("inputCurrencyAmount");
+
+        if (type === 'gold') {
+            title.innerHTML = "🪙 เสนอหน่วย Coins (ทองคำ)";
+            maxText.innerText = `มีทั้งหมดในตัว: ${userDataStore.points.toLocaleString()} 🪙`;
+            input.value = myOfferFinal.gold;
+        } else {
+            title.innerHTML = "💎 เสนอหน่วย Diamonds (เพชร)";
+            maxText.innerText = `มีทั้งหมดในตัว: ${userDataStore.diamonds.toLocaleString()} 💎`;
+            input.value = myOfferFinal.diamonds;
+        }
+        modal.style.display = "flex";
+    }
+
+    window.closeOfferCurrencyModal = function() {
+        document.getElementById("currencyModal").style.display = "none";
+    }
+
+    async function saveCurrencyOffer() {
+        const val = Math.floor(Number(document.getElementById("inputCurrencyAmount").value)) || 0;
+        if (val < 0) return alert("ข้อเสนอต้องไม่ติดลบ!");
+
+        if (currentActiveCurrencyType === 'gold') {
+            if (val > userDataStore.points) return alert("ทองคำของคุณมีไม่เพียงพอ!");
+            myOfferFinal.gold = val;
+        } else {
+            if (val > userDataStore.diamonds) return alert("เพชรของคุณมีไม่เพียงพอ!");
+            myOfferFinal.diamonds = val;
+        }
+
+        closeOfferCurrencyModal();
+        await syncOfferToFirebase();
+    }
+
+    // Firebase Core Connection Streams Data Pipeline Management
+    async function createTradeRoom() {
+        const randKey = Math.floor(100000 + Math.random() * 900000).toString();
+        isCreator = true;
+        currentRoomID = randKey;
+
+        const roomRef = doc(db, "rooms", randKey);
+        await setDoc(roomRef, {
+            creatorOffer: { gold: 0, diamonds: 0, cards: [], ready: false, username: userDataStore.username },
+            joinerOffer: { gold: 0, diamonds: 0, cards: [], ready: false, username: "" },
+            chat: [{ sender: "ระบบ", text: `ตั้งห้องสำเร็จ! คีย์รหัสห้องคือ: ${randKey}` }],
+            status: "waiting"
+        });
+
+        bindRoomStream(randKey);
+    }
+
+    async function joinTradeRoom() {
+        const key = document.getElementById("inputRoomID").value.trim();
+        if (!key) return alert("กรุณากรอกรหัสห้อง!");
+
+        const roomRef = doc(db, "rooms", key);
+        const snap = await getDoc(roomRef);
+        if (!snap.exists()) return alert("ไม่พบรหัสห้องแลกเปลี่ยนนี้!");
+        if (snap.data().status === "trading") return alert("ห้องนี้มีผู้ร่วมแลกเปลี่ยนเต็มแล้ว!");
+
+        isCreator = false;
+        currentRoomID = key;
+
+        await updateDoc(roomRef, {
+            "joinerOffer.username": userDataStore.username,
+            status: "trading",
+            chat: snap.data().chat ? [...snap.data().chat, { sender: "ระบบ", text: `ผู้เล่น ${userDataStore.username} เข้าร่วมห้องเทรดแล้ว` }] : []
+        });
+
+        bindRoomStream(key);
+    }
+
+    function bindRoomStream(roomId) {
+        currentRoomID = roomId;
+        document.getElementById("displayRoomID").innerText = roomId;
+        document.getElementById("roomInfoSection").style.display = "block";
+        document.getElementById("chatInput").disabled = false;
+        document.getElementById("btnSendChat").disabled = false;
+        document.getElementById("btnReady").disabled = false;
+
+        unsubscribeRoom = onSnapshot(doc(db, "rooms", roomId), async (docSnap) => {
+            if (!docSnap.exists()) {
+                alert("ห้องแลกเปลี่ยนถูกยุบหรือปิดตัวลงแล้ว!");
+                resetUIArenaState();
+                return;
+            }
+
+            const data = docSnap.data();
+            
+            // Map side allocations checks
+            if (isCreator) {
+                myOfferFinal = { ...data.creatorOffer };
+                peerOfferFinal = { ...data.joinerOffer };
+            } else {
+                myOfferFinal = { ...data.joinerOffer };
+                peerOfferFinal = { ...data.creatorOffer };
+            }
+
+            updateTradeDashboardDOM();
+            renderChatHistory(data.chat || []);
+
+            // Check executing real time complete transactions trade deals logic matching
+            if (myOfferFinal.ready && peerOfferFinal.ready) {
+                unsubscribeRoom(); // Lock loop entries processing single actions thread
+                await executeFinalCardExchangeTransaction();
             }
         });
     }
 
-    function startCountdown(roomData) {
-        countdownActive = true;
-        const overlay = document.getElementById("countdownOverlay");
-        const timerText = document.getElementById("timerText");
-        overlay.style.display = "flex";
-        let count = 5;
-        const interval = setInterval(() => {
-            count--; timerText.innerText = count;
-            if (count <= 0) { clearInterval(interval); executeTrade(roomData); }
-        }, 1000);
+    function updateTradeDashboardDOM() {
+        // Balances labels updates 
+        document.getElementById("myOfferGold").innerText = myOfferFinal.gold.toLocaleString();
+        document.getElementById("myOfferDiamonds").innerText = myOfferFinal.diamonds.toLocaleString();
+        document.getElementById("peerOfferGold").innerText = peerOfferFinal.gold.toLocaleString();
+        document.getElementById("peerOfferDiamonds").innerText = peerOfferFinal.diamonds.toLocaleString();
+
+        document.getElementById("peerName").innerText = peerOfferFinal.username || "กำลังรอผู้เล่นเข้าร่วม...";
+
+        // Badges notifications setup text rendering
+        const myBadge = document.getElementById("myReadyBadge");
+        if (myOfferFinal.ready) { myBadge.innerText = "พร้อมแล้ว"; myBadge.className = "status-badge ready"; }
+        else { myBadge.innerText = "กำลังเลือกของ"; myBadge.className = "status-badge"; }
+
+        const peerBadge = document.getElementById("peerReadyBadge");
+        if (peerOfferFinal.username) {
+            if (peerOfferFinal.ready) { peerBadge.innerText = "พร้อมแล้ว"; peerBadge.className = "status-badge ready"; }
+            else { peerBadge.innerText = "กำลังเลือกของ"; peerBadge.className = "status-badge"; }
+        } else {
+            peerBadge.innerText = "ไม่ได้เชื่อมต่อ"; peerBadge.className = "status-badge";
+        }
+
+        // Setup text notification central system bar
+        const statusText = document.getElementById("dealStatusText");
+        const btnReady = document.getElementById("btnReady");
+
+        if (myOfferFinal.ready) {
+            btnReady.innerText = "ยกเลิกพร้อม";
+            btnReady.style.background = "linear-gradient(135deg, #ff4d4d, #cc0000)";
+            btnReady.style.color = "#fff";
+        } else {
+            btnReady.innerText = "พร้อมเทรด";
+            btnReady.style.background = "linear-gradient(135deg, #00ff88, #00b359)";
+            btnReady.style.color = "#000";
+        }
+
+        if (!peerOfferFinal.username) {
+            statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin" style="color:var(--blue);"></i> <span>รอผู้เล่นอื่นเชื่อมต่อรหัสห้องนี้...</span>`;
+        } else if (!myOfferFinal.ready || !peerOfferFinal.ready) {
+            statusText.innerHTML = `<i class="fa-solid fa-gavel" style="color:var(--gold);"></i> <span>กำลังเจรจาปรับเปลี่ยนข้อเสนอในการแลกเปลี่ยน</span>`;
+        }
+
+        // Draw slots visuals cards elements mappings boards
+        drawSlotsSideCards(myOfferFinal.cards, true);
+        drawSlotsSideCards(peerOfferFinal.cards, false);
     }
 
-    function updateOfferUI(side, offer) {
-        const area = document.getElementById(`${side}Offers`);
-        const status = document.getElementById(`${side}Status`);
-        const totalValText = document.getElementById(`${side}TotalValue`);
-        
-        document.getElementById(`${side}GoldOffer`).innerText = (offer.gold || 0).toLocaleString();
-        document.getElementById(`${side}DiaOffer`).innerText = (offer.diamonds || 0).toLocaleString();
-        totalValText.innerText = calculateTotalValue(offer).toLocaleString();
+    function drawSlotsSideCards(cardsList, isMySide) {
+        let flatList = [];
+        cardsList.forEach(c => {
+            for (let i = 0; i < c.count; i++) {
+                flatList.push(c);
+            }
+        });
 
-        area.innerHTML = offer.cards.map((c, idx) => `
-            <div class="offered-card-wrapper" ${side==='my' ? `onclick="removeFromOffer(${idx})"` : ''}>
-                <img src="${c.img || c.image}" class="offered-card" style="border-color:${rarityColors[c.rarity]}">
-                <div class="count-badge" style="background: ${rarityColors[c.rarity]}; top: -2px; right: -2px; padding: 1px 5px;">x${c.count}</div>
-                <div style="position:absolute; bottom:2px; left:2px; font-size:7px; background:rgba(0,0,0,0.7); padding:0 3px; border-radius:2px; color:${rarityColors[c.rarity]}">${c.rarity}</div>
-            </div>
-        `).join("");
-
-        if (offer.ready) {
-            status.innerText = "พร้อมแล้ว"; status.className = "status-tag status-ready";
-            if(side === 'my') document.getElementById("myConfirmBtn").classList.add("ready");
-        } else {
-            status.innerText = "รอยืนยัน"; status.className = "status-tag status-waiting";
-            if(side === 'my') document.getElementById("myConfirmBtn").classList.remove("ready");
+        for (let i = 0; i < 8; i++) {
+            const slot = document.getElementById(isMySide ? `mySlot_${i}` : `peerSlot_${i}`);
+            if (flatList[i]) {
+                const card = flatList[i];
+                slot.innerHTML = `
+                    <img class="slot-card-img" src="${card.img || 'https://via.placeholder.com/150'}">
+                    <div class="slot-card-info">
+                        <div class="slot-card-name">${card.name}</div>
+                        <div class="slot-card-meta">
+                            <span>${card.rarity}</span>
+                            <span>LV.${card.level}</span>
+                        </div>
+                    </div>
+                `;
+                slot.style.borderStyle = "solid";
+                slot.style.borderColor = rarityColors[card.rarity] || "#fff";
+            } else {
+                slot.innerHTML = `
+                    <div class="slot-empty-icon"><i class="fa-regular fa-square-plus"></i></div>
+                    <div class="slot-empty-text">ว่าง</div>
+                `;
+                slot.style.borderStyle = "dashed";
+                slot.style.borderColor = "rgba(255,255,255,0.1)";
+                slot.style.boxShadow = "none";
+            }
         }
     }
 
-    window.setResources = () => {
-        const g = parseInt(prompt("ระบุ Coins:", 0)) || 0;
-        const d = parseInt(prompt("ระบุ Diamonds:", 0)) || 0;
-        if (g > (userData.points || 0) || d > (userData.diamonds || 0)) return alert("ทรัพยากรไม่พอ!");
-        myOffer.gold = g; myOffer.diamonds = d; myOffer.ready = false;
-        syncOffer();
-    };
-
-    window.toggleReady = () => { myOffer.ready = !myOffer.ready; syncOffer(); };
-
-    async function syncOffer() {
-        const roomRef = doc(db, "rooms", roomId);
-        const updateObj = isCreator ? { "p1.offer": myOffer } : { "p2.offer": myOffer };
-        await updateDoc(roomRef, updateObj);
+    async function syncOfferToFirebase() {
+        if (!currentRoomID) return;
+        const roomRef = doc(db, "rooms", currentRoomID);
+        const payload = {};
+        payload[isCreator ? "creatorOffer" : "joinerOffer"] = myOfferFinal;
+        await updateDoc(roomRef, payload);
     }
 
-    async function executeTrade(roomData) {
-        if (window.isTradingAction) return;
-        window.isTradingAction = true;
-        const myRef = doc(db, "users", uid);
-        const myOfferFinal = isCreator ? roomData.p1.offer : roomData.p2.offer;
-        const peerOfferFinal = isCreator ? roomData.p2.offer : roomData.p1.offer;
+    async function toggleReadyState() {
+        if (!peerOfferFinal.username) return alert("กรุณารอคู่ค้าเข้าร่วมห้องก่อนกดยืนยัน!");
+        myOfferFinal.ready = !myOfferFinal.ready;
+        await syncOfferToFirebase();
+    }
 
+    // Engine executing transactions exchange databases swap logic safe structures
+    async function executeFinalCardExchangeTransaction() {
+        document.getElementById("dealStatusText").innerHTML = `<i class="fa-solid fa-sync fa-spin" style="color:var(--gold);"></i> <span style="color:var(--gold); font-weight:bold;">กำลังทำรายการแลกเปลี่ยนถาวร โปรดอย่าปิดหน้าจอ...</span>`;
+        
+        const myRef = doc(db, "users", currentUser.uid);
+        const peerSnap = await getDoc(doc(db, "rooms", currentRoomID));
+        let roomData = peerSnap.data();
+
+        let peerUID = "";
+        // Find matching alternate peer targets uid endpoints profiles reference mapping queries
+        if (isCreator) {
+            // Need to look up joiner uid via user collection list lookup if room setup schema expanded, 
+            // In typical standard setup lookup room configuration logs properties match tracking data fields references
+            // Let's secure snapshot records data sync
+        }
+        
+        // Since we are doing a real decentralized simulation snapshot data synchronization writeback updates
         try {
             const mySnap = await getDoc(myRef);
-            let myColl = [...mySnap.data().collection];
+            let myColl = [...(mySnap.data().collection || [])];
 
+            // 1. Process Deduction Subtractions Cards Outflow
             myOfferFinal.cards.forEach(cOut => {
-                const idx = myColl.findIndex(c => c.name === cOut.name && (c.rarity||'C').toUpperCase() === cOut.rarity);
-                if (idx > -1) {
-                    const currentCount = Number(myColl[idx].count) || 1;
-                    if (currentCount > cOut.count) {
-                        myColl[idx].count = currentCount - cOut.count;
-                    } else {
+                let countToDeduct = cOut.count;
+                while (countToDeduct > 0) {
+                    const idx = myColl.findIndex(c => c.name === cOut.name && (c.rarity||'C').toUpperCase() === cOut.rarity && (c.level||1) === cOut.level && (c.stars||0) === cOut.stars && !c.isLocked);
+                    if (idx > -1) {
                         myColl.splice(idx, 1);
                     }
+                    countToDeduct--;
                 }
             });
 
+            // 2. Process Additions Inflow Items
             peerOfferFinal.cards.forEach(cIn => {
-                const idx = myColl.findIndex(c => c.name === cIn.name && (c.rarity||'C').toUpperCase() === cIn.rarity);
-                if (idx > -1) {
-                    myColl[idx].count = (Number(myColl[idx].count) || 1) + cIn.count;
-                } else {
-                    myColl.push({ ...cIn });
+                for (let i = 0; i < cIn.count; i++) {
+                    myColl.push({
+                        name: cIn.name,
+                        rarity: cIn.rarity,
+                        level: cIn.level,
+                        stars: cIn.stars,
+                        img: cIn.img || '',
+                        isLocked: false
+                    });
                 }
             });
 
+            // Update user databases instantly safely 
             await updateDoc(myRef, {
                 collection: myColl,
                 points: increment(peerOfferFinal.gold - myOfferFinal.gold),
                 diamonds: increment(peerOfferFinal.diamonds - myOfferFinal.diamonds)
             });
 
-            if (isCreator) setTimeout(async () => { await deleteDoc(doc(db, "rooms", roomId)); }, 1000);
-            alert("✨ การแลกเปลี่ยนสำเร็จ!");
-            window.location.reload(); 
-        } catch (e) { console.error(e); window.isTradingAction = false; }
+            alert("✨ การแลกเปลี่ยนเสร็จสิ้นสมบูรณ์! คลังของคุณได้รับการอัปเดตแล้ว");
+            
+            // Clean delete collection database reference memory records inside server safely
+            if (isCreator) {
+                setTimeout(async () => { await deleteDoc(doc(db, "rooms", currentRoomID)); }, 1500);
+            }
+        } catch (err) {
+            console.error(err);
+            alert("เกิดข้อผิดพลาดขัดข้องทางเทคนิคระบบเทรด!");
+        } finally {
+            resetUIArenaState();
+        }
+    }
+
+    async function leaveTradeRoom() {
+        if (!currentRoomID) return;
+        if (confirm("คุณแน่ใจหรือไม่ว่าต้องการออกจากห้องแลกเปลี่ยนนี้?")) {
+            if (isCreator) {
+                await deleteDoc(doc(db, "rooms", currentRoomID));
+            } else {
+                const roomRef = doc(db, "rooms", currentRoomID);
+                await updateDoc(roomRef, {
+                    "joinerOffer.username": "",
+                    "joinerOffer.ready": false,
+                    "joinerOffer.cards": [],
+                    "joinerOffer.gold": 0,
+                    "joinerOffer.diamonds": 0,
+                    status: "waiting"
+                });
+            }
+            resetUIArenaState();
+        }
+    }
+
+    function resetUIArenaState() {
+        if (unsubscribeRoom) unsubscribeRoom();
+        currentRoomID = null;
+        isCreator = false;
+        myOfferFinal = { gold: 0, diamonds: 0, cards: [], ready: false, username: userDataStore.username };
+        peerOfferFinal = { gold: 0, diamonds: 0, cards: [], ready: false, username: "" };
+
+        document.getElementById("displayRoomID").innerText = "-------";
+        document.getElementById("roomInfoSection").style.display = "none";
+        document.getElementById("chatInput").disabled = true;
+        document.getElementById("btnSendChat").disabled = true;
+        document.getElementById("btnReady").disabled = true;
+        document.getElementById("dealStatusText").innerHTML = `<i class="fa-solid fa-hourglass-start" style="color:var(--gold);"></i> <span>โปรดสร้างห้องหรือเข้าร่วมรหัสห้องเทรดการ์ด</span>`;
+
+        initSlotsGrid();
+        renderUserInventoryGrid();
+        document.getElementById("chatMessages").innerHTML = `<div style="color: #666; font-style: italic; text-align: center; margin-top: auto;">เข้าสู่ระบบห้องเพื่อพิมพ์แชท</div>`;
+    }
+
+    // Chat Message Mechanics Logging Systems
+    async function sendChatMessage() {
+        const input = document.getElementById("chatInput");
+        const msgText = input.value.trim();
+        if (!msgText || !currentRoomID) return;
+
+        const roomRef = doc(db, "rooms", currentRoomID);
+        const snap = await getDoc(roomRef);
+        if (snap.exists()) {
+            const currentChat = snap.data().chat || [];
+            await updateDoc(roomRef, {
+                chat: [...currentChat, { sender: userDataStore.username, text: msgText }]
+            });
+        }
+        input.value = "";
+    }
+
+    function renderChatHistory(chatList) {
+        const board = document.getElementById("chatMessages");
+        board.innerHTML = "";
+        chatList.forEach(m => {
+            const div = document.createElement("div");
+            div.className = "msg-item";
+            div.innerHTML = `<span class="msg-user">${m.sender}:</span> <span>${m.text}</span>`;
+            board.appendChild(div);
+        });
+        board.scrollTop = board.scrollHeight; // Auto anchor scroll down safely
     }
 </script>
 </body>
