@@ -10,9 +10,9 @@
         :root {
             --gold: #ffc831;
             --gold-dark: #e5b32a;
-            --gem-color: #60efff;
+            --gem-color: #00f0ff;
             --bg: #0a0a0c;
-            --card-bg: rgba(26, 26, 32, 0.9);
+            --card-bg: rgba(26, 26, 32, 0.95);
             --input-bg: #050505;
         }
         
@@ -21,7 +21,7 @@
         body { 
             font-family: 'Kanit', sans-serif; 
             background: var(--bg); 
-            background-image: radial-gradient(circle at center, #16161a 0%, #050505 100%);
+            background-image: radial-gradient(circle at center, #1a1a24 0%, #050505 100%);
             color: white; 
             min-height: 100vh;
             margin: 0;
@@ -31,58 +31,91 @@
             flex-direction: column;
         }
 
-        /* --- 📱 แถบแสดงกระเป๋าเงินแบบ Real-time ด้านบนสุด --- */
+        /* --- 📱 แถบแสดงกระเป๋าเงินแบบหรูหรา (Real-time Navbar) --- */
         .navbar { 
-            background: rgba(15, 15, 15, 0.85); 
+            background: rgba(10, 10, 12, 0.85); 
             padding: 0 40px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            border-bottom: 1px solid rgba(255,200,49,0.2); 
-            backdrop-filter: blur(15px);
+            border-bottom: 2px solid rgba(255, 200, 49, 0.2); 
+            backdrop-filter: blur(20px);
             position: sticky;
             top: 0;
             z-index: 100;
-            height: 70px;
+            height: 80px;
             width: 100%;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
         }
+
         .btn-nav { 
-            background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.1); 
-            padding: 8px 18px; border-radius: 50px; text-decoration: none; 
-            font-size: 0.85rem; transition: 0.3s; 
-            display: flex; align-items: center; gap: 8px;
+            background: rgba(255, 255, 255, 0.03); 
+            color: #ccc; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            padding: 10px 20px; 
+            border-radius: 50px; 
+            text-decoration: none; 
+            font-size: 0.9rem; 
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            display: flex; 
+            align-items: center; 
+            gap: 10px;
         }
-        .btn-nav:hover { background: var(--gold); color: #000; border-color: var(--gold); transform: scale(1.05); }
+        .btn-nav:hover { 
+            background: var(--gold); 
+            color: #000; 
+            border-color: var(--gold); 
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 200, 49, 0.3);
+        }
+
+        .nav-title {
+            color: var(--gold); 
+            font-weight: 700; 
+            letter-spacing: 3px; 
+            font-size: 1.3rem; 
+            text-shadow: 0 0 15px rgba(255, 200, 49, 0.4);
+            text-transform: uppercase;
+        }
 
         .wallet-container {
             display: flex;
             align-items: center;
-            gap: 20px;
-            background: rgba(255, 255, 255, 0.02);
-            padding: 6px 18px;
-            border-radius: 50px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            gap: 15px;
         }
+
         .wallet-item {
-            font-size: 0.95rem;
+            font-size: 1.1rem;
             font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px 18px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            transition: 0.3s;
         }
-        .wallet-item i { font-size: 1.1rem; }
 
-        /* --- Main Content Wrapper --- */
+        .wallet-item.gold-wallet { border-color: rgba(255, 200, 49, 0.3); text-shadow: 0 0 10px rgba(255, 200, 49, 0.2); }
+        .wallet-item.gem-wallet { border-color: rgba(0, 240, 255, 0.3); text-shadow: 0 0 10px rgba(0, 240, 255, 0.2); }
+
+        .wallet-item i { 
+            font-size: 1.2rem;
+            filter: drop-shadow(0 0 5px currentColor);
+        }
+
+        /* --- Main Content Layout --- */
         .main-content {
             flex-grow: 1;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 40px 20px;
             position: relative;
         }
 
-        /* --- Background Animation: Floating Items --- */
         .bg-animate {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -106,54 +139,54 @@
         /* --- Redeem Card Box --- */
         .box { 
             background: var(--card-bg); 
-            padding: 50px 40px; 
+            padding: 60px 45px; 
             border-radius: 40px; 
             text-align: center; 
-            border: 2px solid rgba(255, 200, 49, 0.3); 
+            border: 2px solid rgba(255, 200, 49, 0.25); 
             width: 90%;
-            max-width: 450px; 
-            box-shadow: 0 0 50px rgba(0,0,0,0.8), 0 0 20px rgba(255, 200, 49, 0.1);
-            backdrop-filter: blur(15px);
+            max-width: 460px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 30px rgba(255, 200, 49, 0.05);
+            backdrop-filter: blur(20px);
             position: relative;
             z-index: 10;
         }
 
-        /* ตกแต่งกล่องให้ดูเหมือนตั๋ว (รอยบากด้านข้าง) */
         .box::before, .box::after {
             content: '';
             position: absolute;
-            width: 40px; height: 40px;
-            background: var(--bg);
+            width: 44px; height: 44px;
+            background: #0f0f14;
             border-radius: 50%;
             top: 50%; transform: translateY(-50%);
-            border: 2px solid rgba(255, 200, 49, 0.3);
+            border: 2px solid rgba(255, 200, 49, 0.25);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
         }
-        .box::before { left: -22px; }
-        .box::after { right: -22px; }
+        .box::before { left: -24px; }
+        .box::after { right: -24px; }
 
         .icon-header {
-            font-size: 4.5rem;
+            font-size: 5rem;
             color: var(--gold);
-            margin-bottom: 15px;
-            filter: drop-shadow(0 0 15px rgba(255, 200, 49, 0.5));
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 20px rgba(255, 200, 49, 0.6));
             animation: float 3s ease-in-out infinite;
         }
 
         @keyframes float {
             0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-12px) scale(1.03); }
+            50% { transform: translateY(-15px) scale(1.04); }
         }
 
         h2 { 
             color: var(--gold); 
             margin: 0; 
-            font-size: 2.2rem;
+            font-size: 2.4rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
         }
 
-        .desc { font-size: 1rem; color: #888; margin-bottom: 35px; letter-spacing: 1px; }
+        .desc { font-size: 1rem; color: #8a8a9e; margin-bottom: 40px; letter-spacing: 1px; }
 
         .input-wrapper {
             position: relative;
@@ -162,64 +195,66 @@
 
         input { 
             width: 100%; 
-            padding: 18px; 
+            padding: 20px; 
             border-radius: 20px; 
-            border: 2px solid #333; 
+            border: 2px solid #2d2d38; 
             background: var(--input-bg); 
             color: var(--gold); 
             text-align: center; 
-            font-size: 1.5rem; 
+            font-size: 1.6rem; 
             font-weight: bold; 
             box-sizing: border-box; 
             transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            letter-spacing: 3px;
+            letter-spacing: 4px;
             text-transform: uppercase;
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.6);
         }
 
         input:focus { 
             outline: none; 
             border-color: var(--gold); 
-            box-shadow: 0 0 30px rgba(255, 200, 49, 0.2);
+            box-shadow: 0 0 30px rgba(255, 200, 49, 0.25), inset 0 3px 10px rgba(0,0,0,0.8);
             transform: scale(1.02);
         }
 
         button { 
             width: 100%; 
-            padding: 18px; 
-            background: linear-gradient(135deg, var(--gold), #f39c12); 
+            padding: 20px; 
+            background: linear-gradient(135deg, #ffe066, var(--gold), #f39c12); 
             border: none; 
             border-radius: 20px; 
             font-weight: 800; 
             cursor: pointer; 
-            transition: 0.3s; 
-            font-size: 1.2rem; 
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            font-size: 1.25rem; 
             color: #000;
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 12px;
-            box-shadow: 0 10px 20px rgba(255, 200, 49, 0.2);
+            box-shadow: 0 10px 25px rgba(255, 200, 49, 0.25);
         }
 
         button:hover { 
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(255, 200, 49, 0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(255, 200, 49, 0.45);
             filter: brightness(1.1);
         }
 
-        button:active { transform: translateY(0); }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        button:active { transform: translateY(-1px); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
 
         .back-link { 
-            color: #666; 
+            color: #5c5c70; 
             text-decoration: none; 
-            margin-top: 30px; 
+            margin-top: 35px; 
             display: inline-block; 
             font-size: 0.95rem; 
             transition: 0.3s;
-            font-weight: 300;
+            font-weight: 400;
+            letter-spacing: 1px;
         }
-        .back-link:hover { color: var(--gold); }
+        .back-link:hover { color: var(--gold); text-shadow: 0 0 10px rgba(255,200,49,0.3); }
 
         .loader {
             width: 22px; height: 22px;
@@ -235,18 +270,18 @@
 </head>
 <body>
 
-    <!-- แถบด้านบนแสดงคะแนนคงเหลือ -->
+    <!-- 🌐 Top Real-time Navbar -->
     <nav class="navbar">
-        <a href="index.html" class="btn-nav"><i class="fas fa-arrow-left"></i> หน้าหลักสุ่มการ์ด</a>
-        <div style="color: var(--gold); font-weight: 800; letter-spacing: 4px; font-size: 1.2rem; text-shadow: 0 0 20px rgba(255,200,49,0.3);">REDEEM CENTER</div>
+        <a href="index.html" class="btn-nav"><i class="fas fa-arrow-left"></i> BACK TO GACHA</a>
+        <div class="nav-title">Redeem Center</div>
         
-        <!-- ส่วนแสดงผลเงินคงเหลือแยกประเภทอย่างชัดเจน -->
+        <!-- ส่วนแสดงกระเป๋าเงิน ดึงค่าสดจากฐานข้อมูลจริง -->
         <div class="wallet-container">
-            <div class="wallet-item" style="color: var(--gold);">
-                <i class="fas fa-coins"></i> 🪙 <span id="nav-points">0</span>
+            <div class="wallet-item gold-wallet" style="color: var(--gold);">
+                <i class="fas fa-coins"></i> <span id="nav-points">LOADING...</span>
             </div>
-            <div class="wallet-item" style="color: var(--gem-color);">
-                <i class="fas fa-gem"></i> 💎 <span id="nav-diamonds">0</span>
+            <div class="wallet-item gem-wallet" style="color: var(--gem-color);">
+                <i class="fas fa-gem"></i> <span id="nav-diamonds">LOADING...</span>
             </div>
         </div> 
     </nav>
@@ -259,7 +294,7 @@
                 <i class="fas fa-ticket-alt"></i>
             </div>
             <h2>REDEEM</h2>
-            <p class="desc">กรอกรหัสของคุณเพื่อรับของรางวัล</p>
+            <p class="desc">กรอกรหัสของคุณเพื่อรับของรางวัลเข้าบัญชี</p>
             
             <div class="input-wrapper">
                 <input type="text" id="code-input" placeholder="ENTER CODE" maxlength="20" autocomplete="off">
@@ -271,19 +306,18 @@
             </button>
 
             <br>
-            <a href="index.html" class="back-link"><i class="fas fa-chevron-left"></i> BACK TO GACHA</a>
+            <a href="index.html" class="back-link"><i class="fas fa-chevron-left"></i> BACK TO HOME</a>
         </div>
     </div>
 
 <script type="module">
-    // --- สคริปต์สร้างเอฟเฟกต์ไอคอนลอยเบื้องหลัง (พาสเทลและไอเทมเกม) ---
+    // --- Background Floating Animation Effect ---
     const bgContainer = document.getElementById('bg-tickets');
-    // อัปเดตไอคอนให้ตรงตามของรางวัลที่มีในตู้และการสุ่ม
     const ticketIcons = [
-        { icon: 'fa-ticket-alt', color: 'rgba(255, 200, 49, 0.12)' },
-        { icon: 'fa-star', color: 'rgba(255, 200, 49, 0.12)' },
-        { icon: 'fa-gem', color: 'rgba(96, 239, 255, 0.12)' },
-        { icon: 'fa-coins', color: 'rgba(255, 200, 49, 0.15)' }
+        { icon: 'fa-ticket-alt', color: 'rgba(255, 200, 49, 0.1)' },
+        { icon: 'fa-star', color: 'rgba(255, 200, 49, 0.08)' },
+        { icon: 'fa-gem', color: 'rgba(0, 240, 255, 0.08)' },
+        { icon: 'fa-coins', color: 'rgba(255, 200, 49, 0.12)' }
     ];
 
     function createFloatingIcon() {
@@ -293,16 +327,15 @@
         icon.className = `fas ${chosen.icon} floating-ticket`;
         icon.style.color = chosen.color;
         icon.style.left = Math.random() * 100 + 'vw';
-        icon.style.animationDuration = (Math.random() * 4 + 6) + 's'; // ปรับความเร็ว 6-10 วินาทีให้ดูนุ่มนวล
-        icon.style.fontSize = (Math.random() * 20 + 22) + 'px';
+        icon.style.animationDuration = (Math.random() * 4 + 6) + 's';
+        icon.style.fontSize = (Math.random() * 18 + 22) + 'px';
         
         bgContainer.appendChild(icon);
         setTimeout(() => { icon.remove(); }, 10000);
     }
+    setInterval(createFloatingIcon, 500);
 
-    setInterval(createFloatingIcon, 450);
-
-    // --- ระบบเชื่อมต่อข้อมูล Firebase และอัปเดตกระเป๋าเงิน Real-time ---
+    // --- Firebase Service Integration ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, getDoc, updateDoc, increment, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -321,33 +354,42 @@
     const auth = getAuth(app);
 
     let currentUserId = null;
-    let userCurrentPoints = 0;
-    let userCurrentDiamonds = 0;
+    let unsubscribeUser = null;
 
-    // ตรวจสอบสถานะการล็อกอินและซิงค์ข้อมูลผู้ใช้แบบ Real-time[cite: 9]
+    // ติดตามสถานะผู้ใช้และอัปเดตยอดเงินในกระเป๋าแบบ Real-time ตลอดเวลา
     onAuthStateChanged(auth, (user) => {
         const pointsElement = document.getElementById("nav-points");
         const diamondsElement = document.getElementById("nav-diamonds");
 
         if (user) {
             currentUserId = user.uid;
-            // ดึงค่ากระเป๋าเงินมาแสดงผลแบบ Real-time บน Navbar[cite: 9]
-            onSnapshot(doc(db, "users", user.uid), (snap) => {
+            
+            // ใช้ onSnapshot เพื่อดึงค่าจริงจากเซิร์ฟเวอร์แบบ Real-time ทันทีที่เข้าหน้านี้
+            unsubscribeUser = onSnapshot(doc(db, "users", user.uid), (snap) => {
                 if (snap.exists()) {
                     const userData = snap.data();
-                    userCurrentPoints = userData.points || userData.point || 0;[cite: 9]
-                    userCurrentDiamonds = userData.diamonds || 0;[cite: 9]
+                    // ตรวจสอบทั้งเคสสะกด 'points' และ 'point' เพื่อความชัวร์ไม่ให้บั๊ก
+                    const currentGold = userData.points !== undefined ? userData.points : (userData.point || 0);
+                    const currentDiamonds = userData.diamonds || 0;
                     
-                    pointsElement.innerText = userCurrentPoints.toLocaleString();[cite: 9]
-                    diamondsElement.innerText = userCurrentDiamonds.toLocaleString();[cite: 9]
+                    // แสดงผลลัพธ์ด้วยฟอร์แมตใส่คอมมาคั่นสวยๆ (.toLocaleString)
+                    pointsElement.innerText = currentGold.toLocaleString();
+                    diamondsElement.innerText = currentDiamonds.toLocaleString();
                 } else {
                     pointsElement.innerText = "0";
                     diamondsElement.innerText = "0";
                 }
+            }, (error) => {
+                console.error("Error fetching user data:", error);
+                pointsElement.innerText = "ERROR";
+                diamondsElement.innerText = "ERROR";
             });
         } else {
-            pointsElement.innerText = "Guest";
-            diamondsElement.innerText = "Guest";
+            currentUserId = null;
+            if (unsubscribeUser) unsubscribeUser();
+            pointsElement.innerText = "UNAUTH";
+            diamondsElement.innerText = "UNAUTH";
+            alert("🔒 ไม่พบเซสชันการเข้าสู่ระบบ กรุณากลับไปลงชื่อเข้าใช้ที่หน้าหลักก่อนนะครับ");
         }
     });
 
@@ -359,7 +401,7 @@
         const inputCode = document.getElementById("code-input").value.trim().toUpperCase();
 
         if (!currentUserId) return alert("❌ กรุณาล็อกอินเข้าสู่ระบบก่อนแลกโค้ดนะครับ!");
-        if (!inputCode) return alert("❌ กรุณากรอกโค้ดก่อนกดปุ่มยืนยันครับ!");
+        if (!inputCode) return alert("❌ กรุณากรอกรหัสโค้ดในช่องว่างก่อนกดแลกครับ!");
 
         btn.disabled = true;
         btnText.innerText = "CHECKING...";
@@ -369,30 +411,30 @@
             const codeRef = doc(db, "codes", inputCode);
             const codeSnap = await getDoc(codeRef);
 
-            if (!codeSnap.exists()) throw new Error("ไม่พบโค้ดนี้ หรือรหัสโค้ดอาจหมดอายุไปแล้ว");
+            if (!codeSnap.exists()) throw new Error("ไม่พบรหัสโค้ดนี้ในระบบ หรือโค้ดอาจหมดอายุไปแล้ว");
 
             const codeData = codeSnap.data();
             
-            // เช็คโค้ดจำกัดจำนวนการใช้งาน
+            // ตรวจสอบจำนวนการใช้สิทธิ์สูงสุด (Max Use)
             if (codeData.maxUse > 0 && codeData.usedCount >= codeData.maxUse) {
-                throw new Error("ขออภัย โค้ดรางวัลนี้ถูกใช้งานเต็มสิทธิ์จำนวนแล้ว");
+                throw new Error("ขออภัย โค้ดรางวัลชิ้นนี้ถูกใช้งานครบกำหนดสิทธิ์แล้ว");
             }
 
-            // เช็คประวัติว่าเคยแลกไปหรือยัง
+            // ตรวจสอบประวัติการเคลมโค้ดซ้ำของผู้ใช้รายนี้
             const historyRef = doc(db, "users", currentUserId, "used_codes", inputCode);
             const historySnap = await getDoc(historyRef);
-            if (historySnap.exists()) throw new Error("คุณเคยแลกรับของรางวัลจากโค้ดนี้ไปแล้ว!");
+            if (historySnap.exists()) throw new Error("คุณเคยแลกรับของรางวัลจากรหัสโค้ดนี้ไปแล้ว!");
 
             const userRef = doc(db, "users", currentUserId);
             const userSnap = await getDoc(userRef);
-            if (!userSnap.exists()) throw new Error("ไม่พบข้อมูลบัญชีผู้ใช้งานในระบบ");
+            if (!userSnap.exists()) throw new Error("ไม่พบฐานข้อมูลบัญชีผู้เล่นของคุณ");
             
             const userData = userSnap.data();
             let currentCollection = userData.collection || [];
             let updatedCollection = [...currentCollection];
             let cardInfo = "";
 
-            // ตรวจสอบรางวัลประเภทการ์ดลงคลังสะสม
+            // จัดการกรณีรางวัลระบุเป็นไอเทมการ์ดลงคลังสะสม
             if (codeData.rewardCard && codeData.rewardCard.name) {
                 const rewardAmount = Number(codeData.rewardCard.count) || 1;
                 const newCardEntry = {
@@ -411,27 +453,27 @@
                 cardInfo = `\n🎴 การ์ดรางวัล: ${codeData.rewardCard.name} (x${rewardAmount})`;
             }
 
-            // ทำการอัปเดตยอด points, เพิ่มเติม diamonds ลงฐานข้อมูลพร้อมคลังการ์ด[cite: 9]
+            // จ่ายเงิน อัปเดตทอง อัปเดตเพชร และคลังการ์ดพร้อมกัน
             await updateDoc(userRef, {
                 points: increment(codeData.rewardPoints || 0),
-                diamonds: increment(codeData.rewardDiamonds || 0), // อัปเดตเพชรเพิ่มเข้าไปอย่างถูกต้องตามหน้าสุ่ม[cite: 9]
+                diamonds: increment(codeData.rewardDiamonds || 0),
                 collection: updatedCollection 
             });
 
-            // บันทึกสถิติฝั่ง Code และประวัติผู้ใช้งานเพื่อป้องกันสแปม
+            // เพิ่มจำนวนการใช้งานบนสถิติโค้ดกลาง และลงบันทึกประวัติส่วนตัวกันเหนียว
             await updateDoc(codeRef, { usedCount: increment(1) });
             await setDoc(historyRef, { redeemedAt: new Date().toISOString(), code: inputCode });
 
-            alert(`🎉 แลกรับโค้ดของรางวัลสำเร็จแล้ว!\n🪙ได้รับ Gold: +${codeData.rewardPoints || 0}\n💎ได้รับ Diamonds: +${codeData.rewardDiamonds || 0}${cardInfo}`);
+            alert(`🎉 ยินดีด้วย แลกโค้ดสำเร็จแล้ว!\n🪙 ได้รับ Gold: +${(codeData.rewardPoints || 0).toLocaleString()}\n💎 ได้รับ Diamonds: +${(codeData.rewardDiamonds || 0).toLocaleString()}${cardInfo}`);
             
-            // เคลียร์กล่องข้อความและคืนสถานะปุ่ม
+            // รีเซ็ตค่าและคืนสถานะ UI เพื่อให้พิมพ์โค้ดใหม่ต่อได้ทันที
             document.getElementById("code-input").value = "";
             btn.disabled = false;
             btnText.innerText = "CLAIM REWARD";
             btnLoader.style.display = "none";
 
         } catch (e) {
-            alert("❌เกิดข้อผิดพลาด: " + e.message);
+            alert("❌ ปฏิเสธการแลกโค้ด: " + e.message);
             btn.disabled = false;
             btnText.innerText = "CLAIM REWARD";
             btnLoader.style.display = "none";
