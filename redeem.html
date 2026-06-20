@@ -10,37 +10,89 @@
         :root {
             --gold: #ffc831;
             --gold-dark: #e5b32a;
+            --gem-color: #60efff;
             --bg: #0a0a0c;
             --card-bg: rgba(26, 26, 32, 0.9);
             --input-bg: #050505;
         }
         
+        * { box-sizing: border-box; }
+
         body { 
             font-family: 'Kanit', sans-serif; 
             background: var(--bg); 
+            background-image: radial-gradient(circle at center, #16161a 0%, #050505 100%);
             color: white; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
+            min-height: 100vh;
             margin: 0;
-            overflow: hidden;
+            overflow-x: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- 📱 แถบแสดงกระเป๋าเงินแบบ Real-time ด้านบนสุด --- */
+        .navbar { 
+            background: rgba(15, 15, 15, 0.85); 
+            padding: 0 40px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid rgba(255,200,49,0.2); 
+            backdrop-filter: blur(15px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: 70px;
+            width: 100%;
+        }
+        .btn-nav { 
+            background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.1); 
+            padding: 8px 18px; border-radius: 50px; text-decoration: none; 
+            font-size: 0.85rem; transition: 0.3s; 
+            display: flex; align-items: center; gap: 8px;
+        }
+        .btn-nav:hover { background: var(--gold); color: #000; border-color: var(--gold); transform: scale(1.05); }
+
+        .wallet-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 6px 18px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .wallet-item {
+            font-size: 0.95rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .wallet-item i { font-size: 1.1rem; }
+
+        /* --- Main Content Wrapper --- */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
             position: relative;
         }
 
-        /* --- Background Animation: Floating Tickets --- */
+        /* --- Background Animation: Floating Items --- */
         .bg-animate {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
+            z-index: 1;
             overflow: hidden;
             pointer-events: none;
         }
 
         .floating-ticket {
             position: absolute;
-            color: rgba(255, 200, 49, 0.15);
-            font-size: 2rem;
             animation: fall linear infinite;
         }
 
@@ -54,7 +106,7 @@
         /* --- Redeem Card Box --- */
         .box { 
             background: var(--card-bg); 
-            padding: 60px 40px; 
+            padding: 50px 40px; 
             border-radius: 40px; 
             text-align: center; 
             border: 2px solid rgba(255, 200, 49, 0.3); 
@@ -80,16 +132,16 @@
         .box::after { right: -22px; }
 
         .icon-header {
-            font-size: 5rem;
+            font-size: 4.5rem;
             color: var(--gold);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             filter: drop-shadow(0 0 15px rgba(255, 200, 49, 0.5));
             animation: float 3s ease-in-out infinite;
         }
 
         @keyframes float {
             0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-15px) scale(1.05); }
+            50% { transform: translateY(-12px) scale(1.03); }
         }
 
         h2 { 
@@ -101,7 +153,7 @@
             letter-spacing: 2px;
         }
 
-        .desc { font-size: 1rem; color: #888; margin-bottom: 40px; letter-spacing: 1px; }
+        .desc { font-size: 1rem; color: #888; margin-bottom: 35px; letter-spacing: 1px; }
 
         .input-wrapper {
             position: relative;
@@ -110,13 +162,13 @@
 
         input { 
             width: 100%; 
-            padding: 20px; 
+            padding: 18px; 
             border-radius: 20px; 
             border: 2px solid #333; 
             background: var(--input-bg); 
             color: var(--gold); 
             text-align: center; 
-            font-size: 1.6rem; 
+            font-size: 1.5rem; 
             font-weight: bold; 
             box-sizing: border-box; 
             transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -133,14 +185,14 @@
 
         button { 
             width: 100%; 
-            padding: 20px; 
+            padding: 18px; 
             background: linear-gradient(135deg, var(--gold), #f39c12); 
             border: none; 
             border-radius: 20px; 
             font-weight: 800; 
             cursor: pointer; 
             transition: 0.3s; 
-            font-size: 1.3rem; 
+            font-size: 1.2rem; 
             color: #000;
             display: flex;
             justify-content: center;
@@ -156,19 +208,17 @@
         }
 
         button:active { transform: translateY(0); }
-
         button:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .back-link { 
             color: #666; 
             text-decoration: none; 
-            margin-top: 35px; 
+            margin-top: 30px; 
             display: inline-block; 
             font-size: 0.95rem; 
             transition: 0.3s;
             font-weight: 300;
         }
-
         .back-link:hover { color: var(--gold); }
 
         .loader {
@@ -185,54 +235,76 @@
 </head>
 <body>
 
-    <div class="bg-animate" id="bg-tickets"></div>
-
-    <div class="box">
-        <div class="icon-header">
-            <i class="fas fa-ticket-alt"></i>
-        </div>
-        <h2>REDEEM</h2>
-        <p class="desc">กรอกรหัสของคุณเพื่อรับของรางวัล</p>
+    <!-- แถบด้านบนแสดงคะแนนคงเหลือ -->
+    <nav class="navbar">
+        <a href="index.html" class="btn-nav"><i class="fas fa-arrow-left"></i> หน้าหลักสุ่มการ์ด</a>
+        <div style="color: var(--gold); font-weight: 800; letter-spacing: 4px; font-size: 1.2rem; text-shadow: 0 0 20px rgba(255,200,49,0.3);">REDEEM CENTER</div>
         
-        <div class="input-wrapper">
-            <input type="text" id="code-input" placeholder="ENTER CODE" maxlength="20" autocomplete="off">
+        <!-- ส่วนแสดงผลเงินคงเหลือแยกประเภทอย่างชัดเจน -->
+        <div class="wallet-container">
+            <div class="wallet-item" style="color: var(--gold);">
+                <i class="fas fa-coins"></i> 🪙 <span id="nav-points">0</span>
+            </div>
+            <div class="wallet-item" style="color: var(--gem-color);">
+                <i class="fas fa-gem"></i> 💎 <span id="nav-diamonds">0</span>
+            </div>
+        </div> 
+    </nav>
+
+    <div class="main-content">
+        <div class="bg-animate" id="bg-tickets"></div>
+
+        <div class="box">
+            <div class="icon-header">
+                <i class="fas fa-ticket-alt"></i>
+            </div>
+            <h2>REDEEM</h2>
+            <p class="desc">กรอกรหัสของคุณเพื่อรับของรางวัล</p>
+            
+            <div class="input-wrapper">
+                <input type="text" id="code-input" placeholder="ENTER CODE" maxlength="20" autocomplete="off">
+            </div>
+
+            <button id="redeem-btn">
+                <span class="loader" id="btn-loader"></span>
+                <span id="btn-text">CLAIM REWARD</span>
+            </button>
+
+            <br>
+            <a href="index.html" class="back-link"><i class="fas fa-chevron-left"></i> BACK TO GACHA</a>
         </div>
-
-        <button id="redeem-btn">
-            <span class="loader" id="btn-loader"></span>
-            <span id="btn-text">CLAIM REWARD</span>
-        </button>
-
-        <br>
-        <a href="index.html" class="back-link"><i class="fas fa-chevron-left"></i> BACK TO HOME</a>
     </div>
 
 <script type="module">
-    // --- สคริปต์สร้างตั๋วลอย (Floating Tickets) ---
+    // --- สคริปต์สร้างเอฟเฟกต์ไอคอนลอยเบื้องหลัง (พาสเทลและไอเทมเกม) ---
     const bgContainer = document.getElementById('bg-tickets');
-    const ticketIcons = ['fa-ticket-alt', 'fa-star', 'fa-gem', 'fa-coins'];
+    // อัปเดตไอคอนให้ตรงตามของรางวัลที่มีในตู้และการสุ่ม
+    const ticketIcons = [
+        { icon: 'fa-ticket-alt', color: 'rgba(255, 200, 49, 0.12)' },
+        { icon: 'fa-star', color: 'rgba(255, 200, 49, 0.12)' },
+        { icon: 'fa-gem', color: 'rgba(96, 239, 255, 0.12)' },
+        { icon: 'fa-coins', color: 'rgba(255, 200, 49, 0.15)' }
+    ];
 
     function createFloatingIcon() {
         const icon = document.createElement('i');
-        const randomIcon = ticketIcons[Math.floor(Math.random() * ticketIcons.length)];
+        const chosen = ticketIcons[Math.floor(Math.random() * ticketIcons.length)];
         
-        icon.className = `fas ${randomIcon} floating-ticket`;
+        icon.className = `fas ${chosen.icon} floating-ticket`;
+        icon.style.color = chosen.color;
         icon.style.left = Math.random() * 100 + 'vw';
-        icon.style.animationDuration = (Math.random() * 3 + 5) + 's'; // 5-8 วินาที
-        icon.style.opacity = Math.random() * 0.5;
-        icon.style.fontSize = (Math.random() * 20 + 20) + 'px';
+        icon.style.animationDuration = (Math.random() * 4 + 6) + 's'; // ปรับความเร็ว 6-10 วินาทีให้ดูนุ่มนวล
+        icon.style.fontSize = (Math.random() * 20 + 22) + 'px';
         
         bgContainer.appendChild(icon);
-
-        // ลบออกเมื่ออนิเมชั่นจบ
-        setTimeout(() => { icon.remove(); }, 8000);
+        setTimeout(() => { icon.remove(); }, 10000);
     }
 
-    setInterval(createFloatingIcon, 400); // สร้างไอคอนใหม่ทุกๆ 0.4 วินาที
+    setInterval(createFloatingIcon, 450);
 
-    // --- Firebase Logic ---
+    // --- ระบบเชื่อมต่อข้อมูล Firebase และอัปเดตกระเป๋าเงิน Real-time ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, updateDoc, increment, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, updateDoc, increment, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -249,21 +321,45 @@
     const auth = getAuth(app);
 
     let currentUserId = null;
+    let userCurrentPoints = 0;
+    let userCurrentDiamonds = 0;
 
+    // ตรวจสอบสถานะการล็อกอินและซิงค์ข้อมูลผู้ใช้แบบ Real-time[cite: 9]
     onAuthStateChanged(auth, (user) => {
+        const pointsElement = document.getElementById("nav-points");
+        const diamondsElement = document.getElementById("nav-diamonds");
+
         if (user) {
             currentUserId = user.uid;
+            // ดึงค่ากระเป๋าเงินมาแสดงผลแบบ Real-time บน Navbar[cite: 9]
+            onSnapshot(doc(db, "users", user.uid), (snap) => {
+                if (snap.exists()) {
+                    const userData = snap.data();
+                    userCurrentPoints = userData.points || userData.point || 0;[cite: 9]
+                    userCurrentDiamonds = userData.diamonds || 0;[cite: 9]
+                    
+                    pointsElement.innerText = userCurrentPoints.toLocaleString();[cite: 9]
+                    diamondsElement.innerText = userCurrentDiamonds.toLocaleString();[cite: 9]
+                } else {
+                    pointsElement.innerText = "0";
+                    diamondsElement.innerText = "0";
+                }
+            });
+        } else {
+            pointsElement.innerText = "Guest";
+            diamondsElement.innerText = "Guest";
         }
     });
 
+    // --- ฟังก์ชันการตรวจสอบแลก Code ---
     document.getElementById("redeem-btn").onclick = async () => {
         const btn = document.getElementById("redeem-btn");
         const btnText = document.getElementById("btn-text");
         const btnLoader = document.getElementById("btn-loader");
         const inputCode = document.getElementById("code-input").value.trim().toUpperCase();
 
-        if (!currentUserId) return alert("❌ กรุณาล็อกอินก่อนแลกโค้ด!");
-        if (!inputCode) return alert("❌ กรุณากรอกโค้ด!");
+        if (!currentUserId) return alert("❌ กรุณาล็อกอินเข้าสู่ระบบก่อนแลกโค้ดนะครับ!");
+        if (!inputCode) return alert("❌ กรุณากรอกโค้ดก่อนกดปุ่มยืนยันครับ!");
 
         btn.disabled = true;
         btnText.innerText = "CHECKING...";
@@ -273,27 +369,30 @@
             const codeRef = doc(db, "codes", inputCode);
             const codeSnap = await getDoc(codeRef);
 
-            if (!codeSnap.exists()) throw new Error("ไม่พบโค้ดนี้ หรือโค้ดอาจจะหมดอายุแล้ว");
+            if (!codeSnap.exists()) throw new Error("ไม่พบโค้ดนี้ หรือรหัสโค้ดอาจหมดอายุไปแล้ว");
 
             const codeData = codeSnap.data();
             
+            // เช็คโค้ดจำกัดจำนวนการใช้งาน
             if (codeData.maxUse > 0 && codeData.usedCount >= codeData.maxUse) {
-                throw new Error("ขออภัย โค้ดนี้มีผู้ใช้งานครบจำนวนแล้ว");
+                throw new Error("ขออภัย โค้ดรางวัลนี้ถูกใช้งานเต็มสิทธิ์จำนวนแล้ว");
             }
 
+            // เช็คประวัติว่าเคยแลกไปหรือยัง
             const historyRef = doc(db, "users", currentUserId, "used_codes", inputCode);
             const historySnap = await getDoc(historyRef);
-            if (historySnap.exists()) throw new Error("คุณเคยแลกรับโค้ดนี้ไปแล้ว!");
+            if (historySnap.exists()) throw new Error("คุณเคยแลกรับของรางวัลจากโค้ดนี้ไปแล้ว!");
 
             const userRef = doc(db, "users", currentUserId);
             const userSnap = await getDoc(userRef);
-            if (!userSnap.exists()) throw new Error("ไม่พบข้อมูลผู้ใช้งาน");
+            if (!userSnap.exists()) throw new Error("ไม่พบข้อมูลบัญชีผู้ใช้งานในระบบ");
             
             const userData = userSnap.data();
             let currentCollection = userData.collection || [];
             let updatedCollection = [...currentCollection];
             let cardInfo = "";
 
+            // ตรวจสอบรางวัลประเภทการ์ดลงคลังสะสม
             if (codeData.rewardCard && codeData.rewardCard.name) {
                 const rewardAmount = Number(codeData.rewardCard.count) || 1;
                 const newCardEntry = {
@@ -309,23 +408,30 @@
                 for (let i = 0; i < rewardAmount; i++) {
                     updatedCollection.push({ ...newCardEntry });
                 }
-                cardInfo = `\n🎴 การ์ด: ${codeData.rewardCard.name} (x${rewardAmount})`;
+                cardInfo = `\n🎴 การ์ดรางวัล: ${codeData.rewardCard.name} (x${rewardAmount})`;
             }
 
+            // ทำการอัปเดตยอด points, เพิ่มเติม diamonds ลงฐานข้อมูลพร้อมคลังการ์ด[cite: 9]
             await updateDoc(userRef, {
                 points: increment(codeData.rewardPoints || 0),
-                diamonds: increment(codeData.rewardDiamonds || 0),
+                diamonds: increment(codeData.rewardDiamonds || 0), // อัปเดตเพชรเพิ่มเข้าไปอย่างถูกต้องตามหน้าสุ่ม[cite: 9]
                 collection: updatedCollection 
             });
 
+            // บันทึกสถิติฝั่ง Code และประวัติผู้ใช้งานเพื่อป้องกันสแปม
             await updateDoc(codeRef, { usedCount: increment(1) });
             await setDoc(historyRef, { redeemedAt: new Date().toISOString(), code: inputCode });
 
-            alert(`🎉 แลกโค้ดสำเร็จ!\n🪙 ${codeData.rewardPoints || 0} Gold\n💎 ${codeData.rewardDiamonds || 0} Diamonds${cardInfo}`);
-            window.location.href = "index.html";
+            alert(`🎉 แลกรับโค้ดของรางวัลสำเร็จแล้ว!\n🪙ได้รับ Gold: +${codeData.rewardPoints || 0}\n💎ได้รับ Diamonds: +${codeData.rewardDiamonds || 0}${cardInfo}`);
+            
+            // เคลียร์กล่องข้อความและคืนสถานะปุ่ม
+            document.getElementById("code-input").value = "";
+            btn.disabled = false;
+            btnText.innerText = "CLAIM REWARD";
+            btnLoader.style.display = "none";
 
         } catch (e) {
-            alert("❌ " + e.message);
+            alert("❌เกิดข้อผิดพลาด: " + e.message);
             btn.disabled = false;
             btnText.innerText = "CLAIM REWARD";
             btnLoader.style.display = "none";
