@@ -230,13 +230,6 @@
     const RARITY_POWER = { 'SECRET': { base: 8000, perLv: 9500 }, "P": { base: 5000, perLv: 1000 }, "USEC": { base: 8500, perLv: 6500 }, "EXR": { base: 4000, perLv: 2500 }, "CBR": { base: 6600, perLv: 4000 }, "SEC": { base: 3500, perLv: 2000 }, "SUR": { base: 3000, perLv: 1800 }, "SSR": { base: 2500, perLv: 1500 }, "PR": { base: 2000, perLv: 1500 }, "UR": { base: 1500, perLv: 1200 }, "SR": { base: 1000, perLv: 1000 }, "R": { base: 600, perLv: 800 }, "U": { base: 300, perLv: 500 }, "C": { base: 100, perLv: 300 } };
     const sellValuesBase = { 'SECRET': 99000, 'P': 10000, 'USEC': 90000, 'EXR': 55000, 'CBR': 50000, 'SEC': 25000, 'SUR': 15000, 'SSR': 15000, 'PR': 10000, 'UR': 1200, 'SR': 1000, 'R': 500, 'U': 200, 'C': 100 };
 
-    // ฐานข้อมูลรูปภาพรองรับการดึงข้อมูลอัตโนมัติจากการ์ดตู้ร้านค้า DIAMOND SHOP ลิมิเต็ด และโปรโมชั่นจำกัดเวลา
-    const SHOP_CARDS_ARTWORK = {
-        "Madeleine Cookie": "https://cookierunbraverse.com/data/en_storage/NzPPk1Xsrr-yPGfQWS_RBw.webp",
-        "Elder Faerie Cookie": "https://cookierunbraverse.com/data/en_storage/hImMNhdyGhIiH4RvujTudw.webp",
-        "Rambutan Cookie": "https://cookierunbraverse.com/data/en_storage/Wsr3Lhvv0OeAWXa_XQHDUQ.webp"
-    };
-
     const ACHIEVEMENTS_DATA = [
         { id: 'starter_collector', tier: 'easy', title: 'นักสะสมมือใหม่', desc: 'สะสมการ์ดไม่ซ้ำแบบให้ครบ 10 ใบ', goal: 10, reward: { points: 1000, diamonds: 10 } },
         { id: 'arena_starter', tier: 'easy', title: 'ผู้เริ่มต้นการต่อสู้', desc: 'ต่อสู้ใน Battle ARENA ครบ 10 ครั้ง', goal: 10, reward: { points: 500, diamonds: 5 } },
@@ -295,34 +288,9 @@
             onSnapshot(doc(db, "users", user.uid), (snap) => {
                 if (snap.exists()) {
                     const data = snap.data();
-                    
-                    // --- ⚙️ เริ่มการผสานระบบ Hybrid Sync ระหว่าง collection และ cards_inventory ---
                     let rawCollection = data.collection || [];
-                    let cardsInventory = data.cards_inventory || {};
 
-                    // แปลงไอเทมในคลังสินค้า (cards_inventory) ทั้งจากหน้า DIAMOND SHOP และโปรโมชั่น ให้กลายเป็นการ์ดปกติ
-                    let parsedInventoryCards = [];
-                    for (const [cardName, quantity] of Object.entries(cardsInventory)) {
-                        if (quantity > 0) {
-                            // แตกตัวการ์ดออกตามจำนวนจริงที่มี เพื่อแยกเก็บสะสมซ้ำและแก้ไขบั๊กนับจำนวนให้ตรงกับความจริง
-                            for (let i = 0; i < quantity; i++) {
-                                parsedInventoryCards.push({
-                                    name: cardName,
-                                    rarity: "SUR", // ร้านค้าเพชรและโปรโมชั่นแจกการ์ดระดับ SUR เป็นหลัก
-                                    level: 1,
-                                    stars: 0,
-                                    isLocked: false,
-                                    img: SHOP_CARDS_ARTWORK[cardName] || "https://cookierunbraverse.com/data/en_storage/NzPPk1Xsrr-yPGfQWS_RBw.webp"
-                                });
-                            }
-                        }
-                    }
-
-                    // มัดรวมการ์ดทั่วไป, การ์ดจากระบบ Pass และการ์ดจากหน้าร้านค้า/โปรโมชั่นเข้าไว้ด้วยกันอย่างเป็นระบบ
-                    let combinedCards = [...rawCollection, ...parsedInventoryCards];
-
-                    // ตรวจสอบและแมปข้อมูลพื้นฐานของการ์ดทุกใบให้ครบถ้วนเพื่อความเสถียร
-                    userCards = combinedCards.map(c => ({
+                    userCards = rawCollection.map(c => ({
                         ...c, 
                         level: c.level || 1, 
                         stars: c.stars || 0, 
@@ -553,31 +521,10 @@
         document.getElementById("cardModal").style.display = "flex";
     };
 
-    // 🔄 ฟังก์ชันบันทึกกลับระดับลึก: เซฟข้อมูลกลับเข้า DB โครงสร้างเดิมโดยแยกส่วนอย่างถูกต้องและปลอดภัย
     async function saveStateToFirebase(updatedLocalCollection) {
         const userDocRef = doc(db, "users", currentUID);
-        
-        let finalCollection = [];
-        let finalInventory = {};
-
-        updatedLocalCollection.forEach(card => {
-            // คัดแยกประเภทการ์ดที่เป็นไอเทมของตู้ DIAMOND SHOP หรือโปรโมชั่นจำกัดเวลา
-            if (card.rarity === "SUR" && SHOP_CARDS_ARTWORK[card.name]) {
-                // หากเป็นการ์ดเริ่มต้นดั้งเดิม (Lv.1 / 0 ดาว / ไม่ได้ล็อก) ให้เก็บกลับเข้าคลังร้านค้าตามเดิม
-                if (card.level === 1 && card.stars === 0 && !card.isLocked) {
-                    finalInventory[card.name] = (finalInventory[card.name] || 0) + 1;
-                } else {
-                    // แต่ถ้าผู้เล่นนำไปอัพเกรดหรือล็อกการ์ดไว้แล้ว ให้ดึงมาเซฟเข้าอาร์เรย์คลังหลักแยกเป็นใบเดี่ยว เพื่อความถูกต้อง
-                    finalCollection.push(card);
-                }
-            } else {
-                finalCollection.push(card);
-            }
-        });
-
         await updateDoc(userDocRef, {
-            collection: finalCollection,
-            cards_inventory: finalInventory
+            collection: updatedLocalCollection
         });
     }
 
