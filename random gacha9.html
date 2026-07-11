@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Gacha System - Hybrid Ticket Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- Style หลัก --- */
+        .modal-card-img { width: 45px; height: 65px; object-fit: cover; border-radius: 5px; border: 1px solid #444; display: block; }
+        #rate-list-body tr { border-bottom: 1px solid #222; }
+        #rate-list-body td { padding: 10px 5px; vertical-align: middle; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: #050505; color: white; text-align: center; overflow-x: hidden; }
+        .navbar { background-color: rgba(15, 15, 15, 0.9); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; }
+        .nav-left { display: flex; align-items: center; gap: 15px; }
+        .btn-nav { background: #1a1a1a; color: #ffc831; border: 1px solid #ffc831; padding: 8px 16px; border-radius: 10px; text-decoration: none; font-size: 0.9rem; font-weight: bold; transition: 0.3s; cursor: pointer; }
+        .btn-nav:hover { background: #ffc831; color: #000; }
+        .points-box { background: #000; color: #ffc831; border: 1px solid #ffc831; padding: 8px 20px; border-radius: 25px; font-weight: bold; }
+        .diamond-box { background: #000; color: #00d4ff; border: 1px solid #00d4ff; padding: 8px 20px; border-radius: 25px; font-weight: bold; margin-left: 10px; }
+        
+        /* สไตล์กล่องตั๋วสุ่มทั้ง 2 รูปแบบ */
+        .ticket-box { background: #000; color: #cbd5e1; border: 1px solid #cbd5e1; padding: 8px 20px; border-radius: 25px; font-weight: bold; margin-left: 10px; }
+        .premium-ticket-box { background: #000; color: #ffc831; border: 1px solid #ffc831; padding: 8px 20px; border-radius: 25px; font-weight: bold; margin-left: 10px; }
+
+        .container { max-width: 1400px; margin: 30px auto; padding: 0 20px; }
+        .main-layout { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; align-items: flex-start; }
+        .gacha-box { flex: 2; background-color: #111; border-radius: 30px; padding: 30px; border: 1px solid #222; min-height: 500px; position: relative; background-image: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%); min-width: 320px; }
+        .preview-box { flex: 0.7; background: #111; border-radius: 30px; border: 1px solid #333; padding: 20px; display: flex; flex-direction: column; align-items: center; min-width: 250px; }
+        
+        /* Rate-Up Wishlist Section */
+        .wishlist-section { background: rgba(255, 200, 49, 0.05); border: 1px dashed #ffc831; border-radius: 20px; padding: 15px; margin-bottom: 20px; text-align: left; }
+        .wishlist-title { font-size: 0.95rem; font-weight: bold; color: #ffc831; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .wishlist-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .wishlist-slot { background: #222; aspect-ratio: 2/3; border-radius: 8px; border: 2px dashed #444; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; overflow: hidden; transition: 0.2s; }
+        .wishlist-slot:hover { border-color: #00d4ff; background: #1a1a1a; }
+        .wishlist-slot img { width: 100%; height: 100%; object-fit: cover; }
+        .wishlist-slot .slot-placeholder { font-size: 0.75rem; color: #666; text-align: center; padding: 5px; }
+        .wishlist-slot .remove-wish { position: absolute; top: 2px; right: 2px; background: rgba(255,0,0,0.8); color: white; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 5; }
+
+        .card-choice-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
+        .choice-item { cursor: pointer; border: 2px solid transparent; border-radius: 10px; padding: 5px; transition: 0.2s; background: #222; text-align: center; font-size: 0.8rem; }
+        .choice-item:hover { border-color: #00d4ff; background: #2a2a2a; }
+        .choice-item img { width: 100%; aspect-ratio: 2/3; object-fit: cover; border-radius: 5px; margin-bottom: 5px; }
+        
+        /* Rarity Badge Text Colors */
+        .color-secret { color: #ff4757; text-shadow: 0 0 10px #ff4757, 0 0 20px #ff6b81; font-weight: bold; }
+        .color-p { color: #ff9f43; text-shadow: 0 0 10px #ff9f43; font-weight: bold; }
+        .color-usec { color: #ffffff; text-shadow: 0 0 10px #fff, 0 0 20px #00d4ff; }
+        .color-exr { color: #00d4ff; text-shadow: 0 0 10px #00d4ff; }
+        .color-cbr { color: #ff00ff; text-shadow: 0 0 8px #ff00ff; }
+        .color-sec { color: #a020f0; text-shadow: 0 0 5px #a020f0; }
+        .color-sur { color: #ff4500; text-shadow: 0 0 5px #ff4500; }
+        .color-ssr { color: #ff4444; }
+        .color-pr { color: #ffc831; text-shadow: 0 0 8px #ffc831; } 
+        .color-ur { color: #39ff14; }
+        .color-sr { color: #ffc831; }
+        .color-r { color: #007bff; }
+        .color-u { color: #00ffcc; }
+        .color-c { color: #aaaaaa; }
+
+        .pity-area { max-width: 500px; margin: 0 auto 20px auto; display: flex; flex-direction: column; gap: 10px; }
+        .pity-container { background: #1a1a1a; height: 10px; border-radius: 10px; border: 1px solid #333; overflow: hidden; position: relative; }
+        .pity-bar-sec { height: 100%; background: linear-gradient(90deg, #a020f0, #ff00ff); width: 0%; transition: 0.5s; }
+        .pity-bar-exr { height: 100%; background: linear-gradient(90deg, #ffffff, #00d4ff); width: 0%; transition: 0.5s; }
+        .pity-label { font-size: 0.75rem; color: #aaa; display: flex; justify-content: space-between; }
+        
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; margin-bottom: 30px; justify-items: center; min-height: 200px; }
+        .card { width: 120px; position: relative; perspective: 1000px; }
+        .card-inner { width: 100%; aspect-ratio: 2/3; position: relative; transform-style: preserve-3d; transition: transform 0.6s; transform: rotateY(180deg); }
+        .card.revealed .card-inner { transform: rotateY(0deg); }
+        .card-front, .card-back { width: 100%; height: 100%; position: absolute; backface-visibility: hidden; border-radius: 12px; border: 2px solid #333; overflow: hidden; }
+        .card-back { background: #222; transform: rotateY(180deg); border: 2px solid #444; background-image: repeating-linear-gradient(45deg, #1a1a1a, #1a1a1a 10px, #222 10px, #222 20px); }
+        .card-front img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
+        .modal-content { background: #111; margin: 5% auto; padding: 25px; width: 95%; max-width: 650px; border-radius: 20px; text-align: left; border: 1px solid #333; max-height: 85vh; overflow-y: auto; }
+        .btn-pull { padding: 12px 20px; border-radius: 15px; font-weight: bold; cursor: pointer; border: none; background: #ffc831; color: #000; margin: 5px; transition: 0.2s; font-size: 0.85rem; }
+        .btn-pull:hover:not(:disabled) { transform: scale(1.05); filter: brightness(1.1); }
+        .btn-pull:disabled { background: #444; color: #888; cursor: not-allowed; }
+        
+        /* สไตล์ปุ่มกดสุ่มตั๋วแยกหมวดหมู่ */
+        .btn-normal-ticket { background: #94a3b8 !important; color: black !important; }
+        .btn-premium-ticket { background: #ffc831 !important; color: black !important; }
+
+        .scroll-window { width: 100%; height: 260px; overflow: hidden; position: relative; margin: 10px 0; mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent); }
+        .slide-track-v { display: flex; flex-direction: column; gap: 15px; animation: scroll-up 500s linear infinite; }
+        @keyframes scroll-up { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
+        .preview-card-item { width: 120px; margin: 0 auto; border-radius: 10px; border: 2px solid #222; overflow: hidden; }
+        .preview-card-item img { width: 100%; display: block; }
+        .quick-rate-table { width: 100%; margin: 10px 0; font-size: 0.8rem; border-top: 1px solid #333; padding-top: 10px; }
+        .rate-row { display: flex; justify-content: space-between; padding: 4px 10px; border-bottom: 1px solid #222; }
+        
+        #cutscene-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; display: none; align-items: center; justify-content: center; flex-direction: column; }
+        .shake-heavy { animation: shake-heavy 0.5s both; }
+        @keyframes shake-heavy { 0%, 100% { transform: translate(0,0); } 10%, 30%, 50%, 70%, 90% { transform: translate(-4px, -2px); } 20%, 40%, 60%, 80% { transform: translate(4px, 2px); } }
+    </style>
+</head>
+<body id="body-main">
+
+    <div id="cutscene-overlay">
+        <div style="font-size:3rem; font-weight:bold; text-shadow: 0 0 20px #ff4757; color: white; animation: shake-heavy 0.2s infinite;">โชคชะตาแห่งการ์ด!!!!!</div>
+    </div>
+
+    <div id="rateModal" class="modal">
+        <div class="modal-content">
+            <span style="float:right; cursor:pointer; font-size:24px; color:#aaa;" onclick="closeModal('rateModal')">&times;</span>
+            <h3 style="color:#ffc831; margin-top: 0;">รายชื่อการ์ดและเรทแยกใบ (อัปเดตตามการเลือกเพิ่มโอกาส)</h3>
+            <table style="width:100%; border-collapse: collapse;" id="rate-list-body"></table>
+        </div>
+    </div>
+
+    <div id="wishlistModal" class="modal">
+        <div class="modal-content" style="max-width: 600px; border: 2px solid #00d4ff;">
+            <span style="float:right; cursor:pointer; font-size:24px; color:#aaa;" onclick="closeModal('wishlistModal')">&times;</span>
+            <h3 style="color:#00d4ff; text-align: center; margin-top: 0;">เลือกการ์ดล็อกเรทเพิ่มโอกาส (เฉพาะ USEC / EXR)</h3>
+            <p style="text-align: center; font-size: 0.85rem; color: #aaa; margin-bottom: 15px;">เลือกการ์ดเป้าหมายเพื่อนำไปรับการเพิ่มอัตราสุ่มสำเร็จ</p>
+            <div id="wishlist-selection-grid" class="card-choice-grid"></div>
+        </div>
+    </div>
+
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="index.html" class="btn-nav">🏠 เมนูหลัก</a>
+            <a href="collection.html" class="btn-nav" style="border-color: #fff; color: #fff;">📖 สมุดสะสม</a>
+        </div>
+        <div style="display: flex; align-items: center;">
+            <div class="points-box">🪙 <span id="balance">0</span></div>
+            <div class="diamond-box">💎 <span id="user-diamonds">0</span></div>
+            <div class="ticket-box">🎫 <span id="user-normal-tickets">0</span></div>
+            <div class="premium-ticket-box">🎟️ <span id="user-premium-tickets">0</span></div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="main-layout">
+            <div class="gacha-box">
+                <div class="wishlist-section">
+                    <div class="wishlist-title">
+                        <span><i class="fa-solid fa-star"></i> ระบบเลือกการ์ดเพิ่มโอกาสออก (สูงสุด 4 ใบ เฉพาะ USEC, EXR)</span>
+                        <small style="color: #00d4ff;">เรทของใบที่เลือกจะถูกเพิ่มขึ้นเป็นพิเศษ</small>
+                    </div>
+                    <div class="wishlist-grid" id="wishlist-slots-container"></div>
+                </div>
+
+                <div class="pity-area">
+                    <div class="pity-label">การันตี SEC: <b id="pity-text-sec">0 / 550</b></div>
+                    <div class="pity-container"><div id="pity-bar-sec" class="pity-bar-sec"></div></div>
+                    <div class="pity-label">การันตี USEC (EXR Old): <b id="pity-text-exr">0 / 900</b></div>
+                    <div class="pity-container"><div id="pity-bar-exr" class="pity-bar-exr"></div></div>
+                </div>
+                
+                <div id="display" class="card-grid"></div>
+                
+                <div class="btn-group">
+                    <div style="margin-bottom: 12px; border-bottom: 1px dashed #333; padding-bottom: 10px;">
+                        <span style="font-weight: bold; color: #00d4ff; font-size: 0.9rem;">💎 ใช้เพชรสุ่ม:</span>
+                        <button id="pull-5" class="btn-pull" onclick="executePullGacha(5, 'diamonds')">สุ่ม 5 ใบ (100 💎)</button>
+                        <button id="pull-10" class="btn-pull" style="background: #ff00ff; color: white;" onclick="executePullGacha(10, 'diamonds')">สุ่ม 10 ใบ (500 💎)</button>
+                        <button id="pull-50" class="btn-pull" style="background: #00d4ff; color: white;" onclick="executePullGacha(50, 'diamonds')">สุ่ม 50 ใบ (1,000 💎)</button>
+                    </div>
+                    <div>
+                        <span style="font-weight: bold; color: #ffc831; font-size: 0.9rem;">🎫 / 🎟️ ใช้ตั๋วไฮบริดสุ่ม (หักตั๋วอัตโนมัติ):</span>
+                        <button id="pull-ticket-5" class="btn-pull btn-normal-ticket" onclick="executePullGacha(5, 'tickets')">สุ่ม 5 ครั้ง (🎫10 หรือ 🎟️5)</button>
+                        <button id="pull-ticket-10" class="btn-pull btn-premium-ticket" onclick="executePullGacha(10, 'tickets')">สุ่ม 10 ครั้ง (🎫15 หรือ 🎟️10)</button>
+                        <button id="pull-ticket-50" class="btn-pull btn-premium-ticket" style="background:#ef4444 !important; color:white !important;" onclick="executePullGacha(50, 'tickets')">สุ่ม 50 ครั้ง (🎫30 หรือ 🎟️20)</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="preview-box">
+                <div style="font-size: 0.8rem; color: #ffc831; font-weight: bold; margin-bottom: 5px;">RARITY PREVIEW</div>
+                <div class="scroll-window"><div class="slide-track-v" id="v-track"></div></div>
+                
+                <div class="quick-rate-table">
+                    <div class="rate-row"><span class="rate-label color-secret">SECRET</span><span>0.002%</span></div>
+                    <div class="rate-row"><span class="rate-label color-p">P</span><span>0.005%</span></div>
+                    <div class="rate-row"><span class="rate-label color-usec">USEC</span><span>0.20%</span></div>
+                    <div class="rate-row"><span class="rate-label color-exr">EXR</span><span>0.40%</span></div>
+                    <div class="rate-row"><span class="rate-label color-cbr">CBR</span><span>0.50%</span></div>
+                    <div class="rate-row"><span class="rate-label color-sec">SEC</span><span>1.20%</span></div> 
+                    <div class="rate-row"><span class="rate-label color-sur">SUR</span><span>2.00%</span></div> 
+                    <div class="rate-row"><span class="rate-label color-ssr">SSR</span><span>4.50%</span></div> 
+                    <div class="rate-row"><span class="rate-label color-pr">PR</span><span>6.00%</span></div> 
+                    <div class="rate-row"><span class="rate-label color-ur">UR</span><span>10.00%</span></div>
+                    <div class="rate-row"><span class="rate-label color-sr">SR</span><span>15.00%</span></div>
+                    <div class="rate-row"><span class="rate-label color-r">R</span><span>20.00%</span></div>
+                    <div class="rate-row"><span class="rate-label color-u">U</span><span>20.00%</span></div>
+                    <div class="rate-row"><span class="rate-label color-c">C</span><span>20.193%</span></div>
+                </div>
+                <button class="btn-nav" style="width: 100%; font-size: 0.8rem;" onclick="openRateModal()">ℹ️ ดูเรทสุ่มแบบแยกใบ</button>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, updateDoc, arrayUnion, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
+        authDomain: "sign-up-73f99.firebaseapp.com",
+        projectId: "sign-up-73f99",
+        storageBucket: "sign-up-73f99.appspot.com",
+        messagingSenderId: "916335559099",
+        appId: "1:916335559099:web:3a8ed896ba26e38991849e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let userData = null;
+    let currentUserUID = null;
+    let isPulling = false;
+    let chosenWishlistIDs = [];
+
+    // --- ฐานข้อมูลการ์ดระดับเรทต่างๆ ---
+    const allCards = [
+        { id: 19, rarity: "SECRET", name: "Blossom Cookie", rate: 0.002, img: "https://cookierunbraverse.com/data/en_storage/SH08S1NaBoPDBv9Uiv1Ggw.webp" },
+        { id: 19, rarity: "SECRET", name: "Bubbles Cookie", rate: 0.002, img: "https://cookierunbraverse.com/data/en_storage/d7EERSE0QYVwC_yEcL5SRw.webp" },
+        { id: 19, rarity: "SECRET", name: "Buttercup Cookie", rate: 0.002, img: "https://cookierunbraverse.com/data/en_storage/4J5geOivFB3dd1HgSH4I9w.webp" },
+
+        { id: 19, rarity: "P", name: "Longan Dragon Cookie", rate: 0.005, img: "https://cookierunbraverse.com/data/en_storage/MH-gDX05Ld2DgMMxWUOBNA.webp" },
+        { id: 19, rarity: "P", name: "Cream Ferret Cookie", rate: 0.005, img: "https://cookierunbraverse.com/data/en_storage/wpbHsjb_sEJkiYkXxFaoOA.webp" },
+        { id: 19, rarity: "P", name: "Snapdragon Cookie", rate: 0.005, img: "https://cookierunbraverse.com/data/en_storage/lyx9_8cZKF8s3PR34pnxAQ.webp" },
+        { id: 19, rarity: "P", name: "Icicle Yeti Cookie", rate: 0.005, img: "https://cookierunbraverse.com/data/en_storage/tcHLjDr-WkMfxqtFyOXUYg.webp" },
+        { id: 19, rarity: "P", name: "พัทธกาล", rate: 0.005, img: "https://cdn.bangbon.app/cards/ODY1-062.png" },
+        { id: 19, rarity: "P", name: "มหิตัน", rate: 0.005, img: "https://cdn.bangbon.app/cards/ODY1-061.png" },
+        { id: 19, rarity: "P", name: "โลทัน", rate: 0.005, img: "https://cdn.bangbon.app/cards/ODY1-060.png" },
+        { id: 19, rarity: "P", name: "กาลจักร", rate: 0.005, img: "https://cdn.bangbon.app/cards/ODY1-059.png" },
+
+        { id: 1, rarity: "USEC", name: "อย่าให้มีครั้งที่ 2 (USEC)", rate: 0.20, img: "https://cdn.bangbon.app/cards/SL02-007.png" },
+        { id: 1, rarity: "USEC", name: "เตียวเลี้ยว ขุนพลมือปราบแห่งวุยก๊ก (USEC)", rate: 0.20, img: "https://cdn.bangbon.app/cards/SL02-004.png" },
+        { id: 2, rarity: "USEC", name: "เจค นักฆ่ามือเก๋า (USEC)", rate: 0.20, img: "https://cdn.bangbon.app/cards/SL02-003.png" },
+        { id: 3, rarity: "USEC", name: "พลังแฝง (USEC)", rate: 0.20, img: "https://cdn.bangbon.app/cards/SL02-008.png" },
+        { id: 4, rarity: "USEC", name: "พระอิศวร (USEC)", rate: 0.20, img: "https://cdn.bangbon.app/cards/SL01-003.png" },
+        { id: 5, rarity: "USEC", name: "พระนารายณ์ (USEC)", rate: 0.20, img: "https://cdn.bangbon.app/cards/SL01-004.png" },
+        { id: 6, rarity: "USEC", name: "พระอินทร์ (USEC)", rate: 0.20, img: "https://cdn.bangbon.app/cards/SL01-005.png" },
+        { id: 7, rarity: "USEC", name: "ง่อวซอรัส (USEC)", rate: 0.20, img: "https://cdn.bangbon.app/cards/SL02-005.png" },
+        { id: 8, rarity: "USEC", name: "ครุฑเวนไตย เจ้ากำลัง (USEC)", rate: 0.20, img: "https://cdn.bangbon.app/cards/SL02-002.png" },
+        { id: 9, rarity: "USEC", name: "นางมณโฑ (USEC)", rate: 0.20, img: "https://cdn.bangbon.app/cards/SL01-001.png" },
+
+        { id: 10, rarity: "EXR", name: "Pure Vanilla", rate: 0.40, img: "https://cookierunbraverse.com/data/en_storage/eXN_QVTcLFL7hr0_HG0jVg.webp" },
+        { id: 11, rarity: "EXR", name: "Timekeeper Cookie", rate: 0.40, img: "https://cookierunbraverse.com/data/en_storage/04Ahr1eXIerfTtIvinvqqA.webp" },
+        { id: 12, rarity: "EXR", name: "Arena of Glory", rate: 0.40, img: "https://cookierunbraverse.com/data/en_storage/DNtDIrN3TmeWtjC_LAFoiA.webp" },
+        { id: 13, rarity: "EXR", name: "Dark Cacao Cookie", rate: 0.40, img: "https://cookierunbraverse.com/data/en_storage/vU4s5KR0vFrGzuK0eBL-3Q.webp" },
+        
+        { id: 2, rarity: "CBR", name: "สุดยอดท่าไม้ตายผู้กล้า THE END (CBR)", rate: 0.50, img: "https://cdn.bangbon.app/cards/KD04-012-CBR.png" },
+        { id: 2, rarity: "CBR", name: "ฮันโซ นินจาในตำนาน (CBR)", rate: 0.50, img: "https://cdn.bangbon.app/cards/BT10-005-CBR.png" },
+        { id: 2, rarity: "CBR", name: "จัน หนวดเขี้ยว (CBR)", rate: 0.50, img: "https://cdn.bangbon.app/cards/SD06-001-CBR.png" },
+        { id: 2, rarity: "CBR", name: "มีมมิจัง ไอดอล No.1 (CBR)", rate: 0.50, img: "https://cdn.bangbon.app/cards/KD03-001-CBR.png" },
+        { id: 2, rarity: "CBR", name: "พระอิศวร วีลแชร์ (CBR)", rate: 0.50, img: "https://cdn.bangbon.app/cards/BT09-001-CBR.png" },
+        { id: 2, rarity: "CBR", name: "เมียพระอิศวร (CBR)", rate: 0.50, img: "https://cdn.bangbon.app/cards/SD01-005-CBR.png" },
+        { id: 2, rarity: "CBR", name: "วีรบุรุษปากซอย (CBR)", rate: 0.50, img: "https://cdn.bangbon.app/cards/SD02-005-CBR.png" },
+        { id: 2, rarity: "CBR", name: "อู๊ด ประธานผู้รู้ความจริง (CBR)", rate: 0.50, img: "https://cdn.bangbon.app/cards/BT04-020-CBR.png" },
+        { id: 2, rarity: "CBR", name: "พี่หน่วง พิธีกรผมสวย (CBR)", rate: 0.50, img: "https://cdn.bangbon.app/cards/BT07-023-CBR.png" },
+
+        { id: 302, rarity: "SEC", name: "Mala Sauce Cookie", rate: 1.20, img: "https://cookierunbraverse.com/data/en_storage/jfWKmk2AuhLHe1nQ4XcZOg.webp" },
+        { id: 302, rarity: "SEC", name: "Rye Cookie", rate: 1.20, img: "https://cookierunbraverse.com/data/en_storage/4uN-rWgLpkiJmDSV8EQLyQ.webp" },
+        { id: 302, rarity: "SEC", name: "Crème Brûlée Cookie", rate: 1.20, img: "https://cookierunbraverse.com/data/en_storage/HpnwEi243FVem49dfnr_RQ.webp" },
+        { id: 302, rarity: "SEC", name: "Clotted Cream Cookie", rate: 1.20, img: "https://cookierunbraverse.com/data/en_storage/RSyQ3dE0FJ7KC2MrH2ufAQ.webp" },
+        { id: 302, rarity: "SEC", name: "Licorice Cookie", rate: 1.20, img: "https://cookierunbraverse.com/data/en_storage/Q6ZrMyWC5VaF6tR-bGs1hw.webp" },
+        { id: 302, rarity: "SEC", name: "Schwarzwälder", rate: 1.20, img: "https://cookierunbraverse.com/data/en_storage/o4staPQF69zvCb0k65aJ3A.webp" },
+        { id: 3, rarity: "SEC", name: "Elder Faerie Cookie (SEC)", rate: 1.20, img: "https://cookierunbraverse.com/data/en_storage/GlxuahRzIUHtghiNoBnR8Q.webp" },
+        { id: 5, rarity: "SEC", name: "Cookiemals (SEC)", rate: 1.20, img: "https://cookierunbraverse.com/data/en_storage/eYzBPU7vPznUOLqF3sChUg.webp" },
+        { id: 6, rarity: "SEC", name: "Towerkeeper Cookie (SEC)", rate:1.20, img: "https://cookierunbraverse.com/data/en_storage/30mu5UDmY7GF5P0degmldg.webp" },
+        { id: 6, rarity: "SEC", name: "Pure Vanilla Cookie (SEC)", rate: 1.20, img: "https://cookierunbraverse.com/data/en_storage/n216nqrESeGD3vqTr5tPEg.webp" },
+        { id: 6, rarity: "SEC", name: "Latte Cookie (SEC)", rate: 1.20, img: "https://cookierunbraverse.com/data/en_storage/mxREB5Qnh8K0RLt1m_9lTA.webp" },
+        { id: 3, rarity: "SEC", name: "GingerBrave (SEC)", rate: 1.20, img: "https://cookierunbraverse.com/data/en_storage/G1ZKRY689YVnYwusdDnjmg.webp" },
+        { id: 5, rarity: "SEC", name: "Marble Bread Cookie (SEC)", rate: 1.20, img: "https://cookierunbraverse.com/data/en_storage/bJV3kb4i7lmPR3PQBVSeaw.webp" },
+        { id: 6, rarity: "SEC", name: "Coffee Candy Cookie (SEC)", rate: 1.20, img: "https://cookierunbraverse.com/data/en_storage/B4zYAOpgr0SycdDljZo8pg.webp" },
+        { id: 6, rarity: "SEC", name: "Maple Taffy Cookie (SEC)", rate: 1.20, img: "https://cookierunbraverse.com/data/en_storage/Rirk1WTMDYgQux8lPPezWg.webp" },
+        { id: 6, rarity: "SEC", name: "String Gummy Cookie (SEC)", rate: 1.20, img: "https://cookierunbraverse.com/data/en_storage/rTT_nCZhq8il07Ur3UnkbQ.webp" },
+        { id: 4, rarity: "SEC", name: "Ecycle (SEC)", rate: 1.20, img: "https://cdn.bangbon.app/cards/CC02-035-SCR.png" },
+        { id: 4, rarity: "SEC", name: "มอร์ฟีน Overdose (SEC)", rate: 1.20, img: "https://cdn.bangbon.app/cards/CC02-017-SCR.png" },
+        { id: 4, rarity: "SEC", name: "โจอี้ นักบอลขาหัก (SEC)", rate: 1.20, img: "https://cdn.bangbon.app/cards/CC02-025-SCR.png" },
+        { id: 4, rarity: "SEC", name: "พรของอิศวร (SEC)", rate: 1.20, img: "https://cdn.bangbon.app/cards/CC01-042-SCR.png" },
+        { id: 4, rarity: "SEC", name: "วีรบุรุษสุดซอย (SEC)", rate: 1.20, img: "https://cdn.bangbon.app/cards/CC01-007-SCR.png" },
+        { id: 4, rarity: "SEC", name: "มวยทะเลลลลลล (SEC)", rate: 1.20, img: "https://cdn.bangbon.app/cards/CC02-060-SCR.png" },
+        { id: 4, rarity: "SEC", name: "ร่างอวตารพระนารายณ์ - นรสิง (SEC)", rate: 1.20, img: "https://cdn.bangbon.app/cards/KD01-002-SCR.png" },
+        { id: 4, rarity: "SEC", name: "พญายักษ์ ทศกัณฐ์ (SEC)", rate: 1.20, img: "https://cdn.bangbon.app/cards/CC02-039-SCR.png" },
+        { id: 4, rarity: "SEC", name: "มีมมิจัง ไอดอลหน้าใหม่ (SEC)", rate: 1.20, img: "https://cdn.bangbon.app/cards/KD03-003-SCR.png" },
+        { id: 4, rarity: "SEC", name: "บอสทุเรียน (SEC)", rate: 1.20, img: "https://cdn.bangbon.app/cards/CC02-031-SCR.png" },
+        { id: 4, rarity: "SEC", name: "เตียวเสียน จันทร์หลบโฉมสุดา (SEC)", rate: 1.20, img: "https://cdn.bangbon.app/cards/CC02-012-SCR.png" },
+        { id: 3, rarity: "SEC", name: "Dark Cacao Cookie (SEC)", rate: 1.20, img: "https://cookierunbraverse.com/data/en_storage/vW-WtZbXnbd_ZCuwxTvmwg.webp" },
+        { id: 5, rarity: "SEC", name: "Espresso Cookie (SEC)", rate: 1.20, img: "https://cookierunbraverse.com/data/en_storage/Bw9N7OUwy9TwOpyJu4auyw.webp" },
+        { id: 6, rarity: "SEC", name: "Almond Cookie (SEC)", rate: 1.20, img: "https://cookierunbraverse.com/data/en_storage/ejgnrnTk1I-GkZfD_xmZ8Q.webp" },
+        { id: 6, rarity: "SEC", name: "Oyster Cookie (SEC)", rate: 1.20, img: "https://cookierunbraverse.com/data/en_storage/EzMogYcnFEjW1oB6C_ENug.webp" },
+        { id: 6, rarity: "SEC", name: "Cotton Cookie (SEC)", rate: 1.20, img: "https://cookierunbraverse.com/data/en_storage/d3tdXqNbs0iBEcFdpMKnhQ.webp" },
+  
+        { id: 1001, rarity: "SUR", name: "Dark Cacao Cookie(PURPLE) (SUR)", rate: 2.00, img: "https://cookierunbraverse.com/data/en_storage/N3RN0rJZjNl4gpHPuFkMyw.webp" },
+        { id: 1002, rarity: "SUR", name: "Mystic Flour Cookie (SUR)", rate: 2.00, img: "https://cookierunbraverse.com/data/en_storage/RYJiz4Y3dF4TK1oAxqOWKw.webp" },
+        { id: 1002, rarity: "SUR", name: "Peak of Apathy (SUR)", rate: 2.00, img: "https://cookierunbraverse.com/data/en_storage/S5pLzsJzisen1w4Npikm9g.webp" },
+        { id: 1002, rarity: "SUR", name: "Dark Cacao Cookie (SUR)", rate: 2.00, img: "https://cookierunbraverse.com/data/en_storage/CMHoSF_U6LUYwYSH_9obrQ.webp" },
+        { id: 1002, rarity: "SUR", name: "Caramel Arrow Cookie (SUR)", rate: 2.00, img: "https://cookierunbraverse.com/data/en_storage/9uFvbOAHnwcqR85IS2M_3Q.webp" },
+        { id: 1002, rarity: "SUR", name: "Stormbringer Cookie (SUR)", rate: 2.00, img: "https://cookierunbraverse.com/data/en_storage/T039pptu7nc83IPRFV3sDQ.webp" },
+        { id: 303, rarity: "SUR", name: "Kouign-Amann Cookie", rate: 2.00, img: "https://cookierunbraverse.com/data/en_storage/JSZeCjakE8f-De3vYKIf0g.webp" },
+        { id: 303, rarity: "SUR", name: "Prune Juice Cookie", rate: 2.00, img: "https://cookierunbraverse.com/data/en_storage/L2xRcg1M0ID5fdMc5U4mTg.webp" },
+        { id: 303, rarity: "SUR", name: "Capsaicin Cookie", rate: 2.00, img: "https://cookierunbraverse.com/data/en_storage/sRxRvJ-UI98R-aJNtWtkFg.webp" },
+        { id: 1001, rarity: "SUR", name: "Truthless Recluse (SUR)", rate: 2.00, img: "https://cookierunbraverse.com/data/en_storage/SW4maYQ_Sr5CaMPTKArhHg.webp" },
+        { id: 1002, rarity: "SUR", name: "Shadow Milk Cookie(RED) (SUR)", rate: 2.00, img: "https://cookierunbraverse.com/data/en_storage/hkO1emUYo5fE0Whn1AXGAQ.webp" },
+        { id: 1002, rarity: "SUR", name: "Shadow Milk Cookie(YELLOW) (SUR)", rate: 2.00, img: "https://cookierunbraverse.com/data/en_storage/nbpUqYDu3Vj6TGqx25hKnA.webp" },
+        { id: 1002, rarity: "SUR", name: "Shadow Milk Cookie(GREEN) (SUR)", rate: 2.00, img: "https://cookierunbraverse.com/data/en_storage/utWkhztlRG0-oBe19IYnkw.webp" },
+        { id: 1002, rarity: "SUR", name: "Shadow Milk Cookie(PURPLE) (SUR)", rate: 2.00, img: "https://cookierunbraverse.com/data/en_storage/Jvym0Zjq9yVz0xXF7ci8vA.webp" },
+        { id: 1002, rarity: "SUR", name: "Shadow Milk Cookie (SUR)", rate: 2.00, img: "https://cookierunbraverse.com/data/en_storage/Cy-HXdB8KFbJHRNXqTCItw.webp" },
+        { id: 1001, rarity: "SUR", name: "Croissant Cookie (SUR)", rate: 2.00, img: "https://cookierunbraverse.com/data/en_storage/OPuI_asmEH5n4dIpSpjtJA.webp" },
+        { id: 1002, rarity: "SUR", name: "Timekeeper Cookie(RED) (SUR)", rate: 2.00, img: "https://cookierunbraverse.com/data/en_storage/WxI7hREeWwwuAN_MsApBAQ.webp" },
+        { id: 1002, rarity: "SUR", name: "Timekeeper Cookie(YELLOW) (SUR)", rate: 2.00, img: "https://cookierunbraverse.com/data/en_storage/QQpFIFtz2H_QQTalhH7e3g.webp" },
+        { id: 1002, rarity: "SUR", name: "Timekeeper Cookie(GREEN) (SUR)", rate: 2.00, img: "https://cookierunbraverse.com/data/en_storage/kbr0TRQ4vjQsPAmGKqyW2Q.webp" },
+        { id: 1002, rarity: "SUR", name: "Timekeeper Cookie(PURPLE) (SUR)", rate: 2.00, img: "https://cookierunbraverse.com/data/en_storage/1GZuxasYChokPNKC_29SwA.webp" },
+        { id: 1002, rarity: "SUR", name: "String Gummy Cookie (SUR)", rate: 2.00, img: "https://cookierunbraverse.com/data/en_storage/KUS_NuMMNNpVH7fZKLbEow.webp" },
+        { id: 1002, rarity: "SUR", name: "Pitaya Dragon Cookie (SUR)", rate: 2.00, img: "https://cookierunbraverse.com/data/en_storage/MQwu_mjhVO8S9Xgql01rcg.webp" },
+        { id: 1002, rarity: "SUR", name: "Ananas Dragon Cookie (SUR)", rate: 2.00, img: "https://cookierunbraverse.com/data/en_storage/gQqHDUMVlaAgKTXsBFBy8A.webp" },
+        { id: 1002, rarity: "SUR", name: "Snake Fruit Cookie (SUR)", rate: 2.00, img: "https://cookierunbraverse.com/data/en_storage/7GxPBG1hrRXn7XCItAf3Ew.webp" },
+        { id: 1002, rarity: "SUR", name: "Longan Dragon Cookie (SUR)", rate: 2.00, img: "https://cookierunbraverse.com/data/en_storage/fMJg6fEzZD09DJRXuiD-DA.webp" },
+        { id: 1002, rarity: "SUR", name: "Lotus Dragon Cookie (SUR)", rate: 2.00, img: "https://cookierunbraverse.com/data/en_storage/MmzH1yjooqf8itgqNPs_xw.webp" },
+
+        { id: 7, rarity: "SSR", name: "Caramel Arrow Cookie", rate: 4.50, img: "https://cookierunbraverse.com/data/en_storage/7_FQoGt0DFmnAbyjoTaTng.webp" },
+        { id: 8, rarity: "SSR", name: "Crunchy Chip Cookie", rate: 4.50, img: "https://cookierunbraverse.com/data/en_storage/7KOB9GX-joOAGovu8-cZbg.webp" },
+        { id: 9, rarity: "SSR", name: "Soul Jam: Light of Apathy", rate: 4.50, img: "https://cookierunbraverse.com/data/en_storage/OPzsh8uf_tlk7j56pvDtww.webp" },
+        { id: 10, rarity: "SSR", name: "Cloud Haetae Cookie", rate: 4.50, img: "https://cookierunbraverse.com/data/en_storage/-776HbY63YFn6JPaHS6QPg.webp" },
+        { id: 10, rarity: "SSR", name: "Peach Blossom Cookie", rate: 4.50, img: "https://cookierunbraverse.com/data/en_storage/TqianQVDV6Vm4r2iAiq3dA.webp" },
+        { id: 10, rarity: "SSR", name: "Icicle Yeti Cookie", rate: 4.50, img: "https://cookierunbraverse.com/data/en_storage/4OPNCHsGWdYi1yMAFaKYCg.webp" },
+        { id: 305, rarity: "SSR", name: "Crushed Pepper Cookie", rate: 4.50, img: "https://cookierunbraverse.com/data/en_storage/4_Oj9AFa9NRd-USX33QLBA.webp" },
+        { id: 305, rarity: "SSR", name: "Green Tea Mousse Cookie", rate: 4.50, img: "https://cookierunbraverse.com/data/en_storage/lNTM2xAUOsG4lup2AJWf0g.webp" },
+        { id: 305, rarity: "SSR", name: "Financier Cookie", rate: 4.50, img: "https://cookierunbraverse.com/data/en_storage/ThkoRLd-EhhUX5ApphGItw.webp" },
+        { id: 305, rarity: "SSR", name: "Madeleine Cookie", rate: 4.50, img: "https://cookierunbraverse.com/data/en_storage/p816IWY-18WxNtyEo6yDUQ.webp" },
+        { id: 305, rarity: "SSR", name: "Cherry Cola Cookie", rate: 4.50, img: "https://cookierunbraverse.com/data/en_storage/hnyBQJi329wM7aev2oIY0Q.webp" },
+        { id: 305, rarity: "SSR", name: "Latte Cookie", rate: 4.50, img: "https://cookierunbraverse.com/data/en_storage/NkUZ1omD7nIyoiq5ZmZ2fw.webp" },
+        { id: 7, rarity: "SSR", name: "White Lily", rate: 4.50, img: "https://cookierunbraverse.com/data/en_storage/PROSFwH4wlkFjSC9nn3nyg.webp" },
+        { id: 8, rarity: "SSR", name: "Pure Vanilla Cookie", rate: 4.50, img: "https://cookierunbraverse.com/data/en_storage/FLfwxLrQcMCD7Y51Wu5UvA.webp" },
+        { id: 9, rarity: "SSR", name: "Milky Way Cookie", rate: 4.50, img: "https://assets.cookierunbraverse.com/braverse/images/card_webp/card/en/BS4_092@1.png.webp" },
+        { id: 10, rarity: "SSR", name: "Cookiemals", rate: 4.50, img: "https://assets.cookierunbraverse.com/braverse/images/card_webp/card/en/BS4_059@1.png.webp" },
+        { id: 10, rarity: "SSR", name: "Wind Archer Cookie", rate: 4.50, img: "https://cookierunbraverse.com/data/en_storage/zu03wvQnUMKJwWsre6Phow.webp" },
+        { id: 10, rarity: "SSR", name: "Golden Cheese Cookie", rate: 4.50, img: "https://cookierunbraverse.com/data/en_storage/myHJ_NNKIX2pLS3YG2fVXg.webp" },
+        { id: 7, rarity: "SSR", name: "Sugar Swan Cookie", rate: 4.50, img: "https://cookierunbraverse.com/data/en_storage/L1wzJOdWGCZmANrNABjYPA.webp" },
+        { id: 8, rarity: "SSR", name: "Baguette Cookie", rate: 4.50, img: "https://cookierunbraverse.com/data/en_storage/atN1sYhyCG1eG9V3JRD_1Q.webp" },
+        { id: 9, rarity: "SSR", name: "Coffee Candy Cookie", rate: 4.50, img: "https://cookierunbraverse.com/data/en_storage/KnXzG-iOdT_X-VysaSxMSQ.webp" },
+        { id: 10, rarity: "SSR", name: "Roguefort Cookie", rate: 4.50, img: "https://cookierunbraverse.com/data/en_storage/uy0evUoJmqw2TgyxA21LnQ.webp" },
+        { id: 10, rarity: "SSR", name: "Walnut Cookie", rate: 4.50, img: "https://cookierunbraverse.com/data/en_storage/pXnEMegFYnBgpgGwUBS06w.webp" },
+        { id: 10, rarity: "SSR", name: "Marble Bread Cookie", rate: 4.50, img: "https://cookierunbraverse.com/data/en_storage/Drv1AqUYVnZAPpbdq2Ak_A.webp" },
+        { id: 10, rarity: "SSR", name: "Cherry Cookie", rate: 4.50, img: "https://cookierunbraverse.com/data/en_storage/GNjG5EVHFhD3FXM1LefuBA.webp" },
+        { id: 10, rarity: "SSR", name: "Twizzly Gummy Cookie", rate: 4.50, img: "https://cookierunbraverse.com/data/en_storage/YNvaMET6R2Qczv2NLYfi6w.webp" },
+
+        { id: 3, rarity: "PR", name: "สุดยอดท่าไม้ตายผู้กล้า THE END (PR)", rate: 6.00 , img: "https://cdn.bangbon.app/cards/KD04-012-PR.png" },
+        { id: 3, rarity: "PR", name: "ปีศาจแห่งพันรเลือด เมฟิสโตเฟเลส (PR)", rate: 6.00 , img: "https://cdn.bangbon.app/cards/KD02-001-CBR.png" },
+        { id: 3, rarity: "PR", name: "ลิโป้ ขุนพลเทพสงคราม (PR)", rate: 6.00 , img: "https://cdn.bangbon.app/cards/SD07-007-CBR.png" },
+        { id: 3, rarity: "PR", name: "สุวาน (PR)", rate: 6.00 , img: "https://cdn.bangbon.app/cards/SD03-005-CBR.png" },
+        { id: 3, rarity: "PR", name: "ราชาอาณาจักรของแพง พระเจ้านิโคไล (PR)", rate: 6.00 , img: "https://cdn.bangbon.app/cards/BT03-028-CBR.png" },
+        { id: 3, rarity: "PR", name: "มฤตยูเทวี (PR)", rate: 6.00 , img: "https://cdn.bangbon.app/cards/BT08-023-CBR.png" },
+        { id: 3, rarity: "PR", name: "วีรบุรุษปากซอย (PR)", rate: 6.00 , img: "https://cdn.bangbon.app/cards/SD02-005-PR.png" },
+        { id: 3, rarity: "PR", name: "นนทก นิ้วเพชร (PR)", rate: 6.00 , img: "https://cdn.bangbon.app/cards/BT01-001-PR.png" },
+        { id: 3, rarity: "PR", name: "พระนารายณ์ เทพผดุงธรรม (PR)", rate: 6.00 , img: "https://cdn.bangbon.app/cards/KD01-001-PR.png" },
+        { id: 3, rarity: "PR", name: "มีมมิจัง ไอดอล No.1 (PR)", rate: 6.00 , img: "https://cdn.bangbon.app/cards/KD03-001-PR.png" },
+        { id: 3, rarity: "PR", name: "วอเตอร์แมน (PR)", rate: 6.00 , img: "https://cdn.bangbon.app/cards/SD05-006-PR.png" },
+        { id: 3, rarity: "PR", name: "เมียพระอิศวร (PR)", rate: 6.00 , img: "https://cdn.bangbon.app/cards/SD01-005-PR.png" },
+
+
+        { id: 301, rarity: "UR", name: "Dark Cacao Cookie(PURPLE)", rate: 10.00, img: "https://cookierunbraverse.com/data/en_storage/RWSSLMshCw2ytNkZiNKelg.webp" },
+        { id: 302, rarity: "UR", name: "Mystic Flour Cookie", rate: 10.00, img: "https://cookierunbraverse.com/data/en_storage/mwak-E5ekaJWuADBfiq1qg.webp" },
+        { id: 303, rarity: "UR", name: "Peak of Apathy", rate: 10.00, img: "https://cookierunbraverse.com/data/en_storage/BtrZCmw-FPaYddeBt8fuLg.webp" },
+        { id: 304, rarity: "UR", name: "Dark Cacao Cookie", rate: 10.00, img: "https://cookierunbraverse.com/data/en_storage/aUJOSN9yo7MN_YXGEJ5YLA.webp" },
+        { id: 304, rarity: "UR", name: "Caramel Arrow Cookie", rate: 10.00, img: "https://cookierunbraverse.com/data/en_storage/ZFiVEpYuIdAoavhSx_6Ucg.webp" },
+        { id: 305, rarity: "UR", name: "Stormbringer Cookie", rate: 10.00, img: "https://cookierunbraverse.com/data/en_storage/YKfWcC58KuGsiigVwLvDtw.webp" },
+        { id: 304, rarity: "UR", name: "Kouign-Amann Cookie", rate: 10.00, img: "https://cookierunbraverse.com/data/en_storage/qX1v0ZaAAP5OAdYLC2gWbw.webp" },
+        { id: 304, rarity: "UR", name: "Prune Juice Cookie", rate: 10.00, img: "https://cookierunbraverse.com/data/en_storage/43aztytRcPs7KmyUS-Fcmg.webp" },
+        { id: 304, rarity: "UR", name: "Capsaicin Cookie", rate: 10.00, img: "https://cookierunbraverse.com/data/en_storage/c3tCEACUyj7WYFNVAszO5A.webp" },
+        { id: 301, rarity: "UR", name: "Truthless Recluse", rate: 10.00, img: "https://cookierunbraverse.com/data/en_storage/y7uAfYrr60xYW2yBa4o3Bw.webp" },
+        { id: 302, rarity: "UR", name: "Shadow Milk Cookie(RED)", rate: 10.00, img: "https://cookierunbraverse.com/data/en_storage/MhIiu1Yhpzag7Phn8ZdSWg.webp" },
+        { id: 303, rarity: "UR", name: "Shadow Milk Cookie(YELLOW)", rate: 10.00, img: "https://cookierunbraverse.com/data/en_storage/CdFZqA3cNoc6OCoe6_vcdQ.webp" },
+        { id: 304, rarity: "UR", name: "Shadow Milk Cookie(GREEN)", rate: 10.00, img: "https://cookierunbraverse.com/data/en_storage/F3fKPZonWDUAfd1BXoVYHA.webp" },
+        { id: 304, rarity: "UR", name: "Shadow Milk Cookie(PURPLE)", rate: 10.00, img: "https://cookierunbraverse.com/data/en_storage/IqWJeQWh2zW3FI1veimajw.webp" },
+        { id: 305, rarity: "UR", name: "Shadow Milk Cookie", rate: 10.00, img: "https://cookierunbraverse.com/data/en_storage/12WBB-03-cLAJ0tEKoMnog.webp" },
+        { id: 301, rarity: "UR", name: "Croissant Cookie", rate: 10.00, img: "https://cookierunbraverse.com/data/en_storage/OBpwXNOADKAIpuEnKBJkdA.webp" },
+        { id: 302, rarity: "UR", name: "Timekeeper Cookie(RED)", rate: 10.00, img: "https://cookierunbraverse.com/data/en_storage/t51NUCSsdRXwRL98FZL1gA.webp" },
+        { id: 303, rarity: "UR", name: "Timekeeper Cookie(YELLOW)", rate: 10.00, img: "https://cookierunbraverse.com/data/en_storage/JS9fa9x8iEochSbVqPZAdA.webp" },
+        { id: 304, rarity: "UR", name: "Timekeeper Cookie(GREEN)", rate: 10.00, img: "https://cookierunbraverse.com/data/en_storage/yj53QSK8ncFdu5JlRCCxcQ.webp" },
+        { id: 304, rarity: "UR", name: "Timekeeper Cookie(PURPLE)", rate: 10.00, img: "https://cookierunbraverse.com/data/en_storage/zZ7oH_3Md_F3mjJyfSuc5g.webp" },
+        { id: 305, rarity: "UR", name: "String Gummy Cookie", rate: 10.00, img: "https://cookierunbraverse.com/data/en_storage/sgY39YZptrF4TPJ1I-eU2Q.webp" },
+        { id: 305, rarity: "UR", name: "Pitaya Dragon Cookie", rate: 10.00, img: "https://cookierunbraverse.com/data/en_storage/RVfC7ybJkB_962tg5wz0TA.webp" },
+        { id: 305, rarity: "UR", name: "Ananas Dragon Cookie", rate: 10.00, img: "https://cookierunbraverse.com/data/en_storage/3MTiu6ED4iRLBe_8RLDbYA.webp" },
+        { id: 305, rarity: "UR", name: "Snake Fruit Cookie", rate: 10.00, img: "https://cookierunbraverse.com/data/en_storage/WjK9RI9Ue2-Hc3TzGGVsCQ.webp" },
+        { id: 305, rarity: "UR", name: "Longan Dragon Cookie", rate: 10.00, img: "https://cookierunbraverse.com/data/en_storage/LDVCY0yddHY-fay5P7-5ug.webp" },
+        { id: 305, rarity: "UR", name: "Lotus Dragon Cookie", rate: 10.00, img: "https://cookierunbraverse.com/data/en_storage/imHNCwcI3ybz5jGQkPOBXQ.webp" },
+        { id: 5, rarity: "UR", name: "พี่หน่วง พิธีกรผมสวย", rate: 10.00, img: "https://cdn.bangbon.app/cards/FPRO-003.png" },
+        { id: 5, rarity: "UR", name: "ทาโกะซัง สูตรสวรรค์", rate: 10.00, img: "https://cdn.bangbon.app/cards/ODY1-001.png" },
+        { id: 5, rarity: "UR", name: "ทาโกะซัง สูตรมนุษย์", rate: 10.00, img: "https://cdn.bangbon.app/cards/ODY1-002.png" },
+        { id: 5, rarity: "UR", name: "ทาโกะซัง สูตรนรก", rate: 10.00, img: "https://cdn.bangbon.app/cards/ODY1-003.png" },
+        { id: 5, rarity: "UR", name: "เสามงคล ทรงจีน", rate: 10.00, img: "https://cdn.bangbon.app/cards/CC01-018.png" },
+        { id: 5, rarity: "UR", name: "เล่าปี่ ผู้นำคุณธรรมแห่งจ๊กก๊ก", rate: 10.00, img: "https://cdn.bangbon.app/cards/BT08-035.png" },
+        { id: 5, rarity: "UR", name: "นนทก นิ้วเพชร", rate: 10.00, img: "https://cdn.bangbon.app/cards/BT01-001.png" },
+        { id: 5, rarity: "UR", name: "จัน หนวดเขี้ยว", rate: 10.00, img: "https://cdn.bangbon.app/cards/SD06-001.png" },
+        { id: 5, rarity: "UR", name: "วอเตอร์แมน", rate: 10.00, img: "https://cdn.bangbon.app/cards/SD05-006.png" },
+        { id: 5, rarity: "UR", name: "อู๊ด ประธานผู้รู้ความจริง ", rate: 10.00, img: "https://cdn.bangbon.app/cards/BT04-020.png" },
+        { id: 5, rarity: "UR", name: "พี่หน่วง พิธีกรผมสวย", rate: 10.00, img: "https://cdn.bangbon.app/cards/BT07-023.png" },
+        { id: 5, rarity: "UR", name: "รัททาทุย พ่อพันธุ์", rate: 10.00, img: "https://cdn.bangbon.app/cards/CC01-025.png" },
+
+        { id: 11, rarity: "SR", name: "Caramel Arrow Cookie(SR)", rate: 15.00, img: "https://cookierunbraverse.com/data/en_storage/phgSXYg0kxppGVEUPiHXBw.webp" },
+        { id: 12, rarity: "SR", name: "Crunchy Chip Cookie (SR)", rate: 15.00, img: "https://cookierunbraverse.com/data/en_storage/BRKL7Xv8TgQS2Mcy1EMD0g.webp" },
+        { id: 13, rarity: "SR", name: "Soul Jam: Light of Apathy(SR)", rate: 15.00, img: "https://cookierunbraverse.com/data/en_storage/Ky68s44YzNNy7OcSXvDnOQ.webp" },
+        { id: 14, rarity: "SR", name: "Cloud Haetae Cookie (SR)", rate: 15.00, img: "https://cookierunbraverse.com/data/en_storage/rt73HnmiAG18SW5RWy8zcA.webp" },
+        { id: 14, rarity: "SR", name: "Peach Blossom Cookie (SR)", rate: 15.00, img: "https://cookierunbraverse.com/data/en_storage/Wt8boARFjW_dZd3qw3gFnQ.webp" },
+        { id: 14, rarity: "SR", name: "Icicle Yeti Cookie (SR)", rate: 15.00, img: "https://cookierunbraverse.com/data/en_storage/vfI2rd0Vv3G8PIZP7akT-w.webp" },
+        { id: 306, rarity: "SR", name: "Crushed Pepper Cookie", rate: 15.00, img: "https://cookierunbraverse.com/data/en_storage/lNL3edkT1SXZqXIN2mDmcg.webp" },
+        { id: 306, rarity: "SR", name: "Green Tea Mousse Cookie", rate: 15.00, img: "https://cookierunbraverse.com/data/en_storage/bhUKt7Kstm7pJsyjhOfTwQ.webp" },
+        { id: 306, rarity: "SR", name: "Financier Cookie", rate: 15.00, img: "https://cookierunbraverse.com/data/en_storage/hig3oWgFHDqSwdioYLeRUA.webp" },
+        { id: 306, rarity: "SR", name: "Madeleine Cookie", rate: 15.00, img: "https://cookierunbraverse.com/data/en_storage/HCjTniHa98NH_dHzKF5YOw.webp" },
+        { id: 306, rarity: "SR", name: "Cherry Cola Cookie", rate: 15.00, img: "https://cookierunbraverse.com/data/en_storage/6QLGgKfwURwYecjK9vjd4w.webp" },
+        { id: 306, rarity: "SR", name: "Latte Cookie", rate: 15.00, img: "https://cookierunbraverse.com/data/en_storage/jqJspmqoGpAWu7trIVGe7A.webp" },
+        { id: 11, rarity: "SR", name: "White Lily (SR)", rate: 15.00, img: "https://cookierunbraverse.com/data/en_storage/4jRaQLO9rqksjrgbkvLDMg.webp" },
+        { id: 12, rarity: "SR", name: "Pure Vanilla Cookie (SR)", rate: 15.00, img: "https://cookierunbraverse.com/data/en_storage/qwIOz3Udf_iFsoy3efogQw.webp" },
+        { id: 13, rarity: "SR", name: "Milky Way Cookie(SR)", rate: 15.00, img: "https://assets.cookierunbraverse.com/braverse/images/card_webp/card/en/BS4_092.png.webp" },
+        { id: 14, rarity: "SR", name: "Cookiemals (SR)", rate: 15.00, img: "https://assets.cookierunbraverse.com/braverse/images/card_webp/card/en/BS4_059.png.webp" },
+        { id: 14, rarity: "SR", name: "Wind Archer Cookie (SR)", rate: 15.00, img: "https://cookierunbraverse.com/data/en_storage/RwYYQACXldPCLvuIOWhK5g.webp" },
+        { id: 14, rarity: "SR", name: "Golden Cheese Cookie (SR)", rate: 15.00, img: "https://cookierunbraverse.com/data/en_storage/0rGbl8x0NNYi5rwR7zKvyQ.webp" },
+        { id: 11, rarity: "SR", name: "Sugar Swan Cookie (SR)", rate: 15.00, img: "https://cookierunbraverse.com/data/en_storage/FA9CW-d3DbsY_WSgwKpE4Q.webp" },
+        { id: 12, rarity: "SR", name: "Baguette Cookie (SR)", rate: 15.00, img: "https://cookierunbraverse.com/data/en_storage/xxN1nDyfofdITz6LYCGk4w.webp" },
+        { id: 13, rarity: "SR", name: "Coffee Candy Cookie(SR)", rate: 15.00, img: "https://cookierunbraverse.com/data/en_storage/TTMXb2dUl9-jlegrk4a3SQ.webp" },
+        { id: 14, rarity: "SR", name: "Roguefort Cookie (SR)", rate: 15.00, img: "https://cookierunbraverse.com/data/en_storage/1PyBBp_jG-6x-13qzT1ixA.webp" },
+        { id: 14, rarity: "SR", name: "Walnut Cookie(SR)", rate: 15.00, img: "https://cookierunbraverse.com/data/en_storage/0p7wi2fsjSd40dM1CPXhmA.webp" },
+        { id: 14, rarity: "SR", name: "Marble Bread Cookie(SR)", rate: 15.00, img: "https://cookierunbraverse.com/data/en_storage/_m_20BlI6pwDFklcJNdSgw.webp" },
+        { id: 14, rarity: "SR", name: "Cherry Cookie(SR)", rate: 15.00, img: "https://cookierunbraverse.com/data/en_storage/BpkMEdTu5g46aAb-3Y6zPA.webp" },
+        { id: 14, rarity: "SR", name: "Twizzly Gummy Cookie(SR)", rate: 15.00, img: "https://cookierunbraverse.com/data/en_storage/0SRZOo167BS_8cpPKF_a_w.webp" },
+        { id: 6, rarity: "SR", name: "พ่อบุญใหญ่ (SR)", rate: 15.00, img: "https://cdn.bangbon.app/cards/BT01-013.png" },
+        { id: 6, rarity: "SR", name: "เดซี่ แห่งสายรุ้ง (SR)", rate: 15.00, img: "https://cdn.bangbon.app/cards/BT07-033.png" },
+        { id: 6, rarity: "SR", name: "ขวาน 7 สี (SR)", rate: 15.00, img: "https://cdn.bangbon.app/cards/BT08-061.png" },
+        { id: 6, rarity: "SR", name: "มยุราซัง ไอดอลยุค 80 (SR)", rate: 15.00, img: "https://cdn.bangbon.app/cards/BT05-043.png" },
+        { id: 6, rarity: "SR", name: "ราชินีหิมะ ชีหลิน (SR)", rate: 15.00, img: "https://cdn.bangbon.app/cards/BT07-019.png" },
+        { id: 6, rarity: "SR", name: "ไอ้หนุ่มรด. (SR)", rate: 15.00, img: "https://cdn.bangbon.app/cards/CC01-041.png" },
+        { id: 6, rarity: "SR", name: "พระอิศวร (SR)", rate: 15.00, img: "https://cdn.bangbon.app/cards/ODY1-006.png" },
+        { id: 6, rarity: "SR", name: "พระนารายณ์ (SR)", rate: 15.00, img: "https://cdn.bangbon.app/cards/SD01-002.png" },
+        { id: 6, rarity: "SR", name: "ริกกี้ เพื่อนรัก (SR)", rate: 15.00, img: "https://cdn.bangbon.app/cards/SD02-004.png" },
+        { id: 6, rarity: "SR", name: "บุญลือ วีรบุรุษเปรต (SR)", rate: 15.00, img: "https://cdn.bangbon.app/cards/BT02-001.png" },
+        { id: 6, rarity: "SR", name: "กาฬสินธุ์แมน (SR)", rate: 15.00, img: "https://cdn.bangbon.app/cards/BT03-008.png" },
+        { id: 6, rarity: "SR", name: "กุ่ย นักเอาตัวรอด (SR)", rate: 15.00, img: "https://cdn.bangbon.app/cards/BT05-001.png" },
+
+        { id: 20, rarity: "R", name: "Dark Cacao Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/MajSd9tI9k3oUteUsXWBlA.webp" },
+        { id: 21, rarity: "R", name: "Espresso Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/RLJAKNqKYm0S3oFjB73gBA.webp" },
+        { id: 21, rarity: "R", name: "Almond Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/iW_VI7ZN8UaTiz_v_qG4AQ.webp" },
+        { id: 21, rarity: "R", name: "Oyster Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/D7OM7qh8mYkm7_pUNDnvlg.webp" },
+        { id: 21, rarity: "R", name: "Cotton Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/z_ghbChDX4I0QILYRnKHpg.webp" },
+        { id: 307, rarity: "R", name: "Mala Sauce Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/58QdCXD74FZuDy0X2a2nFg.webp" },
+        { id: 307, rarity: "R", name: "Rye Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/v9UuHKseqH7_-ag67yxelA.webp" },
+        { id: 307, rarity: "R", name: "Crème Brûlée Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/nZJNCCPUdvfQOYsVO-SOaw.webp" },
+        { id: 307, rarity: "R", name: "Clotted Cream Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/RDqVpQDblPWgDc3Cxqmz0A.webp" },
+        { id: 307, rarity: "R", name: "Licorice Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/EBaYqc4y2ilmVHL9270qEA.webp" },
+        { id: 307, rarity: "R", name: "Schwarzwälder", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/8FplRA5TFtLcDUjsDAhCHg.webp" },
+        { id: 20, rarity: "R", name: "Elder Faerie Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/vCZh6kv-DX6oUMyZNf0Diw.webp" },
+        { id: 21, rarity: "R", name: "Cookiemals", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/42B7jdp_oeDaOkv42opZ-A.webp" },
+        { id: 21, rarity: "R", name: "Towerkeeper Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/Qng3HoV7sowfcPNIIdtksA.webp" },
+        { id: 21, rarity: "R", name: "Pure Vanilla Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/GXRVXV-WYMM050t_C6cHJw.webp" },
+        { id: 21, rarity: "R", name: "Latte Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/xde3NvsEaSAC96u5-oQzFg.webp" },
+        { id: 20, rarity: "R", name: "GingerBrave", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/6Q85VFW5x8kzsWOKFCRL1A.webp" },
+        { id: 21, rarity: "R", name: "Marble Bread Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/BiE0r85jRrjqlCwYA-OFqQ.webp" },
+        { id: 21, rarity: "R", name: "Coffee Candy Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/BItTYfwxfuWTncj3VYKGMA.webp" },
+        { id: 21, rarity: "R", name: "Maple Taffy Cookie ", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/wnvGWaZvxBAT2hHzCNbV6w.webp" },
+        { id: 21, rarity: "R", name: "String Gummy Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/G9u-E-vR1YfMJXbGo7CtRw.webp" },
+        { id: 8, rarity: "R", name: "พระเวสสุกรรม", rate: 20.00, img: "https://cdn.bangbon.app/cards/BT01-003.png" },
+        { id: 8, rarity: "R", name: "ไอ้นัท - คนใจเด็ด", rate: 20.00, img: "https://cdn.bangbon.app/cards/BT04-003.png" },
+        { id: 8, rarity: "R", name: "พูดไทยได้ 5 คำ", rate: 20.00, img: "https://cdn.bangbon.app/cards/BT05-050.png" },
+        { id: 8, rarity: "R", name: "น้องมี่ 3.0", rate: 20.00, img: "https://cdn.bangbon.app/cards/BT06-041.png" },
+        { id: 8, rarity: "R", name: "จิตมุ่งมั่นของพระนารายณ์", rate: 20.00, img: "https://cdn.bangbon.app/cards/BT06-047.png" },
+        { id: 8, rarity: "R", name: "หมอเลิฟ ฟันเหยิน", rate: 20.00, img: "https://cdn.bangbon.app/cards/BT07-040.png" },
+        { id: 8, rarity: "R", name: "พระเวสสุกรรม", rate: 20.00, img: "https://cdn.bangbon.app/cards/BT01-003.png" },
+        { id: 8, rarity: "R", name: "นีโม่", rate: 20.00, img: "https://cdn.bangbon.app/cards/BT01-018.png" },
+        { id: 8, rarity: "R", name: "พี่โด 2.0", rate: 20.00, img: "https://cdn.bangbon.app/cards/BT01-024.png" },
+        { id: 8, rarity: "R", name: "ผู้เจริญระดับ 4", rate: 20.00, img: "https://cdn.bangbon.app/cards/BT02-033.png" },
+        { id: 8, rarity: "R", name: "อินทรีย์แมน", rate: 20.00, img: "https://cdn.bangbon.app/cards/BT03-003.png" },
+        { id: 8, rarity: "R", name: "แม่นาค พระประแดง", rate: 20.00, img: "https://cdn.bangbon.app/cards/BT03-022.png" },
+
+        { id: 15, rarity: "U", name: "Affogato Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/V57WeFEPbgsKzCjepp4iUA.webp" },
+        { id: 16, rarity: "U", name: "Carol Cookie (BLUE)", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/Y9-UR4jCTJ5NYHblhWf-aw.webp" },
+        { id: 17, rarity: "U", name: "Spicy Dumpling King", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/AyhOzcAEvk3CEPCWc9s7rw.webp" },
+        { id: 18, rarity: "U", name: "Chives Dumpling King", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/7QTcJr-SfgZIEPA_AFS7mg.webp" },
+        { id: 19, rarity: "U", name: "Shrimp Dumpling King", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/_E32BV_h1KHjUoN7ZSB9sQ.webp" },
+        { id: 19, rarity: "U", name: "Cheesecake Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/PbzVx_EdokBC5ANgN8eLxg.webp" },
+        { id: 19, rarity: "U", name: "Poison Mushroom Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/AZXycANZdMhPS4zQYTnjnQ.webp" },
+        { id: 19, rarity: "U", name: "Milk Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/7VV0GaqvE1wfWcHPnHO3ew.webp" },
+        { id: 308, rarity: "U", name: "Tarte Tatin Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/NVN_QqF2CI_kj-VVx5Jz_g.webp" },
+        { id: 308, rarity: "U", name: "Kohlrabi Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/R33bTV9cNXukJ5_68xsRZQ.webp" },
+        { id: 308, rarity: "U", name: "Leek Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/JxOnuEpl65Nc6kpmvTsI5w.webp" },
+        { id: 308, rarity: "U", name: "Strawberry Crepe Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/_LNXOxI5E-z9X4QnyTHjeA.webp" },
+        { id: 308, rarity: "U", name: "Lemon Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/-zxTqBOSVYpW2miVHjcMng.webp" },
+        { id: 15, rarity: "U", name: "Knight Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/5AoOrNORvc6gfCZGNMzPgA.webp" },
+        { id: 16, rarity: "U", name: "Potato Cookie", rate: 20.00, img: "https://assets.cookierunbraverse.com/braverse/images/card_webp/card/en/BS5_045.png.webp" },
+        { id: 17, rarity: "U", name: "Cinnamon Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/bix5fJI4le2jr-zoCiQfCQ.webp" },
+        { id: 18, rarity: "U", name: "Fairy Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/vHvbL3qhwV434IXg4UsVQQ.webp" },
+        { id: 19, rarity: "U", name: "Carol Cookie", rate: 20.00, img: "https://assets.cookierunbraverse.com/braverse/images/card_webp/card/en/BS5_015.png.webp" },
+        { id: 15, rarity: "U", name: "DJ Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/9cyd6w6vyDKKukj0Ltm49w.webp" },
+        { id: 16, rarity: "U", name: "Croissant Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/oZQv7HwLPPobHzXryMgM-Q.webp" },
+        { id: 17, rarity: "U", name: "Sorbet Shark Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/sRGJujm1YQT2iNF0_8nQaQ.webp" },
+        { id: 18, rarity: "U", name: "Pink Choco Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/fxhbujDOh1KK0SxYThoqxw.webp" },
+        { id: 19, rarity: "U", name: "Dark Choco Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/fZL0Qb0gFdb9sR06p9T15w.webp" },
+        { id: 19, rarity: "U", name: "Zombie Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/7QMYRPNUaM8rjj5Sf64Sew.webp" },
+        { id: 19, rarity: "U", name: "Spinach Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/kSA_rdf1Gc_3DZ8xTJWXtQ.webp" },
+        { id: 19, rarity: "U", name: "Strawberry Cream Cookie", rate: 20.00, img: "https://cookierunbraverse.com/data/en_storage/2jeK0veuK3RcZPyMFcm8Sw.webp" },
+
+        { id: 19, rarity: "C", name: "Icicle Yeti Cookie", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/PIvCKB3m5W1V4IW1nP7ycw.webp" },
+        { id: 19, rarity: "C", name: "Burnt Cheese Cookie", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/sR5AzSzLCID5ONrIMRnkbQ.webp" },
+        { id: 19, rarity: "C", name: "Butter Roll Cookie", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/ZqqRlBuIetxgNZWb80AS6A.webp" },
+        { id: 19, rarity: "C", name: "Candy Diver Cookie", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/JnQqr_u7YzEhX8tTzfbfvQ.webp" },
+        { id: 19, rarity: "C", name: "Prophet Cookie", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/FielnNkIkNhNo9NpemKLMg.webp" },
+        { id: 19, rarity: "C", name: "Mango Tribe Chieftain", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/D9buKWbpw3J2HyAA47tsAg.webp" },
+        { id: 19, rarity: "C", name: "Cotton Candy Cookie", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/n_Yr9uvSa38R0PivEzgqqA.webp" },
+        { id: 19, rarity: "C", name: "Pudding Cookie", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/FUBLYQ3okcKj1kGCbLTY0w.webp" },
+        { id: 19, rarity: "C", name: "Macaron Cookie", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/am6nM1-JtwtHQ4G6vHfsFw.webp" },
+        { id: 19, rarity: "C", name: "Strawberry Stick Cookie", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/bHc4zeKk3D7NBQ9YOIoFAA.webp" },
+        { id: 19, rarity: "C", name: "Purple Yam Cookie", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/TIwHvwWObJZaX4JhUlZD7w.webp" },
+        { id: 19, rarity: "C", name: "Aloe Cookie", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/ABvcigNFiJb2Wdx-hMTe8A.webp" },
+        { id: 19, rarity: "C", name: "Snow Sugar Cookie", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/IeTjBKOGHuJH_E0Ytow2oA.webp" },
+        { id: 19, rarity: "C", name: "Spinach Cookie", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/prFnRccsm8EmQFh5andwtQ.webp" },
+        { id: 19, rarity: "C", name: "Carrot Cookie", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/78PS964vNIqZQhok3iKbmw.webp" },
+        { id: 9, rarity: "C", name: "อรุณีย์ ข้าวมันไก่เมียจ่า", rate: 20.193, img: "https://cdn.bangbon.app/cards/SD04-008.png" },
+        { id: 9, rarity: "C", name: "พิธีกรสารคดีดวงโบ๋", rate: 20.193, img: "https://cdn.bangbon.app/cards/SD05-011.png" },
+        { id: 9, rarity: "C", name: "บึงทมิฬ People - คุณบึกบึน", rate: 20.193, img: "https://cdn.bangbon.app/cards/SD05-007.png" },
+        { id: 9, rarity: "C", name: "พม่าข้าศึก 2310", rate: 20.193, img: "https://cdn.bangbon.app/cards/SD06-009.png" },
+        { id: 9, rarity: "C", name: "อ้วนเสี้ยว ผู้นำขุนพล 18 หัวเมือง", rate: 20.193, img: "https://cdn.bangbon.app/cards/SD07-008.png" },
+        { id: 9, rarity: "C", name: "ลูกกบ", rate: 20.193, img: "https://cdn.bangbon.app/cards/BT01-023.png" },
+        { id: 9, rarity: "C", name: "อ๊บ", rate: 20.193, img: "https://cdn.bangbon.app/cards/BT02-007.png" },
+        { id: 9, rarity: "C", name: "พระอินทร์", rate: 20.193, img: "https://cdn.bangbon.app/cards/SD01-003.png" },
+        { id: 9, rarity: "C", name: "นนทก", rate: 20.193, img: "https://cdn.bangbon.app/cards/SD01-004.png" },
+        { id: 9, rarity: "C", name: "วิรuฬหก", rate: 20.193, img: "https://cdn.bangbon.app/cards/SD01-015.png" },
+        { id: 9, rarity: "C", name: "เทวดาเลื่อยยนต์", rate: 20.193, img: "https://cdn.bangbon.app/cards/SD01-014.png" },
+        { id: 9, rarity: "C", name: "เด็กถ่ายเอกสาร", rate: 20.193, img: "https://cdn.bangbon.app/cards/SD01-009.png" },
+        { id: 9, rarity: "C", name: "เทวดานักมวย", rate: 20.193, img: "https://cdn.bangbon.app/cards/SD01-007.png" },
+        { id: 9, rarity: "C", name: "ช่างแอร์ดวงซวย", rate: 20.193, img: "https://cdn.bangbon.app/cards/SD01-006.png" },
+        { id: 309, rarity: "C", name: "Werewolf Cookie", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/86bIzKL86rfEMDLsjKYU5g.webp" },
+        { id: 309, rarity: "C", name: "Marbleberry Cookie", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/TcER8TcrFLXuvsIFR1htCw.webp" },
+        { id: 309, rarity: "C", name: "Rockstar Cookie", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/Wsq-YdTaEdCpzYGXuPjNrA.webp" },
+        { id: 309, rarity: "C", name: "Ice Juggler Cookie", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/xyCKW_FYhfNd__PiR5alHw.webp" },
+        { id: 309, rarity: "C", name: "Yoga Cookie", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/uq64tZmSFeiwEZwJZHC4Lw.webp" },
+        { id: 19, rarity: "C", name: "Spinach Cookie(GREEN)", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/Bp2bjtLg0NQvLhmPtNlVTA.webp" },
+        { id: 19, rarity: "C", name: "Cream Puff Cookie", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/e8R0OTtiJ17Q614fMTp_qQ.webp" },
+        { id: 19, rarity: "C", name: "White Ghost Cookie", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/DUoHA3ksG8xS6RmX7sHrfQ.webp" },
+        { id: 19, rarity: "C", name: "Yugwa Cookie", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/sTz746deT8T3xiK0xL8weQ.webp" },
+        { id: 19, rarity: "C", name: "Centipede Cookie", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/yr5m_nUTePOZBOka9U-kaA.webp" },
+        { id: 19, rarity: "C", name: "Yugwa Cookie", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/sTz746deT8T3xiK0xL8weQ.webp" },
+        { id: 19, rarity: "C", name: "Cake Wolf", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/n2uN5ZXqw9s0FvvHvA4Nug.webp" },
+        { id: 19, rarity: "C", name: "Choco Cake Hound", rate: 20.193, img: "https://cookierunbraverse.com/data/en_storage/o8nSfj15KAh6-HJXKs-_Zw.webp" }
+
+    ];
+
+    // ผูก Window Functions
+    window.closeModal = (id) => document.getElementById(id).style.display = "none";
+    window.openRateModal = () => renderRateTableModal();
+    window.openWishlistModal = () => showWishlistSelection();
+    window.addCardToWishlist = (id) => addCardToWishlistLogic(id);
+    window.removeWishlistSlot = (index) => removeWishlistSlotLogic(index);
+    window.executePullGacha = (count, costType) => runPullLogic(count, costType);
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUserUID = user.uid;
+            onSnapshot(doc(db, "users", user.uid), (snapshot) => {
+                if (snapshot.exists()) {
+                    userData = snapshot.data();
+                    updateUI();
+                }
+            });
+        } else {
+            window.location.href = "login.html";
+        }
+    });
+
+    function updateUI() {
+        if (!userData) return;
+        document.getElementById("balance").innerText = (userData.points || 0).toLocaleString();
+        document.getElementById("user-diamonds").innerText = (userData.diamonds || 0).toLocaleString();
+        document.getElementById("user-normal-tickets").innerText = (userData.normal_tickets || 0).toLocaleString();
+        document.getElementById("user-premium-tickets").innerText = (userData.premium_tickets || 0).toLocaleString();
+        
+        const pitySec = userData.pitySec || 0;
+        const pityUsec = userData.pityUsec || 0;
+        document.getElementById("pity-text-sec").innerText = `${pitySec} / 550`;
+        document.getElementById("pity-bar-sec").style.width = `${Math.min((pitySec/550)*100, 100)}%`;
+        document.getElementById("pity-text-exr").innerText = `${pityUsec} / 900`;
+        document.getElementById("pity-bar-exr").style.width = `${Math.min((pityUsec/900)*100, 100)}%`;
+    }
+
+    // --- จัดการ Wishlist ---
+    function renderWishlistSlots() {
+        const container = document.getElementById("wishlist-slots-container");
+        container.innerHTML = "";
+        for (let i = 0; i < 4; i++) {
+            const cardId = chosenWishlistIDs[i];
+            const foundCard = allCards.find(c => c.id === cardId);
+            const slotDiv = document.createElement("div");
+            slotDiv.className = "wishlist-slot";
+            
+            if (foundCard) {
+                slotDiv.innerHTML = `
+                    <button class="remove-wish" onclick="event.stopPropagation(); removeWishlistSlot(${i})">&times;</button>
+                    <img src="${foundCard.img}">
+                    <div style="font-size:0.7rem; background:rgba(0,0,0,0.7); position:absolute; bottom:0; width:100%; text-align:center;">[${foundCard.rarity}]</div>
+                `;
+            } else {
+                slotDiv.innerHTML = `
+                    <div class="slot-placeholder" onclick="openWishlistModal()">
+                        <i class="fa-solid fa-plus" style="font-size:1.2rem; color:#00d4ff; margin-bottom:5px;"></i><br>เพิ่มการ์ด
+                    </div>
+                `;
+            }
+            container.appendChild(slotDiv);
+        }
+    }
+
+    function showWishlistSelection() {
+        const grid = document.getElementById("wishlist-selection-grid");
+        grid.innerHTML = "";
+        const candidates = allCards.filter(c => c.rarity === "USEC" || c.rarity === "EXR");
+        
+        candidates.forEach(card => {
+            const isAlreadyChosen = chosenWishlistIDs.includes(card.id);
+            const div = document.createElement("div");
+            div.className = "choice-item";
+            if(isAlreadyChosen) div.style.opacity = "0.4";
+            
+            div.innerHTML = `
+                <img src="${card.img}">
+                <div style="font-weight:bold;">[${card.rarity}]</div>
+                <div>${card.name}</div>
+            `;
+            if(!isAlreadyChosen) {
+                div.onclick = () => addCardToWishlistLogic(card.id);
+            }
+            grid.appendChild(div);
+        });
+        document.getElementById("wishlistModal").style.display = "block";
+    }
+
+    function addCardToWishlistLogic(id) {
+        if (chosenWishlistIDs.length >= 4) return alert("คุณเลือกการ์ดเพิ่มโอกาสครบ 4 ใบแล้ว!");
+        if (!chosenWishlistIDs.includes(id)) {
+            chosenWishlistIDs.push(id);
+            renderWishlistSlots();
+            document.getElementById("wishlistModal").style.display = "none";
+        }
+    }
+
+    function removeWishlistSlotLogic(index) {
+        chosenWishlistIDs.splice(index, 1);
+        renderWishlistSlots();
+    }
+
+    function getAdjustedPool() {
+        let pool = allCards.map(c => ({ ...c }));
+        if (chosenWishlistIDs.length === 0) return pool;
+
+        ["USEC", "EXR"].forEach(targetRarity => {
+            // ดึงข้อมูลการ์ดในระดับนี้ที่ "ถูกเลือกจริง ๆ" (เช็คจาก id)
+            const chosenInThisRarity = pool.filter(c => chosenWishlistIDs.includes(c.id) && c.rarity === targetRarity);
+            
+            if (chosenInThisRarity.length > 0) {
+                // คำนวณเรทรวมดั้งเดิมของระดับนั้น ๆ
+                const totalRarityOriginalRate = allCards.filter(c => c.rarity === targetRarity).reduce((sum, c) => sum + c.rate, 0);
+                const wishBonusChunk = totalRarityOriginalRate * 0.70;
+                const remainChunk = totalRarityOriginalRate * 0.30;
+                
+                // หาจำนวนการ์ดทั้งหมดในระดับนี้จากฐานข้อมูลหลัก
+                const totalCardsInRarity = allCards.filter(x => x.rarity === targetRarity).length;
+
+                pool.forEach(c => {
+                    if (c.rarity === targetRarity) {
+                        // เช็ครายใบ: ถ้าไอดีของการ์ดใบนี้อยู่ในกลุ่มที่ถูกเลือก ให้เพิ่มเรทให้แค่ใบนั้น ๆ
+                        if (chosenWishlistIDs.includes(c.id)) {
+                            c.rate = (wishBonusChunk / chosenInThisRarity.length) + (remainChunk / totalCardsInRarity);
+                        } else {
+                            // ใบที่ไม่ได้ถูกเลือกในระดับเดียวกันจะถูกแชร์จากส่วนที่เหลือ 30%
+                            c.rate = remainChunk / totalCardsInRarity;
+                        }
+                    }
+                });
+            }
+        });
+        return pool;
+    }
+
+    // --- Core ระบบคำนวณกาชาและการหักทรัพยากร ---
+    async function runPullLogic(amount, costType) {
+        if (isPulling || !userData) return;
+
+        let dbUpdatePayload = {};
+        let currentDiamonds = userData.diamonds || 0;
+        let normalTickets = userData.normal_tickets || 0;
+        let premiumTickets = userData.premium_tickets || 0;
+
+        if (costType === 'diamonds') {
+            let diamondCost = amount === 5 ? 100 : (amount === 10 ? 500 : 1000);
+            if (currentDiamonds < diamondCost) return alert("จำนวนเพชรของคุณไม่เพียงพอ!");
+            dbUpdatePayload["diamonds"] = increment(-diamondCost);
+        } 
+        else if (costType === 'tickets') {
+            if (amount === 5) {
+                if (normalTickets >= 10) {
+                    dbUpdatePayload["normal_tickets"] = increment(-10);
+                } else if (premiumTickets >= 5) {
+                    dbUpdatePayload["premium_tickets"] = increment(-5);
+                } else {
+                    return alert("ตั๋วสุ่มของคุณไม่เพียงพอสำหรับการสุ่ม 5 ครั้ง! (ต้องการ 🎫10 หรือ 🎟️5)");
+                }
+            } 
+            else if (amount === 10) {
+                if (normalTickets >= 15) {
+                    dbUpdatePayload["normal_tickets"] = increment(-15);
+                } else if (premiumTickets >= 10) {
+                    dbUpdatePayload["premium_tickets"] = increment(-10);
+                } else {
+                    return alert("ตั๋วสุ่มของคุณไม่เพียงพอสำหรับการสุ่ม 10 ครั้ง! (ต้องการ 🎫15 หรือ 🎟️10)");
+                }
+            } 
+            else if (amount === 50) {
+                if (normalTickets >= 30) {
+                    dbUpdatePayload["normal_tickets"] = increment(-30);
+                } else if (premiumTickets >= 20) {
+                    dbUpdatePayload["premium_tickets"] = increment(-20);
+                } else {
+                    return alert("ตั๋วสุ่มของคุณไม่เพียงพอสำหรับการสุ่ม 50 ครั้ง! (ต้องการ 🎫30 หรือ 🎟️20)");
+                }
+            }
+        }
+
+        isPulling = true;
+        toggleControls(true);
+
+        try {
+            const userRef = doc(db, "users", currentUserUID);
+            let currentPitySec = userData.pitySec || 0;
+            let currentPityUsec = userData.pityUsec || 0;
+            let results = [];
+
+            const currentActivePool = getAdjustedPool();
+
+            for (let i = 0; i < amount; i++) {
+                currentPitySec++;
+                currentPityUsec++;
+                let selectedGachaCard = null;
+
+                if (currentPityUsec >= 900) {
+                    const usecPool = currentActivePool.filter(c => c.rarity === "USEC");
+                    selectedGachaCard = usecPool[Math.floor(Math.random() * usecPool.length)];
+                    currentPityUsec = 0;
+                } else if (currentPitySec >= 550) {
+                    const secPool = currentActivePool.filter(c => c.rarity === "SEC");
+                    selectedGachaCard = secPool[Math.floor(Math.random() * secPool.length)];
+                    currentPitySec = 0;
+                } else {
+                    const totalWeight = currentActivePool.reduce((sum, c) => sum + c.rate, 0);
+                    let randomRoll = Math.random() * totalWeight;
+                    for (const card of currentActivePool) {
+                        randomRoll -= card.rate;
+                        if (randomRoll <= 0) {
+                            selectedGachaCard = card;
+                            break;
+                        }
+                    }
+                }
+
+                if (selectedGachaCard.rarity === "USEC") currentPityUsec = 0;
+                if (selectedGachaCard.rarity === "SEC") currentPitySec = 0;
+
+                results.push(selectedGachaCard);
+            }
+
+            let packToPush = results.map(r => ({
+                name: r.name,
+                rarity: r.rarity,
+                img: r.img,
+                level: Math.floor(Math.random() * 50) + 1,
+                obtainedAt: new Date().toISOString()
+            }));
+
+            const hasGodTier = results.some(c => c.rarity === "USEC" || c.rarity === "SECRET");
+            if (hasGodTier) {
+                document.getElementById("cutscene-overlay").style.display = "flex";
+                await new Promise(r => setTimeout(r, 1300));
+                document.getElementById("cutscene-overlay").style.display = "none";
+            }
+
+            dbUpdatePayload["collection"] = arrayUnion(...packToPush);
+            dbUpdatePayload["pitySec"] = currentPitySec;
+            dbUpdatePayload["pityUsec"] = currentPityUsec;
+
+            await updateDoc(userRef, dbUpdatePayload);
+            renderResultsGrid(packToPush);
+
+        } catch (err) {
+            console.error(err);
+            alert("เกิดข้อผิดพลาดในการเชื่อมต่อกรุณาลองใหมอีกครั้ง");
+        } finally {
+            isPulling = false;
+            toggleControls(false);
+        }
+    }
+
+    function renderResultsGrid(items) {
+        const container = document.getElementById("display");
+        container.innerHTML = "";
+        items.forEach((item, index) => {
+            const cardDiv = document.createElement("div");
+            cardDiv.className = "card";
+            cardDiv.innerHTML = `
+                <div class="card-inner">
+                    <div class="card-back"></div>
+                    <div class="card-front">
+                        <img src="${item.img}">
+                        <div style="font-size:0.65rem; background:rgba(0,0,0,0.8); position:absolute; bottom:0; width:100%; color:#fff; text-align:center;">
+                           LV.${item.level} | ${item.rarity}
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(cardDiv);
+            setTimeout(() => cardDiv.classList.add("revealed"), index * 120);
+        });
+    }
+
+    function toggleControls(disabled) {
+        document.querySelectorAll(".btn-pull").forEach(btn => btn.disabled = disabled);
+    }
+
+    function renderRateTableModal() {
+        const table = document.getElementById("rate-list-body");
+        table.innerHTML = "";
+        const currentActivePool = getAdjustedPool();
+        
+        // เรียงลำดับกลุ่ม Rarity ตามหน้าพรีวิวเพื่อความสวยงาม
+        const rarityOrder = ["SECRET", "P", "USEC", "EXR", "CBR", "SEC", "SUR", "SSR", "PR", "UR", "SR", "R", "U", "C"];
+        const totalWeight = currentActivePool.reduce((sum, c) => sum + c.rate, 0);
+
+        rarityOrder.forEach(rarity => {
+            const cardsInRarity = currentActivePool.filter(c => c.rarity === rarity);
+            if(cardsInRarity.length === 0) return;
+
+            // หัวข้อ Rarity
+            const headerRow = document.createElement("tr");
+            headerRow.innerHTML = `<td colspan="3" style="font-weight:bold; color:#ffc831; background:rgba(255,255,255,0.05); padding:8px 5px;">⭐ ระดับ ${rarity}</td>`;
+            table.appendChild(headerRow);
+
+            cardsInRarity.forEach(card => {
+                const individualPercentage = ((card.rate / totalWeight) * 100).toFixed(4);
+                const isRateUp = chosenWishlistIDs.includes(card.id) && (rarity === "USEC" || rarity === "EXR");
+
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td style="width:55px;"><img class="modal-card-img" src="${card.img}"></td>
+                    <td style="text-align:left;">
+                        <span class="color-${rarity.toLowerCase()}">[${rarity}]</span> ${card.name}
+                        ${isRateUp ? '<br><small style="color:#00d4ff;"><i class="fa-solid fa-arrow-up-long"></i> กำลังเพิ่มโอกาสออกพิเศษ!</small>' : ''}
+                    </td>
+                    <td style="text-align:right; font-weight:bold; color:${isRateUp ? '#00d4ff' : '#fff'};">
+                        ${individualPercentage}%
+                    </td>
+                `;
+                table.appendChild(row);
+            });
+        });
+        document.getElementById("rateModal").style.display = "block";
+    }
+
+    // เรียกฟังก์ชันครั้งแรกเพื่อแสดงตาราง Slot เปล่า 4 ช่อง
+    renderWishlistSlots();
+</script>
+</body>
+</html>
