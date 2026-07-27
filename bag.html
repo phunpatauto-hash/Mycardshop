@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>กระเป๋า - My card game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: #0f0f0f; color: white; line-height: 1.6; }
+        
+        /* --- Navbar --- */
+        .navbar { 
+            background: rgba(30, 30, 30, 0.8); backdrop-filter: blur(15px);
+            padding: 0 50px; display: flex; justify-content: space-between; align-items: center; 
+            position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05); height: 75px; 
+        }
+        .navbar .logo { font-size: 1.6rem; font-weight: 700; color: #ffc831; text-transform: uppercase; }
+        .nav-links { list-style: none; display: flex; gap: 25px; margin: 0; align-items: center; }
+        .nav-links a { color: rgba(255,255,255,0.8); text-decoration: none; transition: 0.3s; font-size: 0.95rem; cursor: pointer; }
+        .nav-links a:hover { color: #ffc831; }
+        
+        .profile-link { 
+            text-decoration: none; display: flex; align-items: center; gap: 12px;
+            padding: 6px 18px; border-radius: 50px; background: rgba(255, 255, 255, 0.03); 
+            border: 1px solid rgba(255, 200, 49, 0.2); cursor: pointer; 
+        }
+        .nav-avatar { width: 35px; height: 35px; border-radius: 12px; border: 2px solid #ffc831; background: #222; object-fit: cover; }
+        
+        .currency-display { display: flex; gap: 12px; font-size: 0.85rem; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 12px; }
+        .point-text { color: #ffc831; font-weight: bold; }
+        .diamond-text { color: #00e5ff; font-weight: bold; }
+        .ticket-normal-text { color: #cbd5e1; font-weight: bold; }
+        .ticket-premium-text { color: #ffc831; font-weight: bold; }
+
+        .btn-blue { 
+            background: linear-gradient(135deg, #2b52ff, #1a36b1); 
+            padding: 10px 22px; border-radius: 12px; font-weight: 600; cursor: pointer; border: none; color: white; text-decoration: none;
+        }
+
+        /* --- Main Content Layout --- */
+        .container { max-width: 1140px; margin: 0 auto; padding: 40px 20px; }
+        
+        .page-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 15px;
+        }
+        .page-title { font-size: 2rem; color: #ffc831; font-weight: bold; margin: 0; display: flex; align-items: center; gap: 12px; }
+
+        /* Tabs สำหรับคลังของ */
+        .bag-tabs { display: flex; gap: 10px; margin-bottom: 30px; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); flex-wrap: wrap; }
+        .bag-tab {
+            background: transparent; color: #a0aec0; border: none; padding: 12px 20px; border-radius: 12px;
+            font-weight: bold; font-family: 'Kanit', sans-serif; cursor: pointer; transition: 0.3s; font-size: 0.95rem;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .bag-tab:hover { color: #fff; background: rgba(255,255,255,0.03); }
+        .bag-tab.active { background: #ffc831; color: #000; box-shadow: 0 4px 15px rgba(255,200,49,0.25); }
+
+        /* Grid แสดงไอเทม */
+        .inventory-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px;
+        }
+
+        /* Item Card Style */
+        .item-card {
+            background: linear-gradient(135deg, #1e1e1e 0%, #151515 100%);
+            border: 1px solid rgba(255,255,255,0.05); border-radius: 20px;
+            padding: 20px; text-align: center; position: relative;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer; overflow: hidden;
+        }
+        .item-card:hover {
+            transform: translateY(-5px); border-color: #ffc831;
+            box-shadow: 0 10px 20px rgba(255, 200, 49, 0.1);
+        }
+        .item-icon-wrapper {
+            font-size: 3rem; margin-bottom: 12px; color: #ffc831;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3)); transition: transform 0.3s;
+            display: flex; justify-content: center; align-items: center; min-height: 70px;
+        }
+        .item-card:hover .item-icon-wrapper { transform: scale(1.1) rotate(5deg); }
+        
+        .pack-img {
+            width: 65px;
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 6px 10px rgba(0,0,0,0.5));
+        }
+
+        .item-name { font-weight: bold; font-size: 1.05rem; margin: 0 0 5px 0; color: #fff; }
+        .item-desc { font-size: 0.8rem; color: #a0aec0; margin: 0 0 15px 0; min-height: 38px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        
+        .item-quantity {
+            position: absolute; top: 12px; right: 12px;
+            background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255,255,255,0.1);
+            padding: 2px 8px; border-radius: 8px; font-size: 0.8rem; font-weight: bold; color: #ffc831;
+            z-index: 5;
+        }
+
+        .btn-use-item {
+            width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            color: white; padding: 6px; border-radius: 10px; font-weight: bold; font-family: 'Kanit', sans-serif;
+            cursor: pointer; transition: 0.2s; font-size: 0.85rem; margin-top: 5px;
+        }
+        .btn-use-item:hover { background: #ffc831; color: #000; border-color: #ffc831; }
+
+        .item-card.ticket-normal .item-icon-wrapper { color: #cbd5e1; }
+        .item-card.ticket-premium .item-icon-wrapper { color: #ffc831; text-shadow: 0 0 10px rgba(255,200,49,0.3); }
+
+        .empty-bag {
+            grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #a0aec0; font-size: 1.1rem;
+        }
+        
+        .item-card.ss-rarity-item { border-color: #ff3d00; box-shadow: 0 0 15px rgba(255, 61, 0, 0.15); }
+        .item-card.ss-rarity-item .item-icon-wrapper { color: #ff3d00; text-shadow: 0 0 10px rgba(255,61,0,0.4); }
+
+        .item-card.ice-item .item-icon-wrapper { color: #74b9ff; }
+        .item-card.sugar-item .item-icon-wrapper { color: #ffeaa7; }
+        .item-card.button-item .item-icon-wrapper { color: #fab1a0; }
+        .item-card.thread-item .item-icon-wrapper { color: #fdcb6e; }
+        .item-card.fluid-iron-item .item-icon-wrapper { color: #a29bfe; text-shadow: 0 0 8px rgba(162,155,254,0.4); }
+        .item-card.empty-bag-item .item-icon-wrapper { color: #cacccf; }
+        .item-card.broken-sword-item .item-icon-wrapper { color: #b2bec3; }
+        .item-card.sweet-cream-item .item-icon-wrapper { color: #fd79a8; }
+        .item-card.icecream-item .item-icon-wrapper { color: #e84393; text-shadow: 0 0 8px rgba(232,67,147,0.4); }
+
+        .item-card.secret-card-item { border-color: #ff9f43; box-shadow: 0 0 15px rgba(255,159,67,0.2); }
+        .item-card.secret-card-item .item-icon-wrapper { color: #ff9f43; text-shadow: 0 0 10px rgba(255,159,67,0.4); }
+
+        /* ================= UI โมดอลรายละเอียดซองการ์ดและการสุ่ม ================= */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px);
+            display: none; align-items: center; justify-content: center; z-index: 2000;
+        }
+        .pack-modal-box {
+            background: #151622; border: 2px solid #ffc831; border-radius: 25px;
+            width: 90%; max-width: 650px; padding: 30px; text-align: center;
+            box-shadow: 0 0 30px rgba(255,200,49,0.2); position: relative;
+        }
+        .modal-close { position: absolute; top: 15px; right: 20px; font-size: 2rem; color: #a0aec0; cursor: pointer; }
+        .modal-close:hover { color: #fff; }
+        .rate-list { background: rgba(0,0,0,0.4); border-radius: 15px; padding: 15px; text-align: left; margin: 20px 0; max-height: 250px; overflow-y: auto; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.05); }
+        .rate-item { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .rate-item span.sur-label { color: #ff3366; font-weight: bold; }
+        
+        /* สไตล์อนิเมชันวงล้อสุ่มการ์ด */
+        .roulette-container { display: none; flex-direction: column; align-items: center; margin: 20px 0; position: relative; }
+        .wheel-wrapper {
+            width: 200px; height: 200px; border-radius: 50%; border: 6px solid #ffc831;
+            position: relative; overflow: hidden; background: conic-gradient(#ff3366 0deg 36deg, #2b52ff 36deg 72deg, #ffc831 72deg 108deg, #00e5ff 108deg 144deg, #00ff87 144deg 180deg, #a855f7 180deg 216deg, #ff7b50 216deg 252deg, #fd79a8 252deg 288deg, #74b9ff 288deg 324deg, #cbd5e1 324deg 360deg);
+            box-shadow: 0 0 25px rgba(255,200,49,0.4);
+        }
+        .wheel-pointer {
+            position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+            width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent;
+            border-top: 25px solid #ffc831; z-index: 10;
+        }
+        .wheel-spinning { animation: spinWheel 2.5s cubic-bezier(0.1, 0.8, 0.1, 1) forwards; }
+        @keyframes spinWheel { 0% { transform: rotate(0deg); } 100% { transform: rotate(1800deg); } }
+
+        /* กรอบแสดงการ์ด 3 ใบที่สุ่มได้ */
+        .gacha-result-cards { display: none; justify-content: center; gap: 15px; margin-top: 25px; flex-wrap: wrap; }
+        .result-card-item {
+            background: linear-gradient(180deg, #252636 0%, #151622 100%);
+            border: 2px solid #ff3366; border-radius: 12px; padding: 12px; width: 150px;
+            box-shadow: 0 5px 15px rgba(255,51,102,0.3); animation: cardPopIn 0.5s ease forwards; opacity: 0;
+            text-align: center;
+        }
+        @keyframes cardPopIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        .result-card-img-wrapper {
+            width: 100%; height: 150px; display: flex; justify-content: center; align-items: center;
+            overflow: hidden; border-radius: 8px; background: rgba(0,0,0,0.2); margin-bottom: 8px;
+        }
+        .result-card-thumb { width: 100%; height: 100%; object-fit: contain; }
+
+        .result-card-name { font-size: 0.85rem; font-weight: bold; min-height: 40px; display: flex; align-items: center; justify-content: center; color: #fff; line-height: 1.2; }
+        .result-card-rarity { font-size: 0.8rem; background: rgba(255,51,102,0.1); border: 1px solid #ff3366; color: #ff3366; border-radius: 4px; display: inline-block; padding: 1px 6px; margin-top: 4px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">Mycard</div>
+        <ul class="nav-links">
+            <li><a href="index.html">หน้าแรก</a></li>
+            <li><a href="collection.html?category=equipment">สมุดสะสม</a></li>
+            <li><a href="bag.html" style="color: #ffc831;">กระเป๋า</a></li>
+            <li id="redeem-tab" style="display: none;"><a href="redeem.html" style="color: #ffc831;">แลกโค้ด</a></li>
+            <li><a href="Cookie city.html">Cookie city</a></li>
+            <li>
+                <div class="profile-link" id="profile-container" style="display: none;">
+                    <img src="" id="nav-avatar-img" class="nav-avatar">
+                    <div>
+                        <div style="display: flex; align-items: center;">
+                            <span id="user-display" style="color: #fff; font-weight: 700; font-size: 0.85rem;"></span>
+                        </div>
+                        <div class="currency-display">
+                            <span class="point-text">🪙 <span id="user-points">0</span></span>
+                            <span class="diamond-text">💎 <span id="user-diamonds">0</span></span>
+                            <span class="ticket-normal-text">🎫 <span id="user-ticket-normal">0</span></span>
+                            <span class="ticket-premium-text">🎟️ <span id="user-ticket-premium">0</span></span>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li><a href="login.html" id="auth-btn" class="btn-blue">เข้าสู่ระบบ</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        <div class="page-header">
+            <h1 class="page-title"><i class="fas fa-backpack"></i> กระเป๋าสัมภาระของคุณ</h1>
+        </div>
+
+        <!-- แท็บแยกหมวดหมู่ไอเทม -->
+        <div class="bag-tabs">
+            <button class="bag-tab active" id="tab-all"><i class="fas fa-th-large"></i> ทั้งหมด</button>
+            <button class="bag-tab" id="tab-tickets"><i class="fas fa-ticket-alt"></i> ตั๋วสุ่มการ์ด</button>
+            <button class="bag-tab" id="tab-materials"><i class="fas fa-hammer"></i> วัตถุดิบคราฟต์</button>
+            <button class="bag-tab" id="tab-boxes"><i class="fas fa-box-open"></i> กล่องสุ่ม/อื่นๆ</button>
+        </div>
+
+        <div class="inventory-grid" id="inventory-container">
+            <div class="empty-bag">📡 กำลังตรวจสอบกระเป๋าสัมภาระของคุณ...</div>
+        </div>
+    </main>
+
+    <!-- ================= UI หน้าต่างโมดอลซองการ์ดลุ้นรางวัล ================= -->
+    <div class="modal-overlay" id="pack-modal">
+        <div class="pack-modal-box">
+            <div class="modal-close" onclick="closePackModal()">&times;</div>
+            <h2 id="modal-pack-name" style="color: #ffc831; margin-bottom: 5px;">ซองการ์ด Age of Heroes</h2>
+            <p style="color: #a0aec0; font-size: 0.9rem; margin: 0;">บรรจุการ์ดแบบสุ่ม 3 ใบภายในซอง สุ่มรับการ์ดระดับ SUR สุดเอ็กซ์คลูซีฟ</p>
+            
+            <div id="modal-info-zone">
+                <div class="rate-list">
+                    <div class="rate-item"><strong>ชื่อการ์ดรางวัลในซอง</strong><strong>อัตราออก (Rate)</strong></div>
+                    <div class="rate-item"><span>Age of Heroes and Kingdoms</span><span class="sur-label">SUR 1%</span></div>
+                    <div class="rate-item"><span>Pure Vanilla Cookie</span><span class="sur-label">SUR 5%</span></div>
+                    <div class="rate-item"><span>White Lily Cookie</span><span class="sur-label">SUR 5%</span></div>
+                    <div class="rate-item"><span>Dark Cacao Cookie</span><span class="sur-label">SUR 5%</span></div>
+                    <div class="rate-item"><span>Hollyberry Cookie</span><span class="sur-label">SUR 5%</span></div>
+                    <div class="rate-item"><span>Golden Cheese Cookie</span><span class="sur-label">SUR 5%</span></div>
+                    <div class="rate-item"><span>Sea Fairy Cookie</span><span class="sur-label">SUR 10%</span></div>
+                    <div class="rate-item"><span>Wind Archer Cookie</span><span class="sur-label">SUR 10%</span></div>
+                    <div class="rate-item"><span>Fire Spirit Cookie</span><span class="sur-label">SUR 10%</span></div>
+                    <div class="rate-item"><span>Moonlight Cookie</span><span class="sur-label">SUR 10%</span></div>
+                    <div class="rate-item"><span>Millennial Tree Cookie</span><span class="sur-label">SUR 10%</span></div>
+                </div>
+                <button class="btn-blue" style="width: 100%; background: linear-gradient(135deg, #ff9f00, #ffc831); color: black;" onclick="startOpeningPackProcess()">เปิดซองการ์ด (สุ่มการ์ด 3 ใบ)</button>
+            </div>
+
+            <div class="roulette-container" id="wheel-zone">
+                <div class="wheel-pointer"></div>
+                <div class="wheel-wrapper" id="gacha-wheel"></div>
+                <h3 style="color: #ffc831; margin-top: 15px; animation: pulse 1s infinite;">🔮 กำลังทำนายโชคร่วมสุ่มการ์ด...</h3>
+            </div>
+
+            <div class="gacha-result-cards" id="result-cards-zone"></div>
+            <button class="btn-blue" id="btn-result-close" style="margin-top:25px; display:none; background:#4a5568;" onclick="closePackModal()">ปิดหน้าต่างผลลัพธ์</button>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
+        authDomain: "sign-up-73f99.firebaseapp.com",
+        projectId: "sign-up-73f99",
+        storageBucket: "sign-up-73f99.appspot.com",
+        messagingSenderId: "916335559099",
+        appId: "1:916335559099:web:3a8ed896ba26e38991849e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const inventoryContainer = document.getElementById("inventory-container");
+    let currentCategory = "all";
+    let globalUserData = null;
+    let isOpening = false;
+
+    const cardPool = [
+        { name: "Age of Heroes and Kingdoms", rate: 1, image: "https://cookierunbraverse.com/data/en_storage/uv4cVIjTFL5Ht6ZkA0eL-w.webp" },
+        { name: "Pure Vanilla Cookie", rate: 5, image: "https://cookierunbraverse.com/data/en_storage/v3sriD5Yu_o7COb4ttgqTw.webp" },
+        { name: "White Lily Cookie", rate: 5, image: "https://cookierunbraverse.com/data/en_storage/d13fpF4FiA0yxYJ5qr6yig.webp" },
+        { name: "Dark Cacao Cookie", rate: 5, image: "https://cookierunbraverse.com/data/en_storage/CMHoSF_U6LUYwYSH_9obrQ.webp" },
+        { name: "Hollyberry Cookie", rate: 5, image: "https://cookierunbraverse.com/data/en_storage/y2vBiMoNyNHtU5x_AvZKSw.webp" },
+        { name: "Golden Cheese Cookie", rate: 5, image: "https://cookierunbraverse.com/data/en_storage/cZirtN8de_gEM8Z95ZLqlg.webp" },
+        { name: "Sea Fairy Cookie", rate: 10, image: "https://cookierunbraverse.com/data/en_storage/RVmPr-7HPnngFU7yoWXM2A.webp" },
+        { name: "Wind Archer Cookie", rate: 10, image: "https://cookierunbraverse.com/data/en_storage/y5XaaH9jk2C9GqZ0bs4rrQ.webp" },
+        { name: "Fire Spirit Cookie", rate: 10, image: "https://cookierunbraverse.com/data/en_storage/F8HxH5lW823t7QPfPrAICA.webp" },
+        { name: "Moonlight Cookie", rate: 10, image: "https://cookierunbraverse.com/data/en_storage/SWMrryev2_S4xfEQmjFJew.webp" },
+        { name: "Millennial Tree Cookie", rate: 10, image: "https://cookierunbraverse.com/data/en_storage/15l7eN6Rs3A-LFYlPZo6lg.webp" }
+    ];
+
+    const materialRegistry = {
+        enchanted_stone: { name: "หินอัปเกรดการ์ด", desc: "วัตถุดิบสำหรับนำไปคราฟต์ไอเทมหรือการ์ด", icon: "fas fa-gem", className: "material-item" },
+        sugar_cube: { name: "น้ำตาลก้อน", desc: "น้ำตาลก้อนหวานบริสุทธิ์เพื่อการคราฟต์ระดับสูง", icon: "fas fa-cubes", className: "sugar-item" },
+        button: { name: "กระดุม", desc: "กระดุมชิ้นเล็กวัตถุดิบตัดเย็บพื้นฐาน", icon: "fas fa-dot-circle", className: "button-item" },
+        thread: { name: "เส้นด้าย", desc: "เส้นด้ายเหนียวพิเศษสำหรับใช้งานสร้าง", icon: "fas fa-yarn", className: "thread-item" },
+        broken_sword_piece: { name: "เศษดาบที่หัก", desc: "ชิ้นส่วนดาบโบราณหักสะบั้น เหมาะสำหรับนำไปหลอมใหม่", icon: "fas fa-broken-image", className: "broken-sword-item" },
+        empty_glass: { name: "แก้วใบเปล่า", desc: "แก้วใบเปล่าสำหรับเตรียมบรรจุวัตถุดิบ", icon: "fas fa-glass-martini-alt", className: "empty-bag-item" },
+        pure_gold: { name: "ทองคำบริสุทธิ์", desc: "ทองคำเนื้อดีบริสุทธิ์สำหรับใช้งานคราฟต์ระดับสูง", icon: "fas fa-coins", className: "material-item" },
+        vortex_chocolate: { name: "ช็อคโกแลตวังวน", desc: "ช็อคโกแลตเวทมนตร์รสชาติเข้มข้นเข้มข้น", icon: "fas fa-cookie", className: "material-item" },
+        snowflake: { name: "เกล็ดหิมะ", desc: "ผลึกเยือกแข็งลึลับ มีไอความเย็นแผ่ออกมาตลอดเวลา", icon: "fas fa-snowflake", className: "material-item" },
+        processed_ice: { name: "ก้อนน้ำแข็งที่ผ่านการแปรรูป", desc: "ก้อนน้ำแข็งความเย็นสูงที่ผ่านการแปรรูป", icon: "fas fa-cube", className: "ice-item" },
+        sweet_cream_glass: { name: "ครีมแสนหวานในแก้ว", desc: "แก้วครีมสดรสหวานละมุนละไม", icon: "fas fa-fill-drip", className: "sweet-cream-item" },
+        star_fragment: { name: "เศษดาว", desc: "เศษเสี้ยวประกายดาวลึกลับที่ตกลงมาสู่พื้นโลก", icon: "fas fa-star", className: "material-item" },
+        moon_fragment: { name: "เศษดวงจันทร์", desc: "ชิ้นส่วนแผ่ออร่าจันทราสีนวลตา", icon: "fas fa-moon", className: "material-item" },
+        shiny_pearl: { name: "ไข่มุกที่แวววาว", desc: "ไข่มุกเม็ดงามล้ำค่าที่ส่องประกายสว่างไสว", icon: "fas fa-circle-notch", className: "material-item" },
+        fluid_iron: { name: "[SS] เหล็กไหล", desc: "แร่โลหะเหลวศักดิ์สิทธิ์ เปี่ยมไปด้วยพลังแฝงขั้นสูง", icon: "fas fa-flask", className: "fluid-iron-item" },
+        broken_crown: { name: "[SS] มงกุฎที่แตกหัก", desc: "วัตถุโบราณระดับ SS แม้จะแตกหักแต่ก็เต็มไปด้วยกลิ่นอายพลังอันเข้มข้น", icon: "fas fa-crown", className: "ss-rarity-item" },
+        sweet_heart_icecream: { name: "[SS] ไอศกรีมสุดหวานใจ", desc: "ไอศกรีมเวทมนตร์เยือกแข็งรสชาติหวานละมุนหัวใจ", icon: "fas fa-ice-cream", className: "icecream-item" }
+    };
+
+    const craftedCardRegistry = {
+        secret_dragon_lord: { name: "🃏 จอมมังกรโบราณโครนอส (Secret)", desc: "สุดยอดการ์ดลับไร้พ่ายระดับความหายาก Secret Rare", icon: "fas fa-dragon", className: "secret-card-item" }
+    };
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            onSnapshot(doc(db, "users", user.uid), (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    globalUserData = data;
+
+                    document.getElementById("profile-container").style.display = "flex";
+                    document.getElementById("user-display").innerText = data.username;
+                    document.getElementById("user-points").innerText = (data.points || 0).toLocaleString();
+                    document.getElementById("user-diamonds").innerText = (data.diamonds || 0).toLocaleString();
+                    document.getElementById("user-ticket-normal").innerText = (data.normal_tickets || 0).toLocaleString();
+                    document.getElementById("user-ticket-premium").innerText = (data.premium_tickets || 0).toLocaleString();
+                    
+                    if (data.userPhoto) {
+                        document.getElementById("nav-avatar-img").src = data.userPhoto;
+                    } else {
+                        document.getElementById("nav-avatar-img").src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.username}`;
+                    }
+
+                    renderInventory();
+                }
+            });
+            document.getElementById("auth-btn").innerText = "ออกจากระบบ";
+            document.getElementById("auth-btn").onclick = () => signOut(auth).then(()=>location.reload());
+            document.getElementById("redeem-tab").style.display = "block";
+        } else {
+            alert("กรุณาเข้าสู่ระบบก่อนใช้งานหน้านี้");
+            window.location.href = "login.html";
+        }
+    });
+
+    function renderInventory() {
+        if (!globalUserData) return;
+        inventoryContainer.innerHTML = "";
+        let itemsToShow = [];
+
+        // 1. ตั๋วสุ่มการ์ด (tickets)
+        if (globalUserData.normal_tickets > 0) {
+            itemsToShow.push({ id: "normal_ticket", name: "ตั๋วสุ่มทั่วไป", desc: "ตั๋วธรรมดาสำหรับใช้สุ่มตู้การ์ดทั่วไป", quantity: globalUserData.normal_tickets, category: "tickets", icon: "fas fa-ticket-alt", className: "ticket-normal", actionText: "ไปที่ตู้สุ่ม" });
+        }
+        if (globalUserData.premium_tickets > 0) {
+            itemsToShow.push({ id: "premium_ticket", name: "ตั๋วสุ่มพรีเมี่ยม", desc: "ตั๋วทองสุดพิเศษการันตีอัตราการได้รับการ์ดหายากที่สูงขึ้น", quantity: globalUserData.premium_tickets, category: "tickets", icon: "fas fa-ticket-alt", className: "ticket-premium", actionText: "ไปที่ตู้สุ่ม" });
+        }
+
+        // 2. ซองการ์ด / กล่องสุ่ม (boxes)
+        if (globalUserData.materials && globalUserData.materials.card_pack && globalUserData.materials.card_pack.qty > 0) {
+            itemsToShow.push({
+                id: "card_pack",
+                name: globalUserData.materials.card_pack.name || "ซองการ์ด Age of Heroes",
+                desc: globalUserData.materials.card_pack.desc || "ซองการ์ดสุ่มลุ้นรับการ์ดระดับ SUR",
+                quantity: globalUserData.materials.card_pack.qty,
+                category: "boxes",
+                imgUrl: "https://cookierunbraverse.com/storage/notice/24a2429abfb3a57568e1f6fcf1e1e19c.png.webp?v=20251105065406",
+                className: "secret-card-item",
+                isPack: true
+            });
+        }
+
+        // 3. วัตถุดิบคราฟต์ (materials)
+        if (globalUserData.materials) {
+            Object.keys(materialRegistry).forEach(key => {
+                if (key === "card_pack") return;
+                const mat = globalUserData.materials[key];
+                if (mat && mat.qty > 0) {
+                    const registryInfo = materialRegistry[key];
+                    itemsToShow.push({ id: key, name: registryInfo.name, desc: registryInfo.desc, quantity: mat.qty, category: "materials", icon: registryInfo.icon, className: registryInfo.className });
+                }
+            });
+        }
+
+        // 4. การ์ดระดับคราฟต์
+        if (globalUserData.crafted_cards) {
+            Object.keys(globalUserData.crafted_cards).forEach(key => {
+                const cc = globalUserData.crafted_cards[key];
+                if (cc && cc.qty > 0) {
+                    const registryInfo = craftedCardRegistry[key] || { name: "การ์ดระดับคราฟต์พิเศษ", desc: "สุดยอดการ์ดระดับพิเศษที่ได้มาจากการคราฟต์สำเร็จ", icon: "fas fa-id-card", className: "secret-card-item" };
+                    itemsToShow.push({ id: key, name: registryInfo.name, desc: registryInfo.desc, quantity: cc.qty, category: "materials", icon: registryInfo.icon, className: registryInfo.className });
+                }
+            });
+        }
+
+        if (currentCategory !== "all") {
+            itemsToShow = itemsToShow.filter(item => item.category === currentCategory);
+        }
+
+        if (itemsToShow.length === 0) {
+            inventoryContainer.innerHTML = `<div class="empty-bag">📭 ไม่พบไอเทมในหมวดหมู่นี้ภายในกระเป๋าของคุณ</div>`;
+            return;
+        }
+
+        itemsToShow.forEach(item => {
+            const card = document.createElement("div");
+            card.className = `item-card ${item.className || ''}`;
+            
+            let iconMarkup = item.imgUrl ? `<img src="${item.imgUrl}" class="pack-img" alt="Card Pack">` : `<i class="${item.icon}"></i>`;
+            
+            let actionBtnMarkup = '';
+            if (item.isPack) {
+                actionBtnMarkup = `<button class="btn-use-item" style="background:#ff9f00; color:#000;">ดูข้อมูล & เปิดซอง</button>`;
+                card.onclick = () => openPackModal();
+            } else if (item.actionText) {
+                actionBtnMarkup = `<button class="btn-use-item" onclick="window.location.href='Banner Selection.html'">${item.actionText}</button>`;
+            }
+
+            card.innerHTML = `
+                <div class="item-quantity">x${item.quantity.toLocaleString()}</div>
+                <div class="item-icon-wrapper">${iconMarkup}</div>
+                <h4 class="item-name">${item.name}</h4>
+                <p class="item-desc">${item.desc}</p>
+                ${actionBtnMarkup}
+            `;
+            inventoryContainer.appendChild(card);
+        });
+    }
+
+    // ================= ฟังก์ชันระบบสุ่มเปิดซองการ์ดและวงล้อ =================
+    window.openPackModal = function() {
+        if (isOpening) return;
+        document.getElementById("modal-info-zone").style.display = "block";
+        document.getElementById("wheel-zone").style.display = "none";
+        document.getElementById("result-cards-zone").style.display = "none";
+        document.getElementById("btn-result-close").style.display = "none";
+        document.getElementById("pack-modal").style.display = "flex";
+    }
+
+    window.closePackModal = function() {
+        if (isOpening) return;
+        document.getElementById("pack-modal").style.display = "none";
+    }
+
+    window.startOpeningPackProcess = async function() {
+        if (!globalUserData || isOpening) return;
+        const currentPackQty = globalUserData.materials?.card_pack?.qty || 0;
+        if (currentPackQty < 1) { alert("❌ คุณไม่มีซองการ์ดเหลือให้เปิดใช้งานแล้ว!"); return; }
+
+        isOpening = true;
+        document.getElementById("modal-info-zone").style.display = "none";
+        document.getElementById("wheel-zone").style.display = "flex";
+        
+        const wheel = document.getElementById("gacha-wheel");
+        wheel.classList.remove("wheel-spinning");
+        void wheel.offsetWidth;
+        wheel.classList.add("wheel-spinning");
+
+        const drawnCards = [];
+        for (let i = 0; i < 3; i++) {
+            drawnCards.push(getRandomCardFromPool());
+        }
+
+        setTimeout(async () => {
+            try {
+                const userRef = doc(db, "users", auth.currentUser.uid);
+                let updateData = {
+                    "materials.card_pack.qty": increment(-1)
+                };
+
+                drawnCards.forEach(cardObj => {
+                    updateData[`cards_inventory.${cardObj.name}`] = increment(1);
+                });
+
+                await updateDoc(userRef, updateData);
+
+                document.getElementById("wheel-zone").style.display = "none";
+                const resultZone = document.getElementById("result-cards-zone");
+                resultZone.innerHTML = "";
+                
+                drawnCards.forEach((cardObj, index) => {
+                    const cardView = document.createElement("div");
+                    cardView.className = "result-card-item";
+                    cardView.style.animationDelay = `${index * 0.2}s`;
+                    
+                    let cardMediaMarkup = cardObj.image 
+                        ? `<img src="${cardObj.image}" class="result-card-thumb" alt="${cardObj.name}">`
+                        : `<i class="fas fa-id-card" style="font-size:2.5rem; color:#ff3366;"></i>`;
+
+                    cardView.innerHTML = `
+                        <div class="result-card-img-wrapper">
+                            ${cardMediaMarkup}
+                        </div>
+                        <div class="result-card-name">${cardObj.name}</div>
+                        <div class="result-card-rarity">SUR</div>
+                    `;
+                    resultZone.appendChild(cardView);
+                });
+
+                resultZone.style.display = "flex";
+                document.getElementById("btn-result-close").style.display = "inline-block";
+                isOpening = false;
+
+            } catch (err) {
+                alert("เกิดข้อผิดพลาดในการบันทึกข้อมูลการ์ดลงฐานข้อมูล");
+                isOpening = false;
+                closePackModal();
+            }
+        }, 2500);
+    }
+
+    function getRandomCardFromPool() {
+        const totalWeight = cardPool.reduce((sum, item) => sum + item.rate, 0);
+        let randomNum = Math.random() * totalWeight;
+        
+        for (const card of cardPool) {
+            if (randomNum < card.rate) {
+                return card;
+            }
+            randomNum -= card.rate;
+        }
+        return cardPool[cardPool.length - 1];
+    }
+
+    const tabs = {
+        "all": document.getElementById("tab-all"),
+        "tickets": document.getElementById("tab-tickets"),
+        "materials": document.getElementById("tab-materials"),
+        "boxes": document.getElementById("tab-boxes")
+    };
+
+    Object.keys(tabs).forEach(cat => {
+        tabs[cat].addEventListener("click", () => {
+            Object.values(tabs).forEach(btn => btn.classList.remove("active"));
+            tabs[cat].classList.add("active");
+            currentCategory = cat;
+            renderInventory();
+        });
+    });
+</script>
+</body>
+</html>

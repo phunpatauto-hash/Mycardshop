@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ห้องคราฟต์วัตถุดิบ - My card game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: #0f0f0f; color: white; line-height: 1.6; }
+        
+        /* --- Navbar --- */
+        .navbar { 
+            background: rgba(30, 30, 30, 0.8); backdrop-filter: blur(15px);
+            padding: 0 50px; display: flex; justify-content: space-between; align-items: center; 
+            position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05); height: 75px; 
+        }
+        .navbar .logo { font-size: 1.6rem; font-weight: 700; color: #ffc831; text-transform: uppercase; }
+        .nav-links { list-style: none; display: flex; gap: 25px; margin: 0; align-items: center; }
+        .nav-links a { color: rgba(255,255,255,0.8); text-decoration: none; transition: 0.3s; font-size: 0.95rem; cursor: pointer; }
+        .nav-links a:hover { color: #ffc831; }
+        
+        .profile-link { 
+            text-decoration: none; display: flex; align-items: center; gap: 12px;
+            padding: 6px 18px; border-radius: 50px; background: rgba(255, 255, 255, 0.03); 
+            border: 1px solid rgba(255, 200, 49, 0.2); cursor: pointer; 
+        }
+        .nav-avatar { width: 35px; height: 35px; border-radius: 12px; border: 2px solid #ffc831; background: #222; object-fit: cover; }
+        
+        .currency-display { display: flex; gap: 12px; font-size: 0.85rem; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 12px; }
+        .point-text { color: #ffc831; font-weight: bold; }
+        .diamond-text { color: #00e5ff; font-weight: bold; }
+        .ticket-normal-text { color: #cbd5e1; font-weight: bold; }
+        .ticket-premium-text { color: #ffc831; font-weight: bold; }
+
+        .btn-blue { 
+            background: linear-gradient(135deg, #2b52ff, #1a36b1); 
+            padding: 10px 22px; border-radius: 12px; font-weight: 600; cursor: pointer; border: none; color: white; text-decoration: none;
+        }
+
+        /* --- Crafting Layout --- */
+        .container { max-width: 1140px; margin: 0 auto; padding: 40px 20px; }
+        
+        .page-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 15px;
+        }
+        .page-title { font-size: 2rem; color: #ffc831; font-weight: bold; margin: 0; display: flex; align-items: center; gap: 12px; }
+
+        .crafting-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px;
+        }
+
+        /* Crafting Card Style */
+        .craft-card {
+            background: linear-gradient(135deg, #1e1e1e 0%, #151515 100%);
+            border: 1px solid rgba(255,255,255,0.05); border-radius: 24px;
+            padding: 25px; display: flex; flex-direction: column; justify-content: space-between;
+            transition: transform 0.3s, border-color 0.3s; position: relative;
+        }
+        .craft-card:hover { transform: translateY(-5px); border-color: #ffc831; }
+
+        .craft-target { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .target-icon { font-size: 2.5rem; color: #ffc831; background: rgba(255,200,49,0.1); padding: 15px; border-radius: 16px; border: 1px solid rgba(255,200,49,0.2); width: 70px; height: 70px; display: flex; justify-content: center; align-items: center; }
+        .target-info h3 { margin: 0; font-size: 1.2rem; color: #fff; }
+        .target-info p { margin: 4px 0 0 0; font-size: 0.85rem; color: #a0aec0; }
+
+        /* --- Rarity Badges Style --- */
+        .rarity-badge {
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+            margin-top: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        /* สีกำกับระดับความหายาก */
+        .rarity-c   { background: #a0aec0; color: #1a202c; } /* Common */
+        .rarity-r   { background: #4299e1; color: #fff; }    /* Rare */
+        .rarity-sr  { background: #9f7aea; color: #fff; }    /* Super Rare */
+        .rarity-ur  { background: linear-gradient(135deg, #ff3d00, #ff9f00); color: #fff; animation: glow 1.5s infinite alternate; } /* Ultra Rare */
+
+        @keyframes glow {
+            from { box-shadow: 0 0 5px rgba(255,61,0,0.5); }
+            to { box-shadow: 0 0 15px rgba(255,159,0,0.8); }
+        }
+
+        /* สูตรผสมไอเทม */
+        .recipe-section { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 16px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.02); }
+        .recipe-title { font-size: 0.85rem; color: #ffc831; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .recipe-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; margin-bottom: 8px; }
+        .recipe-item:last-child { margin-bottom: 0; }
+        
+        .status-valid { color: #00e676; font-weight: bold; }
+        .status-invalid { color: #ff1744; font-weight: bold; }
+
+        .btn-craft {
+            width: 100%; padding: 14px; border-radius: 14px; font-weight: bold; font-size: 1rem;
+            font-family: 'Kanit', sans-serif; cursor: pointer; border: none; transition: 0.2s;
+            background: linear-gradient(135deg, #ffc831, #ff9f00); color: #000;
+            box-shadow: 0 4px 15px rgba(255,200,49,0.2);
+        }
+        .btn-craft:disabled {
+            background: #333; color: #666; cursor: not-allowed; box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">Mycard</div>
+        <ul class="nav-links">
+            <li><a href="index.html">หน้าแรก</a></li>
+            <li><a href="collection.html">สมุดสะสม</a></li>
+            <li><a href="bag.html">กระเป๋า</a></li>
+            <li><a href="crafting.html" style="color: #ffc831;">ห้องคราฟต์</a></li>
+            <li id="redeem-tab" style="display: none;"><a href="redeem.html" style="color: #ffc831;">แลกโค้ด</a></li>
+            <li><a href="Cookie city.html">Cookie city</a></li>
+            <li>
+                <div class="profile-link" id="profile-container" style="display: none;">
+                    <img src="" id="nav-avatar-img" class="nav-avatar">
+                    <div>
+                        <div style="display: flex; align-items: center;">
+                            <span id="user-display" style="color: #fff; font-weight: 700; font-size: 0.85rem;"></span>
+                        </div>
+                        <div class="currency-display">
+                            <span class="point-text">🪙 <span id="user-points">0</span></span>
+                            <span class="diamond-text">💎 <span id="user-diamonds">0</span></span>
+                            <span class="ticket-normal-text">🎫 <span id="user-ticket-normal">0</span></span>
+                            <span class="ticket-premium-text">🎟️ <span id="user-ticket-premium">0</span></span>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li><a href="login.html" id="auth-btn" class="btn-blue">เข้าสู่ระบบ</a></li>
+        </ul>
+    </nav>
+    <main class="container">
+        <div class="page-header">
+            <h1 class="page-title"><i class="fas fa-cubes"></i> โรงหลอมวัตถุดิบ</h1>
+        </div>
+
+        <div class="crafting-grid" id="crafting-container">
+            <!-- รายการของสำหรับคราฟต์จะแสดงตรงนี้ -->
+        </div>
+    </main>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
+        authDomain: "sign-up-73f99.firebaseapp.com",
+        projectId: "sign-up-73f99",
+        storageBucket: "sign-up-73f99.appspot.com",
+        messagingSenderId: "916335559099",
+        appId: "1:916335559099:web:3a8ed896ba26e38991849e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const craftingContainer = document.getElementById("crafting-container");
+    let globalUserData = null;
+    let currentUserUid = null;
+
+    // รายชื่อสูตรวัตถุดิบทั้งหมด เรียงลำดับความหายากจาก COMMON -> RARE -> SUPER RARE -> ULTRA RARE
+    const craftRecipes = [
+        // ====== หมวดหมู่: วัตถุดิบ (materials) ======
+        
+        // --- ระดับ COMMON ---
+        {
+            id: "enchanted_stone",
+            category: "materials",
+            name: "หินอัปเกรดการ์ด",
+            rarity: "c",
+            rarityLabel: "COMMON",
+            desc: "ใช้อัปเลเวลเพิ่มพลังความสามารถให้กับการ์ดใบโปรด",
+            icon: "fas fa-gem",
+            styleClass: "color: #a29bfe; background: rgba(162,155,254,0.1); border-color: rgba(162,155,254,0.2);",
+            costPoints: 10000,
+            reqMaterials: {}, 
+            rewardField: "materials.enchanted_stone.qty",
+            rewardName: "หินอัปเกรดการ์ด",
+            rewardDesc: "วัตถุดิบสำหรับนำไปคราฟต์ไอเทมหรือการ์ด",
+            rewardQty: 1,
+            isNestedMaterial: true
+        },
+        {
+            id: "sugar_cube",
+            category: "materials",
+            name: "น้ำตาลก้อน",
+            rarity: "c",
+            rarityLabel: "COMMON",
+            desc: "ก้อนน้ำตาลหวานกลมกล่อม สำหรับใช้เป็นส่วนประกอบขนมหวานหรือไอเทมพิเศษ",
+            icon: "fas fa-cubes",
+            styleClass: "color: #ffeaa7; background: rgba(255,234,167,0.1); border-color: #ffeaa7;",
+            costPoints: 500,
+            reqMaterials: {},
+            rewardField: "materials.sugar_cube.qty",
+            rewardName: "น้ำตาลก้อน",
+            rewardDesc: "น้ำตาลก้อนหวานบริสุทธิ์เพื่อการคราฟต์ระดับสูง",
+            rewardQty: 1,
+            isNestedMaterial: true
+        },
+        {
+            id: "button",
+            category: "materials",
+            name: "กระดุม",
+            rarity: "c",
+            rarityLabel: "COMMON",
+            desc: "กระดุมหลากสีขนาดเล็ก มักใช้ในงานเย็บปักถักร้อยหรือสร้างไอเทมสวมใส่",
+            icon: "fas fa-dot-circle",
+            styleClass: "color: #fab1a0; background: rgba(250,177,160,0.1); border-color: #fab1a0;",
+            costPoints: 100,
+            reqMaterials: {},
+            rewardField: "materials.button.qty",
+            rewardName: "กระดุม",
+            rewardDesc: "กระดุมชิ้นเล็กวัตถุดิบตัดเย็บพื้นฐาน",
+            rewardQty: 1,
+            isNestedMaterial: true
+        },
+        {
+            id: "thread",
+            category: "materials",
+            name: "เส้นด้าย",
+            rarity: "c",
+            rarityLabel: "COMMON",
+            desc: "เส้นด้ายถักทออย่างเหนียวแน่น สำหรับใช้ผูก ยึด หรือเย็บกระเป๋าและชุด",
+            icon: "fas fa-yarn",
+            styleClass: "color: #fdcb6e; background: rgba(253,203,110,0.1); border-color: #fdcb6e;",
+            costPoints: 100,
+            reqMaterials: {},
+            rewardField: "materials.thread.qty",
+            rewardName: "เส้นด้าย",
+            rewardDesc: "เส้นด้ายเหนียวพิเศษสำหรับใช้งานสร้าง",
+            rewardQty: 1,
+            isNestedMaterial: true
+        },
+        {
+            id: "broken_sword_piece",
+            category: "materials",
+            name: "เศษดาบที่หัก",
+            rarity: "c",
+            rarityLabel: "COMMON",
+            desc: "เศษชิ้นส่วนใบมีดเก่าที่หักสะบั้นลง แต่เนื้อเหล็กยังคงทนทานเหลือกำหนด",
+            icon: "fas fa-broken-image",
+            styleClass: "color: #b2bec3; background: rgba(178,190,195,0.1); border-color: #b2bec3;",
+            costPoints: 1000,
+            reqMaterials: {},
+            rewardField: "materials.broken_sword_piece.qty",
+            rewardName: "เศษดาบที่หัก",
+            rewardDesc: "ชิ้นส่วนดาบโบราณหักสะบั้น เหมาะสำหรับนำไปหลอมใหม่",
+            rewardQty: 1,
+            isNestedMaterial: true
+        },
+        {
+            id: "empty_glass",
+            category: "materials",
+            name: "แก้วใบเปล่า",
+            rarity: "c",
+            rarityLabel: "COMMON",
+            desc: "แก้วใบเล็กที่ยังไม่ได้ใส่อะไรลงไป รอการบรรจุวัตถุดิบแสนหวาน",
+            icon: "fas fa-glass-martini-alt",
+            styleClass: "color: #cacccf; background: rgba(202,204,207,0.1); border-color: #cacccf;",
+            costPoints: 100,
+            reqMaterials: {},
+            rewardField: "materials.empty_glass.qty",
+            rewardName: "แก้วใบเปล่า",
+            rewardDesc: "แก้วใบเปล่าสำหรับเตรียมบรรจุวัตถุดิบ",
+            rewardQty: 1,
+            isNestedMaterial: true
+        },
+
+        // --- ระดับ RARE ---
+        {
+            id: "premium_ticket",
+            category: "materials",
+            name: "ตั๋วสุ่มพรีเมี่ยม",
+            rarity: "r",
+            rarityLabel: "RARE",
+            desc: "หลอมรวมตั๋วธรรมดาและทองให้กลายเป็นตั๋วทองระดับพรีเมี่ยม",
+            icon: "fas fa-ticket-alt",
+            styleClass: "color: #ffc831; background: rgba(255,200,49,0.1); border-color: rgba(255,200,49,0.2);",
+            costPoints: 5000,
+            reqMaterials: {
+                normal_tickets: { name: "ตั๋วสุ่มทั่วไป", amount: 5, isNested: false }
+            },
+            rewardField: "premium_tickets",
+            rewardQty: 1,
+            isNestedMaterial: false
+        },
+        {
+            id: "pure_gold",
+            category: "materials",
+            name: "ทองคำบริสุทธิ์",
+            rarity: "r",
+            rarityLabel: "RARE",
+            desc: "ทองคำเนื้อดีที่ผ่านการสกัด มักใช้เป็นส่วนประกอบระดับสูง",
+            icon: "fas fa-coins",
+            styleClass: "color: #ffd700; background: rgba(255,215,0,0.1); border-color: rgba(255,215,0,0.2);",
+            costPoints: 5000,
+            reqMaterials: {
+                "materials.enchanted_stone.qty": { name: "หินอัปเกรดการ์ด", amount: 1, isNested: true, keyPath: "enchanted_stone" }
+            },
+            rewardField: "materials.pure_gold.qty",
+            rewardName: "ทองคำบริสุทธิ์",
+            rewardDesc: "ทองคำเนื้อดีบริสุทธิ์สำหรับใช้งานคราฟต์ระดับสูง",
+            rewardQty: 1,
+            isNestedMaterial: true
+        },
+        {
+            id: "vortex_chocolate",
+            category: "materials",
+            name: "ช็อคโกแลตวังวน",
+            rarity: "r",
+            rarityLabel: "RARE",
+            desc: "ช็อคโกแลตที่เปี่ยมไปด้วยพลังงานหมุนวนลึกลับ",
+            icon: "fas fa-cookie",
+            styleClass: "color: #8b4513; background: rgba(139,69,19,0.1); border-color: rgba(139,69,19,0.2);",
+            costPoints: 3000,
+            reqMaterials: {
+                premium_tickets: { name: "ตั๋วสุ่มพรีเมี่ยม", amount: 1, isNested: false }
+            },
+            rewardField: "materials.vortex_chocolate.qty",
+            rewardName: "ช็อคโกแลตวังวน",
+            rewardDesc: "ช็อคโกแลตเวทมนตร์รสชาติเข้มข้นเข้มข้น",
+            rewardQty: 1,
+            isNestedMaterial: true
+        },
+        {
+            id: "snowflake",
+            category: "materials",
+            name: "เกล็ดหิมะ",
+            rarity: "r",
+            rarityLabel: "RARE",
+            desc: "ผลึกน้ำแข็งที่ไม่ละลาย ละอองความเย็นปกคลุมรอบๆ",
+            icon: "fas fa-snowflake",
+            styleClass: "color: #00e5ff; background: rgba(0,229,255,0.1); border-color: rgba(0,229,255,0.2);",
+            costPoints: 0,
+            reqMaterials: {
+                "materials.enchanted_stone.qty": { name: "หินอัปเกรดการ์ด", amount: 1, isNested: true, keyPath: "enchanted_stone" },
+                normal_tickets: { name: "ตั๋วสุ่มทั่วไป", amount: 10, isNested: false }
+            },
+            rewardField: "materials.snowflake.qty",
+            rewardName: "เกล็ดหิมะ",
+            rewardDesc: "ผลึกเยือกแข็งลึกลับ มีไอความเย็นแผ่ออกมาตลอดเวลา",
+            rewardQty: 1,
+            isNestedMaterial: true
+        },
+        {
+            id: "processed_ice",
+            category: "materials",
+            name: "ก้อนน้ำแข็งที่ผ่านการแปรรูป",
+            rarity: "r",
+            rarityLabel: "RARE",
+            desc: "น้ำแข็งหลอมเกล็ดหิมะอัดแน่นจนกลายเป็นก้อนทรงสี่เหลี่ยมที่มีความเย็นคงที่",
+            icon: "fas fa-cube",
+            styleClass: "color: #74b9ff; background: rgba(116,185,255,0.1); border-color: #74b9ff;",
+            costPoints: 1000,
+            reqMaterials: {
+                "materials.snowflake.qty": { name: "เกล็ดหิมะ", amount: 5, isNested: true, keyPath: "snowflake" }
+            },
+            rewardField: "materials.processed_ice.qty",
+            rewardName: "ก้อนน้ำแข็งที่ผ่านการแปรรูป",
+            rewardDesc: "ก้อนน้ำแข็งความเย็นสูงที่ผ่านการแปรรูป",
+            rewardQty: 1,
+            isNestedMaterial: true
+        },
+        {
+            id: "sweet_cream_glass",
+            category: "materials",
+            name: "ครีมแสนหวานในแก้ว",
+            rarity: "r",
+            rarityLabel: "RARE",
+            desc: "ครีมสดรสหวานฉ่ำที่บรรจุอยู่ในแก้วใบเปล่าอย่างประณีต",
+            icon: "fas fa-fill-drip",
+            styleClass: "color: #fd79a8; background: rgba(253,121,168,0.1); border-color: #fd79a8;",
+            costPoints: 0,
+            reqMaterials: {
+                "materials.sugar_cube.qty": { name: "น้ำตาลก้อน", amount: 5, isNested: true, keyPath: "sugar_cube" },
+                "materials.empty_glass.qty": { name: "แก้วใบเปล่า", amount: 1, isNested: true, keyPath: "empty_glass" }
+            },
+            rewardField: "materials.sweet_cream_glass.qty",
+            rewardName: "ครีมแสนหวานในแก้ว",
+            rewardDesc: "ถุงครีมสดรสหวานละมุนละไม",
+            rewardQty: 1,
+            isNestedMaterial: true
+        },
+        {
+            id: "star_fragment",
+            category: "materials",
+            name: "เศษดาว",
+            rarity: "r",
+            rarityLabel: "RARE",
+            desc: "ชิ้นส่วนของประกายดาวที่ตกจากฟากฟ้า ส่องแสงระยิบระยับ",
+            icon: "fas fa-star",
+            styleClass: "color: #ffeb3b; background: rgba(255,235,59,0.1); border-color: rgba(255,235,59,0.2);",
+            costPoints: 3000,
+            reqMaterials: {},
+            rewardField: "materials.star_fragment.qty",
+            rewardName: "เศษดาว",
+            rewardDesc: "เศษเสี้ยวประกายดาวลึกลับที่ตกลงมาสู่พื้นโลก",
+            rewardQty: 1,
+            isNestedMaterial: true
+        },
+
+        // --- ระดับ SUPER RARE ---
+        {
+            id: "moon_fragment",
+            category: "materials",
+            name: "เศษดวงจันทร์",
+            rarity: "sr",
+            rarityLabel: "SUPER RARE",
+            desc: "ผลึกหินสีนวลตาที่กักเก็บออร่าแห่งดวงจันทร์เอาไว้",
+            icon: "fas fa-moon",
+            styleClass: "color: #fff59d; background: rgba(255,245,157,0.1); border-color: rgba(255,245,157,0.2);",
+            costPoints: 5000,
+            reqMaterials: {
+                "materials.star_fragment.qty": { name: "เศษดาว", amount: 1, isNested: true, keyPath: "star_fragment" }
+            },
+            rewardField: "materials.moon_fragment.qty",
+            rewardName: "เศษดวงจันทร์",
+            rewardDesc: "ชิ้นส่วนแผ่ออร่าจันทราสีนวลตา",
+            rewardQty: 1,
+            isNestedMaterial: true
+        },
+        {
+            id: "shiny_pearl",
+            category: "materials",
+            name: "ไข่มุกที่แวววาว",
+            rarity: "sr",
+            rarityLabel: "SUPER RARE",
+            desc: "ไข่มุกเม็ดงามที่ส่องแสงประกายสะท้อนกับวัตถุดิบแห่งดวงดาว",
+            icon: "fas fa-circle-notch",
+            styleClass: "color: #e0f7fa; background: rgba(224,247,250,0.1); border-color: rgba(224,247,250,0.15);",
+            costPoints: 10000,
+            reqMaterials: {
+                "materials.star_fragment.qty": { name: "เศษดาว", amount: 1, isNested: true, keyPath: "star_fragment" }
+            },
+            rewardField: "materials.shiny_pearl.qty",
+            rewardName: "ไข่มุกที่แวววาว",
+            rewardDesc: "ไข่มุกเม็ดงามล้ำค่าที่ส่องประกายสว่างไสว",
+            rewardQty: 1,
+            isNestedMaterial: true
+        },
+        // --- ระดับ ULTRA RARE ---
+        {
+            id: "fluid_iron",
+            category: "materials",
+            name: "[SS] เหล็กไหล",
+            rarity: "ur",
+            rarityLabel: "ULTRA RARE",
+            desc: "โลหะเหลวลึกลับที่ผสมผสานระหว่างหินอัปเกรดและทองคำบริสุทธิ์ แผ่ไอพลังงานเข้มข้น",
+            icon: "fas fa-flask",
+            styleClass: "color: #a29bfe; background: rgba(162,155,254,0.1); border-color: #a29bfe; box-shadow: 0 0 10px rgba(162,155,254,0.2);",
+            costPoints: 10000,
+            reqMaterials: {
+                "materials.enchanted_stone.qty": { name: "หินอัปเกรดการ์ด", amount: 5, isNested: true, keyPath: "enchanted_stone" },
+                "materials.pure_gold.qty": { name: "ทองคำบริสุทธิ์", amount: 5, isNested: true, keyPath: "pure_gold" }
+            },
+            rewardField: "materials.fluid_iron.qty",
+            rewardName: "[SS] เหล็กไหล",
+            rewardDesc: "แร่โลหะเหลวศักดิ์สิทธิ์ เปี่ยมไปด้วยพลังแฝงขั้นสูง",
+            rewardQty: 1,
+            isNestedMaterial: true
+        },
+        {
+            id: "broken_crown",
+            category: "materials",
+            name: "[SS] มงกุฎที่แตกหัก",
+            rarity: "ur",
+            rarityLabel: "ULTRA RARE",
+            desc: "สมบัติโบราณระดับสูงสุดที่พังทลาย แต่ยังคงเปี่ยมด้วยพลังมหาศาล",
+            icon: "fas fa-crown",
+            styleClass: "color: #ff3d00; background: rgba(255,61,0,0.15); border-color: #ff3d00;",
+            costPoints: 100000,
+            reqMaterials: {
+                "materials.shiny_pearl.qty": { name: "ไข่มุกที่แวววาว", amount: 1, isNested: true, keyPath: "shiny_pearl" },
+                "materials.star_fragment.qty": { name: "เศษดาว", amount: 1, isNested: true, keyPath: "star_fragment" }
+            },
+            rewardField: "materials.broken_crown.qty",
+            rewardName: "[SS] มงกุฎที่แตกหัก",
+            rewardDesc: "วัตถุโบราณระดับ SS แม้จะแตกหักแต่ก็เต็มไปด้วยกลิ่นอายพลังอันเข้มข้น",
+            rewardQty: 1,
+            isNestedMaterial: true
+        },
+        {
+            id: "sweet_heart_icecream",
+            category: "materials",
+            name: "[SS] ไอศกรีมสุดหวานใจ",
+            rarity: "ur",
+            rarityLabel: "ULTRA RARE",
+            desc: "ไอศกรีมเยือกแข็งรสชาติหวานจับใจ ผสมผสานจากเกล็ดหิมะและน้ำตาลชั้นเลิศ",
+            icon: "fas fa-ice-cream",
+            styleClass: "color: #e84393; background: rgba(232,67,147,0.15); border-color: #e84393;",
+            costPoints: 0,
+            reqMaterials: {
+                "materials.sugar_cube.qty": { name: "น้ำตาลก้อน", amount: 5, isNested: true, keyPath: "sugar_cube" },
+                "materials.snowflake.qty": { name: "เกล็ดหิมะ", amount: 5, isNested: true, keyPath: "snowflake" }
+            },
+            rewardField: "materials.sweet_heart_icecream.qty",
+            rewardName: "[SS] ไอศกรีมสุดหวานใจ",
+            rewardDesc: "ไอศกรีมเวทมนตร์เยือกแข็งรสชาติหวานละมุนหัวใจ",
+            rewardQty: 1,
+            isNestedMaterial: true
+        }
+    ];
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUserUid = user.uid;
+            onSnapshot(doc(db, "users", user.uid), (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    globalUserData = data;
+
+                    document.getElementById("profile-container").style.display = "flex";
+                    document.getElementById("user-display").innerText = data.username;
+                    document.getElementById("user-points").innerText = (data.points || 0).toLocaleString();
+                    document.getElementById("user-diamonds").innerText = (data.diamonds || 0).toLocaleString();
+                    document.getElementById("user-ticket-normal").innerText = (data.normal_tickets || 0).toLocaleString();
+                    document.getElementById("user-ticket-premium").innerText = (data.premium_tickets || 0).toLocaleString();
+                    
+                    if (data.userPhoto) {
+                        document.getElementById("nav-avatar-img").src = data.userPhoto;
+                    } else {
+                        document.getElementById("nav-avatar-img").src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.username}`;
+                    }
+
+                    renderCraftingRecipes();
+                }
+            });
+            document.getElementById("auth-btn").innerText = "ออกจากระบบ";
+            document.getElementById("auth-btn").onclick = () => signOut(auth).then(()=>location.reload());
+            document.getElementById("redeem-tab").style.display = "block";
+        } else {
+            alert("กรุณาเข้าสู่ระบบก่อนใช้งานหน้าคราฟต์");
+            window.location.href = "login.html";
+        }
+    });
+
+    function renderCraftingRecipes() {
+        if (!globalUserData) return;
+        craftingContainer.innerHTML = "";
+
+        if(craftRecipes.length === 0) {
+            craftingContainer.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: #666; padding: 40px;">ไม่มีรายการคราฟต์ในขณะนี้</div>`;
+            return;
+        }
+
+        craftRecipes.forEach(recipe => {
+            let canCraft = true;
+            let recipeItemsMarkup = "";
+
+            if (recipe.costPoints > 0) {
+                const hasPoints = (globalUserData.points || 0) >= recipe.costPoints;
+                if (!hasPoints) canCraft = false;
+                recipeItemsMarkup += `
+                    <div class="recipe-item">
+                        <span>🪙 ทองที่ใช้</span>
+                        <span class="${hasPoints ? 'status-valid' : 'status-invalid'}">
+                            ${(globalUserData.points || 0).toLocaleString()} / ${recipe.costPoints.toLocaleString()}
+                        </span>
+                    </div>
+                `;
+            }
+
+            Object.keys(recipe.reqMaterials).forEach(matKey => {
+                const req = recipe.reqMaterials[matKey];
+                let currentOwnQty = 0;
+
+                if (req.isNested) {
+                    if (globalUserData.materials && globalUserData.materials[req.keyPath]) {
+                        currentOwnQty = globalUserData.materials[req.keyPath].qty || 0;
+                    }
+                } else {
+                    currentOwnQty = globalUserData[matKey] || 0;
+                }
+
+                const hasEnoughMat = currentOwnQty >= req.amount;
+                if (!hasEnoughMat) canCraft = false;
+
+                recipeItemsMarkup += `
+                    <div class="recipe-item">
+                        <span>📦 ${req.name}</span>
+                        <span class="${hasEnoughMat ? 'status-valid' : 'status-invalid'}">
+                            ${currentOwnQty.toLocaleString()} / ${req.amount.toLocaleString()}
+                        </span>
+                    </div>
+                `;
+            });
+
+            const card = document.createElement("div");
+            card.className = "craft-card";
+
+            card.innerHTML = `
+                <div>
+                    <div class="craft-target">
+                        <div class="target-icon" style="${recipe.styleClass}"><i class="${recipe.icon}"></i></div>
+                        <div class="target-info">
+                            <h3 style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
+                                ${recipe.name}
+                                ${recipe.rarity ? `<span class="rarity-badge rarity-${recipe.rarity}">${recipe.rarityLabel}</span>` : ''}
+                            </h3>
+                            <p>${recipe.desc}</p>
+                        </div>
+                    </div>
+                    <div class="recipe-section">
+                        <div class="recipe-title">วัตถุดิบที่ต้องการ</div>
+                        ${recipeItemsMarkup}
+                    </div>
+                </div>
+                <button class="btn-craft" ${!canCraft ? 'disabled' : ''} id="btn-${recipe.id}">
+                    ${canCraft ? '⚒️ เริ่มกระบวนการคราฟต์' : '❌ วัตถุดิบไม่เพียงพอ'}
+                </button>
+            `;
+
+            card.querySelector(`#btn-${recipe.id}`).addEventListener("click", () => {
+                executeCraft(recipe);
+            });
+
+            craftingContainer.appendChild(card);
+        });
+    }
+
+    async function executeCraft(recipe) {
+        if (!currentUserUid || !globalUserData) return;
+
+        const confirmAction = confirm(`คุณต้องการใช้ทรัพยากรเพื่อคราฟต์ "${recipe.name}" ใช่หรือไม่?`);
+        if (!confirmAction) return;
+
+        try {
+            const userRef = doc(db, "users", currentUserUid);
+            let updatePayload = {};
+
+            if (recipe.costPoints > 0) {
+                updatePayload["points"] = increment(-recipe.costPoints);
+            }
+
+            Object.keys(recipe.reqMaterials).forEach(matKey => {
+                const req = recipe.reqMaterials[matKey];
+                updatePayload[matKey] = increment(-req.amount);
+            });
+
+            if (recipe.isNestedMaterial) {
+                const baseField = recipe.rewardField.replace(".qty", "");
+                updatePayload[`${baseField}.name`] = recipe.rewardName;
+                updatePayload[`${baseField}.desc`] = recipe.rewardDesc;
+                updatePayload[recipe.rewardField] = increment(recipe.rewardQty);
+            } else {
+                updatePayload[recipe.rewardField] = increment(recipe.rewardQty);
+            }
+
+            await updateDoc(userRef, updatePayload);
+            alert(`⚒️ คราฟต์สำเร็จ! คุณได้รับ "${recipe.name}" เรียบร้อยแล้ว สามารถตรวจสอบได้ที่หน้ากระเป๋าของคุณ`);
+
+        } catch (error) {
+            console.error("Crafting Error:", error);
+            alert("เกิดข้อผิดพลาดในการคราฟต์ไอเทม กรุณาลองใหม่อีกครั้ง");
+        }
+    }
+</script>
+</body>
+</html>
