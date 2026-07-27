@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Gacha System - SUR Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- นำเข้า SweetAlert2 สำหรับรองรับหน้าต่างแจ้งเตือนเลเวลอัป -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         /* --- Style หลัก --- */
         .modal-card-img { width: 45px; height: 65px; object-fit: cover; border-radius: 5px; border: 1px solid #444; display: block; }
@@ -70,7 +72,7 @@
 </head>
 <body id="body-main">
 
-    <div id="cutscene-overlay"><div class="cutscene-text" style="font-size:3rem; font-weight:bold; text-shadow: 0 0 20px #ffc831; color: white;">A Moment of Fun</div></div>
+    <div id="cutscene-overlay"><div class="cutscene-text" style="font-size:3rem; font-weight:bold; text-shadow: 0 0 20px #ffc831; color: white;">Warmth of Compassion</div></div>
 
     <div id="rateModal" class="modal">
         <div class="modal-content">
@@ -116,7 +118,7 @@
                 
                 <div class="quick-rate-table">
                     <div style="font-size: 0.7rem; color: #666; margin-bottom: 8px;">RATE BY RARITY</div>
-                    <div class="rate-row"><span class="rate-label color-exr">EXR </span><span>2%เพิ่มโอกาสออก!!</span></div>
+                    <div class="rate-row"><span class="rate-label color-exr">EXR </span><span>1%เพิ่มโอกาสออก!!</span></div>
                     <div class="rate-row"><span class="rate-label color-sec">SEC </span><span>0.1%</span></div>
                     <div class="rate-row"><span class="rate-label color-sur">SUR </span><span>1.75%</span></div> 
                     <div class="rate-row"><span class="rate-label color-ur">UR </span><span>2.3%</span></div> 
@@ -124,7 +126,6 @@
                     <div class="rate-row"><span class="rate-label color-sr">SR</span><span>6.25%</span></div>
                     <div class="rate-row"><span class="rate-label color-r">R </span><span>10.0%</span></div>
                     <div class="rate-row"><span class="rate-label color-uc">U / C </span><span>25.0-35.85%</span></div>
-                    <div class="rate-row"><span class="rate-label color-uc">P</span><span>0.001%</span></div>
                 </div>
                 <button class="btn-nav" style="width: 100%; font-size: 0.8rem;" onclick="openModal()">ℹ️ ดูเรทแยกใบ</button>
             </div>
@@ -155,7 +156,7 @@
 
     // --- Card Database ---
     const allCards = [
-        { id: 2, rarity: "EXR", name: "Timekeeper Cookie", rate: 2, img: "https://cookierunbraverse.com/data/en_storage/04Ahr1eXIerfTtIvinvqqA.webp" },
+{ id: 2, rarity: "EXR", name: "Timekeeper Cookie", rate: 1, img: "https://cookierunbraverse.com/data/en_storage/04Ahr1eXIerfTtIvinvqqA.webp" },
         
         { id: 3, rarity: "SEC", name: "GingerBrave (SEC)", rate: 0.1, img: "https://cookierunbraverse.com/data/en_storage/G1ZKRY689YVnYwusdDnjmg.webp" },
         { id: 5, rarity: "SEC", name: "Marble Bread Cookie (SEC)", rate: 0.1, img: "https://cookierunbraverse.com/data/en_storage/bJV3kb4i7lmPR3PQBVSeaw.webp" },
@@ -259,6 +260,11 @@
         document.getElementById("pity-text-exr").innerText = `${pe} / 900`;
     }
 
+    // ฟังก์ชันคำนวณระดับ EXP ประจำระดับเลเวล
+    function getRequiredExpForLevel(lv) {
+        return lv * 120;
+    }
+
     window.pull = async (amount) => {
         if (isPulling || !userData) return;
 
@@ -270,18 +276,21 @@
         // ประกาศตัวแปรฟิลด์ที่จะใช้สำหรับส่งอัปเดตไปที่ Firebase
         let updateFields = {};
         let costPoints = 0;
-        let exp = amount === 5 ? 50 : (amount === 50 ? 1500 : 1000); // แก้บั๊ก EXP สุ่ม 10/50 สลับกันจากโค้ดเดิม
+        let passExpGained = amount === 5 ? 50 : (amount === 50 ? 1500 : 1000); // แต้ม Pass เดิม
+
+        // คำนวณ EXP ประจำเลเวลที่จะได้รับตามโจทย์ (5 ครั้ง=10, 10 ครั้ง=50, 50 ครั้ง=100)
+        let playerExpGained = 0;
+        if (amount === 5) playerExpGained = 10;
+        else if (amount === 10) playerExpGained = 50;
+        else if (amount === 50) playerExpGained = 100;
 
         // ==================== 🎫 ระบบคำนวณและเช็คเงื่อนไขตั๋วสุ่ม 🎫 ====================
         if (amount === 5) {
             if (normalTickets >= 10) {
-                // บังคับใช้ตั๋วปกติก่อนตามเงื่อนไข (10 ใบ = สุ่ม 5 ครั้ง)
                 updateFields["normal_tickets"] = increment(-10);
             } else if (premiumTickets >= 5) {
-                // ถ้าตั๋วปกติไม่พอ เช็คตั๋วพรีเมียมต่อ (5 ใบ = สุ่ม 5 ครั้ง)
                 updateFields["premium_tickets"] = increment(-5);
             } else {
-                // ถ้าตั๋วไม่มีเลย หรือไม่พอ ให้กลับไปใช้แต้ม Point
                 costPoints = 100;
                 if (currentPoints < costPoints) return alert("แต้มหรือตั๋วสุ่มของคุณไม่เพียงพอ!");
                 updateFields["points"] = increment(-costPoints);
@@ -289,10 +298,8 @@
         } 
         else if (amount === 10) {
             if (normalTickets >= 15) {
-                // บังคับใช้ตั๋วปกติก่อน (15 ใบ = สุ่ม 10 ครั้ง)
                 updateFields["normal_tickets"] = increment(-15);
             } else if (premiumTickets >= 10) {
-                // ใช้ตั๋วพรีเมียม (10 ใบ = สุ่ม 10 ครั้ง)
                 updateFields["premium_tickets"] = increment(-10);
             } else {
                 costPoints = 500;
@@ -302,10 +309,8 @@
         } 
         else if (amount === 50) {
             if (normalTickets >= 30) {
-                // บังคับใช้ตั๋วปกติก่อน (30 ใบ = สุ่ม 50 ครั้ง)
                 updateFields["normal_tickets"] = increment(-30);
             } else if (premiumTickets >= 20) {
-                // ใช้ตั๋วพรีเมียม (20 ใบ = สุ่ม 50 ครั้ง)
                 updateFields["premium_tickets"] = increment(-20);
             } else {
                 costPoints = 1000;
@@ -335,7 +340,7 @@
             if (win.rarity === "SEC") ps = 0;
             if (win.rarity === "EXR") { pe = 0; ps = 0; }
 
-            results.push({ name: win.name, rarity: win.rarity, img: win.img, obtainedDate: Date.now(), level: 1, source: "Gacha ตู้ที่ 7" });
+            results.push({ name: win.name, rarity: win.rarity, img: win.img, obtainedDate: Date.now(), level: 1, source: "Gacha ตู้ที่ 1" });
             const cardEl = document.createElement("div");
             cardEl.className = "card";
             cardEl.innerHTML = `<div class="card-inner"><div class="card-front"><img src="${win.img}"></div><div class="card-back"></div></div>`;
@@ -346,16 +351,45 @@
             else if (["SEC", "SUR", "SSR", "UR"].includes(win.rarity)) triggerShake();
         }
 
-        // อัปเดตข้อมูล Pity และ EXP เข้าก้อนที่จะส่งอัปเดตไป Firebaseคราวเดียว
+        // --- คำนวณประมวลผลระบบเลเวลผู้เล่น (Player Level Update Loop) ---
+        let finalPlayerLv = parseInt(userData.playerLevel) || 1;
+        let finalPlayerExp = parseInt(userData.playerExp) || 0;
+        finalPlayerExp += playerExpGained;
+        let isLeveledUp = false;
+
+        while (finalPlayerExp >= getRequiredExpForLevel(finalPlayerLv)) {
+            finalPlayerExp -= getRequiredExpForLevel(finalPlayerLv);
+            finalPlayerLv++;
+            isLeveledUp = true;
+        }
+
+        // อัปเดตข้อมูล Pity, EXP และคลังการ์ดเข้าก้อนที่จะส่งอัปเดตไป Firebase
         updateFields["pitySEC"] = ps;
         updateFields["pityEXR"] = pe;
-        updateFields["passExp"] = increment(exp);
+        updateFields["passExp"] = increment(passExpGained);
+        updateFields["playerLevel"] = finalPlayerLv;
+        updateFields["playerExp"] = finalPlayerExp;
         updateFields["collection"] = arrayUnion(...results);
 
-        // บันทึกการเปลี่ยนแปลงลงฐานข้อมูล Firebase
+        // บันทึกการเปลี่ยนแปลงลงฐานข้อมูล Firebase คราวเดียว
         await updateDoc(doc(db, "users", currentUserUID), updateFields);
         
         isPulling = false; toggleButtons(false);
+
+        // แสดงแจ้งเตือน SweetAlert2 เมื่อเลเวลอัปสำเร็จแบบเรียลไทม์
+        if (isLeveledUp) {
+            Swal.fire({
+                title: '🎉 ยินดีด้วย เลเวลอัปแล้ว! 🎉',
+                html: `<div style="font-size: 1.2rem; margin: 10px 0;">คุณได้เลื่อนระดับเป็น <span style="color: #00e5ff; font-weight: bold; font-size: 1.6rem;">LV. ${finalPlayerLv}</span></div>
+                       <p style="color: #aaa; font-size: 0.9rem;">กลับไปที่หน้าโปรไฟล์หลักเพื่อกดรับไอเทมของรางวัลประจำเลเวลได้เลย!</p>`,
+                icon: 'success',
+                background: '#1a1a1c',
+                color: '#fff',
+                confirmButtonColor: '#ffc831',
+                confirmButtonText: 'รับทราบ!',
+                backdrop: `rgba(0,0,0,0.8)`
+            });
+        }
     }
 
     async function playEXRCutscene() {
