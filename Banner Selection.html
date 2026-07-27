@@ -99,7 +99,7 @@
             100% { transform: scale(1.2); }
         }
 
-        /* ==================== 💎 ส่วนของระบบฝนเพชร (ปรับปรุงใหม่ตามสั่ง) 💎 ==================== */
+        /* ==================== 💎 ส่วนของระบบฝนเพชร 💎 ==================== */
         .event-bar {
             background: linear-gradient(90deg, #111, #bd10e0, #111);
             color: white;
@@ -156,6 +156,7 @@
             justify-content: space-between;
             pointer-events: auto;
             transition: background-color 0.3s;
+            touch-action: none;
         }
         /* เอฟเฟกต์พื้นหลังเมื่อเข้าสู่โหมดคลั่งทอง */
         #game-overlay.frenzy-active {
@@ -164,17 +165,18 @@
         }
         .game-header {
             background: rgba(20,20,20,0.95);
-            padding: 25px;
+            padding: 15px 25px;
             display: flex;
             justify-content: space-around;
             align-items: center;
             border-bottom: 2px solid #ffc831;
+            z-index: 10;
         }
         .game-status-box {
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             font-weight: bold;
             background: rgba(255,255,255,0.03);
-            padding: 8px 25px;
+            padding: 8px 20px;
             border-radius: 50px;
             border: 1px solid rgba(255,255,255,0.1);
         }
@@ -183,11 +185,16 @@
             color: #000;
             padding: 5px 15px;
             border-radius: 20px;
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: 800;
             display: none;
             animation: pulse 1s infinite;
         }
+        .item-status-badge {
+            padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: 800; display: none;
+        }
+        #slow-badge { background: #00d4ff; color: #000; animation: pulse 1s infinite; }
+
         .game-area {
             flex-grow: 1;
             position: relative;
@@ -197,7 +204,7 @@
         /* เม็ดเพชรขนาดใหญ่และตกนุ่มนวล */
         .diamond-drop {
             position: absolute;
-            font-size: 3.8rem; 
+            font-size: 3.5rem; 
             cursor: pointer;
             user-select: none;
             animation: fall linear forwards;
@@ -206,11 +213,13 @@
         }
         .diamond-drop:hover { transform: scale(1.15); }
         
-        /* สไตล์ไอคอนเหรียญทองพิเศษ */
+        /* สไตล์ไอคอนพิเศษ */
         .diamond-drop.frenzy-trigger {
             filter: drop-shadow(0 0 25px #ffc831);
             animation: fall linear forwards, spin 2s linear infinite;
         }
+        .diamond-drop.item-bomb { filter: drop-shadow(0 0 20px #ff4757); }
+        .diamond-drop.item-clock { filter: drop-shadow(0 0 20px #00d4ff); }
 
         @keyframes fall {
             0% { transform: translateY(-80px) rotate(0deg); opacity: 1; }
@@ -220,6 +229,16 @@
         @keyframes spin {
             0% { transform: translateY(-80px) rotateY(0deg); }
             100% { transform: translateY(105vh) rotateY(360deg); }
+        }
+
+        /* 🛡️ แผ่นรองเลื่อนรับเพชรด้านล่าง */
+        #paddle {
+            position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%);
+            width: 140px; height: 26px; background: linear-gradient(135deg, #ffc831, #ff9f00);
+            border: 3px solid #fff; border-radius: 15px;
+            box-shadow: 0 0 20px rgba(255, 200, 49, 0.8), inset 0 0 10px rgba(255,255,255,0.5);
+            display: flex; justify-content: center; align-items: center; font-size: 1.1rem;
+            color: #000; pointer-events: none; z-index: 5;
         }
 
         /* ป๊อปอัปสรุปผล */
@@ -295,15 +314,15 @@
                 </div>
             </a>
 
-            <a href="random gacha9.html" class="banner-item">
+            <a href="" class="banner-item">
                 <span class="banner-type type-event" style="background: linear-gradient(135deg, #79ffd7, #64dbff);">???</span>
                 <div class="banner-img-wrapper"><img src="https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/coming-soon.png" class="banner-img"></div>
                 <div class="banner-content">
-                    <h3 class="banner-title">ตู้รวม</h3>
-                    <p class="banner-desc">ตู้รวมการ์ดทุกใบและสามรถเพิ่มเรทได้แค่USECกับEXRเท่านั้น</p>
+                    <h3 class="banner-title">coming soon</h3>
+                    <p class="banner-desc">coming soon</p>
                     <div class="banner-footer">
-                        <span class="price-tag">💎 100 <small style="font-size: 0.7rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
-                        <div class="pity-info">การันตี EXRและUSEC ที่ 900 รอบ<br>การันตี SEC ที่ 550 รอบ</div>
+                        <span class="price-tag">🪙 ??? <small style="font-size: 0.7rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
+                        <div class="pity-info">???</div>
                     </div>
                 </div>
             </a>
@@ -317,7 +336,7 @@
                     <p class="banner-desc">ร่วมต่อสู้ไปกับ Dark Cacao และสีสันแห่งการนองเลือด ตู้เริ่มต้นสำหรับนักสะสม</p>
                     <div class="banner-footer">
                         <span class="price-tag">🪙 100 <small style="font-size: 0.7rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
-                        <div class="pity-info">การันตี EXR ที่ 900 รอบ<br>การันตี SEC ที่ 550 รอบ</div>
+                        <div class="pity-info">การันตี SSR ที่ 100 รอบ<br>เหมาะสำหรับผู้เริ่มต้น</div>
                     </div>
                 </div>
             </a>
@@ -385,11 +404,13 @@
         <div class="game-header">
             <div class="game-status-box" style="color: #ffc831;"><i class="fas fa-hourglass-half"></i> เวลาที่เหลือ: <span id="game-timer">15:00</span></div>
             <div class="frenzy-badge" id="frenzy-timer-badge">🔥 คลั่งทองกระหน่ำเพชร: 10 วินาที!</div>
-            <div class="game-status-box" style="color: #60efff; font-size: 1.6rem;"><i class="fas fa-gem"></i> เพชรที่เก็บได้: <span id="player-score">0</span></div>
+            <div class="item-status-badge" id="slow-badge">⏰ ชะลอเวลาเพชรตกอยู่! (<span id="slow-time">5</span>s)</div>
+            <div class="game-status-box" style="color: #60efff; font-size: 1.4rem;"><i class="fas fa-gem"></i> เพชรที่เก็บได้: <span id="player-score">0</span></div>
             <button onclick="endGame()" style="background:#ff4757; color:white; border:none; padding:10px 20px; border-radius:12px; font-weight:bold; cursor:pointer;">สรุปผลเลย</button>
         </div>
         <div class="game-area" id="game-area">
-            <!-- เพชรจะถูกสร้างตกลงมาตรงนี้ -->
+            <!-- แผ่นรองเลื่อนรับเพชรด้านล่าง -->
+            <div id="paddle"><i class="fas fa-shield-alt"></i></div>
         </div>
     </div>
 
@@ -456,14 +477,33 @@
         let gameActive = false;
         let score = 0;
         let gameTimeLeft = 900; 
-        let gameInterval, spawnInterval;
+        let gameInterval, spawnInterval, animFrameId;
         let isEarlyAccessMode = false; 
 
-        // ระบบตัวแปรโหมดคลั่งทอง (Frenzy Mode) ที่เพิ่มเข้ามาใหม่
+        // ระบบตัวแปรโหมดคลั่งทอง (Frenzy Mode)
         let isFrenzyMode = false;
         let frenzyTimeLeft = 0;
         let frenzyInterval;
-        let baseSpawnSpeed = 350; // ความเร็วสปอว์นปกติ (0.35 วินาที)
+        let baseSpawnSpeed = 350;
+
+        // ระบบไอเทมชะลอเวลา (Clock Slow Effect)
+        let isSlowMode = false;
+        let slowTimer = null;
+        let slowTimeLeft = 0;
+
+        // ควบคุมแผ่นรองรับเพชร (Paddle)
+        const paddle = document.getElementById("paddle");
+        let paddleX = window.innerWidth / 2;
+        let activeElementsList = []; // เก็บอ้างอิงวัตถุที่ร่วงลงมาเพื่อคำนวณการชน paddle
+
+        window.addEventListener("mousemove", (e) => {
+            if (gameActive) paddleX = e.clientX;
+        });
+        window.addEventListener("touchmove", (e) => {
+            if (gameActive && e.touches.length > 0) {
+                paddleX = e.touches[0].clientX;
+            }
+        });
 
         function checkEventStatus() {
             const now = new Date();
@@ -559,17 +599,23 @@
             score = 0;
             isFrenzyMode = false;
             frenzyTimeLeft = 0;
+            isSlowMode = false;
+            activeElementsList = [];
+
             document.getElementById("player-score").innerText = score;
             document.getElementById("game-overlay").className = ""; 
             document.getElementById("frenzy-timer-badge").style.display = "none";
+            document.getElementById("slow-badge").style.display = "none";
             document.getElementById("game-overlay").style.display = "flex";
             gameActive = true;
 
             gameInterval = setInterval(updateGameTimer, 1000);
-            resetSpawnInterval(baseSpawnSpeed); // รันความเร็วปกติเริ่มต้น
+            resetSpawnInterval(baseSpawnSpeed); 
+            
+            // เริ่มเกมลูปตรวจจับการชนแผ่นรองรับ
+            requestAnimationFrame(paddleLoop);
         };
 
-        // ฟังก์ชันช่วยสลับเปลี่ยนความเร็วสปอว์นไอคอน
         function resetSpawnInterval(speed) {
             clearInterval(spawnInterval);
             if (!gameActive) return;
@@ -587,20 +633,19 @@
             document.getElementById("game-timer").innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
 
-        // ฟังก์ชันเปิดใช้งานโหมดคลั่งทอง 10 วินาที ฝนเพชรถล่มหนักขึ้น x3 เท่า
+        // 🔥 เปิดใช้งานโหมดคลั่งทอง 10 วินาที
         function activateFrenzyMode() {
             if (!gameActive) return;
             
-            // กรณีเก็บซ้อนเหรียญทองเพิ่มได้ ให้รีเซ็ตเวลาเป็น 10 วิใหม่เต็มๆ
             frenzyTimeLeft = 10; 
             document.getElementById("frenzy-timer-badge").innerText = `🔥 คลั่งทองกระหน่ำเพชร: ${frenzyTimeLeft} วิ!`;
             document.getElementById("frenzy-timer-badge").style.display = "block";
             document.getElementById("game-overlay").classList.add("frenzy-active");
 
-            if (isFrenzyMode) return; // ถ้าเปิดอยู่แล้วให้รีเซ็ตแค่เวลาด้านบนพอ
+            if (isFrenzyMode) return; 
             
             isFrenzyMode = true;
-            resetSpawnInterval(100); // ⚡ เร่งความเร็วการตกเหลือ 0.1 วินาทีต่อชิ้น (ตกหนักขึ้นมาก!)
+            resetSpawnInterval(100); 
 
             frenzyInterval = setInterval(() => {
                 frenzyTimeLeft--;
@@ -612,29 +657,64 @@
             }, 1000);
         }
 
-        // สิ้นสุดโหมดคลั่งทอง กลับสู่โหมดปกติ
         function deactivateFrenzyMode() {
             isFrenzyMode = false;
             clearInterval(frenzyInterval);
             document.getElementById("frenzy-timer-badge").style.display = "none";
             document.getElementById("game-overlay").classList.remove("frenzy-active");
-            resetSpawnInterval(baseSpawnSpeed); // กลับไปใช้ความเร็วตกแบบเดิม
+            resetSpawnInterval(baseSpawnSpeed); 
         }
 
-        function spawnDiamond() {
+        // 💣 เอฟเฟกต์ระเบิดจุดชนวนปล่อยฝูงเพชร
+        function triggerBombEffect() {
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => { if (gameActive) spawnDiamond(true); }, i * 50);
+            }
+        }
+
+        // ⏰ เอฟเฟกต์ชะลอเวลา 5 วินาที
+        function triggerClockEffect() {
+            isSlowMode = true;
+            slowTimeLeft = 5;
+            document.getElementById("slow-time").innerText = slowTimeLeft;
+            document.getElementById("slow-badge").style.display = "block";
+
+            if (slowTimer) clearInterval(slowTimer);
+            slowTimer = setInterval(() => {
+                slowTimeLeft--;
+                if (slowTimeLeft <= 0) {
+                    clearInterval(slowTimer);
+                    isSlowMode = false;
+                    document.getElementById("slow-badge").style.display = "none";
+                } else {
+                    document.getElementById("slow-time").innerText = slowTimeLeft;
+                }
+            }, 1000);
+        }
+
+        function spawnDiamond(forceGem = false) {
             if (!gameActive) return;
             const gameArea = document.getElementById("game-area");
             const diamond = document.createElement("div");
             
-            // สุ่มประเภทไอคอนที่จะสปอว์นตกลงมา
             const rand = Math.random();
             let chosen;
-            let isFrenzyTriggerCoin = false;
+            let itemType = "normal";
 
-            // สุ่มเกิดเหรียญทองพิเศษ (💰) โอกาส 5% ในเวลาปกติ และจะไม่เกิดซ้ำในขณะที่เป็นคลั่งทองอยู่แล้ว
-            if (rand < 0.05 && !isFrenzyMode) {
+            if (!forceGem && rand < 0.04) {
+                // 💣 ระเบิด
+                chosen = { icon: "💣", points: 0 };
+                itemType = "bomb";
+                diamond.className = "diamond-drop item-bomb";
+            } else if (!forceGem && rand < 0.08) {
+                // ⏰ นาฬิกา
+                chosen = { icon: "⏰", points: 0 };
+                itemType = "clock";
+                diamond.className = "diamond-drop item-clock";
+            } else if (!forceGem && rand < 0.13 && !isFrenzyMode) {
+                // 💰 เหรียญทองโหมดคลั่ง
                 chosen = { icon: "💰", points: 50 };
-                isFrenzyTriggerCoin = true;
+                itemType = "frenzy";
                 diamond.className = "diamond-drop frenzy-trigger";
             } else {
                 diamond.className = "diamond-drop";
@@ -647,24 +727,40 @@
             }
             
             diamond.innerText = chosen.icon;
-            diamond.style.left = Math.random() * 92 + "vw"; 
+            diamond.style.left = Math.random() * 90 + "vw"; 
             
-            // สุ่มเวลาหล่น ถ้าเป็นช่วงคลั่งทอง (Frenzy) ไอคอนจะร่วงหล่นลงมาเร็วขึ้นเพิ่มความตื่นเต้น
-            const fallDuration = isFrenzyMode ? (Math.random() * 2 + 2) : (Math.random() * 3 + 4); 
+            let fallDuration = isFrenzyMode ? (Math.random() * 2 + 2) : (Math.random() * 3 + 4); 
+            if (isSlowMode) fallDuration *= 1.8; // ถ้านาฬิกาทำงานจะร่วงช้าลง
+
             diamond.style.animationDuration = fallDuration + "s";
 
+            const itemObj = {
+                element: diamond,
+                type: itemType,
+                points: chosen.points,
+                icon: chosen.icon
+            };
+            activeElementsList.push(itemObj);
+
+            // ฟังก์ชันเมื่อคลิกด้วยมือแบบเดิม
             const collectDiamond = (e) => {
                 if (!gameActive) return;
-                score += chosen.points;
+                
+                if (itemType === "bomb") {
+                    triggerBombEffect();
+                } else if (itemType === "clock") {
+                    triggerClockEffect();
+                } else if (itemType === "frenzy") {
+                    score += chosen.points;
+                    activateFrenzyMode();
+                } else {
+                    score += chosen.points;
+                }
+
                 document.getElementById("player-score").innerText = score;
                 createClickEffect(e.clientX, e.clientY, chosen.icon);
                 
-                // ถ้าเก็บเหรียญทองสำเร็จ ให้รันระบบโหมดคลั่งทันที
-                if (isFrenzyTriggerCoin) {
-                    activateFrenzyMode();
-                }
-
-                diamond.remove();
+                removeActiveItem(itemObj);
             };
 
             diamond.addEventListener("mousedown", collectDiamond);
@@ -675,8 +771,61 @@
             gameArea.appendChild(diamond);
 
             setTimeout(() => {
-                diamond.remove();
+                removeActiveItem(itemObj);
             }, fallDuration * 1000);
+        }
+
+        function removeActiveItem(itemObj) {
+            if (itemObj.element && itemObj.element.parentNode) {
+                itemObj.element.remove();
+            }
+            const idx = activeElementsList.indexOf(itemObj);
+            if (idx > -1) activeElementsList.splice(idx, 1);
+        }
+
+        // ลูปตรวจจับเพชรร่วงใส่แผ่นรองรับ (Paddle Collision Loop)
+        function paddleLoop() {
+            if (!gameActive) return;
+
+            paddle.style.left = paddleX + "px";
+            const paddleRect = paddle.getBoundingClientRect();
+
+            for (let i = activeElementsList.length - 1; i >= 0; i--) {
+                let item = activeElementsList[i];
+                if (!item.element) continue;
+
+                const itemRect = item.element.getBoundingClientRect();
+
+                // ตรวจสอบการชนกับ Paddle
+                const isColliding = !(
+                    itemRect.right < paddleRect.left ||
+                    itemRect.left > paddleRect.right ||
+                    itemRect.bottom < paddleRect.top ||
+                    itemRect.top > paddleRect.bottom
+                );
+
+                if (isColliding) {
+                    if (item.type === "bomb") {
+                        triggerBombEffect();
+                        createClickEffect(itemRect.left, itemRect.top, "💥");
+                    } else if (item.type === "clock") {
+                        triggerClockEffect();
+                        createClickEffect(itemRect.left, itemRect.top, "⏰");
+                    } else if (item.type === "frenzy") {
+                        score += item.points;
+                        activateFrenzyMode();
+                        createClickEffect(itemRect.left, itemRect.top, "💰");
+                    } else {
+                        score += item.points;
+                        createClickEffect(itemRect.left, itemRect.top, "+" + item.points);
+                    }
+
+                    document.getElementById("player-score").innerText = score;
+                    removeActiveItem(item);
+                }
+            }
+
+            animFrameId = requestAnimationFrame(paddleLoop);
         }
 
         function createClickEffect(x, y, icon) {
@@ -686,6 +835,8 @@
             fx.style.left = x + "px";
             fx.style.top = y + "px";
             fx.style.fontSize = "2rem";
+            fx.style.fontWeight = "bold";
+            fx.style.color = "#ffc831";
             fx.style.pointerEvents = "none";
             fx.style.transition = "transform 0.4s, opacity 0.4s";
             fx.style.zIndex = "1001";
@@ -704,9 +855,12 @@
             clearInterval(gameInterval);
             clearInterval(spawnInterval);
             clearInterval(frenzyInterval);
+            clearInterval(slowTimer);
+            cancelAnimationFrame(animFrameId);
 
             document.getElementById("game-overlay").style.display = "none";
-            document.getElementById("game-area").innerHTML = "";
+            document.getElementById("game-area").innerHTML = '<div id="paddle"><i class="fas fa-shield-alt"></i></div>';
+            activeElementsList = [];
 
             document.getElementById("final-diamonds").innerText = score;
             document.getElementById("result-popup").style.display = "block";
