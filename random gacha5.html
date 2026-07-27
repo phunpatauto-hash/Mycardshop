@@ -91,7 +91,7 @@
 
     <div id="choiceModal" class="modal">
         <div class="modal-content" style="max-width: 600px; border: 2px solid #00d4ff;">
-            <h3 style="color:#00d4ff; text-align: center; margin-top: 0;">เลือกการ์ด USEC ที่ต้องการ (รับ 1 ใบ สุ่ม LV 1-80)</h3>
+            <h3 style="color:#00d4ff; text-align: center; margin-top: 0;">เลือกการ์ด USEC ที่ต้องการ (รับ 1 ใบ สุ่ม LV 1-50)</h3>
             <p style="text-align: center; font-size: 0.8rem; color: #aaa;">แต้มสะสมจะถูกหักเมื่อเลือกเสร็จสิ้น</p>
             <div id="usec-choice-list" class="card-choice-grid"></div>
             <button class="btn-pull" style="width: 100%; margin-top: 20px; background: #444; color: #fff;" onclick="closeModal('choiceModal')">ยกเลิก</button>
@@ -141,7 +141,7 @@
                 <div class="scroll-window"><div class="slide-track-v" id="v-track"></div></div>
                 
                 <div class="quick-rate-table">
-                    <div class="rate-row"><span class="rate-label color-usec">USEC</span><span>2%เพิ่มโอกาสออก!!</span></div>
+                    <div class="rate-row"><span class="rate-label color-usec">USEC</span><span>0.2%เพิ่มโอกาสออก!!</span></div>
                     <div class="rate-row"><span class="rate-label color-cbr">CBR</span><span>0.01%</span></div>
                     <div class="rate-row"><span class="rate-label color-pr">PR</span><span>0.1%</span></div> 
                     <div class="rate-row"><span class="rate-label color-sec">SEC</span><span>1.5%</span></div> 
@@ -176,7 +176,7 @@
 
                 <div class="reward-item">
                     <div class="reward-title">
-                        🃏 USEC 1 ใบ (สุ่ม LV 1-80)
+                        🃏 USEC 1 ใบ (สุ่ม LV 1-50)
                         <button class="info-btn" onclick="showUsecInfo()">i</button>
                     </div>
                     <div class="reward-cost">ใช้ 250 แต้ม</div>
@@ -210,48 +210,55 @@
 
     // --- รายชื่อการ์ดคงเดิม ---
     const allCards = [
-        { id: 1, rarity: "USEC", name: "พระอิศวร (USEC)", rate: 2, img: "https://cdn.bangbon.app/cards/SL01-003.png" },
-        { id: 1, rarity: "USEC", name: "พระนารายณ์ (USEC)", rate: 2, img: "https://cdn.bangbon.app/cards/SL01-004.png" },
-        { id: 1, rarity: "USEC", name: "พระอินทร์ (USEC)", rate: 2, img: "https://cdn.bangbon.app/cards/SL01-005.png" },
-        { id: 1, rarity: "USEC", name: "ง่อวซอรัส (USEC)", rate: 2, img: "https://cdn.bangbon.app/cards/SL02-005.png" },
-        { id: 1, rarity: "USEC", name: "ครุฑเวนไตย เจ้ากำลัง (USEC)", rate: 2, img: "https://cdn.bangbon.app/cards/SL02-002.png" },
-        { id: 1, rarity: "USEC", name: "นางมณโฑ (USEC)", rate: 2, img: "https://cdn.bangbon.app/cards/SL01-001.png" },
+        { id: 1, rarity: "USEC", name: "พระอิศวร (USEC)", rate: 0.2, img: "https://cdn.bangbon.app/cards/SL01-003.png" },
+        { id: 1, rarity: "USEC", name: "พระนารายณ์ (USEC)", rate: 0.2, img: "https://cdn.bangbon.app/cards/SL01-004.png" },
+        { id: 1, rarity: "USEC", name: "พระอินทร์ (USEC)", rate: 0.2, img: "https://cdn.bangbon.app/cards/SL01-005.png" },
+        { id: 1, rarity: "USEC", name: "ง่อวซอรัส (USEC)", rate: 0.2, img: "https://cdn.bangbon.app/cards/SL02-005.png" },
+        { id: 1, rarity: "USEC", name: "ครุฑเวนไตย เจ้ากำลัง (USEC)", rate: 0.2, img: "https://cdn.bangbon.app/cards/SL02-002.png" },
+        { id: 1, rarity: "USEC", name: "นางมณโฑ (USEC)", rate: 0.2, img: "https://cdn.bangbon.app/cards/SL01-001.png" },
+
         { id: 2, rarity: "CBR", name: "มีมมิจัง ไอดอล No.1 (CBR)", rate: 0.01, img: "https://cdn.bangbon.app/cards/KD03-001-CBR.png" },
         { id: 2, rarity: "CBR", name: "พระอิศวร วีลแชร์ (CBR)", rate: 0.01, img: "https://cdn.bangbon.app/cards/BT09-001-CBR.png" },
         { id: 2, rarity: "CBR", name: "เมียพระอิศวร (CBR)", rate: 0.01, img: "https://cdn.bangbon.app/cards/SD01-005-CBR.png" },
         { id: 2, rarity: "CBR", name: "วีรบุรุษปากซอย (CBR)", rate: 0.01, img: "https://cdn.bangbon.app/cards/SD02-005-CBR.png" },
         { id: 2, rarity: "CBR", name: "อู๊ด ประธานผู้รู้ความจริง (CBR)", rate: 0.01, img: "https://cdn.bangbon.app/cards/BT04-020-CBR.png" },
         { id: 2, rarity: "CBR", name: "พี่หน่วง พิธีกรผมสวย (CBR)", rate: 0.01, img: "https://cdn.bangbon.app/cards/BT07-023-CBR.png" },
+
         { id: 3, rarity: "PR", name: "วีรบุรุษปากซอย (PR)", rate: 0.1 , img: "https://cdn.bangbon.app/cards/SD02-005-PR.png" },
         { id: 3, rarity: "PR", name: "นนทก นิ้วเพชร (PR)", rate: 0.1 , img: "https://cdn.bangbon.app/cards/BT01-001-PR.png" },
         { id: 3, rarity: "PR", name: "พระนารายณ์ เทพผดุงธรรม (PR)", rate: 0.1 , img: "https://cdn.bangbon.app/cards/KD01-001-PR.png" },
         { id: 3, rarity: "PR", name: "มีมมิจัง ไอดอล No.1 (PR)", rate: 0.1 , img: "https://cdn.bangbon.app/cards/KD03-001-PR.png" },
         { id: 3, rarity: "PR", name: "วอเตอร์แมน (PR)", rate: 0.1 , img: "https://cdn.bangbon.app/cards/SD05-006-PR.png" },
         { id: 3, rarity: "PR", name: "เมียพระอิศวร (PR)", rate: 0.1 , img: "https://cdn.bangbon.app/cards/SD01-005-PR.png" },
+
         { id: 4, rarity: "SEC", name: "มวยทะเลลลลลล (SEC)", rate: 1.5, img: "https://cdn.bangbon.app/cards/CC02-060-SCR.png" },
         { id: 4, rarity: "SEC", name: "ร่างอวตารพระนารายณ์ - นรสิง (SEC)", rate: 1.5, img: "https://cdn.bangbon.app/cards/KD01-002-SCR.png" },
         { id: 4, rarity: "SEC", name: "พญายักษ์ ทศกัณฐ์ (SEC)", rate: 1.5, img: "https://cdn.bangbon.app/cards/CC02-039-SCR.png" },
         { id: 4, rarity: "SEC", name: "มีมมิจัง ไอดอลหน้าใหม่ (SEC)", rate: 1.5, img: "https://cdn.bangbon.app/cards/KD03-003-SCR.png" },
         { id: 4, rarity: "SEC", name: "บอสทุเรียน (SEC)", rate: 1.5, img: "https://cdn.bangbon.app/cards/CC02-031-SCR.png" },
         { id: 4, rarity: "SEC", name: "เตียวเสียน จันทร์หลบโฉมสุดา (SEC)", rate: 1.5, img: "https://cdn.bangbon.app/cards/CC02-012-SCR.png" },
+
         { id: 5, rarity: "UR", name: "นนทก นิ้วเพชร", rate: 12.5, img: "https://cdn.bangbon.app/cards/BT01-001.png" },
         { id: 5, rarity: "UR", name: "จัน หนวดเขี้ยว", rate: 12.5, img: "https://cdn.bangbon.app/cards/SD06-001.png" },
         { id: 5, rarity: "UR", name: "วอเตอร์แมน", rate: 12.5, img: "https://cdn.bangbon.app/cards/SD05-006.png" },
         { id: 5, rarity: "UR", name: "อู๊ด ประธานผู้รู้ความจริง ", rate: 12.5, img: "https://cdn.bangbon.app/cards/BT04-020.png" },
         { id: 5, rarity: "UR", name: "พี่หน่วง พิธีกรผมสวย", rate: 12.5, img: "https://cdn.bangbon.app/cards/BT07-023.png" },
         { id: 5, rarity: "UR", name: "รัททาทุย พ่อพันธุ์", rate: 12.5, img: "https://cdn.bangbon.app/cards/CC01-025.png" },
+
         { id: 6, rarity: "SR", name: "พระอิศวร (SR)", rate: 26.0, img: "https://cdn.bangbon.app/cards/ODY1-006.png" },
         { id: 6, rarity: "SR", name: "พระนารายณ์ (SR)", rate: 26.0, img: "https://cdn.bangbon.app/cards/SD01-002.png" },
         { id: 6, rarity: "SR", name: "ริกกี้ เพื่อนรัก (SR)", rate: 26.0, img: "https://cdn.bangbon.app/cards/SD02-004.png" },
         { id: 6, rarity: "SR", name: "บุญลือ วีรบุรุษเปรต (SR)", rate: 26.0, img: "https://cdn.bangbon.app/cards/BT02-001.png" },
         { id: 6, rarity: "SR", name: "กาฬสินธุ์แมน (SR)", rate: 26.0, img: "https://cdn.bangbon.app/cards/BT03-008.png" },
         { id: 6, rarity: "SR", name: "กุ่ย นักเอาตัวรอด (SR)", rate: 26.0, img: "https://cdn.bangbon.app/cards/BT05-001.png" },
+
         { id: 8, rarity: "R", name: "พระเวสสุกรรม", rate: 46.0, img: "https://cdn.bangbon.app/cards/BT01-003.png" },
         { id: 8, rarity: "R", name: "นีโม่", rate: 46.0, img: "https://cdn.bangbon.app/cards/BT01-018.png" },
         { id: 8, rarity: "R", name: "พี่โด 2.0", rate: 46.0, img: "https://cdn.bangbon.app/cards/BT01-024.png" },
         { id: 8, rarity: "R", name: "ผู้เจริญระดับ 4", rate: 46.0, img: "https://cdn.bangbon.app/cards/BT02-033.png" },
         { id: 8, rarity: "R", name: "อินทรีย์แมน", rate: 46.0, img: "https://cdn.bangbon.app/cards/BT03-003.png" },
         { id: 8, rarity: "R", name: "แม่นาค พระประแดง", rate: 46.0, img: "https://cdn.bangbon.app/cards/BT03-022.png" },
+        
         { id: 9, rarity: "C", name: "พระอินทร์", rate: 50.2, img: "https://cdn.bangbon.app/cards/SD01-003.png" },
         { id: 9, rarity: "C", name: "นนทก", rate: 50.2, img: "https://cdn.bangbon.app/cards/SD01-004.png" },
         { id: 9, rarity: "C", name: "วิรuฬหก", rate: 50.2, img: "https://cdn.bangbon.app/cards/SD01-015.png" },
@@ -337,7 +344,7 @@
     // --- แก้ไขฟังก์ชัน confirmChoice ให้สุ่มเลเวลและรับแค่ 1 ใบ ---
     window.confirmChoice = async (cardName, cardImg, cost) => {
         // สุ่มเลเวล 1-50
-        const randomLV = Math.floor(Math.random() * 80) + 1;
+        const randomLV = Math.floor(Math.random() * 50) + 1;
         
         if (!confirm(`ยืนยันรับ ${cardName} 1 ใบ (สุ่มได้ LV.${randomLV})? (ระบบจะเริ่มรอบใหม่)`)) return;
         
