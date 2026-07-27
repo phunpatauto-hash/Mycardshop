@@ -17,7 +17,10 @@
             --blue: #1e90ff;
             --green: #2ed573;
             --star: #ff9f43; 
-            --orange: #ff6b81; /* สีสำหรับปุ่มรีเซ็ต */
+            --orange: #ff6b81;
+            --ticket: #cbd5e1;
+            --premium-ticket: #ff7675;
+            --cyan: #00e5ff;
         }
 
         body { 
@@ -29,7 +32,6 @@
             min-height: 100vh;
         }
 
-        /* --- Sidebar Navigation --- */
         .sidebar {
             width: 260px;
             background: #0a0a0c;
@@ -41,6 +43,7 @@
             position: sticky;
             top: 0;
             height: 100vh;
+            box-sizing: border-box;
         }
 
         .sidebar h1 {
@@ -68,7 +71,6 @@
             color: var(--gold);
         }
 
-        /* --- Main Content --- */
         .main-content {
             flex: 1;
             padding: 40px;
@@ -82,7 +84,6 @@
             margin-bottom: 40px;
         }
 
-        /* --- Stats Grid --- */
         .stats-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
@@ -101,19 +102,9 @@
         }
 
         .stat-box:hover { transform: translateY(-5px); border-color: var(--gold); }
-
-        .stat-val { 
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2.2rem; 
-            font-weight: 700; 
-            color: var(--gold); 
-            display: block; 
-            margin-bottom: 5px;
-        }
-
+        .stat-val { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; font-weight: 700; color: var(--gold); display: block; margin-bottom: 5px; }
         .stat-label { color: #666; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* --- Glass Cards --- */
         .card { 
             background: var(--bg-card); 
             padding: 30px; 
@@ -134,103 +125,86 @@
         }
 
         h2 i { color: var(--gold); }
-
-        /* --- Form Elements --- */
         .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .grid-inputs-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 20px; }
         
+        @media (max-width: 900px) {
+            .grid-inputs-5 { grid-template-columns: repeat(2, 1fr); }
+        }
+
         label { font-size: 0.75rem; color: #555; display: block; margin-bottom: 8px; font-weight: bold; }
+        input, select, textarea { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #222; background: #080808; color: white; font-family: 'Kanit'; box-sizing: border-box; transition: 0.3s; }
+        input:focus, select:focus, textarea:focus { border-color: var(--gold); outline: none; background: #000; }
+        textarea { height: 90px; resize: vertical; }
 
-        input, select { 
-            width: 100%; 
-            padding: 14px; 
-            border-radius: 12px; 
-            border: 1px solid #222; 
-            background: #080808; 
-            color: white; 
-            font-family: 'Kanit'; 
-            box-sizing: border-box;
-            transition: 0.3s;
-        }
-
-        input:focus, select:focus { border-color: var(--gold); outline: none; background: #000; }
-
-        /* --- Buttons --- */
-        .btn { 
-            border: none; padding: 12px 18px; border-radius: 10px; cursor: pointer; 
-            font-weight: bold; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; 
-            text-decoration: none; font-family: 'Kanit';
-        }
-
+        .btn { border: none; padding: 12px 18px; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; font-family: 'Kanit'; }
         .btn-main { background: var(--gold); color: #000; width: 100%; justify-content: center; font-size: 1rem; margin-top: 10px; }
         .btn-main:hover { box-shadow: 0 0 20px var(--gold-glow); transform: scale(1.01); }
 
-        .btn-action { padding: 8px; border-radius: 8px; font-size: 0.9rem; }
+        .btn-action { padding: 8px; border-radius: 8px; font-size: 0.9rem; width: 34px; height: 34px; justify-content: center; align-items: center; display: inline-flex; }
         .btn-red { background: rgba(255, 71, 87, 0.1); color: var(--red); }
         .btn-red:hover { background: var(--red); color: white; }
-        
         .btn-blue { background: rgba(30, 144, 255, 0.1); color: var(--blue); }
         .btn-blue:hover { background: var(--blue); color: white; }
-
         .btn-star { background: rgba(255, 159, 67, 0.1); color: var(--star); }
         .btn-star:hover { background: var(--star); color: white; }
-
+        .btn-ticket { background: rgba(203, 213, 225, 0.1); color: var(--ticket); }
+        .btn-ticket:hover { background: var(--ticket); color: black; }
+        .btn-p-ticket { background: rgba(255, 118, 117, 0.1); color: var(--premium-ticket); }
+        .btn-p-ticket:hover { background: var(--premium-ticket); color: white; }
         .btn-green { background: rgba(46, 213, 115, 0.1); color: var(--green); }
         .btn-green:hover { background: var(--green); color: white; }
-
         .btn-orange { background: rgba(255, 107, 129, 0.1); color: #ff6b81; }
         .btn-orange:hover { background: #ff6b81; color: white; }
 
-        /* --- Tables --- */
         .table-container { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th { text-align: left; padding: 15px; color: #444; font-size: 0.8rem; text-transform: uppercase; border-bottom: 1px solid #222; }
         td { padding: 18px 15px; border-bottom: 1px solid #1a1a1a; font-size: 0.9rem; }
-        
         tr:hover td { background: rgba(255,255,255,0.01); }
 
         .user-info b { color: var(--gold); display: block; font-size: 1rem; }
         .user-info small { color: #555; font-family: monospace; }
-
         .badge { padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; }
         .badge-premium { background: var(--gold); color: #000; }
         .badge-banned { background: var(--red); color: #fff; }
+        .badge-single { background: rgba(30, 144, 255, 0.2); color: var(--blue); border: 1px solid var(--blue); }
+        .badge-all { background: rgba(0, 229, 255, 0.2); color: var(--cyan); border: 1px solid var(--cyan); }
         
         .currency-tag { background: #000; padding: 4px 8px; border-radius: 6px; border: 1px solid #222; margin-right: 5px; font-size: 0.8rem; display: inline-block; margin-bottom: 5px; }
         .gold-txt { color: var(--gold); }
         .dia-txt { color: #00d2ff; }
         .star-txt { color: var(--star); }
+        .ticket-txt { color: var(--ticket); }
+        .p-ticket-txt { color: var(--premium-ticket); }
 
-        .search-bar {
-            background: #0a0a0c;
-            border: 1px solid #222;
-            padding: 12px 20px;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 300px;
-            color: white;
-            font-size: 0.9rem;
-        }
+        .search-bar { background: #0a0a0c; border: 1px solid #222; padding: 12px 20px; border-radius: 12px; width: 100%; max-width: 300px; color: white; font-size: 0.9rem; }
 
-        /* เอฟเฟกต์สีรุ้งสำหรับระดับ SECRET ตัวใหม่ */
         @keyframes secretGlow {
             0% { color: #ff4757; text-shadow: 0 0 5px rgba(255,71,87,0.5); }
             33% { color: #00d2ff; text-shadow: 0 0 5px rgba(0,210,255,0.5); }
             66% { color: #2ed573; text-shadow: 0 0 5px rgba(46,213,115,0.5); }
             100% { color: #ff4757; text-shadow: 0 0 5px rgba(255,71,87,0.5); }
         }
-        .secret-rainbow-opt {
-            animation: secretGlow 3s infinite linear;
-            font-weight: bold !important;
-            background-color: #080808 !important;
-        }
+        .secret-rainbow-opt { animation: secretGlow 3s infinite linear; font-weight: bold !important; background-color: #080808 !important; }
     </style>
 </head>
 <body>
+
+<!-- 🔍 Modal สำหรับดูข้อมูลผู้เล่นทั้งหมด (RAW Data / JSON) -->
+<div id="player-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
+    <div style="background: var(--bg-card); border: 1px solid var(--border); width: 90%; max-width: 750px; padding: 30px; border-radius: 20px; position: relative; max-height: 85vh; overflow-y: auto;">
+        <button onclick="closePlayerModal()" style="position: absolute; right: 20px; top: 20px; background: none; border: none; color: #888; font-size: 1.5rem; cursor: pointer;">&times;</button>
+        <h2 style="color: var(--gold); margin-top: 0;"><i class="fas fa-user-circle"></i> FULL PLAYER DATA</h2>
+        <div id="modal-player-content" style="background: #080808; padding: 20px; border-radius: 12px; font-family: monospace; white-space: pre-wrap; word-break: break-all; color: #00e5ff; font-size: 0.85rem; border: 1px solid #222;"></div>
+    </div>
+</div>
 
 <aside class="sidebar">
     <h1>CORE ADMIN</h1>
     <a href="#" class="nav-item active"><i class="fas fa-chart-pie"></i> Dashboard</a>
     <a href="#users-sec" class="nav-item"><i class="fas fa-users"></i> Player Base</a>
+    <a href="#mailbox-sec" class="nav-item" style="color: var(--cyan);"><i class="fas fa-envelope"></i> Mailbox Broadcast</a>
     <a href="#code-sec" class="nav-item"><i class="fas fa-ticket-alt"></i> Reward Codes</a>
     <a href="#news-sec" class="nav-item"><i class="fas fa-newspaper"></i> News Feed</a>
     <div style="margin-top: auto;">
@@ -264,6 +238,65 @@
             <i class="fas fa-crown" style="position:absolute; right:20px; bottom:20px; font-size:3rem; opacity:0.05;"></i>
         </div>
     </div>
+
+    <!-- 📬 MAILBOX BROADCAST & SINGLE SYSTEM -->
+    <section class="card" id="mailbox-sec" style="border-color: rgba(0, 229, 255, 0.3); box-shadow: 0 0 20px rgba(0, 229, 255, 0.05);">
+        <h2 style="color: var(--cyan);"><i class="fas fa-paper-plane" style="color: var(--cyan);"></i> Mailbox System (ส่งจดหมาย & แจกรางวัล)</h2>
+        
+        <div class="grid-inputs">
+            <div>
+                <label>รูปแบบการส่ง</label>
+                <select id="mail-target-type">
+                    <option value="all">🌐 ผู้เล่นทุกคน (Broadcast)</option>
+                    <option value="single">👤 ผู้เล่นคนเดียว (Single Player)</option>
+                </select>
+            </div>
+            <div id="single-user-input-group" style="display: none;">
+                <label style="color: var(--gold);">PLAYER ID (UID)</label>
+                <input type="text" id="mail-target-uid" placeholder="วาง UID ผู้เล่นตรงนี้...">
+            </div>
+        </div>
+
+        <div class="grid-inputs">
+            <div>
+                <label>หัวข้อจดหมาย</label>
+                <input type="text" id="mail-title" placeholder="เช่น ชดเชยการปิดปรับปรุงระบบเซิร์ฟเวอร์">
+            </div>
+            <div>
+                <label>ทองที่แจก (🪙)</label>
+                <input type="number" id="mail-points" placeholder="0" min="0">
+            </div>
+            <div>
+                <label>เพชรที่แจก (💎)</label>
+                <input type="number" id="mail-diamonds" placeholder="0" min="0">
+            </div>
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label>รายละเอียดข้อความ/ประกาศ</label>
+            <textarea id="mail-content" placeholder="พิมพ์ข้อความที่ต้องการส่ง..."></textarea>
+        </div>
+        <button class="btn btn-main" id="send-mail-btn" style="background: linear-gradient(135deg, #00e5ff, #0055ff); color: white;">
+            <i class="fas fa-paper-plane"></i> SEND MAIL
+        </button>
+
+        <div style="margin-top: 25px;">
+            <label style="color: #aaa; margin-bottom: 10px;">ประวัติจดหมายที่ถูกส่งออกไปแล้ว:</label>
+            <div class="table-container" style="max-height: 250px;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 100px;">วันที่</th>
+                            <th style="width: 120px;">ผู้รับ</th>
+                            <th>หัวข้อจดหมาย</th>
+                            <th>ของรางวัล</th>
+                            <th style="text-align: right;">ควบคุม</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mail-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
 
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
         <section class="card" id="news-sec">
@@ -303,7 +336,7 @@
                     <input type="number" id="max-use" value="0">
                 </div>
             </div>
-            <div class="grid-inputs">
+            <div class="grid-inputs-5">
                 <div>
                     <label>GOLD</label>
                     <input type="number" id="reward-points" placeholder="0">
@@ -315,6 +348,14 @@
                 <div>
                     <label>STAR (⭐)</label>
                     <input type="number" id="reward-stars" placeholder="0">
+                </div>
+                <div>
+                    <label>ตั๋วปกติ (🎫)</label>
+                    <input type="number" id="reward-ticket" placeholder="0">
+                </div>
+                <div>
+                    <label>ตั๋วพรีเมี่ยม (🎟️)</label>
+                    <input type="number" id="reward-premium-tickets" placeholder="0">
                 </div>
             </div>
             <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; border: 1px dashed #333; margin-top: 10px;">
@@ -348,20 +389,22 @@
         </section>
     </div>
 
+    <!-- 👥 PLAYER DATABASE -->
     <section class="card" id="users-sec">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2><i class="fas fa-database"></i> Player Database</h2>
-            <input type="text" id="user-search" class="search-bar" placeholder="🔍 Search username..." onkeyup="filterUsers()">
+            <h2><i class="fas fa-database"></i> Player Database (Full View)</h2>
+            <input type="text" id="user-search" class="search-bar" placeholder="🔍 Search username, UID..." onkeyup="filterUsers()">
         </div>
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th>Identity</th>
+                        <th>Identity & ID</th>
                         <th>Status</th>
-                        <th>Economy (Gold/Dia/Star)</th>
+                        <th>Economy</th>
                         <th>Progress</th>
-                        <th>Actions</th>
+                        <th>Registered</th>
+                        <th style="text-align: right;">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="user-table-body"></tbody>
@@ -389,7 +432,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, doc, setDoc, addDoc, onSnapshot, updateDoc, deleteDoc, increment, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, doc, setDoc, addDoc, onSnapshot, updateDoc, deleteDoc, increment, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
@@ -403,12 +446,112 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Live Clock
+    let rawUserDataMap = {};
+
+    function getVal(obj, ...keys) {
+        for (let k of keys) {
+            if (obj && obj[k] !== undefined && obj[k] !== null) return obj[k];
+        }
+        return 0;
+    }
+
+    function getNormalTicketKey(user) {
+        const possibleKeys = ['tickets', 'ticket', 'normal_tickets', 'normalTicket', 'gacha_tickets', 'gachaTicket'];
+        for (let k of possibleKeys) {
+            if (user && user[k] !== undefined) return k;
+        }
+        return 'tickets';
+    }
+
     setInterval(() => {
         document.getElementById('live-clock').innerText = new Date().toLocaleTimeString();
     }, 1000);
 
-    // --- News Management ---
+    const targetTypeSelect = document.getElementById("mail-target-type");
+    const singleUserGroup = document.getElementById("single-user-input-group");
+
+    targetTypeSelect.addEventListener("change", (e) => {
+        if (e.target.value === "single") {
+            singleUserGroup.style.display = "block";
+        } else {
+            singleUserGroup.style.display = "none";
+        }
+    });
+
+    document.getElementById("send-mail-btn").onclick = async () => {
+        const targetType = document.getElementById("mail-target-type").value;
+        const targetUid = document.getElementById("mail-target-uid").value.trim();
+        const title = document.getElementById("mail-title").value.trim();
+        const content = document.getElementById("mail-content").value.trim();
+        const points = parseInt(document.getElementById("mail-points").value) || 0;
+        const diamonds = parseInt(document.getElementById("mail-diamonds").value) || 0;
+
+        if (targetType === "single" && !targetUid) {
+            return alert("กรุณาระบุ Player ID (UID) ของผู้รับ!");
+        }
+
+        if(!title || !content) {
+            return alert("กรุณาระบุหัวข้อและรายละเอียดจดหมาย!");
+        }
+
+        const dateStr = new Date().toLocaleDateString('th-TH');
+
+        try {
+            await addDoc(collection(db, "mailboxes"), {
+                targetType: targetType, 
+                targetUserId: targetType === "single" ? targetUid : null,
+                title: title,
+                content: content,
+                points: points,
+                diamonds: diamonds,
+                date: dateStr,
+                createdAt: serverTimestamp()
+            });
+
+            alert(targetType === "single" ? `📬 ส่งจดหมายถึง UID: ${targetUid} เรียบร้อยแล้ว!` : "📬 ส่งจดหมายแจ้งเตือนไปยังผู้เล่นทุกคนเรียบร้อยแล้ว!");
+            document.getElementById("mail-title").value = "";
+            document.getElementById("mail-content").value = "";
+            document.getElementById("mail-points").value = "";
+            document.getElementById("mail-diamonds").value = "";
+            document.getElementById("mail-target-uid").value = "";
+        } catch (err) {
+            console.error("Error sending mail: ", err);
+            alert("❌ ส่งจดหมายล้มเหลว กรุณาตรวจสอบคอนโซล");
+        }
+    };
+
+    onSnapshot(query(collection(db, "mailboxes"), orderBy("createdAt", "desc")), (snap) => {
+        const body = document.getElementById("mail-table-body");
+        body.innerHTML = "";
+        
+        if (snap.empty) {
+            body.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#555;">ยังไม่มีประวัติการส่งจดหมาย</td></tr>`;
+            return;
+        }
+
+        snap.forEach(d => {
+            const m = d.data();
+            let rewardText = [];
+            if (m.points > 0) rewardText.push(`🪙 ${m.points.toLocaleString()}`);
+            if (m.diamonds > 0) rewardText.push(`💎 ${m.diamonds.toLocaleString()}`);
+            const rewardsDisplay = rewardText.length > 0 ? rewardText.join(" | ") : '<span style="color:#555;">ไม่มีของรางวัล</span>';
+
+            const targetBadge = m.targetType === "single" 
+                ? `<span class="badge badge-single"><i class="fas fa-user"></i> ${m.targetUserId ? m.targetUserId.substring(0, 8) + '...' : 'Single'}</span>`
+                : `<span class="badge badge-all"><i class="fas fa-globe"></i> ทุกคน</span>`;
+
+            body.innerHTML += `<tr>
+                <td style="color:#777;">${m.date || ''}</td>
+                <td>${targetBadge}</td>
+                <td><b style="color:var(--cyan);">${m.title}</b><br><small style="color:#aaa;">${m.content}</small></td>
+                <td>${rewardsDisplay}</td>
+                <td style="text-align:right;">
+                    <button class="btn btn-action btn-red" onclick="deleteItem('mailboxes', '${d.id}')" title="ลบจดหมาย"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>`;
+        });
+    });
+
     document.getElementById("post-news-btn").onclick = async () => {
         const title = document.getElementById("news-title").value.trim();
         const badge = document.getElementById("news-badge").value;
@@ -437,7 +580,6 @@
         });
     });
 
-    // --- Code Forge ---
     document.getElementById("create-btn").onclick = async () => {
         const codeName = document.getElementById("new-code").value.trim().toUpperCase();
         if(!codeName) return alert("Enter Code Name");
@@ -450,6 +592,8 @@
             rewardPoints: parseInt(document.getElementById("reward-points").value) || 0,
             rewardDiamonds: parseInt(document.getElementById("reward-diamonds").value) || 0,
             rewardStars: parseInt(document.getElementById("reward-stars").value) || 0,
+            rewardTicket: parseInt(document.getElementById("reward-ticket").value) || 0, 
+            rewardPremiumTickets: parseInt(document.getElementById("reward-premium-tickets").value) || 0, 
             maxUse: parseInt(document.getElementById("max-use").value) || 0,
             usedCount: 0,
             rewardCard: cardName ? {
@@ -462,37 +606,77 @@
         await setDoc(doc(db, "codes", codeName), codeData);
         alert(`Code ${codeName} ACTIVATED`);
         document.getElementById("new-code").value = "";
+        document.getElementById("reward-points").value = "";
+        document.getElementById("reward-diamonds").value = "";
+        document.getElementById("reward-stars").value = "";
+        document.getElementById("reward-ticket").value = "";
+        document.getElementById("reward-premium-tickets").value = "";
     };
 
-    // --- User Management ---
+    // --- User Management (นำส่วนแสดง Cards ออกแล้ว) ---
     onSnapshot(collection(db, "users"), (snap) => {
         document.getElementById("stat-users").innerText = snap.size;
         let premiumCount = 0;
         const body = document.getElementById("user-table-body");
         body.innerHTML = "";
+        rawUserDataMap = {};
+
         snap.forEach(d => {
             const user = d.data();
+            rawUserDataMap[d.id] = user;
+
             if(user.isPremiumUser) premiumCount++;
             
             const statusBadge = user.isBanned ? 
                 '<span class="badge badge-banned">BANNED</span>' : 
                 (user.isPremiumUser ? '<span class="badge badge-premium">PREMIUM</span>' : '<span style="color:#444">STANDARD</span>');
 
+            let regDate = "N/A";
+            if (user.createdAt) {
+                if (user.createdAt.toDate) {
+                    regDate = user.createdAt.toDate().toLocaleDateString('th-TH');
+                } else if (typeof user.createdAt === 'string') {
+                    regDate = user.createdAt;
+                }
+            }
+
+            const userPoints = getVal(user, 'points', 'gold', 'coins');
+            const userDiamonds = getVal(user, 'diamonds', 'diamond', 'gems');
+            const userStars = getVal(user, 'stars', 'star');
+            const userTickets = getVal(user, 'tickets', 'ticket', 'normal_tickets', 'normalTicket', 'gacha_tickets', 'gachaTicket');
+            const userPremiumTickets = getVal(user, 'premium_tickets', 'premiumTickets', 'premium_ticket', 'p_tickets');
+
+            const ticketKey = getNormalTicketKey(user);
+
             body.innerHTML += `
                 <tr>
-                    <td class="user-info"><b>${user.username || 'N/A'}</b><small>${d.id.substring(0,8)}</small></td>
+                    <td class="user-info">
+                        <b>${user.username || 'N/A'}</b>
+                        <small style="color:#777;">ID: ${d.id}</small>
+                        ${user.email ? `<br><small style="color:var(--cyan);">${user.email}</small>` : ''}
+                    </td>
                     <td>${statusBadge}</td>
                     <td>
-                        <span class="currency-tag gold-txt">🪙 ${user.points||0}</span>
-                        <span class="currency-tag dia-txt">💎 ${user.diamonds||0}</span>
-                        <span class="currency-tag star-txt">⭐ ${user.stars||0}</span>
+                        <span class="currency-tag gold-txt">🪙 ${userPoints.toLocaleString()}</span>
+                        <span class="currency-tag dia-txt">💎 ${userDiamonds.toLocaleString()}</span>
+                        <span class="currency-tag star-txt">⭐ ${userStars.toLocaleString()}</span>
+                        <span class="currency-tag ticket-txt">🎫 ${userTickets.toLocaleString()}</span>
+                        <span class="currency-tag p-ticket-txt">🎟️ ${userPremiumTickets.toLocaleString()}</span>
                     </td>
-                    <td><b style="color:var(--gold)">LV.${calculateLevel(user.passExp || 0)}</b></td>
                     <td>
-                        <div style="display:flex; gap:5px;">
+                        <b style="color:var(--gold)">LV.${calculateLevel(user.passExp || 0)}</b><br>
+                        <small style="color:#666;">EXP: ${(user.passExp || 0).toLocaleString()}</small>
+                    </td>
+                    <td><small style="color:#888;">${regDate}</small></td>
+                    <td style="text-align: right;">
+                        <div style="display:inline-flex; gap:4px; flex-wrap: wrap; justify-content: flex-end;">
+                            <button class="btn btn-action btn-blue" onclick="quickSendMail('${d.id}')" title="ส่งจดหมายหาผู้เล่นนี้"><i class="fas fa-envelope"></i></button>
+                            <button class="btn btn-action btn-blue" onclick="viewPlayerDetails('${d.id}')" title="ดูข้อมูลดิบทั้งหมด"><i class="fas fa-eye"></i></button>
                             <button class="btn btn-action btn-blue" onclick="editVal('${d.id}', 'points', 'Gold')" title="Edit Gold"><i class="fas fa-coins"></i></button>
                             <button class="btn btn-action btn-blue" onclick="editVal('${d.id}', 'diamonds', 'Diamond')" title="Edit Diamond"><i class="fas fa-gem"></i></button>
                             <button class="btn btn-action btn-star" onclick="editVal('${d.id}', 'stars', 'Star')" title="Edit Star"><i class="fas fa-star"></i></button>
+                            <button class="btn btn-action btn-ticket" onclick="editVal('${d.id}', '${ticketKey}', 'ตั๋วปกติ')" title="Edit ตั๋วปกติ"><i class="fas fa-ticket-alt"></i></button>
+                            <button class="btn btn-action btn-p-ticket" onclick="editVal('${d.id}', 'premium_tickets', 'ตั๋วพรีเมี่ยม')" title="Edit ตั๋วพรีเมี่ยม"><i class="fas fa-tags"></i></button>
                             <button class="btn btn-action btn-orange" onclick="resetUserEconomy('${d.id}', '${user.username || 'N/A'}')" title="Reset All Currencies"><i class="fas fa-sync-alt"></i></button>
                             <button class="btn btn-action ${user.isBanned ? 'btn-green' : 'btn-red'}" onclick="toggleBan('${d.id}', ${user.isBanned})" title="${user.isBanned ? 'Unban' : 'Ban'}">
                                 <i class="fas ${user.isBanned ? 'fa-user-check' : 'fa-user-slash'}"></i>
@@ -511,17 +695,18 @@
         snap.forEach(d => {
             const c = d.data();
             const starPart = c.rewardStars > 0 ? ` ⭐${c.rewardStars}` : '';
+            const ticketPart = c.rewardTicket > 0 ? ` 🎫${c.rewardTicket}` : '';
+            const pTicketPart = c.rewardPremiumTickets > 0 ? ` 🎟️${c.rewardPremiumTickets}` : '';
             const cardPart = c.rewardCard ? ` | 🎴 ${c.rewardCard.name} (${c.rewardCard.rarity})` : '';
             body.innerHTML += `<tr>
                 <td><b style="color:var(--gold)">${d.id}</b></td>
-                <td>🪙${c.rewardPoints} 💎${c.rewardDiamonds}${starPart}${cardPart}</td>
+                <td>🪙${c.rewardPoints} 💎${c.rewardDiamonds}${starPart}${ticketPart}${pTicketPart}${cardPart}</td>
                 <td>${c.usedCount}/${c.maxUse === 0 ? '∞' : c.maxUse}</td>
                 <td><button class="btn btn-action btn-red" onclick="deleteItem('codes', '${d.id}')"><i class="fas fa-times"></i></button></td>
             </tr>`;
         });
     });
 
-    // --- Globals for Actions ---
     function calculateLevel(exp) {
         let lv = 1; let rem = exp;
         while(true) {
@@ -531,19 +716,41 @@
         return lv;
     }
 
+    window.quickSendMail = (uid) => {
+        document.getElementById("mail-target-type").value = "single";
+        singleUserGroup.style.display = "block";
+        document.getElementById("mail-target-uid").value = uid;
+        document.getElementById("mailbox-sec").scrollIntoView({ behavior: 'smooth' });
+    };
+
+    window.viewPlayerDetails = (uid) => {
+        const data = rawUserDataMap[uid];
+        if (data) {
+            document.getElementById("modal-player-content").innerText = JSON.stringify(data, null, 2);
+            document.getElementById("player-modal").style.display = "flex";
+        }
+    };
+
+    window.closePlayerModal = () => {
+        document.getElementById("player-modal").style.display = "none";
+    };
+
     window.editVal = async (uid, field, label) => {
         const val = prompt(`ระบุจำนวนที่ต้องการเพิ่ม/ลด ${label} (ใส่เลขลบเพื่อลด):`);
         if(val && !isNaN(val)) await updateDoc(doc(db, "users", uid), { [field]: increment(parseInt(val)) });
     };
 
-    // ฟังก์ชันรีเซ็ตค่าเงิน ทอง และดาว ของผู้เล่นให้เป็น 0 ทันที
     window.resetUserEconomy = async (uid, username) => {
-        if(confirm(`คุณต้องการรีเซ็ตค่าเงินทั้งหมด (ทอง, เพชร, ดาว) ของผู้เล่น "${username}" ให้เป็น 0 ใช่หรือไม่?`)) {
+        if(confirm(`คุณต้องการรีเซ็ตค่าเงินทั้งหมด (ทอง, เพชร, ดาว, ตั๋วปกติ, ตั๋วพรีเมี่ยม) ของผู้เล่น "${username}" ให้เป็น 0 ใช่หรือไม่?`)) {
             try {
                 await updateDoc(doc(db, "users", uid), {
                     points: 0,
                     diamonds: 0,
-                    stars: 0
+                    stars: 0,
+                    ticket: 0,
+                    tickets: 0,
+                    normal_tickets: 0,
+                    premium_tickets: 0
                 });
                 alert(`รีเซ็ตระบบการเงินของคุณ ${username} สำเร็จ`);
             } catch(error) {
