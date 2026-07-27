@@ -34,6 +34,7 @@
         .nav-buttons { display: flex; gap: 12px; margin-top: 5px; }
         .btn-nav { background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 12px; text-decoration: none; font-size: 0.9rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .btn-nav.primary { background: linear-gradient(45deg, #ffc831, #ff9000); color: #000; border: none; }
+        .btn-nav.achievement { background: linear-gradient(45deg, #ff2a6d, #9a00e6); color: #fff; border: none; }
         .wallet-display { display: flex; gap: 15px; }
         .wallet-box { background: rgba(255, 255, 255, 0.05); padding: 8px 16px; border-radius: 25px; border: 1.5px solid #333; display: flex; align-items: center; gap: 8px; font-weight: bold; }
 
@@ -63,9 +64,18 @@
         /* Lock Indicator Badge */
         .card-lock-badge { position: absolute; bottom: 75px; right: 8px; background: rgba(0,0,0,0.75); color: #ff4d4d; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; z-index: 5; border: 1px solid #ff4d4d; }
 
-        /* Achievement Styles */
-        .achievement-section { max-width: 1200px; margin: 60px auto 40px; padding: 0 20px; border-top: 1px solid #333; padding-top: 40px; }
-        .achievement-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin-top: 20px; }
+        /* Achievement Popup Styles */
+        .ach-modal-content { background: #0b0b12; border-radius: 20px; max-width: 1000px; width: 100%; max-height: 85vh; display: flex; flex-direction: column; border: 1px solid #333; overflow: hidden; box-shadow: 0 0 50px rgba(0,0,0,0.9); }
+        .ach-header { padding: 20px; background: rgba(255,255,255,0.03); border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
+        .ach-body { padding: 20px; overflow-y: auto; flex: 1; }
+        
+        /* Milestone Rewards */
+        .milestone-box { background: rgba(255, 200, 49, 0.05); border: 1px solid rgba(255, 200, 49, 0.3); border-radius: 15px; padding: 15px; margin-bottom: 25px; }
+        .milestone-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 15px; }
+        .milestone-card { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 12px; border-radius: 10px; text-align: center; }
+        .milestone-card.completed { border-color: #ffc831; background: rgba(255, 200, 49, 0.1); }
+
+        .achievement-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
         .ach-card { background: rgba(255,255,255,0.05); border-radius: 15px; padding: 20px; border: 1px solid #333; position: relative; transition: 0.3s; }
         .ach-card.completed { border-color: #ffc831; background: rgba(255,200,49,0.05); box-shadow: 0 0 15px rgba(255,200,49,0.1); }
         .ach-card.claimed { opacity: 0.6; filter: grayscale(0.5); }
@@ -121,6 +131,7 @@
             <div class="nav-buttons">
                 <a href="index.html" class="btn-nav">🏠 หน้าหลัก</a>
                 <a href="Banner Selection.html" class="btn-nav primary">สุ่มการ์ด</a>
+                <button class="btn-nav achievement" onclick="document.getElementById('achievementsModal').style.display='flex'">🏆 ความสำเร็จ</button>
             </div>
         </div>
         <div class="wallet-display">
@@ -151,9 +162,26 @@
         <div id="grid" class="collection-grid"></div>
     </div>
 
-    <div class="achievement-section">
-        <h2 style="color: #ffc831; border-left: 5px solid #ffc831; padding-left: 15px; margin-bottom: 25px;">🏆 ความสำเร็จ (ACHIEVEMENTS)</h2>
-        <div id="achievementGrid" class="achievement-grid"></div>
+    <!-- Achievements Modal Popup -->
+    <div id="achievementsModal" class="modal" onclick="this.style.display='none'">
+        <div class="ach-modal-content" onclick="event.stopPropagation()">
+            <div class="ach-header">
+                <h2 style="margin: 0; color: #ffc831;">🏆 ความสำเร็จ (ACHIEVEMENTS)</h2>
+                <button class="btn-nav" onclick="document.getElementById('achievementsModal').style.display='none'">✕ ปิด</button>
+            </div>
+            <div class="ach-body">
+                <!-- Milestone System -->
+                <div class="milestone-box">
+                    <h3 style="margin-top:0; color:#00d4ff;">🎯 รางวัลการสะสม ความสำเร็จ (<span id="totalAchCount">0</span>/20)</h3>
+                    <div class="ach-progress-container" style="height:12px;">
+                        <div id="milestoneBarFill" class="ach-progress-bar" style="background: linear-gradient(90deg, #ffc831, #00ff88); width: 0%;"></div>
+                    </div>
+                    <div class="milestone-grid" id="milestoneGrid"></div>
+                </div>
+
+                <div id="achievementGrid" class="achievement-grid"></div>
+            </div>
+        </div>
     </div>
 
     <div id="cardModal" class="modal" onclick="this.style.display='none'">
@@ -247,7 +275,8 @@
         { id: 'power_up4', tier: 'impossible', title: 'ผู้สูงสุดทุกอย่าง!!', desc: 'มีการ์ดเลเวล 80 ขึ้นไปอย่างน้อย 60 ใบ', goal: 60, reward: { points: 2000, diamonds: 20 } },
         { id: 'lv80_impossible', tier: 'impossible', title: 'Impossible Collector', desc: 'สะสมการ์ด Lv.80 และ 5 ดาว ครบ 80 ใบ', goal: 80, reward: { points: 1000000, diamonds: 2000 } },
 
-        { id: 'arena_divine', tier: 'divine', title: 'เหนือเกินความคาดหมาย',  desc: 'จิตวิญญาณแห่งการต่อสู้ ต่อสู้ใน Battle ARENA ครบ 500 ครั้ง', goal: 500, reward: { points: 2000000, diamonds: 5000 }, rewardTitle: 'ราชันย์อารีน่าไร้พ่าย' },
+        { id: 'arena_divine', tier: 'divine', title: 'เหนือเกินความคาดหมาย', desc: 'จิตวิญญาณแห่งการต่อสู้ ต่อสู้ใน Battle ARENA ครบ 500 ครั้ง', goal: 500, reward: { points: 2000000, diamonds: 5000 }, rewardTitle: 'ราชันย์อารีน่าไร้พ่าย' },
+        { id: 'collection_time_2h', tier: 'divine', title: 'ออกไปแตะหญ้าบ้างนะ', desc: 'สิงอยู่ในหน้าสะสมการ์ด (Collection) เป็นเวลาสะสมครบ 2 ชั่วโมง', goal: 7200, reward: { points: 5000000, diamonds: 100000 } },
 
         { id: 'whale_secret_SECRET', tier: 'secret', title: '???', desc: 'มีการ์ดระดับ SECRET Full Power (LV.80 และ 5 ดาว) 1 ใบ', goal: 1, reward: { points: 60000000, diamonds: 60000000 } },
         { id: 'whale_secret_usec', tier: 'secret', title: '???', desc: 'มีการ์ดระดับ USEC Full Power (LV.80 และ 5 ดาว) 6 ใบ', goal: 6, reward: { points: 60000000, diamonds: 60000000 } },
@@ -256,6 +285,13 @@
         { id: 'arena_legend_secret', tier: 'secret', title: '???', desc: 'ตำนานแห่ง Battle ARENA ต่อสู้ครบ 1000 ครั้ง', goal: 1000, reward: { points: 500000000, diamonds: 500000000 } },
         { id: 'whale_secret_coins', tier: 'secret', title: '???', desc: 'สะสม Coins ในตัวให้มากกว่า 1,000,000', goal: 1000000, reward: { points: 0, diamonds: 100000000 } },
         { id: 'power_Full_Allcollector', tier: 'secret', title: '???', desc: 'สะสมการ์ด Level 80 และ 5 ดาวให้ครบตามจำนวน', goal: 150, reward: { points: 100000000, diamonds: 100000000 } }
+    ];
+
+    const MILESTONES = [
+        { goal: 5, reward: { points: 100000, diamonds: 1000 }, title: 'ทำครบ 5 อัน' },
+        { goal: 10, reward: { points: 500000, diamonds: 5000 }, title: 'ทำครบ 10 อัน' },
+        { goal: 15, reward: { points: 2000000, diamonds: 20000 }, title: 'ทำครบ 15 อัน' },
+        { goal: 20, reward: { points: 10000000, diamonds: 100000 }, title: 'ทำครบ 20 อัน (MAX)' }
     ];
 
     function getArenaPower(card) {
@@ -374,6 +410,7 @@
         const uniqueCardsCount = new Set(userCards.map(c => `${c.name}_${(c.rarity||'C').toUpperCase()}`)).size;
         const points = userData.points || 0;
         const arenaCount = userData.arenaBattles || 0; 
+        const timeInCollection = userData.collectionTime || 0;
         
         switch(ach.id) {
             case 'starter_collector': return Math.min(uniqueCardsCount, ach.goal);
@@ -412,6 +449,7 @@
             case 'whale_secret_coins': return points >= ach.goal ? ach.goal : points;
             case 'power_Full_Allcollector': return userCards.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;
             case 'arena_divine': return Math.min(arenaCount, 500);
+            case 'collection_time_2h': return Math.min(timeInCollection, ach.goal);
             default: return 0;
         }
     }
@@ -420,12 +458,17 @@
         const grid = document.getElementById("achievementGrid");
         grid.innerHTML = "";
         const claimedAchs = userData.claimedAchievements || [];
+        const claimedMilestones = userData.claimedMilestones || [];
+
+        let completedTotalCount = 0;
 
         ACHIEVEMENTS_DATA.forEach(ach => {
             const progress = checkAchProgress(ach, userData);
             const isCompleted = progress >= ach.goal;
             const isClaimed = claimedAchs.includes(ach.id);
             const percent = (progress / ach.goal) * 100;
+
+            if (isCompleted) completedTotalCount++;
 
             const card = document.createElement("div");
             card.className = `ach-card ${isCompleted ? 'completed' : ''} ${isClaimed ? 'claimed' : ''}`;
@@ -434,6 +477,10 @@
             const displayTitle = (isSecret && !isCompleted) ? "ภารกิจลับที่ยังไม่เปิดเผย" : ach.title;
             const displayDesc = (isSecret && !isCompleted) ? "เงื่อนไข: เป็นความลับจนกว่าจะทำสำเร็จ" : ach.desc;
             const displayTier = (isSecret && !isCompleted) ? "???" : ach.tier;
+
+            const progressDisplay = ach.id === 'collection_time_2h' 
+                ? `${Math.floor(progress / 60)} / ${Math.floor(ach.goal / 60)} นาที` 
+                : `${progress.toLocaleString()} / ${ach.goal.toLocaleString()}`;
 
             card.innerHTML = `
                 <span class="ach-tier tier-${ach.tier}">${displayTier}</span>
@@ -444,7 +491,7 @@
                     <div class="ach-progress-bar" style="width: ${percent}%"></div>
                 </div>
                 <div style="font-size: 0.75rem; color: #888; margin-bottom: 12px;">
-                    ความคืบหน้า: ${progress.toLocaleString()} / ${ach.goal.toLocaleString()}
+                    ความคืบหน้า: ${progressDisplay}
                 </div>
                 <button class="btn-claim" 
                     ${!isCompleted || isClaimed ? 'disabled' : ''} 
@@ -453,6 +500,30 @@
                 </button>
             `;
             grid.appendChild(card);
+        });
+
+        // Update Milestone Section
+        document.getElementById("totalAchCount").innerText = completedTotalCount;
+        document.getElementById("milestoneBarFill").style.width = Math.min((completedTotalCount / 20) * 100, 100) + "%";
+        
+        const mGrid = document.getElementById("milestoneGrid");
+        mGrid.innerHTML = "";
+        MILESTONES.forEach(ms => {
+            const isReached = completedTotalCount >= ms.goal;
+            const isClaimed = claimedMilestones.includes(ms.goal);
+
+            const msDiv = document.createElement("div");
+            msDiv.className = `milestone-card ${isReached ? 'completed' : ''}`;
+            msDiv.innerHTML = `
+                <div style="font-weight:bold; color:${isReached ? '#ffc831' : '#fff'};">${ms.title}</div>
+                <div style="font-size:0.75rem; color:#aaa; margin:5px 0;">🎁 ${ms.reward.points.toLocaleString()} 🪙 | ${ms.reward.diamonds.toLocaleString()} 💎</div>
+                <button class="btn-claim" style="font-size:0.75rem; padding:5px;"
+                    ${!isReached || isClaimed ? 'disabled' : ''} 
+                    onclick="claimMilestoneReward(${ms.goal})">
+                    ${isClaimed ? 'รับแล้ว' : (isReached ? 'รับรางวัล' : 'ยังไม่ถึง')}
+                </button>
+            `;
+            mGrid.appendChild(msDiv);
         });
     }
 
@@ -471,6 +542,24 @@
         } catch (e) {
             console.error("Error claiming reward:", e);
             alert("เกิดข้อผิดพลาดในการรับรางวัล");
+        }
+    };
+
+    window.claimMilestoneReward = async (goal) => {
+        const ms = MILESTONES.find(m => m.goal === goal);
+        if (!ms || !currentUID) return;
+
+        const userDocRef = doc(db, "users", currentUID);
+        try {
+            await updateDoc(userDocRef, {
+                points: increment(ms.reward.points || 0),
+                diamonds: increment(ms.reward.diamonds || 0),
+                claimedMilestones: arrayUnion(goal)
+            });
+            alert(`🎉 ยินดีด้วย! คุณได้รับรางวัลการทำสะสมครบ ${goal} อัน\n💎 +${ms.reward.diamonds.toLocaleString()} | 🪙 +${ms.reward.points.toLocaleString()}`);
+        } catch (e) {
+            console.error("Error claiming milestone reward:", e);
+            alert("เกิดข้อผิดพลาดในการรับรางวัลสะสม");
         }
     };
 
@@ -679,6 +768,55 @@
             renderCards();
         };
         fCon.appendChild(btn);
+    });
+
+    // --- ระบบจับเวลาการใช้งานหน้า collection.html ---
+    let sessionSeconds = 0;
+    let timerInterval = null;
+
+    function startTimer() {
+        if (!timerInterval) {
+            timerInterval = setInterval(() => {
+                sessionSeconds++;
+            }, 1000);
+        }
+    }
+
+    function stopTimer() {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+    }
+
+    async function saveElapsedTime() {
+        if (!currentUID || sessionSeconds === 0) return;
+        const secondsToSave = sessionSeconds;
+        sessionSeconds = 0;
+
+        try {
+            const userDocRef = doc(db, "users", currentUID);
+            await updateDoc(userDocRef, {
+                collectionTime: increment(secondsToSave)
+            });
+        } catch (e) {
+            console.error("Error saving collection time:", e);
+        }
+    }
+
+    startTimer();
+
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+            stopTimer();
+            saveElapsedTime();
+        } else {
+            startTimer();
+        }
+    });
+
+    window.addEventListener("beforeunload", () => {
+        saveElapsedTime();
     });
 </script>
 </body>
