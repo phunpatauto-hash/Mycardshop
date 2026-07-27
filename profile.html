@@ -14,8 +14,6 @@
             --bg-dark: #0a0a0c;
             --card-bg: rgba(255, 255, 255, 0.04);
             --glass-border: rgba(255, 255, 255, 0.1);
-            
-            /* ตัวแปรควบคุมธีมพื้นหลังการ์ดโปรไฟล์เริ่มต้น */
             --theme-glow: conic-gradient(from 0deg, transparent, rgba(255,200,49,0.05), transparent);
         }
 
@@ -33,12 +31,11 @@
         .container { max-width: 1100px; margin: auto; padding: 20px; opacity: 0; transform: scale(0.98); }
         .container.show { opacity: 1; transform: scale(1); }
 
-        /* --- Stylish Navbar --- */
         .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .back-btn { 
             background: var(--card-bg); border: 1px solid var(--glass-border); color: #fff;
             padding: 8px 20px; border-radius: 12px; text-decoration: none; display: flex; align-items: center; gap: 10px;
-            font-size: 0.9rem; backdrop-filter: blur(10px);
+            font-size: 0.9rem; backdrop-filter: blur(10px); cursor: pointer;
         }
         .back-btn:hover { background: var(--primary); color: #000; box-shadow: 0 0 20px rgba(255,200,49,0.3); }
 
@@ -51,7 +48,6 @@
             margin-bottom: 40px; position: relative; overflow: hidden;
         }
 
-        /* ใช้ตัวแปร --theme-glow ในการเปลี่ยนสีแสงหมุนพื้นหลัง */
         .hero-section::before {
             content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
             background: var(--theme-glow);
@@ -60,16 +56,13 @@
 
         @keyframes rotate { 100% { transform: rotate(360deg); } }
 
-        /* ปุ่มเปลี่ยนสีธีมพื้นหลังการ์ดโปรไฟล์ */
         .theme-btn {
             position: absolute; top: 20px; right: 20px; z-index: 10;
             background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
             color: #fff; width: 40px; height: 40px; border-radius: 12px;
             display: flex; align-items: center; justify-content: center; cursor: pointer;
         }
-        .theme-btn:hover {
-            background: #fff; color: #000; transform: scale(1.05);
-        }
+        .theme-btn:hover { background: #fff; color: #000; transform: scale(1.05); }
 
         /* Avatar */
         .pfp-container { position: relative; z-index: 2; justify-self: center; }
@@ -87,113 +80,61 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
-        /* User Info */
+        /* User Info & LEVEL System */
         .user-main { z-index: 2; align-self: center; }
-        .name-wrapper { display: flex; align-items: center; gap: 12px; margin-top: 5px; }
+        .name-wrapper { display: flex; align-items: center; gap: 12px; margin-top: 5px; flex-wrap: wrap; }
         .user-main h1 { font-size: 2.5rem; margin: 0; letter-spacing: 2px; text-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         .btn-edit-name { background: none; border: none; color: var(--primary); cursor: pointer; font-size: 1.2rem; opacity: 0.6; }
         .btn-edit-name:hover { opacity: 1; transform: scale(1.1); }
         .uid-tag { color: var(--primary); font-size: 0.8rem; opacity: 0.7; font-family: monospace; }
         
-        /* สัญลักษณ์แรงก์สูงสุด */
-        .max-rank-banner { display: inline-flex; align-items: center; gap: 6px; background: rgba(230, 57, 70, 0.15); border: 1px solid rgba(230, 57, 70, 0.4); color: #ff4d6d; padding: 4px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: bold; margin-top: 8px; }
-        
-        /* สัญลักษณ์แรงก์ซีซั่นล่าสุด */
-        .last-rank-banner { display: inline-flex; align-items: center; gap: 6px; background: rgba(0, 229, 255, 0.12); border: 1px solid rgba(0, 229, 255, 0.3); color: #00e5ff; padding: 4px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: bold; margin-top: 8px; margin-left: 8px; }
+        /* สไตล์กล่องหลอดเลเวล */
+        .level-wrapper { margin-top: 15px; width: 100%; max-width: 450px; background: rgba(0,0,0,0.4); padding: 12px 18px; border-radius: 16px; border: 1px solid var(--glass-border); cursor: pointer; }
+        .level-wrapper:hover { border-color: var(--accent); background: rgba(0,0,0,0.6); }
+        .level-header-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; font-weight: bold; margin-bottom: 6px; }
+        .level-lbl { color: var(--accent); letter-spacing: 1px; }
+        .level-exp-text { color: #aaa; font-size: 0.75rem; }
+        .level-bar-container { width: 100%; height: 10px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; position: relative; border: 1px solid rgba(255,255,255,0.05); }
+        .level-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #ffc831, #00e5ff); border-radius: 10px; box-shadow: 0 0 10px rgba(0,229,255,0.5); }
 
-        /* 🔥 สไตล์กล่องฉายา ออร่าทองเรืองแสง (รองรับการเปลี่ยนสีตามระดับฉายา) */
+        /* ฉายา ออร่าทองเรืองแสง */
         .whale-title-banner {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
+            display: inline-flex; align-items: center; gap: 6px;
             background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 165, 0, 0.2) 100%);
-            border: 1px solid rgba(255, 215, 0, 0.5);
-            color: #ffd700;
-            padding: 5px 14px;
-            border-radius: 50px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            margin-top: 10px;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
-            text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+            border: 1px solid rgba(255, 215, 0, 0.5); color: #ffd700;
+            padding: 5px 14px; border-radius: 50px; font-size: 0.85rem; font-weight: bold; margin-top: 10px;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
             animation: titlePulse 2s infinite alternate;
         }
-        
-        /* สไตล์พิเศษสำหรับฉายา "กำหนดผู้ชนะ" (สีม่วง-แดงระดับเทพ) */
-        .whale-title-banner.rank-pro {
-            background: linear-gradient(135deg, rgba(255, 0, 255, 0.2) 0%, rgba(255, 51, 51, 0.2) 100%);
-            border: 1px solid rgba(255, 0, 255, 0.5);
-            color: #ff00ff;
-            box-shadow: 0 0 15px rgba(255, 0, 255, 0.4);
-            text-shadow: 0 0 5px rgba(255, 0, 255, 0.6);
-        }
+        .whale-title-banner.rank-pro { background: linear-gradient(135deg, rgba(255, 0, 255, 0.2) 0%, rgba(255, 51, 51, 0.2) 100%); border: 1px solid rgba(255, 0, 255, 0.5); color: #ff00ff; box-shadow: 0 0 15px rgba(255, 0, 255, 0.4); text-shadow: 0 0 5px rgba(255, 0, 255, 0.6); }
+        .whale-title-banner.rank-master { background: linear-gradient(135deg, rgba(255, 200, 49, 0.2) 0%, rgba(255, 144, 0, 0.2) 100%); border: 1px solid rgba(255, 144, 0, 0.5); color: #ff9000; box-shadow: 0 0 15px rgba(255, 144, 0, 0.4); text-shadow: 0 0 5px rgba(255, 144, 0, 0.6); }
+        .whale-title-banner.rank-level-traveler { background: linear-gradient(135deg, rgba(0, 229, 255, 0.2) 0%, rgba(0, 102, 255, 0.2) 100%); border: 1px solid rgba(0, 229, 255, 0.5); color: #00e5ff; box-shadow: 0 0 15px rgba(0, 229, 255, 0.4); text-shadow: 0 0 5px rgba(0, 229, 255, 0.6); }
 
-        /* สไตล์พิเศษสำหรับฉายา "ผู้พิชิตศึกสงคราม" (สีส้มทองเข้มขลัง) */
-        .whale-title-banner.rank-master {
-            background: linear-gradient(135deg, rgba(255, 200, 49, 0.2) 0%, rgba(255, 144, 0, 0.2) 100%);
-            border: 1px solid rgba(255, 144, 0, 0.5);
-            color: #ff9000;
-            box-shadow: 0 0 15px rgba(255, 144, 0, 0.4);
-            text-shadow: 0 0 5px rgba(255, 144, 0, 0.6);
-        }
+        @keyframes titlePulse { from { transform: scale(1); } to { transform: scale(1.02); } }
 
-        @keyframes titlePulse {
-            from { transform: scale(1); }
-            to { transform: scale(1.02); }
-        }
+        .max-rank-banner { display: inline-flex; align-items: center; gap: 6px; background: rgba(230, 57, 70, 0.15); border: 1px solid rgba(230, 57, 70, 0.4); color: #ff4d6d; padding: 4px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: bold; margin-top: 8px; }
+        .last-rank-banner { display: inline-flex; align-items: center; gap: 6px; background: rgba(0, 229, 255, 0.12); border: 1px solid rgba(0, 229, 255, 0.3); color: #00e5ff; padding: 4px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: bold; margin-top: 8px; margin-left: 8px; }
 
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 25px; }
-        .stat-card {
-            background: rgba(0,0,0,0.3); padding: 15px; border-radius: 20px;
-            border: 1px solid var(--glass-border); text-align: center;
-        }
+        .stat-card { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 20px; border: 1px solid var(--glass-border); text-align: center; }
         .stat-card i { font-size: 1.2rem; margin-bottom: 5px; display: block; }
         .stat-val { font-size: 1.1rem; font-weight: 700; }
 
-        /* Featured Slot */
-        .featured-display {
-            z-index: 2; background: rgba(0,0,0,0.5); border-radius: 25px;
-            border: 2px dashed var(--glass-border); display: flex; align-items: center;
-            justify-content: center; position: relative; overflow: hidden;
-            cursor: pointer;
-        }
+        /* Featured Showcase Slot */
+        .featured-display { z-index: 2; background: rgba(0,0,0,0.5); border-radius: 25px; border: 2px dashed var(--glass-border); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; cursor: pointer; }
         .featured-display img { width: 100%; height: 100%; object-fit: cover; }
-        .featured-label {
-            position: absolute; top: 10px; background: var(--primary); color: #000;
-            font-size: 0.6rem; font-weight: 800; padding: 2px 10px; border-radius: 5px;
-        }
+        .featured-label { position: absolute; top: 10px; background: var(--primary); color: #000; font-size: 0.6rem; font-weight: 800; padding: 2px 10px; border-radius: 5px; }
 
-        /* --- Collection Grid --- */
-        .section-title { 
-            display: flex; justify-content: space-between; align-items: center; 
-            margin-bottom: 25px; padding: 0 10px;
-        }
+        /* --- Collection --- */
+        .section-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 0 10px; }
         .section-title h2 { font-size: 1.4rem; margin: 0; font-weight: 300; letter-spacing: 1px; }
-
-        .grid-container {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 20px; padding-bottom: 100px;
-        }
-
-        .card-item {
-            background: var(--card-bg); border-radius: 24px; padding: 12px;
-            border: 1px solid var(--glass-border); position: relative;
-            cursor: pointer; text-align: center;
-        }
-        .card-item:hover {
-            transform: translateY(-10px); border-color: var(--primary);
-            background: rgba(255,255,255,0.08); box-shadow: 0 15px 30px rgba(0,0,0,0.4);
-        }
-
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; padding-bottom: 100px; }
+        .card-item { background: var(--card-bg); border-radius: 24px; padding: 12px; border: 1px solid var(--glass-border); position: relative; cursor: pointer; text-align: center; }
+        .card-item:hover { transform: translateY(-10px); border-color: var(--primary); background: rgba(255,255,255,0.08); box-shadow: 0 15px 30px rgba(0,0,0,0.4); }
         .card-item img { width: 100%; border-radius: 18px; aspect-ratio: 2/3; object-fit: cover; margin-bottom: 12px; }
-        
         .card-info .name { font-size: 0.85rem; font-weight: 400; margin-bottom: 8px; color: #ddd; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .rarity-pill {
-            font-size: 0.65rem; font-weight: 800; padding: 3px 12px; border-radius: 8px;
-            display: inline-block; letter-spacing: 1px; text-transform: uppercase;
-        }
+        .rarity-pill { font-size: 0.65rem; font-weight: 800; padding: 3px 12px; border-radius: 8px; display: inline-block; letter-spacing: 1px; text-transform: uppercase; }
         
-        /* สีปุ่มระดับต่างๆ */
         .rarity-SECRET { background: #D8BFD8; color: #000; }
         .rarity-P, .rarity-USEC { background: #ff00ff; color: #fff; }
         .rarity-EXR, .rarity-CBR { background: linear-gradient(45deg, #ff0055, #ffdd00); color: #fff; box-shadow: 0 0 15px rgba(255,0,85,0.4); }
@@ -205,74 +146,30 @@
         .rarity-R { background: #33ff57; color: #000; }
         .rarity-U, .rarity-C { background: #ffffff; color: #000; }
 
-        .lvl-tag {
-            position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.8);
-            font-size: 0.6rem; padding: 2px 8px; border-radius: 5px; color: var(--primary);
-            border: 1px solid var(--primary); z-index: 5;
-        }
+        .lvl-tag { position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.8); font-size: 0.6rem; padding: 2px 8px; border-radius: 5px; color: var(--primary); border: 1px solid var(--primary); z-index: 5; }
+        .qty-badge { position: absolute; top: -5px; right: -5px; background: #fff; color: #000; width: 24px; height: 24px; border-radius: 50%; font-size: 0.7rem; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 10px rgba(0,0,0,0.3); z-index: 5; }
 
-        .qty-badge {
-            position: absolute; top: -5px; right: -5px; background: #fff; color: #000;
-            width: 24px; height: 24px; border-radius: 50%; font-size: 0.7rem; font-weight: 800;
-            display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 10px rgba(0,0,0,0.3); z-index: 5;
-        }
-
-        /* --- Loader --- */
-        #loader { 
-            position: fixed; inset: 0; background: var(--bg-dark); z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
+        /* Loader */
+        #loader { position: fixed; inset: 0; background: var(--bg-dark); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .spinner { width: 50px; height: 50px; border: 3px solid rgba(255,200,49,0.1); border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 1s infinite linear; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Custom Dropdown Box inside SweetAlert */
+        .swal-select-custom { background: #222 !important; color: white !important; border-radius: 10px !important; border: 1px solid #444 !important; padding: 10px !important; }
 
         @media (max-width: 900px) {
             .hero-section { grid-template-columns: 1fr; text-align: center; padding: 30px; }
             .stats-grid { grid-template-columns: 1fr 1fr 1fr; }
             .featured-display { height: 250px; width: 180px; margin: 20px auto 0; }
             .last-rank-banner { margin-left: 0; }
-            .theme-btn { top: 15px; right: 15px; }
         }
 
-        /* 💠 กรอบโปรไฟล์สีฟ้าสุดหรู (Blue Luxury Frame) */
-        .pfp-frame.blue-luxury-frame {
-            background: linear-gradient(135deg, #00d4ff, #0077ff, #00ff87);
-            background-size: 300% 300%;
-            animation: rotateFrameGradient 4s ease infinite;
-            box-shadow: 0 0 25px rgba(30, 218, 255, 0.87);
-        }
+        .pfp-frame.blue-luxury-frame { background: linear-gradient(135deg, #00d4ff, #0077ff, #00ff87); background-size: 300% 300%; animation: rotateFrameGradient 4s ease infinite; box-shadow: 0 0 25px rgba(30, 218, 255, 0.87); }
+        @keyframes rotateFrameGradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        @keyframes rotateFrameGradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* ✨ เอฟเฟกต์พื้นหลังเปิดใช้งานโหมดเพชรร่วง */
-        body.diamond-waterfall-bg {
-            position: relative;
-            background-color: #050508 !important;
-            overflow-x: hidden;
-        }
-
-        /* สไตล์ของเม็ดเพชรแต่ละอันที่จะถูกเสกขึ้นมา */
-        .falling-diamond {
-            position: fixed;
-            top: -50px; 
-            z-index: -1; 
-            font-size: 1.5rem; 
-            pointer-events: none;
-            user-select: none;
-            text-shadow: 0 0 10px rgba(0, 229, 255, 0.6), 0 0 20px rgba(0, 229, 255, 0.3);
-            opacity: 0.7;
-            animation: diamondDrop linear forwards;
-        }
-
-        @keyframes diamondDrop {
-            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.7; }
-            90% { opacity: 0.7; }
-            100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
-        }
+        body.diamond-waterfall-bg { position: relative; background-color: #050508 !important; overflow-x: hidden; }
+        .falling-diamond { position: fixed; top: -50px; z-index: -1; font-size: 1.5rem; pointer-events: none; user-select: none; text-shadow: 0 0 10px rgba(0, 229, 255, 0.6); opacity: 0.7; animation: diamondDrop linear forwards; }
+        @keyframes diamondDrop { 0% { transform: translateY(0) rotate(0deg); opacity: 0; } 10% { opacity: 0.7; } 90% { opacity: 0.7; } 100% { transform: translateY(105vh) rotate(360deg); opacity: 0; } }
     </style>
 </head>
 <body>
@@ -313,9 +210,20 @@
                 </button>
             </div>
 
+            <!-- 💠 ระบบหลอดระดับเลเวลผู้เล่น (User Level Progress Bar) -->
+            <div class="level-wrapper" onclick="openLevelRewardsModal()" title="คลิกเพื่อดูของรางวัลเลเวล">
+                <div class="level-header-row">
+                    <span class="level-lbl" id="player-level-title">LV. 1</span>
+                    <span class="level-exp-text" id="player-exp-display">EXP 0 / 100</span>
+                </div>
+                <div class="level-bar-container">
+                    <div class="level-bar-fill" id="player-level-bar-fill"></div>
+                </div>
+            </div>
+
             <div id="whale-title-container" style="display: none; text-align: left;">
                 <div class="whale-title-banner" id="whale-title-banner-main">
-                    <i class="fas fa-hands-holding-circle"></i> ฉายา: <span id="whale-title-text">ผู้ใหญ่ใจบุญ</span>
+                    <i class="fas fa-hands-holding-circle"></i> ฉายา: <span id="whale-title-text">-</span>
                 </div>
             </div>
 
@@ -323,7 +231,6 @@
                 <div class="max-rank-banner" id="max-rank-display">
                     <i class="fas fa-trophy"></i> สถิติสูงสุด: <span id="max-rank-text">UNRANKED (0 🏆)</span>
                 </div>
-
                 <div class="last-rank-banner">
                     <i class="fas fa-calendar-check"></i> อารีน่าซีซั่นล่าสุด: <span id="profile-last-rank">ไม่มีประวัติซีซั่นก่อนหน้า</span>
                 </div>
@@ -365,7 +272,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, onSnapshot, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, updateDoc, getDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
@@ -381,6 +288,8 @@
     const db = getFirestore(app);
 
     let userUID = null;
+    let globalUserData = {};
+    let previousPlayerLevel = null; // ตัวแปรเก็บเลเวลก่อนหน้าเพื่อใช้เช็ก Popup ตอนอัปเลเวลแบบเรียลไทม์
 
     const themePresets = {
         'default': 'conic-gradient(from 0deg, transparent, rgba(255,200,49,0.05), transparent)',
@@ -396,16 +305,68 @@
         'SR': 5, 'R': 4, 'U': 3, 'C': 2 
     };
 
+    // การ์ดพูลอ้างอิงสำหรับการมอบรางวัลระดับ SSR แบบแรนดอม
+    const ssrRewardPool = [
+        { name: "Pure Vanilla Cookie", rarity: "SUR", image: "https://cookierunbraverse.com/data/en_storage/v3sriD5Yu_o7COb4ttgqTw.webp" },
+        { name: "White Lily Cookie", rarity: "SUR", image: "https://cookierunbraverse.com/data/en_storage/d13fpF4FiA0yxYJ5qr6yig.webp" },
+        { name: "Dark Cacao Cookie", rarity: "SUR", image: "https://cookierunbraverse.com/data/en_storage/CMHoSF_U6LUYwYSH_9obrQ.webp" },
+        { name: "Hollyberry Cookie", rarity: "SUR", image: "https://cookierunbraverse.com/data/en_storage/y2vBiMoNyNHtU5x_AvZKSw.webp" }
+    ];
+
+    // ข้อมูลของรางวัลเลเวล 1 - 29 ตามโจทย์
+    const LEVEL_REWARDS_CONFIG = {
+        1: { name: "เหรียญ 10,000 🪙", type: "points", value: 10000 },
+        2: { name: "เหรียญ 2,000 🪙", type: "points", value: 2000 },
+        3: { name: "เพชร 200 💎", type: "diamonds", value: 200 },
+        4: { name: "เหรียญ 5,000 🪙", type: "points", value: 5000 },
+        5: { name: "เพชร 100,000 💎", type: "diamonds", value: 100000 },
+        6: { name: "เพชร 500 💎", type: "diamonds", value: 500 },
+        7: { name: "เหรียญ 7,000 🪙", type: "points", value: 7000 },
+        8: { name: "เพชร 800 💎", type: "diamonds", value: 800 },
+        9: { name: "เหรียญ 9,000 🪙", type: "points", value: 9000 },
+        10: { name: "การ์ดระดับยอดเยี่ยม SSR 🎴", type: "ssr_card" },
+        11: { name: "เพชร 1,000 💎", type: "diamonds", value: 1000 },
+        12: { name: "เหรียญ 12,000 🪙", type: "points", value: 12000 },
+        13: { name: "เพชร 1,500 💎", type: "diamonds", value: 1500 },
+        14: { name: "เหรียญ 15,000 🪙", type: "points", value: 15000 },
+        15: { name: "ตั๋วพรีเมียร์ 10 ใบ 🎫", type: "premier_tickets", value: 10 },
+        16: { name: "เพชร 2,000 💎", type: "diamonds", value: 2000 },
+        17: { name: "เหรียญ 18,000 🪙", type: "points", value: 18000 },
+        18: { name: "เพชร 2,500 💎", type: "diamonds", value: 2500 },
+        19: { name: "เหรียญ 20,000 🪙", type: "points", value: 20000 },
+        20: { name: "ฉายาพิเศษ [นักเดินทางเลเวล] 👑", type: "title_reward", value: "นักเดินทางเลเวล" },
+        21: { name: "เพชร 3,000 💎", type: "diamonds", value: 3000 },
+        22: { name: "เหรียญ 25,000 🪙", type: "points", value: 25000 },
+        23: { name: "เพชร 4,500 💎", type: "diamonds", value: 4500 },
+        24: { name: "เหรียญ 30,000 🪙", type: "points", value: 30000 },
+        25: { name: "วัตถุดิบเลือกได้ระดับ SS 💎✨", type: "material_ss_select" },
+        26: { name: "เพชร 6,000 💎", type: "diamonds", value: 6000 },
+        27: { name: "เหรียญ 40,000 🪙", type: "points", value: 40000 },
+        28: { name: "เพชร 8,000 💎", type: "diamonds", value: 8000 },
+        29: { name: "กล่องทองปริศนา 🪙 50,000", type: "points", value: 50000 }
+    };
+
+    // คำนวณค่า EXP สูงสุดของแต่ละระดับ
+    function getRequiredExpForLevel(lv) {
+        return lv * 120;
+    }
+
     onAuthStateChanged(auth, (user) => {
         if (user) {
             userUID = user.uid;
             document.getElementById("uid-display").innerText = `UID: ${user.uid.toUpperCase()}`;
             
-            onSnapshot(doc(db, "users", user.uid), (snap) => {
+            onSnapshot(doc(db, "users", user.uid), async (snap) => {
                 if (snap.exists()) {
                     const userData = snap.data();
+                    globalUserData = userData;
+                    
+                    // 🌟 เพิ่มระบบตรวจเช็กการเลื่อนเลเวลอัตโนมัติ (Auto Level Up Calculation)
+                    await checkAndProcessLevelUp(user.uid, userData);
+
                     updateUI(userData);
                     updateProfileUI(userData);
+                    updatePlayerLevelUI(userData);
                     hideLoader();
                 }
             });
@@ -416,6 +377,200 @@
         }
     });
 
+    // ⚡ ฟังก์ชันตรวจเช็กเลเวลและปรับฐานข้อมูลอัตโนมัติหาก EXP เกินกำหนด
+    async function checkAndProcessLevelUp(uid, data) {
+        let currentLv = parseInt(data.playerLevel) || 1;
+        let currentExp = parseInt(data.playerExp) || 0;
+        let reqExp = getRequiredExpForLevel(currentLv);
+        let updated = false;
+
+        while (currentExp >= reqExp) {
+            currentExp -= reqExp;
+            currentLv += 1;
+            reqExp = getRequiredExpForLevel(currentLv);
+            updated = true;
+        }
+
+        if (updated) {
+            await updateDoc(doc(db, "users", uid), {
+                playerLevel: currentLv,
+                playerExp: currentExp
+            });
+        }
+    }
+
+    // แสดงผลข้อมูล Level บนหน้าจอโปรไฟล์ พร้อม Popup ตรวจเช็กเลเวลอัป
+    function updatePlayerLevelUI(data) {
+        const lv = parseInt(data.playerLevel) || 1;
+        const currentExp = parseInt(data.playerExp) || 0;
+        const maxExp = getRequiredExpForLevel(lv);
+        const percent = Math.min((currentExp / maxExp) * 100, 100);
+
+        document.getElementById("player-level-title").innerText = `LV. ${lv}`;
+        document.getElementById("player-exp-display").innerText = `EXP ${currentExp.toLocaleString()} / ${maxExp.toLocaleString()}`;
+        document.getElementById("player-level-bar-fill").style.width = `${percent}%`;
+
+        // 🌟 เช็ก Popup เลเวลอัปตรงกลางหน้าจอแบบเรียลไทม์
+        if (previousPlayerLevel !== null && lv > previousPlayerLevel) {
+            Swal.fire({
+                title: '🎉 ยินดีด้วย เลเวลอัปแล้ว! 🎉',
+                html: `<div style="font-size: 1.2rem; margin: 10px 0;">คุณได้เลื่อนระดับเป็น <span style="color: #00e5ff; font-weight: bold; font-size: 1.6rem;">LV. ${lv}</span></div>
+                       <p style="color: #aaa; font-size: 0.9rem;">คลิกที่หลอดเลเวลเพื่อรับของรางวัลตามเส้นทางได้เลย!</p>`,
+                icon: 'success',
+                background: '#1a1a1c',
+                color: '#fff',
+                confirmButtonColor: '#ffc831',
+                confirmButtonText: 'เยี่ยมเลย!',
+                backdrop: `rgba(0,0,0,0.85)`
+            });
+        }
+        previousPlayerLevel = lv;
+    }
+
+    // หน้าต่างแสดงรายการของรางวัลและการรับของ
+    window.openLevelRewardsModal = async () => {
+        const currentLv = parseInt(globalUserData.playerLevel) || 1;
+        const claimedList = globalUserData.claimedLevelRewards || [];
+
+        let htmlContent = `<div style="text-align: left; max-height: 400px; overflow-y: auto; padding-right: 5px; color: #fff;">`;
+        
+        for (let i = 1; i <= 29; i++) {
+            const reward = LEVEL_REWARDS_CONFIG[i] || { name: "พลังงานกล่องสุ่ม 🪙 5,000", type: "points", value: 5000 };
+            const isClaimed = claimedList.includes(i);
+            const isUnlocked = currentLv >= i;
+            
+            let btnStr = "";
+            if (isClaimed) {
+                btnStr = `<span style="color:#666; font-size:0.85rem;"><i class="fas fa-check-circle"></i> รับแล้ว</span>`;
+            } else if (isUnlocked) {
+                btnStr = `<button onclick="claimLevelReward(${i})" style="background:#ffc831; color:#000; border:none; padding:4px 10px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:0.8rem;">🎁 รับรางวัล</button>`;
+            } else {
+                btnStr = `<span style="color:#555; font-size:0.8rem;"><i class="fas fa-lock"></i> LV.${i}</span>`;
+            }
+
+            htmlContent += `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #222;">
+                    <div>
+                        <span style="font-weight:bold; color:${isUnlocked ? '#00e5ff' : '#666'};">เลเวล ${i}:</span>
+                        <span style="margin-left:8px; color:${isClaimed ? '#aaa' : '#fff'};">${reward.name}</span>
+                    </div>
+                    <div>${btnStr}</div>
+                </div>`;
+        }
+        htmlContent += `</div>`;
+
+        Swal.fire({
+            title: '🏆 รางวัลเส้นทางเลเวลผู้เล่น',
+            html: htmlContent,
+            background: '#141416',
+            color: '#fff',
+            confirmButtonText: 'ปิดหน้านี้',
+            confirmButtonColor: '#444'
+        });
+    };
+
+    // ฟังก์ชันเบื้องหลังสำหรับแจกของรางวัลเลเวลเข้าฐานข้อมูล
+    window.claimLevelReward = async (lv) => {
+        Swal.close();
+        if (!userUID) return;
+
+        const config = LEVEL_REWARDS_CONFIG[lv];
+        if (!config) return;
+
+        const docRef = doc(db, "users", userUID);
+        const userSnap = await getDoc(docRef);
+        if (!userSnap.exists()) return;
+
+        const data = userSnap.data();
+        const currentLv = parseInt(data.playerLevel) || 1;
+        const claimedList = data.claimedLevelRewards || [];
+
+        if (claimedList.includes(lv)) return Swal.fire("ผิดพลาด", "คุณเคยรับรางวัลเลเวลนี้ไปแล้ว", "error");
+        if (currentLv < lv) return Swal.fire("ผิดพลาด", "เลเวลของคุณยังไม่ถึงกำหนด", "error");
+
+        try {
+            let updatePayload = {
+                claimedLevelRewards: arrayUnion(lv)
+            };
+
+            if (config.type === "points") {
+                updatePayload.points = (parseInt(data.points) || 0) + config.value;
+                await updateDoc(docRef, updatePayload);
+                Swal.fire("สำเร็จ!", `คุณได้รับรางวัล ${config.name} เรียบร้อย!`, "success");
+            } 
+            else if (config.type === "diamonds") {
+                updatePayload.diamonds = (parseInt(data.diamonds) || 0) + config.value;
+                await updateDoc(docRef, updatePayload);
+                Swal.fire("สำเร็จ!", `คุณได้รับรางวัล ${config.name} เรียบร้อย!`, "success");
+            } 
+            else if (config.type === "premier_tickets") {
+                updatePayload.premierTickets = (parseInt(data.premierTickets) || 0) + config.value;
+                await updateDoc(docRef, updatePayload);
+                Swal.fire("สำเร็จ!", `คุณได้รับรางวัล ${config.name} เรียบร้อย!`, "success");
+            }
+            else if (config.type === "title_reward") {
+                updatePayload.titles = arrayUnion(config.value);
+                await updateDoc(docRef, updatePayload);
+                Swal.fire("ปลดล็อกฉายาใหม่!", `คุณได้รับฉายาพิเศษ: [${config.value}] เรียบร้อย ไปกดเปลี่ยนได้ที่มงกุฎข้างชื่อ!`, "success");
+            }
+            else if (config.type === "ssr_card") {
+                const randomCard = ssrRewardPool[Math.floor(Math.random() * ssrRewardPool.length)];
+                let currentCollection = data.collection || [];
+                
+                const newCardInstance = {
+                    name: randomCard.name,
+                    rarity: randomCard.rarity,
+                    level: 1,
+                    stars: 0,
+                    isLocked: false,
+                    img: randomCard.image,
+                    image: randomCard.image
+                };
+                
+                currentCollection.push(newCardInstance);
+                updatePayload.collection = currentCollection;
+                updatePayload[`cards_inventory.${randomCard.name}`] = (data.cards_inventory?.[randomCard.name] || 0) + 1;
+
+                await updateDoc(docRef, updatePayload);
+                Swal.fire({
+                    title: "ยินดีด้วย! ได้รับการ์ดใหม่",
+                    text: `คุณได้รับสุ่มการ์ดรางวัลเลเวล: ${randomCard.name} (${randomCard.rarity})`,
+                    imageUrl: randomCard.image,
+                    imageWidth: 160,
+                    imageHeight: 240,
+                    background: '#1a1a1c',
+                    color: '#fff'
+                });
+            }
+            else if (config.type === "material_ss_select") {
+                const { value: selectedMat } = await Swal.fire({
+                    title: '💎 เลือกวัตถุดิบระดับ SS ของคุณ',
+                    input: 'select',
+                    inputOptions: {
+                        'ss_crystal': '💎 ผลึกดาวหางระดับกาลเวลา SS',
+                        'ss_core': '🔥 แกนพลังงานปฏิสสารอารีน่า SS',
+                        'ss_alloy': '🔩 โลหะผสมนาโนไทเทเนียมบวกห้า SS'
+                    },
+                    inputPlaceholder: '-- โปรดเลือกวัตถุดิบ 1 ชิ้น --',
+                    showCancelButton: false,
+                    background: '#1a1a1c',
+                    color: '#fff',
+                    confirmButtonColor: '#ffc831',
+                    customClass: { input: 'swal-select-custom' }
+                });
+
+                if (selectedMat) {
+                    updatePayload[`inventory_materials.${selectedMat}`] = (data.inventory_materials?.[selectedMat] || 0) + 1;
+                    await updateDoc(docRef, updatePayload);
+                    Swal.fire("สำเร็จ!", "ได้รับวัตถุดิบระดับ SS ชิ้นที่คุณเลือกเข้ากระเป๋าเรียบร้อย!", "success");
+                }
+            }
+        } catch (err) {
+            console.error(err);
+            Swal.fire("ล้มเหลว", "ระบบเกิดข้อผิดพลาดในการรับของรางวัล", "error");
+        }
+    };
+
     function updateProfileUI(userData) {
         if (!userData) return;
         const profileRankEl = document.getElementById("profile-last-rank");
@@ -424,7 +579,6 @@
         }
     } 
 
-    // 👑 ฟังก์ชันระบบเลือกสลับฉายา (ดึงเงื่อนไขตรวจสอบจากฐานข้อมูล)
     window.openTitleSelector = async () => {
         if (!userUID) return;
         
@@ -433,25 +587,16 @@
             if (!userSnap.exists()) return;
             const userData = userSnap.data();
 
-            // ตัวเลือกเริ่มต้นแบบฟรี
-            const availableTitles = {
-                'none': '❌ ไม่แสดงฉายา'
-            };
+            const availableTitles = { 'none': '❌ ไม่แสดงฉายา' };
 
-            // 1. ตรวจสอบเงื่อนไขฉายาเติมเงิน "ผู้ใหญ่ใจบุญ"
             if (userData.title_prefix === "ผู้ใหญ่ใจบุญ" || userData.bought_daddy_pack === true) {
                 availableTitles['ผู้ใหญ่ใจบุญ'] = '✨ [ผู้ใหญ่ใจบุญ] (ปลดล็อกแล้ว)';
             }
 
-            // 2. ดึงประวัติฉายาที่เคยปลดล็อกมาจากหน้า Battle.html (ฟิลด์ซีซั่น titles แบบ Array)
             const unlockedTitles = userData.titles || [];
-            
-            if (unlockedTitles.includes("ผู้พิชิตศึกสงคราม")) {
-                availableTitles['ผู้พิชิตศึกสงคราม'] = '🔥 [ผู้พิชิตศึกสงคราม] (ปลดล็อกประจำแรงค์)';
-            }
-            if (unlockedTitles.includes("กำหนดผู้ชนะ")) {
-                availableTitles['กำหนดผู้ชนะ'] = '👑 [กำหนดผู้ชนะ] (ปลดล็อกระดับแชมป์)';
-            }
+            if (unlockedTitles.includes("ผู้พิชิตศึกสงคราม")) availableTitles['ผู้พิชิตศึกสงคราม'] = '🔥 [ผู้พิชิตศึกสงคราม] (ประจำแรงค์)';
+            if (unlockedTitles.includes("กำหนดผู้ชนะ")) availableTitles['กำหนดผู้ชนะ'] = '👑 [กำหนดผู้ชนะ] (ระดับแชมป์)';
+            if (unlockedTitles.includes("นักเดินทางเลเวล")) availableTitles['นักเดินทางเลเวล'] = '🧭 [นักเดินทางเลเวล] (รางวัลเลเวล 20)';
 
             const { value: selectedTitle } = await Swal.fire({
                 title: '👑 เลือกฉายาของคุณ',
@@ -470,12 +615,10 @@
                 Swal.fire({ icon: 'success', title: 'เปลี่ยนฉายาเรียบร้อย!', timer: 1000, showConfirmButton: false, background: '#1a1a1c', color: '#fff' });
             }
         } catch (error) {
-            console.error("Error loading titles:", error);
             Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถโหลดข้อมูลคลังฉายาได้', 'error');
         }
     };
 
-    // 💠 ฟังก์ชันสลับธีม และไอเทมตกแต่งพิเศษ (กรอบรูป & พื้นหลังเพชรไหล)
     window.openThemeSelector = async () => {
         if (!userUID) return;
 
@@ -492,7 +635,6 @@
             cancelButtonText: '🎨 เปลี่ยนสีแสงหมุน (ฟรี)',
         });
 
-        // กรณีเลือกเปลี่ยนสีแสงหมุนแบบปกติ (ปุ่มเทา)
         if (menuChoice === false) {
             const { value: selectedTheme } = await Swal.fire({
                 title: '🎨 เลือกสีแสงหมุน',
@@ -513,25 +655,16 @@
 
             if (selectedTheme) {
                 await updateDoc(doc(db, "users", userUID), { profileTheme: selectedTheme });
-                Swal.fire({ icon: 'success', title: 'เปลี่ยนแสงหมุนสำเร็จ!', timer: 1000, showConfirmButton: false, background: '#1a1a1c', color: '#fff' });
             }
-        } 
-        // กรณีเลือกไอเทมตกแต่งพิเศษที่ได้จากร้านค้า/กาชา (ปุ่มเหลือง)
-        else if (menuChoice === true) {
+        } else if (menuChoice === true) {
             onSnapshot(doc(db, "users", userUID), async (snap) => {
                 if (!snap.exists()) return;
                 const userData = snap.data();
                 
-                const decorationOptions = {
-                    'default_clean': '❌ ถอดไอเทมตกแต่งทั้งหมดกลับเป็นค่าเริ่มต้น'
-                };
+                const decorationOptions = { 'default_clean': '❌ ถอดไอเทมตกแต่งทั้งหมดกลับเป็นค่าเริ่มต้น' };
 
-                if (userData.unlocked_profile_frame === "blue_luxury_frame") {
-                    decorationOptions['frame_blue'] = '💠 สวมกรอบโปรไฟล์สีฟ้าสุดหรู';
-                }
-                if (userData.unlocked_profile_bg === "diamond_waterfall_bg") {
-                    decorationOptions['bg_diamond'] = '✨ เปิดใช้งานพื้นหลังลายเพชรไหล';
-                }
+                if (userData.unlocked_profile_frame === "blue_luxury_frame") decorationOptions['frame_blue'] = '💠 สวมกรอบโปรไฟล์สีฟ้าสุดหรู';
+                if (userData.unlocked_profile_bg === "diamond_waterfall_bg") decorationOptions['bg_diamond'] = '✨ เปิดใช้งานพื้นหลังลายเพชรไหล';
                 if (userData.unlocked_profile_frame === "blue_luxury_frame" && userData.unlocked_profile_bg === "diamond_waterfall_bg") {
                     decorationOptions['both'] = '👑 เปิดใช้งานทั้งกรอบฟ้า + พื้นหลังเพชร';
                 }
@@ -549,16 +682,13 @@
 
                 if (selectedDecoration) {
                     let payload = { currentFrame: 'none', currentBg: 'none' };
-                    
                     if (selectedDecoration === 'frame_blue') payload.currentFrame = 'blue_luxury_frame';
                     if (selectedDecoration === 'bg_diamond') payload.currentBg = 'diamond_waterfall_bg';
                     if (selectedDecoration === 'both') {
                         payload.currentFrame = 'blue_luxury_frame';
                         payload.currentBg = 'diamond_waterfall_bg';
                     }
-
                     await updateDoc(doc(db, "users", userUID), payload);
-                    Swal.fire({ icon: 'success', title: 'อัปเดตสไตล์สำเร็จ!', timer: 1000, showConfirmButton: false, background: '#1a1a1c', color: '#fff' });
                 }
             });
         }
@@ -574,33 +704,11 @@
             background: '#1a1a1c',
             color: '#fff',
             confirmButtonColor: '#ffc831',
-            cancelButtonColor: '#444',
-            confirmButtonText: 'ตกลง',
-            cancelButtonText: 'ยกเลิก',
-            inputAttributes: { maxlength: 15 },
-            inputValidator: (value) => {
-                if (!value || value.trim() === "") {
-                    return 'กรุณาใส่ชื่อด้วยนะ!'
-                }
-            }
+            inputAttributes: { maxlength: 15 }
         });
 
         if (newName && newName.trim() !== "") {
-            try {
-                await updateDoc(doc(db, "users", userUID), { username: newName.trim() });
-                Swal.fire({
-                    icon: 'success',
-                    title: 'สำเร็จ!',
-                    text: 'เปลี่ยนชื่อเรียบร้อยแล้ว',
-                    timer: 1500,
-                    showConfirmButton: false,
-                    background: '#1a1a1c',
-                    color: '#fff'
-                });
-            } catch (err) {
-                console.error("Update error:", err);
-                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถอัปเดตชื่อได้', 'error');
-            }
+            await updateDoc(doc(db, "users", userUID), { username: newName.trim() });
         }
     };
 
@@ -616,14 +724,12 @@
         };
     }
 
-    // ฟังก์ชันอัปเดตข้อมูล UI หลักเมื่อมีการสตรีมสถานะมาจาก Firebase
     function updateUI(data) {
         document.getElementById("username-display").innerText = data.username || "COLLECTOR";
         document.getElementById("stat-points").innerText = (data.points || 0).toLocaleString();
         document.getElementById("stat-diamonds").innerText = (data.diamonds || 0).toLocaleString();
         document.getElementById("stat-stars").innerText = (data.stars || 0).toLocaleString();
         
-        // 👑 1. ตรวจสอบและแสดงผลฉายาปัจจุบันพร้อมเปลี่ยนสีตามระดับ
         const titleContainer = document.getElementById("whale-title-container");
         const titleBanner = document.getElementById("whale-title-banner-main");
         
@@ -631,19 +737,18 @@
             document.getElementById("whale-title-text").innerText = data.currentTitle;
             titleContainer.style.display = "block";
             
-            // เคลียร์คลาสตกแต่งเดิมออกก่อนเพื่อไม่ให้ทับกัน
-            titleBanner.classList.remove("rank-pro", "rank-master");
-            
+            titleBanner.classList.remove("rank-pro", "rank-master", "rank-level-traveler");
             if (data.currentTitle === "กำหนดผู้ชนะ") {
                 titleBanner.classList.add("rank-pro");
             } else if (data.currentTitle === "ผู้พิชิตศึกสงคราม") {
                 titleBanner.classList.add("rank-master");
+            } else if (data.currentTitle === "นักเดินทางเลเวล") {
+                titleBanner.classList.add("rank-level-traveler");
             }
         } else {
             titleContainer.style.display = "none";
         }
 
-        // 💠 2. ตรวจสอบและสวมกรอบรูปโปรไฟล์
         const pfpFrame = document.querySelector(".pfp-frame");
         if (pfpFrame) {
             if (data.currentFrame === "blue_luxury_frame") {
@@ -653,14 +758,12 @@
             }
         }
 
-        // ✨ 3. ตรวจสอบและเปิดใช้งานเอฟเฟกต์พื้นหลังลายเพชรไหลเลื่อนลงมาบนหน้าจอ
         if (data.currentBg === "diamond_waterfall_bg") {
             document.body.classList.add("diamond-waterfall-bg");
         } else {
             document.body.classList.remove("diamond-waterfall-bg");
         }
 
-        // 🟡 4. ตั้งค่าแสงหมุนหลังการ์ดโปรไฟล์ปกติ
         const currentThemeKey = data.profileTheme || 'default';
         const targetGlow = themePresets[currentThemeKey] || themePresets['default'];
         document.documentElement.style.setProperty('--theme-glow', targetGlow);
@@ -692,34 +795,20 @@
             return;
         }
 
-        // ✨ ระบบเสกเม็ดเพชรดิ่งลงมาทีละอันแบบแรนดอม
-        if (window.diamondInterval) {
-            clearInterval(window.diamondInterval);
-        }
+        if (window.diamondInterval) clearInterval(window.diamondInterval);
 
         if (data.currentBg === "diamond_waterfall_bg") {
-            document.body.classList.add("diamond-waterfall-bg");
-            
             window.diamondInterval = setInterval(() => {
                 const diamond = document.createElement('div');
                 diamond.classList.add('falling-diamond');
                 diamond.innerText = '💎';
-                
                 diamond.style.left = Math.random() * 100 + 'vw';
                 const duration = Math.random() * 4 + 4;
                 diamond.style.animationDuration = duration + 's';
                 diamond.style.fontSize = (Math.random() * 0.8 + 0.8) + 'rem';
-                
                 document.body.appendChild(diamond);
-                
-                setTimeout(() => {
-                    diamond.remove();
-                }, duration * 1000);
-                
+                setTimeout(() => diamond.remove(), duration * 1000);
             }, 300);
-            
-        } else {
-            document.body.classList.remove("diamond-waterfall-bg");
         }
 
         const grouped = {};
@@ -740,41 +829,26 @@
                 const starB = parseInt(b.stars || 0);
                 return (starB * 100 + lvB) - (starA * 100 + lvA);
             });
-            
             const bestCard = copies[0];
-            const currentLv = parseInt(bestCard.level || bestCard.lv || 1);
-            displayList.push({
-                ...bestCard,
-                finalLv: currentLv,
-                qty: copies.length
-            });
+            displayList.push({ ...bestCard, finalLv: parseInt(bestCard.level || bestCard.lv || 1), qty: copies.length });
         }
 
         displayList.sort((a, b) => {
             const rA = (a.rarity || 'C').toUpperCase();
             const rB = (b.rarity || 'C').toUpperCase();
-            
             const orderA = rarityOrder[rA] || 0;
             const orderB = rarityOrder[rB] || 0;
-
-            if (orderB !== orderA) {
-                return orderB - orderA;
-            }
+            if (orderB !== orderA) return orderB - orderA;
             return b.finalLv - a.finalLv;
         });
 
         grid.innerHTML = displayList.map(c => {
             const rDisplay = (c.rarity || 'C').toUpperCase();
-            const safeImg = c.img || c.image || '';
-            const safeName = (c.name || 'Unknown Card').replace(/'/g, "\\'");
-            const safeAtk = c.atk || c.attack || 0;
-            const safeDef = c.def || c.defense || 0;
-
             return `
-                <div class="card-item" onclick="setFeatured('${safeImg}', '${rDisplay}', '${safeName}', ${safeAtk}, ${safeDef})">
+                <div class="card-item" onclick="setFeatured('${c.img || c.image || ''}', '${rDisplay}', '${(c.name || 'Unknown').replace(/'/g, "\\'")}', ${c.atk || 0}, ${c.def || 0})">
                     <div class="lvl-tag">LV.${c.finalLv}</div>
                     ${c.qty > 1 ? `<div class="qty-badge">x${c.qty}</div>` : ''}
-                    <img src="${safeImg}" onerror="this.src='https://via.placeholder.com/150x225?text=Card'">
+                    <img src="${c.img || c.image || ''}" onerror="this.src='https://via.placeholder.com/150x225?text=Card'">
                     <div class="card-info">
                         <div class="name">${c.name}</div>
                         <div class="rarity-pill rarity-${rDisplay}">${rDisplay}</div>
@@ -786,7 +860,6 @@
 
     window.setFeatured = async (img, rarity, name, atk, def) => {
         if (!img) return;
-        
         const result = await Swal.fire({
             title: 'ตั้งค่าการ์ดโชว์',
             text: `ต้องการนำการ์ด "${name}" ใบนี้ไปตั้งเป็นหน้าตาทับโปรไฟล์หลักของคุณใช่หรือไม่?`,
@@ -794,40 +867,12 @@
             showCancelButton: true,
             background: '#1a1a1c',
             color: '#fff',
-            confirmButtonColor: '#ffc831',
-            cancelButtonColor: '#444',
-            confirmButtonText: 'ตกลง',
-            cancelButtonText: 'ยกเลิก'
+            confirmButtonColor: '#ffc831'
         });
 
         if (result.isConfirmed) {
-            try {
-                const cardPayload = {
-                    img: img,
-                    rarity: rarity,
-                    name: name,
-                    atk: atk,
-                    def: def
-                };
-
-                await updateDoc(doc(db, "users", userUID), { 
-                    featuredCard: cardPayload,
-                    decoratedCard: cardPayload 
-                });
-
-                Swal.fire({
-                    icon: 'success',
-                    title: 'ตั้งค่าสำเร็จ!',
-                    text: 'อัปเดตการ์ดโชว์บนหน้าโปรไฟล์เรียบร้อยแล้ว',
-                    timer: 1500,
-                    showConfirmButton: false,
-                    background: '#1a1a1c',
-                    color: '#fff'
-                });
-            } catch (err) {
-                console.error("Set featured card error:", err);
-                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถบันทึกการ์ดโชว์ได้', 'error');
-            }
+            const cardPayload = { img, rarity, name, atk, def };
+            await updateDoc(doc(db, "users", userUID), { featuredCard: cardPayload, decoratedCard: cardPayload });
         }
     };
 
