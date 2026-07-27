@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COOKIE WORLD - 2D Side Scrolling</title>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <title>COOKIE WORLD - Interactive Town with Maps</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; user-select: none; }
         body { 
             font-family: 'Kanit', sans-serif; 
             margin: 0; 
-            background: #1a0f05; 
+            background: #110803; 
             color: white; 
             min-height: 100vh; 
             overflow: hidden; 
@@ -18,27 +18,75 @@
             flex-direction: column;
         }
         
+        /* Glassmorphism Navbar */
         .navbar { 
-            background-color: rgba(40, 20, 10, 0.95); 
-            padding: 15px 25px; 
+            background: rgba(30, 15, 8, 0.85); 
+            backdrop-filter: blur(10px);
+            padding: 10px 25px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            border-bottom: 2px solid #e7ac66; 
+            border-bottom: 3px solid #e7ac66; 
             height: 80px; 
             z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .stats-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .stat-badge {
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid #e7ac66;
+            padding: 6px 16px;
+            border-radius: 20px;
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: inset 0 0 8px rgba(231,172,102,0.3);
         }
 
         #game-clock {
-            background: rgba(0, 0, 0, 0.7);
-            border: 1px solid #e7ac66;
-            padding: 5px 15px;
-            border-radius: 10px;
-            color: #e7ac66;
-            font-weight: bold;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #ff9000;
+            padding: 6px 15px;
+            border-radius: 12px;
+            color: #ffaa00;
+            font-weight: 800;
             font-size: 1.1rem;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            letter-spacing: 1px;
         }
+
+        .nav-btn {
+            cursor: pointer;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-family: 'Kanit';
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .nav-btn:active { transform: translateY(4px); box-shadow: none; }
+        .btn-map { background: linear-gradient(180deg, #29B6F6 0%, #0288D1 100%); }
+        .btn-map:hover { filter: brightness(1.1); transform: translateY(-2px); }
+        .btn-feed { background: linear-gradient(180deg, #66BB6A 0%, #388E3C 100%); }
+        .btn-feed:hover { filter: brightness(1.1); transform: translateY(-2px); }
+        .btn-char { background: linear-gradient(180deg, #FFA726 0%, #F57C00 100%); }
+        .btn-char:hover { filter: brightness(1.1); transform: translateY(-2px); }
+        .btn-home { background: transparent; border: 2px solid #e7ac66; color: #e7ac66; }
+        .btn-home:hover { background: rgba(231,172,102,0.15); }
 
         #game-area {
             flex: 1;
@@ -46,44 +94,99 @@
             overflow: hidden;
             display: flex;
             align-items: flex-end; 
+            cursor: pointer;
         }
 
         #city-map {
             width: 2600px; 
             height: 100%;
-            background-image: url('Gemini_Generated_Image_cbgsypcbgsypcbgs.jpg'); 
             background-size: cover; 
             background-repeat: repeat-x; 
             background-position: bottom;
             position: absolute;
-            transition: transform 0.6s ease-out, background-image 2s ease-in-out;
+            transition: transform 0.6s cubic-bezier(0.15, 0.85, 0.35, 1.2), opacity 0.5s ease;
         }
 
+        /* Warp Portals on Map */
+        .warp-portal {
+            position: absolute;
+            bottom: 120px;
+            width: 90px;
+            height: 120px;
+            background: rgba(0, 229, 255, 0.25);
+            border: 3px dashed #00e5ff;
+            border-radius: 50px 50px 10px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+            font-size: 0.85rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+            animation: portalGlow 2s infinite alternate;
+            z-index: 30;
+            cursor: pointer;
+        }
+        .warp-portal:hover { transform: scale(1.08); background: rgba(0, 229, 255, 0.4); }
+
+        @keyframes portalGlow {
+            0% { box-shadow: 0 0 10px rgba(0, 229, 255, 0.4); }
+            100% { box-shadow: 0 0 30px rgba(0, 229, 255, 0.9); }
+        }
+
+        #weather-overlay {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            pointer-events: none; z-index: 10;
+        }
+
+        /* Collectibles Drop */
+        .collectible {
+            position: absolute;
+            bottom: 120px;
+            width: 35px;
+            height: 35px;
+            z-index: 40;
+            cursor: pointer;
+            animation: floatItem 2s infinite ease-in-out;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+            transition: transform 0.2s, opacity 0.3s;
+        }
+        .collectible:hover { transform: scale(1.3) rotate(10deg); }
+
+        @keyframes floatItem {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        /* Avatars & Characters */
         .card-avatar {
             position: absolute;
             width: 110px; 
             bottom: 120px; 
-            transition: left 3s linear, transform 0.3s, opacity 1s; 
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.7));
+            transition: left 3s linear, transform 0.3s, opacity 0.5s; 
+            filter: drop-shadow(0 12px 15px rgba(0,0,0,0.6));
             z-index: 50;
             text-align: center;
             opacity: 1;
         }
 
         .hunger-container {
-            width: 60px;
-            height: 6px;
-            background: rgba(0,0,0,0.5);
-            border-radius: 5px;
-            margin: 0 auto 5px auto;
-            border: 1px solid #e7ac66;
+            width: 70px;
+            height: 8px;
+            background: rgba(0,0,0,0.6);
+            border-radius: 10px;
+            margin: 0 auto 6px auto;
+            border: 1.5px solid #ffcc80;
             overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
         .hunger-fill {
             width: 100%;
             height: 100%;
-            background: #4CAF50;
-            transition: width 0.3s, background 0.3s;
+            background: linear-gradient(90deg, #66BB6A, #43A047);
+            transition: width 0.4s ease, background 0.4s ease;
         }
 
         #player { transition: left 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
@@ -92,162 +195,298 @@
             width: 100%;
             aspect-ratio: 2/3;
             object-fit: cover;
-            border-radius: 10px;
-            border: 3px solid #fff;
-            transition: transform 0.3s;
+            border-radius: 12px;
+            border: 3px solid #ffffff;
+            transition: transform 0.2s ease, border-color 0.3s;
             cursor: pointer;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
         }
+        .card-avatar img:hover { transform: scale(1.05); }
 
-        .is-talking img { transform: scale(1.1); border-color: #ff9000; }
+        .is-walking img { animation: walkBounce 0.4s infinite alternate; }
+        .is-hungry img { animation: hungryShake 1.2s infinite ease-in-out; filter: grayscale(0.3); }
+        .is-talking img { transform: scale(1.15) !important; border-color: #ff9000 !important; }
         .facing-left img { transform: scaleX(-1); }
-        .facing-left.is-talking img { transform: scaleX(-1) scale(1.1); }
+        .facing-left.is-talking img { transform: scaleX(-1) scale(1.15) !important; }
+
+        @keyframes walkBounce {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-8px); }
+        }
+        @keyframes hungryShake {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-4deg) translateY(2px); }
+            75% { transform: rotate(4deg) translateY(2px); }
+        }
 
         .card-name {
             font-size: 11px;
-            background: rgba(0, 0, 0, 0.85);
-            padding: 3px 12px;
-            border-radius: 15px;
-            margin-top: 8px;
+            font-weight: bold;
+            background: rgba(20, 10, 5, 0.85);
+            color: #ffe0b2;
+            padding: 3px 10px;
+            border-radius: 12px;
+            margin-top: 6px;
             border: 1px solid #e7ac66;
             display: inline-block;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.5);
         }
 
+        /* Speech Bubbles */
         .speech-bubble {
-            position: absolute; bottom: 135%; left: 50%; transform: translateX(-50%);
-            background: white; color: #333; padding: 8px 12px; border-radius: 12px;
-            font-size: 13px; font-weight: bold; min-width: 130px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: none; z-index: 100;
-            animation: popIn 0.3s ease-out;
+            position: absolute; bottom: 140%; left: 50%; transform: translateX(-50%);
+            background: #ffffff; color: #2c1810; padding: 8px 14px; border-radius: 16px;
+            font-size: 13px; font-weight: 700; min-width: 130px; max-width: 200px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3); display: none; z-index: 100;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid #e7ac66;
+        }
+        .speech-bubble::after {
+            content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+            border-width: 7px; border-style: solid;
+            border-color: #ffffff transparent transparent transparent;
         }
 
         @keyframes popIn {
-            0% { transform: translateX(-50%) scale(0.5); opacity: 0; }
+            0% { transform: translateX(-50%) scale(0.3); opacity: 0; }
             100% { transform: translateX(-50%) scale(1); opacity: 1; }
         }
 
-        #collection-popup, #food-popup {
+        /* Floating Animated Text */
+        .floating-text {
+            position: absolute;
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #ffd700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8), 0 0 10px rgba(255,215,0,0.5);
+            pointer-events: none;
+            z-index: 200;
+            animation: floatUp 1.2s forwards ease-out;
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(0.8); }
+            50% { transform: translateY(-30px) scale(1.2); }
+            100% { opacity: 0; transform: translateY(-60px) scale(1); }
+        }
+
+        /* Modals & Popups */
+        #collection-popup, #food-popup, #map-popup {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); z-index: 2000;
+            background: rgba(10, 5, 0, 0.85); backdrop-filter: blur(8px); z-index: 2000;
             display: none; align-items: center; justify-content: center;
         }
 
         .popup-content {
-            background: #2d1b0e; width: 90%; max-width: 1000px; height: 80vh;
-            border: 3px solid #e7ac66; border-radius: 20px;
+            background: linear-gradient(145deg, #2d1b0e, #1a0f07); width: 90%; max-width: 950px; height: 80vh;
+            border: 3px solid #e7ac66; border-radius: 24px;
             display: flex; overflow: hidden; position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
         }
 
         .close-btn {
-            position: absolute; top: 15px; right: 20px; font-size: 30px;
-            cursor: pointer; color: #e7ac66; z-index: 10;
+            position: absolute; top: 15px; right: 20px; font-size: 32px;
+            cursor: pointer; color: #e7ac66; z-index: 10; transition: transform 0.2s;
+        }
+        .close-btn:hover { transform: scale(1.2) rotate(90deg); color: #ff5252; }
+
+        /* Map Selection Cards */
+        .map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            width: 100%;
+        }
+
+        .map-card {
+            background: #2a180d;
+            border: 3px solid #5d4037;
+            border-radius: 18px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .map-card:hover {
+            transform: translateY(-8px);
+            border-color: #29B6F6;
+            box-shadow: 0 10px 25px rgba(41, 182, 246, 0.4);
+        }
+        .map-card img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+        }
+        .map-card-info {
+            padding: 15px;
+            text-align: center;
+        }
+        .map-card-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #ffe0b2;
+            margin-bottom: 5px;
+        }
+        .map-card-desc {
+            font-size: 0.85rem;
+            color: #b0bec5;
         }
 
         .food-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
             gap: 20px; padding: 20px;
         }
         .food-card {
-            background: #4a301a; border-radius: 15px; padding: 15px;
+            background: #3e2413; border-radius: 18px; padding: 15px;
             text-align: center; border: 2px solid #5d4037; cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.3s; box-shadow: 0 6px 12px rgba(0,0,0,0.3);
         }
-        .food-card:hover { transform: translateY(-5px); border-color: #4CAF50; }
-        .food-card img { width: 80px; height: 80px; object-fit: contain; margin-bottom: 10px; }
+        .food-card:hover { transform: translateY(-8px) scale(1.03); border-color: #66BB6A; background: #4a2c17; }
+        .food-card img { width: 90px; height: 90px; object-fit: cover; border-radius: 12px; margin-bottom: 10px; }
 
         .preview-side {
-            flex: 1; background: rgba(0,0,0,0.3);
+            flex: 1; background: rgba(0,0,0,0.4);
             display: flex; flex-direction: column; align-items: center;
-            justify-content: center; border-right: 2px solid #4a301a;
-            padding: 20px;
+            justify-content: center; border-right: 2px solid #4a301a; padding: 20px;
         }
         .preview-side img {
-            width: 220px; border-radius: 15px; border: 4px solid #ff9000;
-            box-shadow: 0 0 30px rgba(255,144,0,0.4);
+            width: 200px; border-radius: 16px; border: 4px solid #ff9000;
+            box-shadow: 0 0 35px rgba(255,144,0,0.5);
         }
-        .preview-info { margin-top: 20px; text-align: center; }
 
-        .list-side {
-            flex: 2; padding: 25px; overflow-y: auto;
-        }
-        .card-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 15px;
-        }
-        .grid-card-item {
-            cursor: pointer; transition: 0.3s; position: relative;
-        }
+        .list-side { flex: 2; padding: 25px; overflow-y: auto; }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 15px; }
+        .grid-card-item { cursor: pointer; transition: 0.3s; position: relative; }
         .grid-card-item img {
             width: 100%; aspect-ratio: 2/3; object-fit: cover;
-            border-radius: 8px; border: 2px solid #5d4037;
+            border-radius: 10px; border: 2px solid #5d4037;
         }
-        .grid-card-item:hover { transform: translateY(-5px); }
-        .grid-card-item.active img { border-color: #ff9000; box-shadow: 0 0 15px #ff9000; }
+        .grid-card-item:hover { transform: translateY(-5px) scale(1.05); }
+        .grid-card-item.active img { border-color: #ff9000; box-shadow: 0 0 20px #ff9000; }
     </style>
 </head>
 <body>
 
-   <nav class="navbar">
-    <div style="display: flex; align-items: center; gap: 20px;">
-        <div style="color:#e7ac66; font-weight:bold; font-size:1.2rem;">Cookie city</div>
-        <div id="game-clock">00:00:00</div>
-    </div>
-    <div style="display: flex; gap: 10px;">
-        <button onclick="toggleFoodPopup(true)" style="cursor:pointer; border:none; color:white; background:#4CAF50; padding:8px 20px; border-radius:10px; font-weight:bold; font-family:'Kanit';">FEED ALL</button>
-        <button onclick="togglePopup(true)" style="cursor:pointer; border:none; color:white; background:#ff9000; padding:8px 20px; border-radius:10px; font-weight:bold; font-family:'Kanit';">CHARACTER</button>
-        
-        <button onclick="window.location.href='index.html'" style="cursor:pointer; border:2px solid #e7ac66; color:#e7ac66; background:transparent; padding:8px 20px; border-radius:10px; font-weight:bold; font-family:'Kanit';">BACK TO HOME</button>
-    </div>
-</nav>
+    <nav class="navbar">
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <div style="color:#e7ac66; font-weight:800; font-size:1.4rem; letter-spacing: 1px;">🍪 COOKIE WORLD</div>
+            <div class="stats-container">
+                <div class="stat-badge">🪙 <span id="coin-count">0</span></div>
+                <div class="stat-badge" style="color: #ff5252;">❤️ <span id="happy-count">100%</span></div>
+            </div>
+            <div id="game-clock">00:00:00</div>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="nav-btn btn-map" onclick="toggleMapPopup(true)">🗺️ MAPS</button>
+            <button class="nav-btn btn-feed" onclick="toggleFoodPopup(true)">🍕 FEED ALL</button>
+            <button class="nav-btn btn-char" onclick="togglePopup(true)">🎴 CHARS</button>
+            <button class="nav-btn btn-home" onclick="window.location.href='index.html'">🏠 HOME</button>
+        </div>
+    </nav>
 
     <div id="game-area">
         <div id="city-map">
+            <div id="weather-overlay"></div>
+            
+            <!-- Warp Portals at Map Ends -->
+            <div class="warp-portal" style="left: 60px;" onclick="switchMap('forest')">
+                <span>🌀 WARP</span>
+                <span style="font-size:0.75rem; color:#80deea;">Cookie Forest</span>
+            </div>
+            <div class="warp-portal" style="right: 60px;" onclick="switchMap('beach')">
+                <span>🌀 WARP</span>
+                <span style="font-size:0.75rem; color:#80deea;">Cookie Beach</span>
+            </div>
+
+            <div id="collectibles-container"></div>
+            
             <div id="player" class="card-avatar">
                 <div class="hunger-container"><div class="hunger-fill" id="player-hunger"></div></div>
                 <div class="speech-bubble" id="player-bubble"></div>
                 <img id="player-img" src="" alt="Player" onclick="feed(this.parentElement)">
                 <div class="card-name" id="player-name">Loading...</div>
             </div>
+            
             <div id="npc-container"></div>
         </div>
     </div>
 
-    <div id="food-popup">
-        <div class="popup-content" style="flex-direction: column; height: auto; max-width: 600px; padding-bottom: 30px;">
-            <span class="close-btn" onclick="toggleFoodPopup(false)">&times;</span>
-            <div style="padding: 25px; text-align: center;">
-                <h3 style="color:#4CAF50; margin-bottom:10px;">SELECT FOOD</h3>
-                <p style="color: #aaa; margin-bottom: 20px;">เลือกอาหารเพื่อเติมพลังงานให้ทุกคน!</p>
-                <div class="food-grid">
-                    <div class="food-card" onclick="processFeedAll('ข้าวผัดกุ้ง')">
-                        <img src="https://s.isanook.com/wo/0/ud/16/82677/82677-20171002051729-5e992c5.jpg" alt="Rice">
-                        <div>ข้าวผัดกุ้ง</div>
+    <!-- Map Selection Modal -->
+    <div id="map-popup">
+        <div class="popup-content" style="flex-direction: column; height: auto; max-width: 800px; padding-bottom: 25px;">
+            <span class="close-btn" onclick="toggleMapPopup(false)">&times;</span>
+            <div style="padding: 25px 25px 10px 25px; text-align: center;">
+                <h2 style="color:#29B6F6; margin:0 0 8px 0; font-weight:800;">🗺️ WORLD TELEPORT</h2>
+                <p style="color: #b0bec5; margin-bottom: 20px;">เลือกสถานที่ที่คุณต้องการเดินทางไปเลย!</p>
+                <div class="map-grid">
+                    <div class="map-card" onclick="switchMap('town')">
+                        <img src="https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/Gemini_Generated_Image_cbgsypcbgsypcbgs.png" alt="Town">
+                        <div class="map-card-info">
+                            <div class="map-card-title">🍪 Central Town</div>
+                            <div class="map-card-desc">เมืองหลวงหลักของพวกการ์ด</div>
+                        </div>
                     </div>
-                    <div class="food-card" onclick="processFeedAll('ไก่ทอดหาดใหญ่')">
-                        <img src="https://images.deliveryhero.io/image/fd-th/LH/o1ao-hero.jpg" alt="Chicken">
-                        <div>ไก่ทอดหาดใหญ่</div>
+                    <div class="map-card" onclick="switchMap('forest')">
+                        <img src="https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/Gemini_Generated_Image_70wasb70wasb70wa.png" alt="Forest">
+                        <div class="map-card-info">
+                            <div class="map-card-title">🌲 Cookie Forest</div>
+                            <div class="map-card-desc">ป่าที่สงบที่ทำให้ผ่อยคลาย</div>
+                        </div>
                     </div>
-                    <div class="food-card" onclick="processFeedAll('นมสดเย็น')">
-                        <img src="https://tse2.mm.bing.net/th/id/OIP.S-PZuRbkMI7Whv8v91q9gQHaSa?rs=1&pid=ImgDetMain&o=7&rm=3" alt="Milk">
-                        <div>นมสดเย็น</div>
+                    <div class="map-card" onclick="switchMap('beach')">
+                        <img src="https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/Gemini_Generated_Image_pt4i0vpt4i0vpt4i.png" alt="Beach">
+                        <div class="map-card-info">
+                            <div class="map-card-title">🏖️ Cookie Beach</div>
+                            <div class="map-card-desc">หาดทรายที่มีเสียงลมเบาๆในท้งทะเล</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Food Popup Modal -->
+    <div id="food-popup">
+        <div class="popup-content" style="flex-direction: column; height: auto; max-width: 650px; padding-bottom: 25px;">
+            <span class="close-btn" onclick="toggleFoodPopup(false)">&times;</span>
+            <div style="padding: 25px; text-align: center;">
+                <h2 style="color:#66BB6A; margin:0 0 8px 0; font-weight:800;">🍔 SELECT YUMMY FOOD</h2>
+                <p style="color: #b0bec5; margin-bottom: 20px;">เลือกอาหารเพื่อเพิ่มค่าพลังงานให้ชาวเมืองทุกคน!</p>
+                <div class="food-grid">
+                    <div class="food-card" onclick="processFeedAll('ข้าวผัดกุ้ง')">
+                        <img src="https://s.isanook.com/wo/0/ud/16/82677/82677-20171002051729-5e992c5.jpg" alt="Rice">
+                        <div style="font-weight:bold; margin-top:5px;">ข้าวผัดกุ้ง</div>
+                        <div style="color:#ffd700; font-size:0.8rem;">+100 Hunger</div>
+                    </div>
+                    <div class="food-card" onclick="processFeedAll('ไก่ทอดหาดใหญ่')">
+                        <img src="https://images.deliveryhero.io/image/fd-th/LH/o1ao-hero.jpg" alt="Chicken">
+                        <div style="font-weight:bold; margin-top:5px;">ไก่ทอดหาดใหญ่</div>
+                        <div style="color:#ffd700; font-size:0.8rem;">+100 Hunger</div>
+                    </div>
+                    <div class="food-card" onclick="processFeedAll('นมสดเย็น')">
+                        <img src="https://tse2.mm.bing.net/th/id/OIP.S-PZuRbkMI7Whv8v91q9gQHaSa?rs=1&pid=ImgDetMain&o=7&rm=3" alt="Milk">
+                        <div style="font-weight:bold; margin-top:5px;">นมสดเย็น</div>
+                        <div style="color:#ffd700; font-size:0.8rem;">+100 Hunger</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Collection Modal -->
     <div id="collection-popup">
         <div class="popup-content">
             <span class="close-btn" onclick="togglePopup(false)">&times;</span>
             <div class="preview-side">
-                <h3 style="color:#e7ac66; margin-bottom:15px;">SELECTED</h3>
+                <h3 style="color:#e7ac66; margin-bottom:15px; letter-spacing:1px;">CURRENT CHARACTER</h3>
                 <img id="popup-preview-img" src="" alt="Selected Card">
                 <div class="preview-info">
-                    <h2 id="popup-preview-name" style="margin:10px 0;">-</h2>
-                    <p style="color:#aaa; font-size:0.9rem;">กำลังใช้งานตัวละครนี้</p>
+                    <h2 id="popup-preview-name" style="margin:12px 0 5px 0; color:#fff;">-</h2>
+                    <p style="color:#a1887f; font-size:0.9rem; margin:0;">กำลังสวมบทบาทเป็นตัวละครนี้</p>
                 </div>
             </div>
             <div class="list-side">
-                <h3 style="margin-bottom:20px;">MY COLLECTION</h3>
+                <h3 style="margin-bottom:20px; color:#ffe0b2;">MY COLLECTION</h3>
                 <div class="card-grid" id="card-grid-container"></div>
             </div>
         </div>
@@ -280,14 +519,30 @@
     let currentPlayerX = 1300; 
     let npcsList = [];
     let userCards = []; 
+    let coins = 0;
+    let currentMapKey = 'town';
 
-    const DAY_BG = 'https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/Gemini_Generated_Image_cbgsypcbgsypcbgs.png';
-    const NIGHT_BG = 'https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/Gemini_Generated_Image_9jzhhy9jzhhy9jzh.png';
+    // Map Images Config
+    const MAPS_BG = {
+        town: {
+            day: 'https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/Gemini_Generated_Image_cbgsypcbgsypcbgs.png',
+            night: 'https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/Gemini_Generated_Image_9jzhhy9jzhhy9jzh.png'
+        },
+        forest: {
+            day: 'https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/Gemini_Generated_Image_70wasb70wasb70wa.png',
+            night: 'https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/Gemini_Generated_Image_5uti3q5uti3q5uti.png'
+        },
+        beach: {
+            day: 'https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/Gemini_Generated_Image_pt4i0vpt4i0vpt4i.png',
+            night: 'https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/Gemini_Generated_Image_i2jpc1i2jpc1i2jp.png'
+        }
+    };
 
-    const idleQuotes = ["อากาศดีจัง", "หิวขนมจังเลย", "เดินเล่นกันเถอะ", "ที่นี้ดุเงียบจัง...", "บรรยกาศที่นี้...ดูสงบจัง...", "วันนี้จะเจอการ์ดแรร์ไหมนะ?", "ง่วงจังเลย...", "เมืองนี้สวยดีนะ", "สวัดดี้ทุกคนนน!", "วันนี้จะทำให้เต็มที่ไปเลยย!!", "ในเมืองนี้มีคนเยอะจัง", "ขอน้ำหน่อยได้ไหม"];
-    const hungerQuotes = ["หิวจังเลย...", "ขอขนมหน่อยได้ไหม?", "ไม่มีแรงเดินแล้ว", "ท้องร้องจ๊อกๆ", "หิวข้าวววววววววววว"];
-    const talkQuotes = ["ไง! สบายดีไหม?", "มาเล่นการ์ดกับฉันไหม?", "วันนี้คุณดูดีนะ!", "ยินดีที่ได้รู้จัก!", "แถวนี้มีร้านขนมอร่อยๆ ไหม?", "กำลังจะไปไหนหรอ?", "ขอให้เป็นวันที่ดีนะ!", "ยินดีต้อนรับสู่Cookie cityนะผู้ใช้", "ให้ขนมฉันหรอขอบใจนะ❤️", "😄", "🥳", "😍", "😡", "😱", "😰", "🥺"];
+    const idleQuotes = ["อากาศดีจัง!", "หิวขนมจังเลย...", "เดินเล่นกันเถอะ", "บรรยากาศดูสงบจัง~", "วันนี้จะเจอการ์ดแรร์ไหมนะ?", "เมืองนี้สวยดีนะ ✨", "สวัสดีทุกคนนน!", "วันนี้ลุยเต็มที่ไปเลย!", "มาสนุกด้วยกันเถอะ!!"];
+    const hungerQuotes = ["หิวจังเลย...", "ขอขนมหน่อยได้ไหม? 🥺", "ไม่มีแรงเดินแล้ว...", "ท้องร้องจ๊อกๆ แล้วนะ"];
+    const talkQuotes = ["ไง! สบายดีไหม?", "มาจัดเด็คการ์ดแข่งกัน!", "วันนี้คุณดูดีจัง!", "ยินดีที่ได้รู้จักนะ!", "ขอให้เป็นวันที่ดีนะ! ❤️"];
 
+    // Clock and Day/Night System
     function updateTime() {
         const now = new Date();
         const hours = now.getHours();
@@ -296,27 +551,44 @@
         
         clockElement.innerText = `${String(hours).padStart(2, '0')}:${mins}:${secs}`;
 
-        if (hours >= 19 || hours < 6) {
-            if (!map.style.backgroundImage.includes(NIGHT_BG)) {
-                map.style.backgroundImage = `url('${NIGHT_BG}')`;
-            }
-        } else {
-            if (!map.style.backgroundImage.includes(DAY_BG)) {
-                map.style.backgroundImage = `url('${DAY_BG}')`;
-            }
+        const isNight = hours >= 19 || hours < 6;
+        const targetBg = isNight ? MAPS_BG[currentMapKey].night : MAPS_BG[currentMapKey].day;
+        
+        if (!map.style.backgroundImage.includes(targetBg)) {
+            map.style.backgroundImage = `url('${targetBg}')`;
         }
     }
-    
     setInterval(updateTime, 1000);
-    updateTime();
 
-    window.togglePopup = (show) => {
-        document.getElementById('collection-popup').style.display = show ? 'flex' : 'none';
-    };
-    window.toggleFoodPopup = (show) => {
-        document.getElementById('food-popup').style.display = show ? 'flex' : 'none';
+    window.togglePopup = (show) => { document.getElementById('collection-popup').style.display = show ? 'flex' : 'none'; };
+    window.toggleFoodPopup = (show) => { document.getElementById('food-popup').style.display = show ? 'flex' : 'none'; };
+    window.toggleMapPopup = (show) => { document.getElementById('map-popup').style.display = show ? 'flex' : 'none'; };
+
+    // Switch Map / Teleport Function
+    window.switchMap = (mapKey) => {
+        if (!MAPS_BG[mapKey]) return;
+        toggleMapPopup(false);
+
+        // Fade Out Effect
+        map.style.opacity = '0';
+
+        setTimeout(() => {
+            currentMapKey = mapKey;
+            currentPlayerX = 1300; // Reset player position to middle
+            player.style.left = currentPlayerX + 'px';
+            updateCamera(currentPlayerX);
+            updateTime();
+
+            // Respawn NPCs in new map
+            if (userCards.length > 0) createNPCs(userCards);
+
+            // Fade In Effect
+            map.style.opacity = '1';
+            showFloatingText(currentPlayerX + 20, 200, `Welcome to ${mapKey.toUpperCase()}! ✨`, "#29B6F6");
+        }, 500);
     };
 
+    // Camera
     function updateCamera(x) {
         const viewW = gameArea.offsetWidth;
         let offsetX = (viewW / 2) - x;
@@ -324,31 +596,58 @@
         map.style.transform = `translateX(${offsetX}px)`;
     }
 
+    // Player Movement
     gameArea.onclick = (e) => {
-        if(e.target.closest('.card-avatar') || e.target.closest('#collection-popup') || e.target.closest('#food-popup')) return; 
+        if(e.target.closest('.card-avatar') || e.target.closest('.warp-portal') || e.target.closest('.collectible') || e.target.closest('.popup-content')) return; 
         const rect = map.getBoundingClientRect();
         const clickX = e.clientX - rect.left;
+        
+        player.classList.add('is-walking');
         player.classList.toggle('facing-left', clickX < currentPlayerX);
         currentPlayerX = clickX;
         player.style.left = (currentPlayerX - 55) + 'px';
         updateCamera(currentPlayerX);
+
+        setTimeout(() => player.classList.remove('is-walking'), 800);
     };
 
+    // VFX Floating Text
+    function showFloatingText(x, y, text, color = '#ffd700') {
+        const el = document.createElement('div');
+        el.className = 'floating-text';
+        el.innerText = text;
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+        el.style.color = color;
+        map.appendChild(el);
+        setTimeout(() => el.remove(), 1200);
+    }
+
+    // Feeding & Actions
     window.feed = (entity, foodName = "ขนม") => {
         entity.dataset.hunger = 100;
         updateHungerUI(entity);
-        handleGreet(entity, [`ง่ำๆ ${foodName} อร่อยจัง!`, `ขอบคุณสำหรับ ${foodName} นะ!`, "สดชื่นเลย!"]);
+        handleGreet(entity, [`ง่ำๆ ${foodName} อร่อยจัง! 😋`, `ขอบคุณสำหรับ ${foodName} นะ! ❤️`]);
+        
+        const mapRect = map.getBoundingClientRect();
+        showFloatingText(parseFloat(entity.style.left) + 20, mapRect.height - 230, "FULL HP! ❤️", "#66BB6A");
+        
+        coins += 10;
+        document.getElementById('coin-count').innerText = coins;
     };
 
     window.talkToNPC = (npc) => {
         const npcX = parseFloat(npc.style.left);
         const distance = Math.abs(npcX - currentPlayerX);
         
-        if (distance < 150) {
+        if (distance < 160) {
             handleGreet(npc, talkQuotes);
             player.classList.toggle('facing-left', npcX < currentPlayerX);
+            coins += 5;
+            document.getElementById('coin-count').innerText = coins;
+            showFloatingText(npcX + 20, 200, "+5 Coins 🪙");
         } else {
-            handleGreet(player, ["อยู่ไกลเกินไป คุยไม่ได้แฮะ", "ต้องเดินเข้าไปใกล้กว่านี้หน่อย", "ฉันอยากทำความรู้จักช่วยเข้าไปไกลหน่อยสิ"]);
+            handleGreet(player, ["เดินเข้าไปใกล้กว่านี้หน่อยสิ...", "อยู่ไกลเกินไป คุยไม่ได้นะ"]);
         }
     };
 
@@ -363,9 +662,20 @@
         if(!fill) return;
         const val = parseFloat(entity.dataset.hunger);
         fill.style.width = val + '%';
-        fill.style.background = val < 30 ? '#f44336' : (val < 60 ? '#ff9800' : '#4CAF50');
+        
+        if (val < 25) {
+            fill.style.background = 'linear-gradient(90deg, #ef5350, #d32f2f)';
+            entity.classList.add('is-hungry');
+        } else if (val < 60) {
+            fill.style.background = 'linear-gradient(90deg, #ffa726, #f57c00)';
+            entity.classList.remove('is-hungry');
+        } else {
+            fill.style.background = 'linear-gradient(90deg, #66BB6A, #43A047)';
+            entity.classList.remove('is-hungry');
+        }
     }
 
+    // Firebase Auth
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             const snap = await getDoc(doc(db, "users", user.uid));
@@ -379,10 +689,12 @@
                 player.dataset.hunger = 100;
                 player.style.left = currentPlayerX + 'px';
                 updateCamera(currentPlayerX);
+                updateTime();
                 createNPCs(userCards);
                 startWorldEvents();
                 startHungerSystem();
                 startNPCCycle();
+                startItemDrops();
             }
         }
     });
@@ -414,7 +726,7 @@
         const container = document.getElementById('npc-container');
         container.innerHTML = ''; npcsList = [];
         const shuffled = [...cards].sort(() => 0.5 - Math.random());
-        shuffled.slice(0, 11).forEach((data) => spawnNPC(data));
+        shuffled.slice(0, 8).forEach((data) => spawnNPC(data));
     }
 
     function spawnNPC(data) {
@@ -422,8 +734,8 @@
         const npc = document.createElement('div');
         npc.className = 'card-avatar';
         npc.style.opacity = '0';
-        npc.style.left = (Math.random() * (worldWidth - 200) + 100) + 'px';
-        npc.dataset.hunger = Math.random() * 50 + 50;
+        npc.style.left = (Math.random() * (worldWidth - 400) + 200) + 'px';
+        npc.dataset.hunger = Math.random() * 40 + 60;
         
         npc.innerHTML = `
             <div class="hunger-container"><div class="hunger-fill"></div></div>
@@ -439,6 +751,36 @@
         makeNPCWander(npc);
     }
 
+    function startItemDrops() {
+        const container = document.getElementById('collectibles-container');
+        setInterval(() => {
+            if (container.children.length < 6) {
+                const item = document.createElement('div');
+                const isCoin = Math.random() > 0.3;
+                item.className = 'collectible';
+                item.innerText = isCoin ? '🪙' : '❤️';
+                item.style.fontSize = '25px';
+                const spawnX = Math.random() * (worldWidth - 300) + 150;
+                item.style.left = spawnX + 'px';
+                
+                item.onclick = () => {
+                    if (isCoin) {
+                        coins += 20;
+                        document.getElementById('coin-count').innerText = coins;
+                        showFloatingText(spawnX, 220, "+20 Coins! 🪙");
+                    } else {
+                        showFloatingText(spawnX, 220, "+15 Happy! ❤️", "#ff5252");
+                    }
+                    item.style.opacity = '0';
+                    setTimeout(() => item.remove(), 200);
+                };
+
+                container.appendChild(item);
+                setTimeout(() => { if (item.parentElement) item.remove(); }, 15000);
+            }
+        }, 4000);
+    }
+
     function startNPCCycle() {
         setInterval(() => {
             if (npcsList.length > 0 && userCards.length > 0) {
@@ -446,7 +788,7 @@
                 const oldNpc = npcsList[index];
                 if(oldNpc.classList.contains('is-talking')) return; 
                 
-                handleGreet(oldNpc, ["ไว้เจอกันใหม่นะ!", "บ๊ายบาย~", "ขอตัวไปพักก่อนนะ", "ขอบคุณที่เป็นเพื่อนกันนะ","ฉัน...ต้องไปแล้วหรอ...","ฉัน...ป่วยหรอขอตัวก่อนนะ🤒"]);
+                handleGreet(oldNpc, ["ไว้เจอกันใหม่นะ!", "บ๊ายบาย~ 👋"]);
                 setTimeout(() => {
                     oldNpc.style.opacity = '0';
                     setTimeout(() => {
@@ -457,7 +799,7 @@
                     }, 1000);
                 }, 2000);
             }
-        }, 15000);
+        }, 20000);
     }
 
     function handleGreet(entity, quotes) {
@@ -469,17 +811,21 @@
         setTimeout(() => { 
             entity.classList.remove('is-talking'); 
             bubble.style.display = 'none'; 
-        }, 3000);
+        }, 3200);
     }
 
     function makeNPCWander(npc) {
         function wander() {
             if (!npc || !npc.parentElement || npc.classList.contains('is-talking')) return setTimeout(wander, 2000);
             const currentX = parseFloat(npc.style.left);
-            const targetX = Math.random() * (worldWidth - 150) + 50;
+            const targetX = Math.random() * (worldWidth - 300) + 150;
+            
+            npc.classList.add('is-walking');
             npc.classList.toggle('facing-left', targetX < currentX);
             npc.style.left = targetX + 'px';
-            setTimeout(wander, Math.random() * 7000 + 5000);
+            
+            setTimeout(() => npc.classList.remove('is-walking'), 3000);
+            setTimeout(wander, Math.random() * 8000 + 6000);
         }
         setTimeout(wander, Math.random() * 3000);
     }
@@ -488,15 +834,16 @@
         setInterval(() => {
             player.dataset.hunger = Math.max(0, player.dataset.hunger - 1);
             updateHungerUI(player);
-            if(player.dataset.hunger < 20 && Math.random() < 0.3) handleGreet(player, hungerQuotes);
 
+            let totalHunger = parseFloat(player.dataset.hunger);
             npcsList.forEach(npc => {
                 npc.dataset.hunger = Math.max(0, npc.dataset.hunger - 0.8);
+                totalHunger += parseFloat(npc.dataset.hunger);
                 updateHungerUI(npc);
-                if(npc.dataset.hunger < 20 && !npc.classList.contains('is-talking') && Math.random() < 0.2) {
-                    handleGreet(npc, hungerQuotes);
-                }
             });
+
+            const avgHunger = Math.round(totalHunger / (npcsList.length + 1));
+            document.getElementById('happy-count').innerText = `${avgHunger}%`;
         }, 3000);
     }
 
@@ -507,7 +854,7 @@
                     handleGreet(npc, idleQuotes);
                 }
             });
-        }, 5000);
+        }, 7000);
     }
 </script>
 </body>
