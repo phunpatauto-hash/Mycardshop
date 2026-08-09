@@ -320,8 +320,10 @@
             padding: 8px;
         }
         .inv-card-name { font-size: 0.75rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
-        .inv-card-power { font-size: 0.7rem; color: var(--gold); font-weight: bold; margin-top: 2px; }
         .inv-card-badge { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.75); color: #fff; border: 1px solid rgba(255,255,255,0.2); font-size: 0.7rem; font-weight: 600; padding: 2px 6px; border-radius: 6px; }
+        
+        /* Badge for Level inside Inventory */
+        .inv-card-lv { position: absolute; top: 6px; left: 6px; background: linear-gradient(135deg, var(--gold), #ff9000); color: #000; font-size: 0.65rem; font-weight: 900; padding: 2px 6px; border-radius: 5px; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
 
         /* Chat Window styling inside Sidebar */
         .chat-box {
@@ -542,19 +544,11 @@
     let isCreator = false; 
     let currentActiveCurrencyType = 'gold'; 
 
-    // Offer structures local caching models
     let myOfferFinal = { gold: 0, diamonds: 0, cards: [], ready: false, username: "" };
     let peerOfferFinal = { gold: 0, diamonds: 0, cards: [], ready: false, username: "" };
 
-    const RARITY_POWER_SET = { 'SECRET': 8000, "P": 5000, "USEC": 8500, "EXR": 4000, "CBR": 6600, "SEC": 3500, "SUR": 3000, "SSR": 2500, "PR": 2000, "UR": 1500, "SR": 1000, "R": 600, "U": 300, "C": 100 };
     const rarityColors = { 'SECRET': '#ff00ff', 'P': '#ff00ff', 'USEC': '#ff00ff', 'EXR': '#ff4d4d', 'CBR': '#ff4d4d', 'SEC': '#ffac33', 'SUR': '#33ffad', 'SSR': '#ffc831', 'PR': '#ffc831', 'UR': '#bf40bf', 'SR': '#33aaff', 'R': '#33ff57', 'U': '#ffffff', 'C': '#ffffff' };
 
-    function calculatePower(card) {
-        const base = RARITY_POWER_SET[(card.rarity || 'C').toUpperCase()] || 100;
-        return Math.floor((base + ((card.level || 1) * 300)) * (1 + ((card.stars || 0) * 0.1)));
-    }
-
-    // Window Setup Initializer Listeners
     window.addEventListener("DOMContentLoaded", () => {
         initSlotsGrid();
         
@@ -616,24 +610,25 @@
         return slot;
     }
 
-    // Render User Personal Deck Inventory list
     function renderUserInventoryGrid() {
         const grid = document.getElementById("myInventoryGrid");
         grid.innerHTML = "";
         const search = document.getElementById("invSearchInput").value.toLowerCase();
 
-        // Pack cards aggregation map counting
         const aggregated = {};
         userDataStore.collection.forEach(card => {
-            if (card.isLocked) return; // Skip locked records
-            const key = `${card.name}_${(card.rarity||'C').toUpperCase()}_${card.level || 1}_${card.stars || 0}`;
-            if (!aggregated[key]) { aggregated[key] = { ...card, count: 0 }; }
+            if (card.isLocked) return; 
+            const level = Number(card.level || card.lv || 1);
+            const key = `${card.name}_${(card.rarity||'C').toUpperCase()}_${level}`;
+            
+            if (!aggregated[key]) { 
+                aggregated[key] = { ...card, level, count: 0 }; 
+            }
             aggregated[key].count++;
         });
 
-        // Calculate available inventory minus cards currently locked on offer grid slots
         myOfferFinal.cards.forEach(cOut => {
-            const key = `${cOut.name}_${cOut.rarity.toUpperCase()}_${cOut.level}_${cOut.stars}`;
+            const key = `${cOut.name}_${cOut.rarity.toUpperCase()}_${cOut.level}`;
             if (aggregated[key]) { aggregated[key].count -= cOut.count; }
         });
 
@@ -648,18 +643,17 @@
             div.onclick = () => addCardToOfferBoard(card);
 
             div.innerHTML = `
+                <div class="inv-card-lv">Lv.${card.level}</div>
                 <div class="inv-card-badge">x${card.count}</div>
                 <img src="${card.img || card.image || 'https://via.placeholder.com/150'}">
                 <div class="inv-card-info">
                     <div class="inv-card-name">${card.name}</div>
-                    <div class="inv-card-power">⚡ ${calculatePower(card).toLocaleString()}</div>
                 </div>
             `;
             grid.appendChild(div);
         });
     }
 
-    // Logic management adding to trade layout matrix
     async function addCardToOfferBoard(card) {
         if (!currentRoomID) return alert("โปรดเชื่อมต่อห้องแลกเปลี่ยนก่อน!");
         if (myOfferFinal.ready) return alert("ปลดสถานะ 'พร้อมเทรด' ก่อนแก้ไขข้อเสนอ!");
@@ -668,7 +662,9 @@
         }
 
         const r = (card.rarity || 'C').toUpperCase();
-        const existingIdx = myOfferFinal.cards.findIndex(c => c.name === card.name && c.rarity === r && c.level === (card.level||1) && c.stars === (card.stars||0));
+        const level = Number(card.level || card.lv || 1);
+
+        const existingIdx = myOfferFinal.cards.findIndex(c => c.name === card.name && c.rarity === r && c.level === level);
         
         if (existingIdx > -1) {
             myOfferFinal.cards[existingIdx].count++;
@@ -676,8 +672,7 @@
             myOfferFinal.cards.push({
                 name: card.name,
                 rarity: r,
-                level: card.level || 1,
-                stars: card.stars || 0,
+                level: level,
                 img: card.img || card.image || '',
                 count: 1
             });
@@ -696,13 +691,12 @@
             }
         });
 
-        if (!flatCards[index]) return; // empty slot hit
+        if (!flatCards[index]) return; 
         flatCards.splice(index, 1);
 
-        // Re-pack matrix map aggregate state back
         const repack = [];
         flatCards.forEach(fc => {
-            const idx = repack.findIndex(r => r.name === fc.name && r.rarity === fc.rarity && r.level === fc.level && r.stars === fc.stars);
+            const idx = repack.findIndex(r => r.name === fc.name && r.rarity === fc.rarity && r.level === fc.level);
             if (idx > -1) repack[idx].count++;
             else repack.push(fc);
         });
@@ -712,7 +706,6 @@
         renderUserInventoryGrid();
     }
 
-    // Modal Control Windows handler triggers
     window.openOfferCurrencyModal = function(type) {
         if (!currentRoomID) return alert("โปรดเข้าสู่ห้องเทรดก่อนปรับราคา!");
         if (myOfferFinal.ready) return alert("ปลดสถานะ 'พร้อมเทรด' ก่อนแก้ไขข้อเสนอ!");
@@ -755,7 +748,6 @@
         await syncOfferToFirebase();
     }
 
-    // Firebase Core Connection Streams Data Pipeline Management
     async function createTradeRoom() {
         const randKey = Math.floor(100000 + Math.random() * 900000).toString();
         isCreator = true;
@@ -810,7 +802,6 @@
 
             const data = docSnap.data();
             
-            // Map side allocations checks
             if (isCreator) {
                 myOfferFinal = { ...data.creatorOffer };
                 peerOfferFinal = { ...data.joinerOffer };
@@ -822,16 +813,14 @@
             updateTradeDashboardDOM();
             renderChatHistory(data.chat || []);
 
-            // Check executing real time complete transactions trade deals logic matching
             if (myOfferFinal.ready && peerOfferFinal.ready) {
-                unsubscribeRoom(); // Lock loop entries processing single actions thread
+                unsubscribeRoom(); 
                 await executeFinalCardExchangeTransaction();
             }
         });
     }
 
     function updateTradeDashboardDOM() {
-        // Balances labels updates 
         document.getElementById("myOfferGold").innerText = myOfferFinal.gold.toLocaleString();
         document.getElementById("myOfferDiamonds").innerText = myOfferFinal.diamonds.toLocaleString();
         document.getElementById("peerOfferGold").innerText = peerOfferFinal.gold.toLocaleString();
@@ -839,7 +828,6 @@
 
         document.getElementById("peerName").innerText = peerOfferFinal.username || "กำลังรอผู้เล่นเข้าร่วม...";
 
-        // Badges notifications setup text rendering
         const myBadge = document.getElementById("myReadyBadge");
         if (myOfferFinal.ready) { myBadge.innerText = "พร้อมแล้ว"; myBadge.className = "status-badge ready"; }
         else { myBadge.innerText = "กำลังเลือกของ"; myBadge.className = "status-badge"; }
@@ -852,7 +840,6 @@
             peerBadge.innerText = "ไม่ได้เชื่อมต่อ"; peerBadge.className = "status-badge";
         }
 
-        // Setup text notification central system bar
         const statusText = document.getElementById("dealStatusText");
         const btnReady = document.getElementById("btnReady");
 
@@ -872,7 +859,6 @@
             statusText.innerHTML = `<i class="fa-solid fa-gavel" style="color:var(--gold);"></i> <span>กำลังเจรจาปรับเปลี่ยนข้อเสนอในการแลกเปลี่ยน</span>`;
         }
 
-        // Draw slots visuals cards elements mappings boards
         drawSlotsSideCards(myOfferFinal.cards, true);
         drawSlotsSideCards(peerOfferFinal.cards, false);
     }
@@ -927,32 +913,19 @@
         await syncOfferToFirebase();
     }
 
-    // Engine executing transactions exchange databases swap logic safe structures
     async function executeFinalCardExchangeTransaction() {
         document.getElementById("dealStatusText").innerHTML = `<i class="fa-solid fa-sync fa-spin" style="color:var(--gold);"></i> <span style="color:var(--gold); font-weight:bold;">กำลังทำรายการแลกเปลี่ยนถาวร โปรดอย่าปิดหน้าจอ...</span>`;
         
         const myRef = doc(db, "users", currentUser.uid);
-        const peerSnap = await getDoc(doc(db, "rooms", currentRoomID));
-        let roomData = peerSnap.data();
-
-        let peerUID = "";
-        // Find matching alternate peer targets uid endpoints profiles reference mapping queries
-        if (isCreator) {
-            // Need to look up joiner uid via user collection list lookup if room setup schema expanded, 
-            // In typical standard setup lookup room configuration logs properties match tracking data fields references
-            // Let's secure snapshot records data sync
-        }
         
-        // Since we are doing a real decentralized simulation snapshot data synchronization writeback updates
         try {
             const mySnap = await getDoc(myRef);
             let myColl = [...(mySnap.data().collection || [])];
 
-            // 1. Process Deduction Subtractions Cards Outflow
             myOfferFinal.cards.forEach(cOut => {
                 let countToDeduct = cOut.count;
                 while (countToDeduct > 0) {
-                    const idx = myColl.findIndex(c => c.name === cOut.name && (c.rarity||'C').toUpperCase() === cOut.rarity && (c.level||1) === cOut.level && (c.stars||0) === cOut.stars && !c.isLocked);
+                    const idx = myColl.findIndex(c => c.name === cOut.name && (c.rarity||'C').toUpperCase() === cOut.rarity && Number(c.level||c.lv||1) === cOut.level && !c.isLocked);
                     if (idx > -1) {
                         myColl.splice(idx, 1);
                     }
@@ -960,21 +933,18 @@
                 }
             });
 
-            // 2. Process Additions Inflow Items
             peerOfferFinal.cards.forEach(cIn => {
                 for (let i = 0; i < cIn.count; i++) {
                     myColl.push({
                         name: cIn.name,
                         rarity: cIn.rarity,
                         level: cIn.level,
-                        stars: cIn.stars,
                         img: cIn.img || '',
                         isLocked: false
                     });
                 }
             });
 
-            // Update user databases instantly safely 
             await updateDoc(myRef, {
                 collection: myColl,
                 points: increment(peerOfferFinal.gold - myOfferFinal.gold),
@@ -983,7 +953,6 @@
 
             alert("✨ การแลกเปลี่ยนเสร็จสิ้นสมบูรณ์! คลังของคุณได้รับการอัปเดตแล้ว");
             
-            // Clean delete collection database reference memory records inside server safely
             if (isCreator) {
                 setTimeout(async () => { await deleteDoc(doc(db, "rooms", currentRoomID)); }, 1500);
             }
@@ -1034,7 +1003,6 @@
         document.getElementById("chatMessages").innerHTML = `<div style="color: #666; font-style: italic; text-align: center; margin-top: auto;">เข้าสู่ระบบห้องเพื่อพิมพ์แชท</div>`;
     }
 
-    // Chat Message Mechanics Logging Systems
     async function sendChatMessage() {
         const input = document.getElementById("chatInput");
         const msgText = input.value.trim();
@@ -1051,6 +1019,8 @@
         input.value = "";
     }
 
+    function renderChatHeader(chatList) {} // Dummy placeholder
+
     function renderChatHistory(chatList) {
         const board = document.getElementById("chatMessages");
         board.innerHTML = "";
@@ -1060,7 +1030,7 @@
             div.innerHTML = `<span class="msg-user">${m.sender}:</span> <span>${m.text}</span>`;
             board.appendChild(div);
         });
-        board.scrollTop = board.scrollHeight; // Auto anchor scroll down safely
+        board.scrollTop = board.scrollHeight; 
     }
 </script>
 </body>
