@@ -113,7 +113,8 @@
             grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #a0aec0; font-size: 1.1rem;
         }
         
-        .item-card.ss-rarity-item { border-color: #ff3d00; box-shadow: 0 0 15px rgba(255, 61, 0, 0.15); }
+        /* สไตล์ไอเทมระดับ SS (Ultra Rare) สีส้มแดง */
+        .item-card.ss-rarity-item { border-color: #ff3d00; box-shadow: 0 0 15px rgba(255, 61, 0, 0.25); background: linear-gradient(135deg, #251612 0%, #151010 100%); }
         .item-card.ss-rarity-item .item-icon-wrapper { color: #ff3d00; text-shadow: 0 0 10px rgba(255,61,0,0.4); }
 
         .item-card.ice-item .item-icon-wrapper { color: #74b9ff; }
@@ -317,9 +318,16 @@
         star_fragment: { name: "เศษดาว", desc: "เศษเสี้ยวประกายดาวลึกลับที่ตกลงมาสู่พื้นโลก", icon: "fas fa-star", className: "material-item" },
         moon_fragment: { name: "เศษดวงจันทร์", desc: "ชิ้นส่วนแผ่ออร่าจันทราสีนวลตา", icon: "fas fa-moon", className: "material-item" },
         shiny_pearl: { name: "ไข่มุกที่แวววาว", desc: "ไข่มุกเม็ดงามล้ำค่าที่ส่องประกายสว่างไสว", icon: "fas fa-circle-notch", className: "material-item" },
-        fluid_iron: { name: "[SS] เหล็กไหล", desc: "แร่โลหะเหลวศักดิ์สิทธิ์ เปี่ยมไปด้วยพลังแฝงขั้นสูง", icon: "fas fa-flask", className: "fluid-iron-item" },
+        
+        /* ไอเทมระดับ SS (Ultra Rare) ใช้ className เป็น ss-rarity-item */
+        fluid_iron: { name: "[SS] เหล็กไหล", desc: "แร่โลหะเหลวศักดิ์สิทธิ์ เปี่ยมไปด้วยพลังแฝงขั้นสูง", icon: "fas fa-flask", className: "ss-rarity-item" },
         broken_crown: { name: "[SS] มงกุฎที่แตกหัก", desc: "วัตถุโบราณระดับ SS แม้จะแตกหักแต่ก็เต็มไปด้วยกลิ่นอายพลังอันเข้มข้น", icon: "fas fa-crown", className: "ss-rarity-item" },
-        sweet_heart_icecream: { name: "[SS] ไอศกรีมสุดหวานใจ", desc: "ไอศกรีมเวทมนตร์เยือกแข็งรสชาติหวานละมุนหัวใจ", icon: "fas fa-ice-cream", className: "icecream-item" }
+        sweet_heart_icecream: { name: "[SS] ไอศกรีมสุดหวานใจ", desc: "ไอศกรีมเวทมนตร์เยือกแข็งรสชาติหวานละมุนหัวใจ", icon: "fas fa-ice-cream", className: "ss-rarity-item" },
+        unknown_heart: { name: "[SS] หัวใจที่ไม่มีที่มา", desc: "หัวใจลึกลับที่เต้นเบาๆ โดยไม่ทราบที่มาและที่ไป", icon: "fas fa-heart", className: "ss-rarity-item" },
+        ice_statue_manga_2: { name: "[SS] รูปปั้นน้ำแข็ง มังงะตอนที่ 2", desc: "รูปปั้นแกะสลักจากน้ำแข็งระดับ SS จากเนื้อหามังงะตอนที่ 2", icon: "fas fa-chess-rook", className: "ss-rarity-item" },
+        
+        manga_vol_1: { name: "มังงะตอนที่ 1", desc: "หนังสือการ์ตูนมังงะเล่มแรกที่เต็มไปด้วยเรื่องราวน่าตื่นเต้น", icon: "fas fa-book-open", className: "material-item" },
+        special_water_drop: { name: "หยดน้ำพิเศษ", desc: "หยดน้ำใสบริสุทธิ์ที่เปล่งประกายออร่าเวทมนตร์ออกมาจางๆ", icon: "fas fa-tint", className: "fluid-iron-item" }
     };
 
     const craftedCardRegistry = {
@@ -385,28 +393,40 @@
             });
         }
 
-        // 3. วัตถุดิบคราฟต์ (materials)
-        if (globalUserData.materials) {
-            Object.keys(materialRegistry).forEach(key => {
-                if (key === "card_pack") return;
-                const mat = globalUserData.materials[key];
-                if (mat && mat.qty > 0) {
-                    const registryInfo = materialRegistry[key];
-                    itemsToShow.push({ id: key, name: registryInfo.name, desc: registryInfo.desc, quantity: mat.qty, category: "materials", icon: registryInfo.icon, className: registryInfo.className });
-                }
-            });
-        }
+        // 3. ดึงข้อมูลจากฟิลด์ materials
+        const materialsData = globalUserData.materials || {};
+        Object.keys(materialsData).forEach(key => {
+            if (key === "card_pack") return;
+            const itemVal = materialsData[key];
+            const qty = (typeof itemVal === 'object' && itemVal !== null) ? (itemVal.qty || 0) : (Number(itemVal) || 0);
+            
+            if (qty > 0) {
+                const registryInfo = materialRegistry[key] || {
+                    name: (typeof itemVal === 'object' && itemVal.name) ? itemVal.name : key,
+                    desc: (typeof itemVal === 'object' && itemVal.desc) ? itemVal.desc : "ไอเทมวัตถุดิบในกระเป๋า",
+                    icon: "fas fa-box",
+                    className: "material-item"
+                };
+                itemsToShow.push({ id: key, name: registryInfo.name, desc: registryInfo.desc, quantity: qty, category: "materials", icon: registryInfo.icon, className: registryInfo.className });
+            }
+        });
 
-        // 4. การ์ดระดับคราฟต์
-        if (globalUserData.crafted_cards) {
-            Object.keys(globalUserData.crafted_cards).forEach(key => {
-                const cc = globalUserData.crafted_cards[key];
-                if (cc && cc.qty > 0) {
-                    const registryInfo = craftedCardRegistry[key] || { name: "การ์ดระดับคราฟต์พิเศษ", desc: "สุดยอดการ์ดระดับพิเศษที่ได้มาจากการคราฟต์สำเร็จ", icon: "fas fa-id-card", className: "secret-card-item" };
-                    itemsToShow.push({ id: key, name: registryInfo.name, desc: registryInfo.desc, quantity: cc.qty, category: "materials", icon: registryInfo.icon, className: registryInfo.className });
-                }
-            });
-        }
+        // 4. ดึงข้อมูลจากการ์ดที่คราฟต์หรือเก็บไว้ในฟิลด์ crafted_cards
+        const craftedData = globalUserData.crafted_cards || {};
+        Object.keys(craftedData).forEach(key => {
+            const itemVal = craftedData[key];
+            const qty = (typeof itemVal === 'object' && itemVal !== null) ? (itemVal.qty || 0) : (Number(itemVal) || 0);
+            
+            if (qty > 0) {
+                const registryInfo = craftedCardRegistry[key] || {
+                    name: (typeof itemVal === 'object' && itemVal.name) ? itemVal.name : key,
+                    desc: (typeof itemVal === 'object' && itemVal.desc) ? itemVal.desc : "การ์ดระดับพิเศษที่ได้จากการคราฟต์",
+                    icon: "fas fa-id-card",
+                    className: "secret-card-item"
+                };
+                itemsToShow.push({ id: key, name: registryInfo.name, desc: registryInfo.desc, quantity: qty, category: "materials", icon: registryInfo.icon, className: registryInfo.className });
+            }
+        });
 
         if (currentCategory !== "all") {
             itemsToShow = itemsToShow.filter(item => item.category === currentCategory);
