@@ -3,1070 +3,842 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CARD ARENA PRO - Rank System (Dynamic Trophies)</title>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>BATTLE ARENA - สนามต่อสู้</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* ==================== GLOBAL CYBERPUNK STYLES ==================== */
+        * { box-sizing: border-box; }
         body { 
             font-family: 'Kanit', sans-serif; 
             margin: 0; 
-            background: radial-gradient(circle at top, #0d0e15 0%, #020205 100%); 
-            color: #e2e8f0; 
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-        
-        /* Custom Scrollbar ให้เข้ากับธีม */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #0a0a0f; }
-        ::-webkit-scrollbar-thumb { background: #ffc831; border-radius: 3px; }
-
-        .navbar { 
-            background: rgba(6, 6, 10, 0.85); 
-            padding: 15px 25px; 
-            border-bottom: 2px solid rgba(255, 200, 49, 0.8); 
-            box-shadow: 0 4px 20px rgba(255, 200, 49, 0.15);
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            backdrop-filter: blur(12px); 
-            position: sticky; 
-            top: 0; 
-            z-index: 100; 
-            padding-left: 90px;
+            background: #050508; 
+            color: #fff; 
+            overflow: hidden;
+            user-select: none;
         }
 
-        .container { max-width: 1000px; margin: auto; padding: 25px 15px; }
-        
-        /* ==================== PREMIUM UI ELEMENTS ==================== */
-        .season-timer { 
-            text-align: center; 
-            font-size: 0.85rem; 
-            color: #ff9000; 
-            font-weight: bold;
-            letter-spacing: 1px;
-            margin-bottom: 20px; 
-            background: rgba(255, 144, 0, 0.08); 
-            padding: 8px 15px; 
-            border-radius: 30px; 
-            border: 1px solid rgba(255, 144, 0, 0.3); 
-            box-shadow: inset 0 0 10px rgba(255, 144, 0, 0.05);
+        /* Arena Canvas Viewport */
+        .battle-stage {
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #080811 100%);
+            position: relative;
+            overflow: hidden;
         }
 
-        .rank-status { 
-            background: linear-gradient(135deg, rgba(20, 20, 35, 0.7) 0%, rgba(10, 10, 15, 0.9) 100%); 
-            padding: 20px; 
-            border-radius: 16px; 
-            border: 1px solid rgba(255, 200, 49, 0.25); 
-            margin-bottom: 25px; 
-            display: flex; 
-            align-items: center; 
-            gap: 20px; 
-            cursor: pointer;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-        .rank-status:hover { 
-            transform: translateY(-2px);
-            border-color: #ffc831; 
-            box-shadow: 0 12px 40px rgba(255, 200, 49, 0.15);
-            background: linear-gradient(135deg, rgba(30, 30, 50, 0.8) 0%, rgba(15, 15, 25, 0.95) 100%);
-        }
-        .rank-icon { font-size: 3rem; filter: drop-shadow(0 0 12px rgba(255,200,49,0.4)); }
-        
-        .progress-bar { width: 100%; height: 10px; background: #14141f; border-radius: 30px; margin-top: 8px; overflow: hidden; border: 1px solid #222; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, #ff9000, #ffc831, #00ff88); width: 0%; transition: 1s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
-
-        /* Tabs Navigation แบบ Esports */
-        .tabs { display: flex; gap: 10px; margin-bottom: 25px; overflow-x: auto; padding-bottom: 5px; }
-        .tab { 
-            flex: 1; 
-            min-width: 100px; 
-            padding: 14px 10px; 
-            background: rgba(20, 20, 30, 0.6); 
-            border: 1px solid rgba(255,255,255,0.08); 
-            color: #a0aec0; 
-            cursor: pointer; 
-            border-radius: 12px; 
-            font-weight: 700; 
-            text-align: center; 
-            font-size: 0.95rem; 
-            transition: all 0.2s ease;
-            backdrop-filter: blur(5px);
-        }
-        .tab:hover { color: #fff; background: rgba(30, 30, 45, 0.8); border-color: rgba(255,255,255,0.2); }
-        .tab.active { 
-            background: linear-gradient(135deg, #ffc831 0%, #ff9000 100%); 
-            color: #050505; 
-            border-color: #ffc831; 
-            box-shadow: 0 6px 20px rgba(255, 200, 49, 0.35); 
+        /* Grid Effect Background */
+        .grid-bg {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background-image: 
+                linear-gradient(rgba(255, 200, 49, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 200, 49, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            transform: perspective(500px) rotateX(45deg);
+            pointer-events: none;
         }
 
-        /* ==================== CARD STYLES ==================== */
-        .card-row { display: flex; gap: 10px; margin: 12px 0; justify-content: center; flex-wrap: wrap; }
-        .mini-card { 
-            width: 82px; 
-            aspect-ratio: 2/3; 
-            background: #11111a; 
-            border-radius: 10px; 
-            border: 1px solid #2d3748; 
-            overflow: hidden; 
-            position: relative; 
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
-            cursor: pointer; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-        .mini-card:hover { transform: translateY(-4px) scale(1.02); z-index: 10; }
-        .mini-card img { width: 100%; height: 100%; object-fit: cover; }
-        
-        /* Rarity Neon Glow Effects */
-        .rarity-usec { border: 2px solid #ffc831 !important; box-shadow: 0 0 15px rgba(255, 200, 49, 0.6); }
-        .rarity-exr { border: 2px solid #ff00ff !important; box-shadow: 0 0 12px rgba(255, 0, 255, 0.5); }
-        .rarity-cbr { border: 2px solid #00ffff !important; box-shadow: 0 0 12px rgba(0, 255, 255, 0.5); }
-        .rarity-pr { border: 2px solid #00ff88 !important; box-shadow: 0 0 10px rgba(0, 255, 136, 0.4); }
-
-        .stat-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(6, 6, 10, 0.85); display: flex; flex-direction: column; padding: 4px 2px; font-size: 0.65rem; font-weight: bold; text-align: center; color: #ffc831; border-top: 1px solid rgba(255,255,255,0.05); }
-        .lv-badge { position: absolute; top: 4px; right: 4px; background: #ffc831; color: black; font-size: 0.6rem; padding: 2px 5px; border-radius: 5px; font-weight: bold; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
-        .selected-glow { border: 2.5px solid #ffc831 !important; transform: scale(1.05); z-index: 5; box-shadow: 0 0 22px #ffc831 !important; }
-
-        .elem-icon {
-            position: absolute; top: 4px; left: 5px; font-size: 0.85rem; z-index: 2;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+        /* VS Banner Overlay */
+        .top-hud {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 10;
+            background: rgba(10, 10, 18, 0.85);
+            padding: 10px 25px;
+            border-radius: 40px;
+            border: 2px solid rgba(255, 200, 49, 0.4);
+            backdrop-filter: blur(8px);
+            min-width: 550px;
+            justify-content: space-between;
         }
 
-        /* Container UI แบบการ์ดโปร่งแสง */
-        .ui-card { 
-            background: rgba(15, 15, 25, 0.7); 
-            padding: 22px; 
-            border-radius: 18px; 
-            margin-bottom: 20px; 
-            border: 1px solid rgba(255,255,255,0.06); 
+        .player-info { text-align: right; flex: 1; }
+        .enemy-info { text-align: left; flex: 1; }
+
+        /* Team HP Bar Styles */
+        .team-hp-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .team-hp-fill { height: 100%; width: 100%; transition: width 0.2s ease; }
+        .player-hp-fill { background: linear-gradient(90deg, #00ff88, #10b981); margin-left: auto; }
+        .enemy-hp-fill { background: linear-gradient(90deg, #ef4444, #f87171); }
+
+        .center-hud-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0 10px;
+        }
+
+        .vs-badge { 
+            font-size: 1.5rem; 
+            font-weight: 900; 
+            color: #ef4444; 
+            text-shadow: 0 0 10px #ef4444; 
+            line-height: 1;
+        }
+
+        .timer-display {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #ffc831;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 2px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 200, 49, 0.3);
+            margin-top: 4px;
+            font-family: monospace;
+        }
+
+        /* Countdown Overlay */
+        .overlay-screen {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 100;
             backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            position: relative; 
-            overflow: hidden; 
         }
-        
-        .btn-action { 
-            background: linear-gradient(135deg, #ffc831 0%, #ff9000 100%); 
-            color: #000; 
-            border: none; 
-            padding: 14px; 
-            border-radius: 12px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            width: 100%; 
-            margin-top: 12px; 
-            transition: all 0.2s ease; 
-            font-size: 1rem; 
-            box-shadow: 0 4px 15px rgba(255, 144, 0, 0.3);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .btn-action:hover { filter: brightness(1.1); box-shadow: 0 6px 20px rgba(255, 144, 0, 0.45); }
-        .btn-action:active { transform: scale(0.98); }
-        .btn-action:disabled { background: #2d3748; color: #718096; cursor: not-allowed; box-shadow: none; filter: none; }
 
-        .bot-tag { background: #ff4d4d; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; margin-left: 8px; font-weight: bold; letter-spacing: 0.5px; }
-
-        /* ==================== BATTLE AREA (คงโครงสร้างเดิมแต่เสริมมิติ) ==================== */
-        .battle-area { position: relative; overflow: hidden; min-height: 560px; display: flex; flex-direction: column; justify-content: center; padding: 30px 10px; }
-        
-        .battle-area .card-row { gap: -2px !important; justify-content: center; margin: 8px 0; }
-        .battle-area .mini-card {
-            width: 115px !important; 
-            height: 172px !important; 
-            border-radius: 0px !important;
-            clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%);
-            transform: skewX(-4deg);
-            transition: transform 0.3s ease;
-            margin: 0 -14px; 
-        }
-        
-        .battle-area .mini-card .stat-overlay { clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%); font-size: 0.85rem; padding: 6px 2px; }
-        .battle-area .mini-card .elem-icon { font-size: 1.2rem; top: 5px; left: 26px; }
-        .battle-area .mini-card .lv-badge { top: 5px; right: 26px; font-size: 0.7rem; }
-        .battle-area .mini-card img { clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%); }
-
-        .battle-row-container { width: 100%; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
-
-        /* Animations & Shakes */
-        @keyframes slideFromLeft { 0% { transform: translateX(-100vw); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
-        .opp-entering { animation: slideFromLeft 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards; }
-
-        @keyframes slideFromRight { 0% { transform: translateX(100vw); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
-        .player-entering { animation: slideFromRight 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards; }
-
-        .ready-up { animation: readyAni 0.6s ease-in-out infinite alternate; }
-        @keyframes readyAni { from { transform: translateY(0); filter: brightness(1); } to { transform: translateY(6px); filter: brightness(1.25); } }
-
-        .strike-player { animation: strikeP 0.4s cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards; }
-        .strike-opp { animation: strikeO 0.4s cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards; }
-        @keyframes strikeP { 0% { transform: translateY(0); } 50% { transform: translateY(-140px) scale(1.05); z-index: 10; } 100% { transform: translateY(0); } }
-        @keyframes strikeO { 0% { transform: translateY(0); } 50% { transform: translateY(140px) scale(1.05); z-index: 10; } 100% { transform: translateY(0); } }
-
-        .arena-shake { animation: shakeEffect 0.4s ease-in-out; }
-        @keyframes shakeEffect { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-15px) rotate(-1deg); } 40% { transform: translateX(15px) rotate(1deg); } 60% { transform: translateX(-15px); } 80% { transform: translateX(15px); } }
-        .clash-flash { position: absolute; inset: 0; background: white; opacity: 0; pointer-events: none; z-index: 50; }
-        .flash-active { animation: flashAni 0.5s ease-out; }
-        @keyframes flashAni { 0% { opacity: 0; } 10% { opacity: 0.8; } 100% { opacity: 0; } }
-
-        /* Rainbow Animation สำหรับ Rank สูงสุด */
-        @keyframes rainbowText {
-            0% { color: #ff3333; text-shadow: 0 0 12px rgba(255,51,51,0.6); }
-            25% { color: #ffff33; text-shadow: 0 0 12px rgba(255,255,51,0.6); }
-            50% { color: #33ff33; text-shadow: 0 0 12px rgba(51,255,51,0.6); }
-            75% { color: #3333ff; text-shadow: 0 0 12px rgba(51,51,255,0.6); }
-            100% { color: #ff3333; text-shadow: 0 0 12px rgba(255,51,51,0.6); }
-        }
-        .rank-rainbow { animation: rainbowText 4s linear infinite; font-weight: bold !important; }
-
-        #view-defense, #view-history, #view-leaderboard, #view-battle { display: none; }
-
-        /* Back Button */
-        .back-btn {
-            position: fixed; top: 12px; left: 20px; width: 45px; height: 45px;
-            background: rgba(30, 30, 45, 0.7); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 200, 49, 0.4); border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            color: #ffc831; text-decoration: none; font-size: 1.2rem; z-index: 1001; transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-        }
-        .back-btn:hover { background: #ffc831; color: #000; transform: scale(1.1); box-shadow: 0 0 20px rgba(255, 200, 49, 0.5); }
-
-        /* ==================== MODALS DESIGN ==================== */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(2, 2, 5, 0.85); backdrop-filter: blur(8px); overflow-y: auto; }
-        .modal-content { 
-            background: #0f0f1a; 
-            margin: 5% auto; 
-            padding: 30px 25px; 
-            border: 2px solid #ffc831; 
-            width: 90%; 
-            max-width: 600px; 
-            border-radius: 24px; 
-            position: relative; 
-            box-shadow: 0 0 40px rgba(255, 200, 49, 0.25);
-            animation: modalFade 0.3s ease-out;
-        }
-        @keyframes modalFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .close-modal { position: absolute; right: 22px; top: 18px; font-size: 2rem; cursor: pointer; color: #ef4444; transition: 0.2s; }
-        .close-modal:hover { transform: scale(1.1); }
-
-        .reward-highlight {
-            background: rgba(0, 255, 136, 0.08);
-            padding: 25px;
-            border-radius: 16px;
-            border: 1px solid #00ff88;
-            margin: 20px 0;
+        .countdown-text {
+            font-size: 5rem;
+            font-weight: 900;
+            color: #ffc831;
+            text-shadow: 0 0 30px rgba(255, 200, 49, 0.8);
+            animation: pulseText 0.8s infinite alternate;
             text-align: center;
-            box-shadow: inset 0 0 20px rgba(0,255,136,0.05);
         }
 
-        /* Leaderboard Background Particles Effect */
-        .particle-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: 1; }
-        .rank-particle { position: absolute; font-size: 14px; opacity: 0.25; animation: floatingIcons 5s linear infinite; }
-        @keyframes floatingIcons {
-            0% { transform: translateY(60px) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.4; }
-            90% { opacity: 0.4; }
-            100% { transform: translateY(-40px) rotate(360deg); opacity: 0; }
+        @keyframes pulseText {
+            from { transform: scale(1); }
+            to { transform: scale(1.15); }
         }
-        .ui-card-content { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center; width: 100%; }
+
+        /* 2D Battle Field Containers */
+        .field { position: absolute; width: 100%; height: 100%; top: 0; left: 0; }
+
+        /* Card Unit Styles */
+        .battle-unit {
+            width: 90px;
+            height: 130px;
+            background: #111;
+            border-radius: 12px;
+            position: absolute;
+            border: 2px solid #ffc831;
+            box-shadow: 0 0 15px rgba(255, 200, 49, 0.4);
+            transition: transform 0.1s ease;
+            overflow: visible;
+        }
+
+        .battle-unit.enemy {
+            border-color: #ef4444;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .battle-unit img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+
+        .battle-unit .unit-lv {
+            position: absolute;
+            top: -10px;
+            right: -6px;
+            background: #ffc831;
+            color: #000;
+            font-weight: 900;
+            font-size: 0.65rem;
+            padding: 2px 5px;
+            border-radius: 4px;
+            z-index: 5;
+        }
+
+        /* Health Bar */
+        .hp-bar-container {
+            position: absolute;
+            top: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 8px;
+            background: rgba(0,0,0,0.8);
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .hp-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #10b981);
+            width: 100%;
+            transition: width 0.2s ease;
+        }
+
+        .battle-unit.enemy .hp-bar-fill {
+            background: linear-gradient(90deg, #ef4444, #f87171);
+        }
+
+        /* Floating Damage Text */
+        .damage-pop {
+            position: absolute;
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: #ff3333;
+            text-shadow: 0 0 6px #000;
+            pointer-events: none;
+            animation: floatUp 0.6s ease-out forwards;
+            z-index: 50;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1.2); }
+            100% { opacity: 0; transform: translateY(-30px) scale(0.8); }
+        }
+
+        /* Result Panel */
+        .result-panel {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(5, 5, 10, 0.92);
+            z-index: 200;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .result-card {
+            background: rgba(20, 20, 35, 0.85);
+            border: 2px solid rgba(255, 200, 49, 0.3);
+            border-radius: 24px;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+            min-width: 400px;
+        }
+
+        .result-title {
+            font-size: 3.8rem;
+            font-weight: 900;
+            margin: 0;
+            line-height: 1;
+        }
+
+        .win { color: #00ff88; text-shadow: 0 0 25px rgba(0, 255, 136, 0.6); }
+        .lose { color: #ef4444; text-shadow: 0 0 25px rgba(239, 68, 68, 0.6); }
+        .draw { color: #ffc831; text-shadow: 0 0 25px rgba(255, 200, 49, 0.6); }
+
+        .trophy-change-badge {
+            font-size: 1.4rem;
+            font-weight: 900;
+            margin: 12px 0 5px 0;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .trophy-change-badge.gain { color: #00ff88; }
+        .trophy-change-badge.loss { color: #ef4444; }
+        .trophy-change-badge.draw { color: #ffc831; }
+
+        .xp-change-badge {
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: #00ffff;
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
+        }
+
+        /* Rank Badge Display */
+        .rank-badge-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px 18px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 15px;
+        }
+
+        .rank-icon { font-size: 2rem; }
+        .rank-name { font-weight: 800; font-size: 1.1rem; color: #ffc831; }
+
+        /* Trophy Progress Bar UI */
+        .trophy-bar-section {
+            width: 100%;
+            margin-bottom: 25px;
+        }
+
+        .trophy-label-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #a0aec0;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .trophy-progress-bg {
+            width: 100%;
+            height: 14px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 200, 49, 0.3);
+            position: relative;
+        }
+
+        .trophy-progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff9000, #ffc831);
+            border-radius: 10px;
+            transition: width 0.8s ease-out;
+            box-shadow: 0 0 10px rgba(255, 200, 49, 0.6);
+        }
+
+        .btn-return {
+            padding: 12px 35px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ffc831, #ff9000);
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            color: #000;
+            box-shadow: 0 0 20px rgba(255, 200, 49, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-return:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 200, 49, 0.7);
+        }
     </style>
 </head>
 <body>
-    <a href="index.html" class="back-btn" title="กลับหน้าหลัก">
-        <i class="fas fa-arrow-left"></i>
-    </a>
 
-    <nav class="navbar">
-        <div style="color: #ffc831; font-weight: bold; font-size: 1.3rem; text-shadow: 0 0 10px rgba(255,200,49,0.3);">⚔️ Battle ARENA!!</div>
-        <div style="display: flex; gap: 15px;">
-            <div id="navbar-coins" style="color: #ffc831; font-weight: bold; background: rgba(255,200,49,0.15); padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(255,200,49,0.3);">🪙 0</div>
-        </div>
-    </nav>
+    <div class="battle-stage">
+        <div class="grid-bg"></div>
 
-    <div class="container">
-        <div class="season-timer">⏳ จบซีซั่นใน: <span id="season-countdown">-- วัน --:--:--</span></div>
-
-        <div class="rank-status" onclick="toggleModal('rankModal', true)">
-            <div id="rank-icon" class="rank-icon">🥉</div>
-            <div style="flex: 1;">
-                <div style="display:flex; justify-content:space-between; font-size: 1rem; font-weight: 700;">
-                    <span id="rank-name">BRONZE 3</span>
-                    <span style="color: #ffc831;">🏆 <span id="trophy-count">0</span></span>
+        <!-- Top HUD -->
+        <div class="top-hud">
+            <div class="player-info">
+                <div style="font-weight: bold; color: #ffc831;" id="p1-name">กำลังโหลด...</div>
+                <div style="font-size: 0.8rem; color: #a0aec0;">ฝ่ายผู้ท้าชน</div>
+                <div class="team-hp-bar">
+                    <div class="team-hp-fill player-hp-fill" id="p1-team-hp"></div>
                 </div>
-                <div class="progress-bar"><div id="rank-progress" class="progress-fill"></div></div>
+            </div>
+
+            <div class="center-hud-box">
+                <div class="vs-badge">VS</div>
+                <div class="timer-display" id="battle-timer">02:00</div>
+            </div>
+
+            <div class="enemy-info">
+                <div style="font-weight: bold; color: #ef4444;" id="p2-name">กำลังโหลด...</div>
+                <div style="font-size: 0.8rem; color: #a0aec0;">ฝ่ายตั้งรับ</div>
+                <div class="team-hp-bar">
+                    <div class="team-hp-fill enemy-hp-fill" id="p2-team-hp"></div>
+                </div>
             </div>
         </div>
 
-        <div class="tabs">
-            <button id="tab-lobby" class="tab active" onclick="showView('lobby')">🏟️ ท้าดวล</button>
-            <button id="tab-defense" class="tab" onclick="showView('defense')">🛡️ ป้องกัน</button>
-            <button id="tab-leaderboard" class="tab" onclick="showView('leaderboard')">🏆 อันดับ</button>
-            <button id="tab-history" class="tab" onclick="showView('history')">📜 ประวัติ</button>
+        <!-- Field for 2D Cards -->
+        <div class="field" id="battle-field"></div>
+
+        <!-- Overlay Countdown Screen -->
+        <div class="overlay-screen" id="countdown-screen">
+            <div class="countdown-text" id="countdown-num">กำลังโหลด...</div>
         </div>
 
-        <div id="view-lobby"><div id="lobby-list" style="text-align: center; padding: 40px; color: #718096;">กำลังโหลด...</div></div>
-        
-        <div id="view-leaderboard">
-            <h3 style="color:#ffc831; text-align:center; font-size: 1.4rem; margin-bottom: 20px; letter-spacing: 1px;">🏆 TOP 20 WARRIORS</h3>
-            <div id="leaderboard-list"></div>
-        </div>
-
-        <div id="view-defense" class="ui-card" style="text-align: center;">
-            <h3 style="color:#00ff88; font-size: 1.3rem; margin-top: 5px;">🛡️ จัดทีมตั้งรับ (Defense Team)</h3>
-            <p style="font-size: 0.85rem; color: #a0aec0; margin-bottom: 20px;">ทีมนี้จะใช้ป้องกันเมื่อมีคนอื่นมาท้าดวลคุณ</p>
-            <div id="defense-slots" class="card-row" style="min-height: 120px; border: 2px dashed rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); border-radius: 14px; padding: 12px;"></div>
-            <button class="btn-action" onclick="saveDefense()">💾 บันทึกทีมป้องกัน</button>
-            <hr style="border:0; border-top:1px solid rgba(255,255,255,0.08); margin:25px 0;">
-            <div id="defense-pool" class="card-row"></div>
-        </div>
-
-        <div id="view-history"><div id="history-list"></div></div>
-
-        <div id="view-battle">
-            <div class="ui-card battle-area" id="arena-box" style="border: 2px solid #ffc831; background: radial-gradient(circle, rgba(26,26,46,0.9) 0%, rgba(5,5,10,0.95) 100%); box-shadow: 0 0 30px rgba(255,200,49,0.2);">
-                <div id="flash-effect" class="clash-flash"></div>
+        <!-- Match Result Modal -->
+        <div class="result-panel" id="result-screen">
+            <div class="result-card">
+                <div class="result-title" id="result-title">VICTORY!</div>
                 
-                <div id="opp-container" class="battle-row-container">
-                    <div id="opp-battle-row" class="card-row"></div>
+                <div class="trophy-change-badge gain" id="trophy-change-text">🏆 +15 ถ้วยรางวัล</div>
+                <div class="xp-change-badge" id="xp-change-text">✨ +200 XP Grand Pass</div>
+
+                <div class="rank-badge-container">
+                    <span class="rank-icon" id="rank-icon">🥉</span>
+                    <span class="rank-name" id="rank-name">BRONZE 3</span>
                 </div>
 
-                <h1 id="vs-label" style="text-align:center; color:#ffc831; margin:25px 0; transition: 0.3s; font-style: italic; font-size: 3.5rem; text-shadow: 0 0 20px rgba(255,200,49,0.6); font-weight: bold; letter-spacing: 2px;">VS</h1>
-                
-                <div id="player-container" class="battle-row-container">
-                    <div id="player-battle-row" class="card-row"></div>
+                <div class="trophy-bar-section">
+                    <div class="trophy-label-row">
+                        <span>ถ้วยรางวัลทั้งหมด</span>
+                        <span id="trophy-count-text">0 / 100</span>
+                    </div>
+                    <div class="trophy-progress-bg">
+                        <div class="trophy-progress-fill" id="trophy-bar-fill"></div>
+                    </div>
                 </div>
 
-                <div id="battle-status" style="text-align:center; min-height: 60px; margin-top: 25px; font-weight: bold; font-size: 1.1rem;"></div>
-                <button id="exit-battle-btn" class="btn-action" style="display:none; max-width: 250px; margin: 20px auto 0 auto;" onclick="showView('lobby')">กลับสู่หน้าหลัก</button>
+                <button class="btn-return" onclick="window.location.href='Grand Arena.html'">กลับสู่แกรนด์อารีน่า</button>
             </div>
-        </div>
-    </div>
-
-    <div id="rankModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="toggleModal('rankModal', false)">&times;</span>
-            <h3 style="color:#ffc831; text-align:center; font-size: 1.3rem; margin-bottom: 20px;">🎖️ อันดับและรางวัลซีซั่น</h3>
-            <div id="rank-details" style="max-height: 450px; overflow-y: auto; padding-right: 5px;"></div>
-        </div>
-    </div>
-
-    <div id="prepModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="toggleModal('prepModal', false)">&times;</span>
-            <h3 style="color:#ffc831; text-align:center; font-size: 1.3rem;">🚩 จัดทีมบุก (เลือกสูงสุด 5 ใบ)</h3>
-            <div id="prep-slots" class="card-row" style="min-height: 120px; border: 2px dashed rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); border-radius: 14px; padding: 12px;"></div>
-            <button id="start-btn" class="btn-action" disabled>⚔️ เริ่มการท้าดวล!</button>
-            <div id="prep-pool" class="card-row" style="margin-top:25px; max-height: 250px; overflow-y: auto; padding-top: 5px;"></div>
-        </div>
-    </div>
-
-    <div id="seasonRewardModal" class="modal">
-        <div class="modal-content" style="border-color: #00ff88; box-shadow: 0 0 40px rgba(0,255,136,0.25);">
-            <h2 style="color: #00ff88; text-align: center; font-size: 1.6rem;">🎉 สิ้นสุดการแข่งขัน!</h2>
-            <p style="text-align: center; color: #a0aec0;">ครบกำหนดซีซั่น 20 วันแล้ว นี่คือผลลัพธ์ของคุณ:</p>
-            <div class="reward-highlight">
-                <div id="final-rank-display" style="font-size: 1.6rem; margin-bottom: 12px; font-weight: bold;">--</div>
-                <div style="font-size: 1.3rem; color: #ffc831; font-weight: bold;">รางวัลที่ได้รับ: <span id="final-coin-reward">🪙 0</span></div>
-            </div>
-            <button class="btn-action" style="background: linear-gradient(135deg, #00ff88 0%, #00b359 100%);" onclick="claimSeasonReward()">รับรางวัลและเริ่มซีซั่นใหม่ ⚔️</button>
         </div>
     </div>
 
 <script type="module">
-    // ==================== SYSTEM BACKEND LOGIC ====================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, onSnapshot, updateDoc, increment, collection, query, orderBy, limit, getDocs, getDoc, addDoc, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // Re-import อย่างถูกต้องเพื่อความเสถียรของระบบหลังบ้าน
     const db = getFirestore(initializeApp({ 
-        apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM", 
-        authDomain: "sign-up-73f99.firebaseapp.com", 
-        projectId: "sign-up-73f99", 
-        storageBucket: "sign-up-73f99.appspot.com", 
-        messagingSenderId: "916335559099", 
-        appId: "1:916335559099:web:3a8ed896ba26e38991849e" 
+        apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM", authDomain: "sign-up-73f99.firebaseapp.com", 
+        projectId: "sign-up-73f99", storageBucket: "sign-up-73f99.appspot.com", 
+        messagingSenderId: "916335559099", appId: "1:916335559099:web:3a8ed896ba26e38991849e" 
     }));
     const auth = getAuth();
 
-    const RARITY_POWER = {
-        "SECRET": { base: 7000, perLv: 7500 },
-        "P":    { base: 5000, perLv: 5000 },
-        "USEC": { base: 8500, perLv: 7000 }, 
-        "EXR":  { base: 4000, perLv: 4500 }, 
-        "CBR":  { base: 6600, perLv: 4000 }, 
-        "SEC":  { base: 3500, perLv: 2000 },
-        "SUR":  { base: 3000, perLv: 1800 },
-        "SSR":  { base: 2500, perLv: 1500 },
-        "PR":   { base: 2000, perLv: 1500 }, 
-        "UR":   { base: 1500, perLv: 1200 },
-        "SR":   { base: 1000, perLv: 1000 },
-        "R":    { base: 600, perLv: 800 },
-        "U":    { base: 300, perLv: 500 },
-        "C":    { base: 100, perLv: 300 }
-    };
+    const urlParams = new URLSearchParams(window.location.search);
+    const opponentId = urlParams.get('opponent') || 'BOT';
 
-    const RANKS = [
-        { name: "BRONZE 3", min: 0, icon: "🥉", color: "#cd7f32", reward: {coin: 1000} },
-        { name: "BRONZE 2", min: 100, icon: "🥉", color: "#cd7f32", reward: {coin: 2500} },
-        { name: "BRONZE 1", min: 300, icon: "🥉", color: "#cd7f32", reward: {coin: 5000} },
-        { name: "SILVER 3", min: 600, icon: "🥈", color: "#c0c0c0", reward: {coin: 10000} },
-        { name: "SILVER 2", min: 1000, icon: "🥈", color: "#c0c0c0", reward: {coin: 15000} },
-        { name: "SILVER 1", min: 1400, icon: "🥈", color: "#c0c0c0", reward: {coin: 20000} },
-        { name: "GOLD 3", min: 1800, icon: "🥇", color: "#ffd700", reward: {coin: 35000} },
-        { name: "GOLD 2", min: 2200, icon: "🥇", color: "#ffd700", reward: {coin: 50000} },
-        { name: "GOLD 1", min: 2600, icon: "🥇", color: "#ffd700", reward: {coin: 75000} },
-        { name: "DIAMOND 4", min: 3100, icon: "💎", color: "#00eeee", reward: {coin: 100000} },
-        { name: "DIAMOND 3", min: 3700, icon: "💎", color: "#00eeee", reward: {coin: 130000} },
-        { name: "DIAMOND 2", min: 4400, icon: "💎", color: "#00eeee", reward: {coin: 170000} },
-        { name: "DIAMOND 1", min: 5200, icon: "💎", color: "#00eeee", reward: {coin: 210000} },
-        { name: "MASTER 4", min: 6100, icon: "⚔️", color: "#ff4500", reward: {coin: 300000} },
-        { name: "MASTER 3", min: 7200, icon: "⚔️", color: "#ff4500", reward: {coin: 450000} },
-        { name: "MASTER 2", min: 8500, icon: "⚔️", color: "#ff4500", reward: {coin: 650000} },
-        { name: "MASTER 1", min: 10000, icon: "🔥", color: "#ff0000", reward: {coin: 1000000} },
-        { name: "Supreme MASTER 4 ", min: 12000, icon: "👑", color: "rainbow", reward: {coin: 2500000} },
-        { name: "Supreme MASTER 3 ", min: 15000, icon: "👑", color: "rainbow", reward: {coin: 2500000} },
-        { name: "Supreme MASTER 2 ", min: 17000, icon: "👑", color: "rainbow", reward: {coin: 2500000} },
-        { name: "Supreme MASTER 1 ", min: 19000, icon: "👑", color: "rainbow", reward: {coin: 2500000} },
-        { name: "Supreme MASTER PRO!!", min: 21000, icon: "👑🔥", color: "rainbow", reward: {coin: 50000000} }
+    let myCards = [];
+    let enemyCards = [];
+    let currentUserUid = null;
+    let currentTrophies = 0;
+    let currentArenaXp = 0;
+    const field = document.getElementById('battle-field');
+    let battleActive = false;
+
+    let battleTimeSeconds = 120;
+    let timerInterval = null;
+
+    // รายชื่อ Rank ทั้งหมดแบบละเอียด พร้อมค่าคะแนนถ้วย ได้/เสีย
+    const RANK_TIERS = [
+        { name: "BRONZE 3", min: 0, icon: "🥉", color: "#cd7f32", win: 15, lose: 5 },
+        { name: "BRONZE 2", min: 100, icon: "🥉", color: "#cd7f32", win: 20, lose: 8 },
+        { name: "BRONZE 1", min: 300, icon: "🥉", color: "#cd7f32", win: 25, lose: 10 },
+        { name: "SILVER 3", min: 600, icon: "🥈", color: "#c0c0c0", win: 30, lose: 15 },
+        { name: "SILVER 2", min: 1000, icon: "🥈", color: "#c0c0c0", win: 35, lose: 18 },
+        { name: "SILVER 1", min: 1400, icon: "🥈", color: "#c0c0c0", win: 40, lose: 20 },
+        { name: "GOLD 3", min: 1800, icon: "🥇", color: "#ffd700", win: 45, lose: 25 },
+        { name: "GOLD 2", min: 2200, icon: "🥇", color: "#ffd700", win: 50, lose: 30 },
+        { name: "GOLD 1", min: 2600, icon: "🥇", color: "#ffd700", win: 55, lose: 35 },
+        { name: "DIAMOND 4", min: 3100, icon: "💎", color: "#00eeee", win: 60, lose: 40 },
+        { name: "DIAMOND 3", min: 3700, icon: "💎", color: "#00eeee", win: 65, lose: 45 },
+        { name: "DIAMOND 2", min: 4400, icon: "💎", color: "#00eeee", win: 70, lose: 50 },
+        { name: "DIAMOND 1", min: 5200, icon: "💎", color: "#00eeee", win: 75, lose: 55 },
+        { name: "MASTER 4", min: 6100, icon: "⚔️", color: "#ff4500", win: 80, lose: 65 },
+        { name: "MASTER 3", min: 7200, icon: "⚔️", color: "#ff4500", win: 85, lose: 70 },
+        { name: "MASTER 2", min: 8500, icon: "⚔️", color: "#ff4500", win: 90, lose: 75 },
+        { name: "MASTER 1", min: 10000, icon: "🔥", color: "#ff0000", win: 100, lose: 85 },
+        { name: "Supreme MASTER 3", min: 15000, icon: "👑", color: "rainbow", win: 120, lose: 100 },
+        { name: "Supreme MASTER 2", min: 17000, icon: "👑", color: "rainbow", win: 140, lose: 110 },
+        { name: "Supreme MASTER 1", min: 19000, icon: "👑", color: "rainbow", win: 160, lose: 120 },
+        { name: "Supreme MASTER PRO!!", min: 21000, icon: "👑🔥", color: "rainbow", win: 200, lose: 150 }
     ];
 
-    const ELEMENTS = {
-        "Fire": { icon: "🔥", beats: "Wind", color: "#ff4d4d" },
-        "Wind": { icon: "🌪️", beats: "Earth", color: "#4dff88" },
-        "Earth": { icon: "⛰️", beats: "Water", color: "#ffb347" },
-        "Water": { icon: "💧", beats: "Fire", color: "#4da6ff" }
-    };
-
-    let userDoc = null, tempAtk = [], tempDef = [], targetOpp = null;
-    const SEASON_LIMIT = 20 * 24 * 60 * 60 * 1000;
-    // ฟังก์ชันคำนวณเวลาจบซีซั่นส่วนกลาง โดยอิงจากรอบละ 20 วัน นับจากจุดเริ่มต้นจุดเดียวกัน
-function getGlobalSeasonEndTime() {
-    // กำหนดเวลาเริ่มต้นระบบเป็นศูนย์กลาง (ในตัวอย่างใช้ 1 มกราคม 2026)
-    const SYSTEM_START_TIME = new Date("2026-01-01T00:00:00Z").getTime(); 
-    const now = Date.now();
-    
-    // คำนวณว่าผ่านมาแล้วกี่ซีซั่น
-    const elapsedSinceStart = now - SYSTEM_START_TIME;
-    const currentSeasonNumber = Math.floor(elapsedSinceStart / SEASON_LIMIT);
-    
-    // เวลาจบซีซั่นปัจจุบัน = เวลาเริ่มต้นระบบ + (จำนวนซีซั่นที่ผ่านมาแล้ว + 1) * ระยะเวลาซีซั่น
-    return SYSTEM_START_TIME + (currentSeasonNumber + 1) * SEASON_LIMIT;
-}
-
-    const getPower = (c) => {
-        if(!c) return 0;
-        const config = RARITY_POWER[c.rarity] || RARITY_POWER["C"];
-        const level = Number(c.level || 1);
-        const stars = Number(c.stars || 0); 
-        
-        const basePower = config.base + (level * config.perLv);
-        const starBonus = 1 + (stars * 0.1); 
-        
-        return Math.floor(basePower * starBonus);
-    };
-
-    const getRankInfo = (trophies) => {
-        let rank = RANKS[0];
-        for (let i = RANKS.length - 1; i >= 0; i--) {
-            if (trophies >= RANKS[i].min) { rank = RANKS[i]; break; }
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            alert("กรุณาล็อกอินก่อนเข้าสู่สนามต่อสู้");
+            window.location.href = "index.html";
+            return;
         }
-        return rank;
-    };
-    
-    const cardHTML = (c, selected = false) => {
-        if(!c) return `<div class="mini-card" style="border: 2px dashed rgba(255,255,255,0.1); background: transparent;"></div>`;
-        const imgUrl = c.img || c.image || 'https://via.placeholder.com/150';
-        if(!c.element) {
-            const keys = Object.keys(ELEMENTS);
-            c.element = keys[Math.floor(Math.random() * keys.length)];
-        }
-        const elemInfo = ELEMENTS[c.element] || ELEMENTS["Fire"];
-        const starDisplay = "⭐".repeat(c.stars || 0); 
 
-        let rarityClass = "";
-        if(c.rarity === 'USEC') rarityClass = "rarity-usec";
-        else if(c.rarity === 'EXR') rarityClass = "rarity-exr";
-        else if(c.rarity === 'CBR') rarityClass = "rarity-cbr";
-        else if(c.rarity === 'PR') rarityClass = "rarity-pr";
+        currentUserUid = user.uid;
 
-        return `
-        <div class="mini-card ${rarityClass} ${selected?'selected-glow':''}">
-            <div class="elem-icon" style="color:${elemInfo.color}">${elemInfo.icon}</div>
-            <img src="${imgUrl}" onerror="this.src='https://picsum.photos/seed/error/150/225'">
-            <div class="lv-badge">Lv.${c.level || 1}</div>
-            <div style="position: absolute; top: 15px; width: 100%; text-align: center; font-size: 0.5rem; z-index: 2; text-shadow: 0 0 2px black;">
-                ${starDisplay}
-            </div>
-            <div class="stat-overlay">⚡ ${getPower(c).toLocaleString()}</div>
-        </div>`;
-    };
-
-    onAuthStateChanged(auth, user => {
-        if(!user) return;
-        onSnapshot(doc(db, "users", user.uid), snap => {
-            userDoc = snap.data();
-            if(userDoc) {
-                document.getElementById("navbar-coins").innerText = `🪙 ${Number(userDoc.points || 0).toLocaleString()}`;
-                if(!userDoc.collection) userDoc.collection = [];
-                if (tempDef.length === 0 && userDoc.defenseTeam) { tempDef = [...userDoc.defenseTeam]; }
-                updateUI();
-                checkSeasonStatus();
-            }
-        });
-        startSeasonTimer();
-        setTimeout(() => showView('lobby'), 500);
-    });
-
-    async function checkSeasonStatus() {
-    const now = Date.now();
-    const globalEndTime = getGlobalSeasonEndTime();
-    const globalStartTime = globalEndTime - SEASON_LIMIT;
-
-    // ตรวจสอบว่าผู้ใช้คนนี้เคยรับรางวัลของซีซั่นปัจจุบันไปหรือยัง 
-    // โดยดูว่ารอบที่เริ่มเล่นล่าสุด (lastSeasonChecked) ตรงกับซีซั่นปัจจุบันไหม
-    if (userDoc.lastSeasonChecked && userDoc.lastSeasonChecked === globalStartTime) {
-        return; // ถ้ารับไปแล้ว หรือบันทึกรอบปัจจุบันแล้ว ไม่ต้องทำอะไร
-    }
-
-    // กรณีที่เวลาปัจจุบันเลยกำหนด หรือข้ามซีซั่นมาแล้ว และยังไม่ได้เคลียร์ถ้วยรางวัล
-    // (สำหรับคนเพิ่งเข้าเกมมาหลังจากซีซั่นส่วนกลางตัดรอบ)
-    if (userDoc.trophies > 0 && (!userDoc.lastSeasonChecked || userDoc.lastSeasonChecked < globalStartTime)) {
-        const currentRank = getRankInfo(userDoc.trophies || 0);
-        document.getElementById("final-rank-display").innerText = `${currentRank.icon} ${currentRank.name}`;
-        document.getElementById("final-coin-reward").innerText = `🪙 ${currentRank.reward.coin.toLocaleString()}`;
-        toggleModal("seasonRewardModal", true);
-    } else {
-        // สำหรับผู้เล่นใหม่ หรือผู้เล่นที่เคลียร์รอบไปแล้ว ให้บันทึกสถานะซีซั่นปัจจุบันไว้
-        await updateDoc(doc(db, "users", auth.currentUser.uid), { 
-            lastSeasonChecked: globalStartTime 
-        });
-    }
-}
-
-window.claimSeasonReward = async function() {
-    const currentRank = getRankInfo(userDoc.trophies || 0);
-    const globalEndTime = getGlobalSeasonEndTime();
-    const globalStartTime = globalEndTime - SEASON_LIMIT;
-    
-    const rankString = `${currentRank.icon} ${currentRank.name}`;
-    
-    // ==================== [ระบบฉายา & รางวัลซ้ำแบบใหม่] ====================
-    let titleReward = null; // ฉายาที่จะได้รับในซีซั่นนี้
-    let finalCoinReward = currentRank.reward.coin; // ค่าเริ่มต้นคอยน์รางวัลประจำแรงค์
-    let titleCompensationBonus = 0; // เงินชดเชยกรณีฉายาซ้ำ
-
-    // ตรวจสอบระดับ Rank เพื่อแจกฉายา
-    if (currentRank.name.includes("Supreme MASTER PRO!!")) {
-        titleReward = "กำหนดผู้ชนะ";
-    } else if (
-        currentRank.name.includes("Supreme MASTER 1") ||
-        currentRank.name.includes("Supreme MASTER 2") ||
-        currentRank.name.includes("Supreme MASTER 3") ||
-        currentRank.name.includes("Supreme MASTER 4")
-    ) {
-        titleReward = "ผู้พิชิตศึกสงคราม";
-    }
-
-    // โครงสร้างฟิลด์อัปเดตข้อมูลที่จะส่งไป Firestore
-    let updateData = {
-        points: increment(finalCoinReward),
-        trophies: 0,
-        lastSeasonChecked: globalStartTime,
-        lastSeasonRank: rankString
-    };
-
-    // อาร์เรย์เก็บฉายาเดิมของผู้เล่น (ถ้ายังไม่มีในระบบให้ตั้งเป็นอาร์เรย์ว่าง)
-    let currentTitles = userDoc.titles || [];
-
-    if (titleReward) {
-        // ตรวจสอบว่าผู้เล่นเคยได้รับฉายานี้ไปแล้วหรือยัง
-        if (currentTitles.includes(titleReward)) {
-            titleCompensationBonus = 1000000; // ได้เงิน 1,000,000 แทนฉายาเดิม
-            updateData.points = increment(finalCoinReward + titleCompensationBonus);
-            alert(`🎉 คุณมีฉายา "${titleReward}" อยู่แล้ว! ระบบจึงเปลี่ยนฉายาเป็นเงินรางวัลมูลค่า 🪙 1,000,000 แทน`);
-        } else {
-            // ถ้ายังไม่เคยมี ให้ทำการเพิ่มฉายาใหม่เข้าไปใน Array
-            currentTitles.push(titleReward);
-            updateData.titles = currentTitles;
-            alert(`🎉 ยินดีด้วย! คุณได้รับฉายาใหม่: [${titleReward}]`);
-        }
-    }
-    // ==================================================================
-
-    try {
-        // อัปเดตข้อมูลลงฐานข้อมูล Firebase Firestore
-        await updateDoc(doc(db, "users", auth.currentUser.uid), updateData);
-        
-        toggleModal("seasonRewardModal", false);
-        alert("รับรางวัลประจำซีซั่นเสร็จสิ้นแล้ว!");
-        
-        if (typeof updateProfileUI === "function") { updateProfileUI(); }
-
-    } catch (e) {
-        console.error("Error claiming season reward:", e);
-        alert("เกิดข้อผิดพลาดในการรับรางวัล กรุณาลองใหม่อีกครั้ง");
-    }
-}
-
-window.claimSeasonReward = async function() {
-    const currentRank = getRankInfo(userDoc.trophies || 0);
-    const globalEndTime = getGlobalSeasonEndTime();
-    const globalStartTime = globalEndTime - SEASON_LIMIT;
-    
-    const rankString = `${currentRank.icon} ${currentRank.name}`;
-    
-    // ==================== [ระบบฉายา & รางวัลซ้ำแบบใหม่] ====================
-    let titleReward = null; // ฉายาที่จะได้รับในซีซั่นนี้
-    let finalCoinReward = currentRank.reward.coin; // ค่าเริ่มต้นคอยน์รางวัลประจำแรงค์
-    let titleCompensationBonus = 0; // เงินชดเชยกรณีฉายาซ้ำ
-
-    // ตรวจสอบระดับ Rank เพื่อแจกฉายา
-    if (currentRank.name.includes("Supreme MASTER PRO!!")) {
-        titleReward = "กำหนดผู้ชนะ";
-    } else if (
-        currentRank.name.includes("Supreme MASTER 1") ||
-        currentRank.name.includes("Supreme MASTER 2") ||
-        currentRank.name.includes("Supreme MASTER 3") ||
-        currentRank.name.includes("Supreme MASTER 4")
-    ) {
-        titleReward = "ผู้พิชิตศึกสงคราม";
-    }
-
-    // โครงสร้างฟิลด์อัปเดตข้อมูลที่จะส่งไป Firestore
-    let updateData = {
-        points: increment(finalCoinReward),
-        trophies: 0,
-        lastSeasonChecked: globalStartTime,
-        lastSeasonRank: rankString
-    };
-
-    // อาร์เรย์เก็บฉายาเดิมของผู้เล่น (ถ้ายังไม่มีในระบบให้ตั้งเป็นอาร์เรย์ว่าง)
-    let currentTitles = userDoc.titles || [];
-
-    if (titleReward) {
-        // ตรวจสอบว่าผู้เล่นเคยได้รับฉายานี้ไปแล้วหรือยัง
-        if (currentTitles.includes(titleReward)) {
-            titleCompensationBonus = 1000000; // ได้เงิน 1,000,000 แทนฉายาเดิม
-            updateData.points = increment(finalCoinReward + titleCompensationBonus);
-            alert(`🎉 คุณมีฉายา "${titleReward}" อยู่แล้ว! ระบบจึงเปลี่ยนฉายาเป็นเงินรางวัลมูลค่า 🪙 1,000,000 แทน`);
-        } else {
-            // ถ้ายังไม่เคยมี ให้ทำการเพิ่มฉายาใหม่เข้าไปใน Array
-            currentTitles.push(titleReward);
-            updateData.titles = currentTitles;
-            alert(`🎉 ยินดีด้วย! คุณได้รับฉายาใหม่: [${titleReward}]`);
-        }
-    }
-    // ==================================================================
-
-    try {
-        // อัปเดตข้อมูลลงฐานข้อมูล Firebase Firestore
-        await updateDoc(doc(db, "users", auth.currentUser.uid), updateData);
-        
-        toggleModal("seasonRewardModal", false);
-        alert("รับรางวัลประจำซีซั่นเสร็จสิ้นแล้ว!");
-        
-        if (typeof updateProfileUI === "function") { updateProfileUI(); }
-
-    } catch (e) {
-        console.error("Error claiming season reward:", e);
-        alert("เกิดข้อผิดพลาดในการรับรางวัล กรุณาลองใหม่อีกครั้ง");
-    }
-}
-    function updateUI() {
-        if(!userDoc) return;
-        document.getElementById("trophy-count").innerText = (userDoc.trophies || 0).toLocaleString();
-        const cur = getRankInfo(userDoc.trophies || 0);
-        document.getElementById("rank-icon").innerText = cur.icon;
-        const rName = document.getElementById("rank-name");
-        rName.innerText = cur.name;
-        if(cur.color === "rainbow") { rName.className = "rank-rainbow"; rName.style.color = ""; } 
-        else { rName.className = ""; rName.style.color = cur.color; }
-        const nextRank = RANKS[RANKS.indexOf(cur)+1];
-        const progEl = document.getElementById("rank-progress");
-        if(nextRank) {
-            const prog = ((userDoc.trophies - cur.min) / (nextRank.min - cur.min)) * 100;
-            progEl.style.width = Math.min(prog, 100) + "%";
-        } else { progEl.style.width = "100%"; }
-    }
-
-  function startSeasonTimer() {
-    setInterval(() => {
-        if (!userDoc) return;
-        
-        // ดึงเวลาสิ้นสุดซีซั่นส่วนกลางมาใช้คำนวณหน้าจอ
-        const endTime = getGlobalSeasonEndTime();
-        const diff = endTime - Date.now();
-        
-        const el = document.getElementById("season-countdown");
-        if (diff <= 0) { el.innerText = "กำลังรีเซ็ตซีซั่น..."; return; }
-        
-        const d = Math.floor(diff/86400000);
-        const h = Math.floor((diff%86400000)/3600000).toString().padStart(2,'0');
-        const m = Math.floor((diff%3600000)/60000).toString().padStart(2,'0');
-        const s = Math.floor((diff%60000)/1000).toString().padStart(2,'0');
-        el.innerText = `${d} วัน ${h}:${m}:${s}`;
-    }, 1000);
-}
-
-    async function generateBot() {
-        const botNames = ["Shadow_King", "Zero_Bot", "Arena_Master", "Ghost_Rider", "Cyber_Slayer"];
-        const botTrophies = Math.max(0, (userDoc?.trophies || 0) + (Math.floor(Math.random() * 500) - 250));
-        const botTeam = [];
-        const myCollection = userDoc?.collection || [];
-        let botLevel = (botTrophies >= 12000) ? 40 : Math.max(1, Math.floor(botTrophies / 300) + 5);
-        for(let i=0; i<5; i++) {
-            const randomCard = myCollection[Math.floor(Math.random() * myCollection.length)];
-            const keys = Object.keys(ELEMENTS);
-            
-            const rands = Math.random();
-            let rRarity = "SR";
-            if(rands > 0.95) rRarity = "USEC";
-            else if(rands > 0.85) rRarity = "EXR";
-            else if(rands > 0.75) rRarity = "CBR";
-            else if(rands > 0.60) rRarity = "SSR";
-            else if(rands > 0.45) rRarity = "PR";
-
-            botTeam.push({ 
-                name: "BotCard" + i, level: botLevel, rarity: rRarity, 
-                element: keys[Math.floor(Math.random() * keys.length)],
-                stars: Math.floor(Math.random() * 3), 
-                img: randomCard ? (randomCard.img || randomCard.image) : `https://picsum.photos/seed/bot${i}/150/225` 
-            });
-        }
-        return { id: "bot_" + Math.random().toString(36).substr(2, 9), username: botNames[Math.floor(Math.random() * botNames.length)], trophies: botTrophies, defenseTeam: botTeam, isBot: true };
-    }
-
-    window.showView = function(v) {
-        ["lobby", "defense", "history", "leaderboard", "battle"].forEach(id => {
-            const el = document.getElementById(`view-${id}`);
-            if(el) el.style.display = (id === v) ? 'block' : 'none';
-            const tab = document.getElementById(`tab-${id}`);
-            if(tab) tab.classList.toggle('active', id === v);
-        });
-        if(v === 'lobby') loadLobby();
-        if(v === 'leaderboard') loadLeaderboard();
-        if(v === 'history') loadHistory();
-        if(v === 'defense') renderPools(); 
-    };
-
-    async function loadLobby() {
-        const list = document.getElementById("lobby-list");
-        if(!list) return;
-        list.innerHTML = "<div style='padding:20px; color:#a0aec0;'>🔍 กำลังค้นหาคู่ต่อสู้ในสนามประลอง...</div>";
         try {
-            const snap = await getDocs(query(collection(db, "users"), limit(10)));
-            let players = [];
-            snap.forEach(d => {
-                if(auth.currentUser && d.id !== auth.currentUser.uid) {
-                    const data = d.data();
-                    if(data.defenseTeam && data.defenseTeam.length === 5) players.push({id: d.id, ...data});
-                }
-            });
-            while(players.length < 5) { players.push(await generateBot()); }
-            list.innerHTML = "";
-            players.sort((a,b) => (b.trophies || 0) - (a.trophies || 0));
-            players.forEach(u => {
-                const pwr = u.defenseTeam.reduce((s, c) => s + getPower(c), 0);
-                const rInfo = getRankInfo(u.trophies || 0);
-                const rankDisplay = rInfo.color === 'rainbow' 
-                    ? `<span class="rank-rainbow">${rInfo.icon} ${u.username}</span>` 
-                    : `<b style="color:${rInfo.color}">${rInfo.icon} ${u.username}</b>`;
-                const div = document.createElement("div");
-                div.className = "ui-card";
-                div.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
-                        <span>${rankDisplay} ${u.isBot ? '<span class="bot-tag">BOT</span>' : ''}</span>
-                        <span style="color:#ffc831; font-weight: bold; font-size:0.9rem;">🏆 ${u.trophies || 0}</span>
-                    </div>
-                    <div class="card-row" style="justify-content:flex-start; transform: scale(0.9); transform-origin: left center; margin: 15px 0;">
-                        ${u.defenseTeam.map(c => cardHTML(c)).join('')}
-                    </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 8px;">
-                        <span style="color:#00ff88; font-weight:bold; font-size: 0.9rem;">DEF POWER: ${pwr.toLocaleString()}</span>
-                        <button class="btn-action" style="width:120px; margin:0; padding: 8px 10px; font-size:0.9rem;" onclick="openPrep('${u.id}', ${u.isBot})">ท้าชิง ⚔️</button>
-                    </div>`;
-                list.appendChild(div);
-                if(u.isBot) window["bot_data_"+u.id] = u;
-            });
-        } catch (err) { list.innerHTML = "<div style='color:#ef4444;'>Error: " + err.message + "</div>"; }
-    }
-
-    window.openPrep = async function(id, isBot) {
-        if(isBot) targetOpp = window["bot_data_"+id];
-        else { const snap = await getDoc(doc(db, "users", id)); targetOpp = {id, ...snap.data()}; }
-        tempAtk = []; toggleModal('prepModal', true); renderPrep();
-    };
-
-    window.handleStartBattle = async function() {
-        toggleModal('prepModal', false); 
-        showView('battle'); 
-        
-        const log = document.getElementById("battle-status");
-        const exit = document.getElementById("exit-battle-btn");
-        const pRow = document.getElementById("player-battle-row");
-        const oRow = document.getElementById("opp-battle-row");
-        const pContainer = document.getElementById("player-container");
-        const oContainer = document.getElementById("opp-container");
-        const arena = document.getElementById("arena-box");
-        const flash = document.getElementById("flash-effect");
-        const vsLabel = document.getElementById("vs-label");
-        
-        exit.style.display = "none";
-        log.innerHTML = "<span style='color:#a0aec0; text-transform:uppercase; letter-spacing:1px;'>⚔️ Connecting to Arena Grid...</span>";
-        vsLabel.style.transform = "scale(1)";
-        
-        oRow.innerHTML = targetOpp.defenseTeam.map(c => cardHTML(c)).join('');
-        pRow.innerHTML = tempAtk.map(c => cardHTML(c)).join('');
-        
-        oContainer.className = "battle-row-container opp-entering";
-        pContainer.className = "battle-row-container player-entering";
-
-        setTimeout(() => { 
-            log.innerHTML = "<span style='color:#ffc831; text-shadow: 0 0 10px rgba(255,200,49,0.5);'>🔥 OVERCHARGING ENERGY MATRIX!</span>"; 
-            oContainer.classList.add('ready-up');
-            pContainer.classList.add('ready-up');
-        }, 800);
-
-        setTimeout(() => {
-            log.innerHTML = "<span style='color:#ff4d4d; font-size:1.6rem; text-shadow: 0 0 15px #ff4d4d; font-weight:800; letter-spacing:1px;'>EX-BURST ATTACK!!</span>";
-            oContainer.classList.remove('ready-up');
-            pContainer.classList.remove('ready-up');
-            
-            pRow.classList.add('strike-player'); 
-            oRow.classList.add('strike-opp');    
-            vsLabel.style.transform = "scale(1.3)"; 
-            vsLabel.style.color = "#fff";
-        }, 2000);
-
-        setTimeout(() => { 
-            arena.classList.add('arena-shake'); 
-            flash.classList.add('flash-active'); 
-        }, 2150);
-
-        setTimeout(async () => {
-            let pTotalPwr = 0;
-            let oTotalPwr = 0;
-            
-            // หาจำนวนลูปสูงสุดระหว่างทีมผู้เล่น และ ทีมคู่ต่อสู้ ป้องกันอาการลูปค้าง
-            const maxLoops = Math.max(tempAtk.length, targetOpp.defenseTeam.length);
-            for(let i=0; i<maxLoops; i++) {
-                let pCard = tempAtk[i];
-                let oCard = targetOpp.defenseTeam[i];
+            const mySnap = await getDoc(doc(db, "users", user.uid));
+            if (mySnap.exists()) {
+                const myData = mySnap.data();
+                document.getElementById('p1-name').innerText = myData.displayName || myData.username || "คุณ";
+                currentTrophies = Number(myData.trophies || 0);
+                currentArenaXp = Number(myData.arenaPassXp || 0);
                 
-                let pPwr = pCard ? getPower(pCard) : 0;
-                let oPwr = oCard ? getPower(oCard) : 0;
-                
-                // คำนวณธาตุเมื่อมีการ์ดชนกันครบสองฝั่ง และใช้ตัวแปรที่ถูกต้องคือ pCard แทน c
-                if(pCard && oCard && ELEMENTS[pCard.element] && ELEMENTS[oCard.element]) {
-                    if(ELEMENTS[pCard.element].beats === oCard.element) pPwr *= 1.25;
-                    else if(ELEMENTS[oCard.element].beats === pCard.element) oPwr *= 1.25;
-                }
-                pTotalPwr += pPwr;
-                oTotalPwr += oPwr;
-            }
-            
-            const win = pTotalPwr >= oTotalPwr;
-            let trophyGain = 90; 
-            const currentRankName = getRankInfo(userDoc.trophies || 0).name;
-            if (currentRankName.includes("SILVER 1") || currentRankName.includes("GOLD") || currentRankName.includes("DIAMOND")) trophyGain = 120;
-            else if (currentRankName.includes("MASTER")) trophyGain = 290;
-            const trophyChange = win ? trophyGain : -Math.floor(trophyGain / 2);
-            const coinPrize = win ? 250 : 50;
-            
-            log.innerHTML = win ? `
-                <div style='animation: readyAni 0.3s infinite alternate'>
-                    <h2 style='color:#00ff88; margin:0; text-shadow: 0 0 15px #00ff88; font-size: 1.8rem;'>VICTORY !!</h2>
-                    <p style="color: #a0aec0; font-size:0.85rem; margin: 4px 0;">PWR: ${Math.floor(pTotalPwr).toLocaleString()} vs ${Math.floor(oTotalPwr).toLocaleString()}</p>
-                    <p style="color: #ffc831; margin:5px 0; font-size: 1.1rem; font-weight: bold;">+${trophyChange} 🏆 | 🪙 ${coinPrize}</p>
-                </div>` : `
-                <div>
-                    <h2 style='color:#ff4d4d; margin:0; text-shadow: 0 0 15px #ff4d4d; font-size: 1.8rem;'>DEFEAT</h2>
-                    <p style="color: #a0aec0; font-size:0.85rem; margin: 4px 0;">PWR: ${Math.floor(pTotalPwr).toLocaleString()} vs ${Math.floor(oTotalPwr).toLocaleString()}</p>
-                    <p style="color: #fc8181; margin:5px 0; font-size: 1.1rem; font-weight: bold;">${trophyChange} 🏆</p>
-                </div>`;
-            
-            exit.style.display = "block";
-            
-            pRow.classList.remove('strike-player'); 
-            oRow.classList.remove('strike-opp');
-            oContainer.className = "battle-row-container";
-            pContainer.className = "battle-row-container";
-            arena.classList.remove('arena-shake'); 
-            flash.classList.remove('flash-active');
-            
-            await updateDoc(doc(db, "users", auth.currentUser.uid), { trophies: Math.max(0, (userDoc.trophies || 0) + trophyChange), points: increment(coinPrize) });
-            await addDoc(collection(db, "users", auth.currentUser.uid, "logs"), { type: "attack", oppName: targetOpp.username + (targetOpp.isBot ? " (Bot)" : ""), win, trophyChange: trophyChange, time: serverTimestamp() });
-            if(!targetOpp.isBot) {
-                const oppChange = win ? -15 : 20;
-                await updateDoc(doc(db, "users", targetOpp.id), { trophies: Math.max(0, (targetOpp.trophies||0) + oppChange) });
-            }
-        }, 2800);
-    };
+                const rawMyCards = myData.defenseCards?.length ? myData.defenseCards : 
+                                  (myData.showcaseCards?.length ? myData.showcaseCards : (myData.collection || []).slice(0, 3));
 
-    function renderPrep() {
-        if (!userDoc) return;
-        const slots = document.getElementById("prep-slots");
-        const pool = document.getElementById("prep-pool");
-        slots.innerHTML = ""; pool.innerHTML = "";
-        
-        for(let i=0; i<5; i++) { 
-            slots.innerHTML += tempAtk[i] ? cardHTML(tempAtk[i]) : `<div class="mini-card" style="border:2px dashed rgba(255,255,255,0.1); background:transparent;"></div>`; 
-        }
-        
-        const unique = {};
-        (userDoc.collection || []).forEach(c => { if(!unique[c.name] || Number(c.level) > Number(unique[c.name].level)) unique[c.name] = c; });
-        const sortedCollection = Object.values(unique).sort((a, b) => Number(b.level || 1) - Number(a.level || 1));
-        
-        sortedCollection.forEach(c => {
-            const isSel = tempAtk.some(t => t.name === c.name);
-            const div = document.createElement("div");
-            div.innerHTML = cardHTML(c, isSel);
-            
-            div.onclick = () => {
-                const idx = tempAtk.findIndex(t => t.name === c.name);
-                if(idx > -1) {
-                    tempAtk.splice(idx, 1);
-                } else {
-                    // ดักเงื่อนไขการใส่การ์ดระดับ SECRET (สูงสุด 1 ใบ)
-                    if (c.rarity === 'SECRET') {
-                        const secretCount = tempAtk.filter(t => t.rarity === 'SECRET').length;
-                        if (secretCount >= 1) {
-                            alert("❌ จำกัด! สามารถเลือกใช้การ์ดระดับ SECRET ได้สูงสุดเพียง 1 ใบเท่านั้นในทีมบุก");
-                            return;
-                        }
-                    }
+                myCards = formatCardsData(rawMyCards, 'my');
+            }
+
+            if (opponentId.startsWith('bot_')) {
+                document.getElementById('p2-name').innerText = `BOT (${opponentId})`;
+                enemyCards = generateBotCards();
+            } else {
+                const enemySnap = await getDoc(doc(db, "users", opponentId));
+                if (enemySnap.exists()) {
+                    const enemyData = enemySnap.data();
+                    document.getElementById('p2-name').innerText = enemyData.displayName || enemyData.username || "คู่ต่อสู้";
                     
-                    // บังคับจำนวนสูงสุดรวมไม่เกิน 5 ใบ
-                    if(tempAtk.length < 5) tempAtk.push(c);
-                }
-                renderPrep();
-            };
-            pool.appendChild(div);
-        });
-        
-        // ปลดล็อกให้ปุ่มเริ่มทำงานเมื่อใส่การ์ดอย่างน้อย 1 ใบขึ้นไป
-        document.getElementById("start-btn").disabled = (tempAtk.length === 0);
-    }
+                    const rawEnemyCards = enemyData.defenseCards?.length ? enemyData.defenseCards : 
+                                         (enemyData.showcaseCards?.length ? enemyData.showcaseCards : (enemyData.collection || []).slice(0, 3));
 
-    // ผูกปุ่มกดเริ่มเกมเข้ากับ Module Event Listener ของปุ่มแบบสมบูรณ์
-    document.getElementById("start-btn").addEventListener("click", () => {
-        window.handleStartBattle();
+                    enemyCards = formatCardsData(rawEnemyCards, 'enemy');
+                } else {
+                    document.getElementById('p2-name').innerText = "BOT (สำรอง)";
+                    enemyCards = generateBotCards();
+                }
+            }
+
+            if (!myCards.length) myCards = generateBotCards('my');
+            if (!enemyCards.length) enemyCards = generateBotCards('enemy');
+
+            updateTeamHpHUD();
+            startCountdown();
+
+        } catch (e) {
+            console.error("Error loading battle data:", e);
+            document.getElementById('countdown-num').innerText = "เกิดข้อผิดพลาดในการโหลดข้อมูล";
+        }
     });
 
-    window.saveDefense = async function() {
-        if(tempDef.length < 5) return alert("กรุณาเลือกการ์ดป้องกันให้ครบ 5 ใบ!");
-        try { await updateDoc(doc(db, "users", auth.currentUser.uid), { defenseTeam: tempDef }); alert("✅ บันทึกทีมป้องกันเรียบร้อย!"); } 
-        catch (err) { alert("❌ เกิดข้อผิดพลาดในการบันทึก"); }
-    };
+    function formatCardsData(cardsList, prefix) {
+        return cardsList.map((c, idx) => {
+            const level = Number(c.level || c.lv || 1);
+            const stars = Number(c.stars || c.star || 0);
+            
+            const baseHp = 200 + (level * 20) + (stars * 30);
+            const baseAtk = 20 + (level * 5) + (stars * 8);
 
-    function renderPools() {
-        if (!userDoc) return;
-        const dSlots = document.getElementById("defense-slots");
-        const dPool = document.getElementById("defense-pool");
-        if(!dSlots || !dPool) return;
-        dSlots.innerHTML = ""; dPool.innerHTML = "";
-        for(let i=0; i<5; i++) { dSlots.innerHTML += tempDef[i] ? cardHTML(tempDef[i]) : `<div class="mini-card" style="border:2px dashed rgba(255,255,255,0.1); background:transparent;"></div>`; }
-        const unique = {};
-        (userDoc.collection || []).forEach(c => { if(!unique[c.name] || Number(c.level) > Number(unique[c.name].level)) unique[c.name] = c; });
-        const sortedDefPool = Object.values(unique).sort((a, b) => Number(b.level || 1) - Number(a.level || 1));
-        sortedDefPool.forEach(c => {
-            const isSel = tempDef.some(t => t.name === c.name);
-            const div = document.createElement("div");
-            div.innerHTML = cardHTML(c, isSel);
-            div.onclick = () => {
-                const idx = tempDef.findIndex(t => t.name === c.name);
-                if(idx > -1) tempDef.splice(idx, 1);
-                else if(tempDef.length < 5) tempDef.push(c);
-                renderPools();
+            return {
+                id: `${prefix}_${idx}_${Date.now()}`,
+                name: c.name || 'Unknown Card',
+                level: level,
+                hp: baseHp,
+                maxHp: baseHp,
+                atk: baseAtk,
+                speed: 3 + (Math.random() * 1.5),
+                img: c.img || c.image || 'https://via.placeholder.com/150/ffc831/000?text=Card'
             };
-            dPool.appendChild(div); 
         });
     }
 
-    async function loadLeaderboard() {
-        const list = document.getElementById("leaderboard-list");
-        if(!list) return;
-        try {
-            const q = query(collection(db, "users"), orderBy("trophies", "desc"), limit(20));
-            const snap = await getDocs(q);
-            list.innerHTML = ""; let i = 1;
-            snap.forEach(d => {
-                const u = d.data(); const r = getRankInfo(u.trophies || 0);
-                const rankText = r.color === "rainbow" ? `<span class="rank-rainbow">${r.icon} ${u.username || 'Unknown'}</span>` : `<span>${r.icon} ${u.username || 'Unknown'}</span>`;
-                
-                let particleContainerHTML = "";
-                if (u.trophies >= 3100) {
-                    particleContainerHTML = `<div class="particle-container">`;
-                    for (let p = 0; p < 5; p++) {
-                        const randomLeft = Math.floor(Math.random() * 85);
-                        const randomDelay = (Math.random() * 4).toFixed(1);
-                        const randomDuration = (4 + Math.random() * 3).toFixed(1);
-                        particleContainerHTML += `<span class="rank-particle" style="left: ${randomLeft}%; animation-delay: -${randomDelay}s; animation-duration: ${randomDuration}s;">${r.icon}</span>`;
+    function generateBotCards(prefix = 'enemy') {
+        const botImgs = [
+            'https://via.placeholder.com/150/ffc831/000?text=Dragon',
+            'https://via.placeholder.com/150/00ff88/000?text=Knight',
+            'https://via.placeholder.com/150/ff4d4d/fff?text=Wizard'
+        ];
+        return [1, 2, 3].map((num, idx) => {
+            const level = Math.floor(Math.random() * 5) + 1;
+            const baseHp = 200 + (level * 20);
+            return {
+                id: `${prefix}_bot_${idx}_${Date.now()}`,
+                name: `Bot Unit ${num}`,
+                level: level,
+                hp: baseHp,
+                maxHp: baseHp,
+                atk: 20 + (level * 4),
+                speed: 3.2,
+                img: botImgs[idx % botImgs.length]
+            };
+        });
+    }
+
+    function spawnUnits() {
+        const stageHeight = window.innerHeight;
+        const stageWidth = window.innerWidth;
+
+        myCards.forEach((c, idx) => {
+            c.x = 100 + (idx * 30);
+            c.y = (stageHeight / (myCards.length + 1)) * (idx + 1);
+            c.isEnemy = false;
+            createCardElem(c);
+        });
+
+        enemyCards.forEach((c, idx) => {
+            c.x = stageWidth - 190 - (idx * 30);
+            c.y = (stageHeight / (enemyCards.length + 1)) * (idx + 1);
+            c.isEnemy = true;
+            createCardElem(c);
+        });
+    }
+
+    function createCardElem(c) {
+        const div = document.createElement('div');
+        div.id = `card-${c.id}`;
+        div.className = `battle-unit ${c.isEnemy ? 'enemy' : ''}`;
+        div.style.left = `${c.x}px`;
+        div.style.top = `${c.y}px`;
+        div.innerHTML = `
+            <div class="unit-lv">Lv.${c.level}</div>
+            <div class="hp-bar-container"><div class="hp-bar-fill" id="hp-${c.id}"></div></div>
+            <img src="${c.img}" alt="${c.name}">
+        `;
+        field.appendChild(div);
+    }
+
+    function startCountdown() {
+        spawnUnits();
+        let count = 3;
+        const numElem = document.getElementById('countdown-num');
+        numElem.innerText = count;
+
+        const timer = setInterval(() => {
+            count--;
+            if (count > 0) {
+                numElem.innerText = count;
+            } else if (count === 0) {
+                numElem.style.fontSize = "3.5rem";
+                numElem.innerText = "เริ่มการต่อสู้!";
+            } else {
+                clearInterval(timer);
+                document.getElementById('countdown-screen').style.display = 'none';
+                battleActive = true;
+                startBattleTimer();
+                requestAnimationFrame(gameLoop);
+            }
+        }, 1000);
+    }
+
+    function startBattleTimer() {
+        const timerElem = document.getElementById('battle-timer');
+        timerInterval = setInterval(() => {
+            if (!battleActive) {
+                clearInterval(timerInterval);
+                return;
+            }
+            battleTimeSeconds--;
+            
+            const mins = String(Math.floor(battleTimeSeconds / 60)).padStart(2, '0');
+            const secs = String(battleTimeSeconds % 60).padStart(2, '0');
+            timerElem.innerText = `${mins}:${secs}`;
+
+            if (battleTimeSeconds <= 0) {
+                clearInterval(timerInterval);
+                battleActive = false;
+
+                const myTotalHp = myCards.reduce((acc, c) => acc + Math.max(0, c.hp), 0);
+                const enemyTotalHp = enemyCards.reduce((acc, c) => acc + Math.max(0, c.hp), 0);
+
+                setTimeout(() => {
+                    if (myTotalHp > enemyTotalHp) {
+                        showResult('win');
+                    } else if (myTotalHp < enemyTotalHp) {
+                        showResult('lose');
+                    } else {
+                        showResult('draw');
                     }
-                    particleContainerHTML += `</div>`;
+                }, 500);
+            }
+        }, 1000);
+    }
+
+    function updateTeamHpHUD() {
+        const myTotalMax = myCards.reduce((acc, c) => acc + c.maxHp, 0);
+        const myCurrent = myCards.reduce((acc, c) => acc + Math.max(0, c.hp), 0);
+        const myPercent = myTotalMax > 0 ? (myCurrent / myTotalMax) * 100 : 0;
+        document.getElementById('p1-team-hp').style.width = `${myPercent}%`;
+
+        const enemyTotalMax = enemyCards.reduce((acc, c) => acc + c.maxHp, 0);
+        const enemyCurrent = enemyCards.reduce((acc, c) => acc + Math.max(0, c.hp), 0);
+        const enemyPercent = enemyTotalMax > 0 ? (enemyCurrent / enemyTotalMax) * 100 : 0;
+        document.getElementById('p2-team-hp').style.width = `${enemyPercent}%`;
+    }
+
+    function gameLoop() {
+        if (!battleActive) return;
+
+        let aliveMine = myCards.filter(c => c.hp > 0);
+        let aliveEnemy = enemyCards.filter(c => c.hp > 0);
+
+        if (aliveMine.length === 0 || aliveEnemy.length === 0) {
+            battleActive = false;
+            if (timerInterval) clearInterval(timerInterval);
+            
+            setTimeout(() => {
+                if (aliveMine.length > 0 && aliveEnemy.length === 0) {
+                    showResult('win');
+                } else if (aliveMine.length === 0 && aliveEnemy.length > 0) {
+                    showResult('lose');
+                } else {
+                    showResult('draw');
                 }
-
-                list.innerHTML += `
-                    <div class="ui-card" style="border-left: 4px solid ${r.color === 'rainbow' ? '#ff00ff' : r.color}; background: rgba(20,20,35,0.45); margin-bottom: 12px; padding: 15px 20px;">
-                        ${particleContainerHTML}
-                        <div class="ui-card-content">
-                            <span><b style="color:#718096; margin-right:12px; font-size: 1.1rem;">#${i++}</b> <span style="font-weight:600;">${rankText}</span></span> 
-                            <span style="color:#ffc831; font-weight:bold; font-size:1.1rem; text-shadow: 0 0 8px rgba(255,200,49,0.3);">🏆 ${(u.trophies || 0).toLocaleString()}</span>
-                        </div>
-                    </div>`;
-            });
-        } catch (e) { list.innerHTML = "<div style='color:#ef4444; text-align:center;'>Error loading leaderboard</div>"; }
-    }
-
-    async function loadHistory() {
-        const list = document.getElementById("history-list");
-        if(!list) return;
-        try {
-            const snap = await getDocs(query(collection(db, "users", auth.currentUser.uid, "logs"), orderBy("time", "desc"), limit(10)));
-            list.innerHTML = snap.empty ? "<p style='text-align:center; color:#718096; padding: 20px;'>ยังไม่มีประวัติการต่อสู้ในซีซั่นนี้</p>" : "";
-            snap.forEach(d => {
-                const l = d.data(); const color = l.win ? '#00ff88' : '#ff4d4d';
-                const bgLight = l.win ? 'rgba(0,255,136,0.03)' : 'rgba(255,77,77,0.03)';
-                list.innerHTML += `
-                    <div class="ui-card" style="border-left:5px solid ${color}; background: ${bgLight}; padding:14px 20px; margin-bottom:12px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <b style="font-size:1rem; letter-spacing:0.5px;">${l.type==='attack'?'⚔️ บุกโจมตี':'🛡️ ทีมตั้งรับ'} - <span style="color:${color}">${l.win?'ชนะ':'แพ้'}</span></b>
-                            <span style="color:${color}; font-weight:bold; font-size:1.05rem;">${l.trophyChange >= 0 ? '+' : ''}${l.trophyChange} 🏆</span>
-                        </div>
-                        <div style="font-size:0.85rem; color:#a0aec0; margin-top: 5px;">คู่ต่อสู้: <span style="color:#fff; font-weight:500;">${l.oppName}</span></div>
-                    </div>`;
-            });
-        } catch (e) { list.innerHTML = "<div style='color:#ef4444; text-align:center;'>Error loading history</div>"; }
-    }
-
-    window.toggleModal = function(id, show) {
-        const el = document.getElementById(id); if(el) el.style.display = show ? "block" : "none";
-        if(id === 'rankModal' && show) {
-            document.getElementById("rank-details").innerHTML = `
-                <div style="background:rgba(255,200,49,0.08); padding:12px; border-radius:12px; margin-bottom:20px; font-size:0.85rem; border:1px dashed #ffc831; color:#ffc831; text-align:center; font-weight:500;">
-                    🎁 รางวัลประจำซีซั่นจะจัดส่งให้โดยอัตโนมัติเมื่อสิ้นสุดช่วงเวลาแข่งขัน
-                </div>
-            ` + [...RANKS].reverse().map(r => {
-                const nameStyle = r.color === "rainbow" ? `class=\"rank-rainbow\"` : `style=\"color:${r.color}\"`;
-                let winTrophy = 50; 
-                if (r.name.includes("SILVER 1") || r.name.includes("GOLD") || r.name.includes("DIAMOND")) winTrophy = 120;
-                if (r.name.includes("MASTER")) winTrophy = 290;
-                return `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 8px; border-bottom:1px solid rgba(255,255,255,0.05);">
-                    <div ${nameStyle}><b>${r.icon} ${r.name}</b><br><small style="color:#718096; font-weight:normal;">คะแนนขั้นต่ำ: ${r.min.toLocaleString()} 🏆</small></div>
-                    <div style="text-align:right; font-size:0.85rem; font-weight:bold;">
-                        <span style="color:#00ff88;">Win: +${winTrophy} 🏆</span><br>
-                        <span style="color:#ffc831;">Coin: ${r.reward.coin.toLocaleString()}</span>
-                    </div>
-                </div>`;
-            }).join('');
+            }, 800);
+            return;
         }
-    };
+
+        aliveMine.forEach(unit => updateUnitBehavior(unit, aliveEnemy));
+        aliveEnemy.forEach(unit => updateUnitBehavior(unit, aliveMine));
+
+        requestAnimationFrame(gameLoop);
+    }
+
+    function updateUnitBehavior(unit, targets) {
+        if (targets.length === 0) return;
+
+        let target = targets[0];
+        let minDist = 99999;
+
+        targets.forEach(t => {
+            let dist = Math.hypot(t.x - unit.x, t.y - unit.y);
+            if (dist < minDist) {
+                minDist = dist;
+                target = t;
+            }
+        });
+
+        if (minDist > 80) {
+            let angle = Math.atan2(target.y - unit.y, target.x - unit.x);
+            unit.x += Math.cos(angle) * unit.speed;
+            unit.y += Math.sin(angle) * unit.speed;
+
+            const elem = document.getElementById(`card-${unit.id}`);
+            if (elem) {
+                elem.style.left = `${unit.x}px`;
+                elem.style.top = `${unit.y}px`;
+            }
+        } else {
+            if (!unit.lastAttack || Date.now() - unit.lastAttack > 800) {
+                unit.lastAttack = Date.now();
+                attackTarget(unit, target);
+            }
+        }
+    }
+
+    function attackTarget(attacker, target) {
+        const elem = document.getElementById(`card-${attacker.id}`);
+        if(elem) {
+            elem.style.transform = 'scale(1.15)';
+            setTimeout(() => elem.style.transform = 'scale(1)', 150);
+        }
+
+        let dmg = attacker.atk + Math.floor(Math.random() * 8 - 4);
+        target.hp = Math.max(0, target.hp - dmg);
+
+        const hpFill = document.getElementById(`hp-${target.id}`);
+        if (hpFill) {
+            hpFill.style.width = `${(target.hp / target.maxHp) * 100}%`;
+        }
+
+        updateTeamHpHUD();
+        showDamagePop(target.x + 30, target.y - 10, dmg);
+
+        if (target.hp <= 0) {
+            const targetElem = document.getElementById(`card-${target.id}`);
+            if (targetElem) {
+                targetElem.style.opacity = '0';
+                setTimeout(() => targetElem.remove(), 300);
+            }
+        }
+    }
+
+    function showDamagePop(x, y, dmg) {
+        const pop = document.createElement('div');
+        pop.className = 'damage-pop';
+        pop.style.left = `${x}px`;
+        pop.style.top = `${y}px`;
+        pop.innerText = `-${dmg}`;
+        field.appendChild(pop);
+        setTimeout(() => pop.remove(), 600);
+    }
+
+    function getRankConfig(trophies) {
+        let currentTierIndex = 0;
+        for (let i = 0; i < RANK_TIERS.length; i++) {
+            if (trophies >= RANK_TIERS[i].min) {
+                currentTierIndex = i;
+            }
+        }
+
+        const current = RANK_TIERS[currentTierIndex];
+        const next = RANK_TIERS[currentTierIndex + 1] || null;
+        
+        return {
+            ...current,
+            max: next ? next.min : current.min + 5000
+        };
+    }
+
+    async function showResult(resultType) {
+        const resPanel = document.getElementById('result-screen');
+        const resTitle = document.getElementById('result-title');
+        const changeText = document.getElementById('trophy-change-text');
+        const xpChangeText = document.getElementById('xp-change-text');
+        
+        const currentRank = getRankConfig(currentTrophies);
+        
+        let trophyDelta = 0;
+        let xpDelta = 0;
+
+        if (resultType === 'win') {
+            trophyDelta = currentRank.win;
+            xpDelta = 200; // ชนะได้รับ 200 XP[cite: 13]
+        } else if (resultType === 'lose') {
+            trophyDelta = -currentRank.lose;
+            xpDelta = 50;  // แพ้ได้รับ 50 XP[cite: 13]
+        } else {
+            trophyDelta = 0;
+            xpDelta = 0;   // เสมอไม่ได้ XP เลย[cite: 13]
+        }
+
+        let newTrophies = Math.max(0, currentTrophies + trophyDelta);
+        let newArenaXp = currentArenaXp + xpDelta;
+        const newRank = getRankConfig(newTrophies);
+
+        resPanel.style.display = 'flex';
+
+        if (resultType === 'win') {
+            resTitle.innerText = "VICTORY!";
+            resTitle.className = "result-title win";
+            changeText.innerText = `🏆 +${currentRank.win} ถ้วยรางวัล`;
+            changeText.className = "trophy-change-badge gain";
+            xpChangeText.innerText = `✨ +${xpDelta} XP Grand Pass`;
+        } else if (resultType === 'lose') {
+            resTitle.innerText = "DEFEAT";
+            resTitle.className = "result-title lose";
+            changeText.innerText = `🏆 -${currentRank.lose} ถ้วยรางวัล`;
+            changeText.className = "trophy-change-badge loss";
+            xpChangeText.innerText = `✨ +${xpDelta} XP Grand Pass`;
+        } else {
+            resTitle.innerText = "DRAW";
+            resTitle.className = "result-title draw";
+            changeText.innerText = `🏆 0 ถ้วยรางวัล (เสมอกัน)`;
+            changeText.className = "trophy-change-badge draw";
+            xpChangeText.innerText = `✨ +0 XP Grand Pass (เสมอไม่ได้ XP)`;
+        }
+
+        document.getElementById('rank-icon').innerText = newRank.icon;
+        const nameElem = document.getElementById('rank-name');
+        nameElem.innerText = newRank.name;
+        if (newRank.color !== "rainbow") {
+            nameElem.style.color = newRank.color;
+        } else {
+            nameElem.style.color = "#ff4500";
+        }
+
+        const targetMax = newRank.max;
+        const barPercent = Math.min(100, Math.max(0, (newTrophies / targetMax) * 100));
+
+        document.getElementById('trophy-count-text').innerText = `${newTrophies} / ${targetMax}`;
+        
+        setTimeout(() => {
+            document.getElementById('trophy-bar-fill').style.width = `${barPercent}%`;
+        }, 100);
+
+        if (currentUserUid) {
+            try {
+                const userRef = doc(db, "users", currentUserUid);
+                await updateDoc(userRef, {
+                    trophies: newTrophies,
+                    arenaPassXp: newArenaXp
+                });
+            } catch (err) {
+                console.error("อัปเดตถ้วยรางวัลและ XP ไม่สำเร็จ:", err);
+            }
+        }
+    }
 </script>
 </body>
 </html>
