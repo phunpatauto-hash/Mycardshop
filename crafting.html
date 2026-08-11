@@ -451,6 +451,77 @@
             rewardQty: 1,
             isNestedMaterial: true
         },
+        {
+            id: "origin_heart",
+            category: "materials",
+            name: "หัวใจที่ไม่มีที่มา",
+            rarity: "sr",
+            rarityLabel: "SUPER RARE",
+            desc: "หัวใจปริศนาที่เปล่งประกายลึกลับ ไร้ที่มาและแหล่งกำเนิดแน่ชัด",
+            icon: "fas fa-heart",
+            styleClass: "color: #ff4757; background: rgba(255,71,87,0.1); border-color: rgba(255,71,87,0.2);",
+            costPoints: 100000,
+            reqMaterials: {},
+            rewardField: "materials.origin_heart.qty",
+            rewardName: "หัวใจที่ไม่มีที่มา",
+            rewardDesc: "หัวใจลึกลับไร้ที่มา เปี่ยมด้วยพลังงานแปลกประหลาด",
+            rewardQty: 1,
+            isNestedMaterial: true
+        },
+        {
+            id: "manga_vol_1",
+            category: "materials",
+            name: "มังงะตอนที่ 1",
+            rarity: "sr",
+            rarityLabel: "SUPER RARE",
+            desc: "หนังสือการ์ตูนมังงะเล่มประเดิมตอนแรกสุดหายาก",
+            icon: "fas fa-book-open",
+            styleClass: "color: #2ed573; background: rgba(46,213,115,0.1); border-color: rgba(46,213,115,0.2);",
+            costPoints: 10000,
+            reqMaterials: {},
+            rewardField: "materials.manga_vol_1.qty",
+            rewardName: "มังงะตอนที่ 1",
+            rewardDesc: "หนังสือมังงะตอนที่ 1 ทรงคุณค่าสำหรับนักสะสม",
+            rewardQty: 1,
+            isNestedMaterial: true
+        },
+        {
+            id: "special_water_drop",
+            category: "materials",
+            name: "หยดน้ำพิเศษ",
+            rarity: "sr",
+            rarityLabel: "SUPER RARE",
+            desc: "หยดน้ำบริสุทธิ์กลั่นตัวจากพลังงานเวทมนตร์ธรรมชาติ",
+            icon: "fas fa-tint",
+            styleClass: "color: #1e90ff; background: rgba(30,144,255,0.1); border-color: rgba(30,144,255,0.2);",
+            costPoints: 100000,
+            reqMaterials: {},
+            rewardField: "materials.special_water_drop.qty",
+            rewardName: "หยดน้ำพิเศษ",
+            rewardDesc: "หยดน้ำเวทมนตร์บริสุทธิ์พิเศษ",
+            rewardQty: 1,
+            isNestedMaterial: true
+        },
+        {
+            id: "ice_statue",
+            category: "materials",
+            name: "รูปปั้นน้ำแข็ง",
+            rarity: "sr",
+            rarityLabel: "SUPER RARE",
+            desc: "รูปปั้นแกะสลักจากน้ำแข็งวิเศษที่ไม่มีวันละลาย",
+            icon: "fas fa-snowman",
+            styleClass: "color: #70a1ff; background: rgba(112,161,255,0.1); border-color: rgba(112,161,255,0.2);",
+            costPoints: 10000,
+            reqMaterials: {
+                "materials.special_water_drop.qty": { name: "หยดน้ำพิเศษ", amount: 10, isNested: true, keyPath: "special_water_drop" }
+            },
+            rewardField: "materials.ice_statue.qty",
+            rewardName: "รูปปั้นน้ำแข็ง",
+            rewardDesc: "รูปปั้นน้ำแข็งวิเศษแกะสลักอย่างประณีต",
+            rewardQty: 1,
+            isNestedMaterial: true
+        },
+
         // --- ระดับ ULTRA RARE ---
         {
             id: "fluid_iron",
@@ -509,6 +580,23 @@
             rewardField: "materials.sweet_heart_icecream.qty",
             rewardName: "[SS] ไอศกรีมสุดหวานใจ",
             rewardDesc: "ไอศกรีมเวทมนตร์เยือกแข็งรสชาติหวานละมุนหัวใจ",
+            rewardQty: 1,
+            isNestedMaterial: true
+        },
+        {
+            id: "manga_vol_2",
+            category: "materials",
+            name: "[SS] มังงะตอนที่ 2",
+            rarity: "ur",
+            rarityLabel: "ULTRA RARE",
+            desc: "มังงะภาคต่อสุดยอดหายากระดับอัลตร้าแรร์ เนื้อเรื่องเข้มข้นขั้นสุด",
+            icon: "fas fa-book",
+            styleClass: "color: #ff9f43; background: rgba(255,159,67,0.15); border-color: #ff9f43;",
+            costPoints: 20000,
+            reqMaterials: {},
+            rewardField: "materials.manga_vol_2.qty",
+            rewardName: "[SS] มังงะตอนที่ 2",
+            rewardDesc: "หนังสือมังงะตอนที่ 2 หายากระดับ ULTRA RARE",
             rewardQty: 1,
             isNestedMaterial: true
         }
