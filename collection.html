@@ -52,6 +52,16 @@
         @keyframes rainbow-rotate { 100% { filter: hue-rotate(360deg); } }
         .rainbow-effect { border: 3px solid transparent !important; background: linear-gradient(#111, #111) padding-box, conic-gradient(from 0deg, red, yellow, lime, aqua, blue, magenta, red) border-box !important; animation: rainbow-rotate 3s linear infinite; box-shadow: 0 0 20px rgba(255,255,255,0.4); }
 
+        /* Animation สำหรับการ์ดใหม่หรือมีการ์ดซ้ำกระพริบเรืองแสงเบาๆ */
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 5px rgba(255, 200, 49, 0.4), inset 0 0 5px rgba(255, 200, 49, 0.2); }
+            50% { box-shadow: 0 0 20px rgba(255, 200, 49, 0.8), inset 0 0 8px rgba(255, 200, 49, 0.4); }
+            100% { box-shadow: 0 0 5px rgba(255, 200, 49, 0.4), inset 0 0 5px rgba(255, 200, 49, 0.2); }
+        }
+        .card-pulse-new {
+            animation: pulse-glow 1.8s infinite ease-in-out;
+        }
+
         /* Grid & Cards */
         .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
         .collection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
@@ -63,6 +73,30 @@
         
         /* Lock Indicator Badge */
         .card-lock-badge { position: absolute; bottom: 75px; right: 8px; background: rgba(0,0,0,0.75); color: #ff4d4d; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; z-index: 5; border: 1px solid #ff4d4d; }
+
+        /* Upgrade Available Arrow Badge */
+        @keyframes bounce-arrow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+        .card-upgrade-badge {
+            position: absolute;
+            bottom: 75px;
+            left: 8px;
+            background: linear-gradient(135deg, #00ff88, #00d4ff);
+            color: #000;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            z-index: 5;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.6);
+            animation: bounce-arrow 1.2s infinite ease-in-out;
+        }
 
         /* Achievement Popup Styles */
         .ach-modal-content { background: #0b0b12; border-radius: 20px; max-width: 1000px; width: 100%; max-height: 85vh; display: flex; flex-direction: column; border: 1px solid #333; overflow: hidden; box-shadow: 0 0 50px rgba(0,0,0,0.9); }
@@ -97,7 +131,7 @@
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(10px); }
         .modal-content { background: #0a0a0f; border-radius: 25px; max-width: 900px; width: 100%; display: flex; overflow: hidden; border: 1px solid #333; box-shadow: 0 0 50px rgba(0,0,0,1); }
         .modal-left { width: 45%; background: #000; display: flex; align-items: center; justify-content: center; padding: 20px; position: relative; }
-        .modal-right { width: 55%; padding: 35px; display: flex; flex-direction: column; background: linear-gradient(135deg, #0a0a0f 0%, #111 100%); }
+        .modal-right { width: 55%; padding: 35px; display: flex; flex-direction: column; background: linear-gradient(135deg, #0a0a0f 0%, #111 100%); max-height: 90vh; overflow-y: auto; }
         .stat-item { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; border-left: 4px solid #ffc831; margin: 10px 0; }
         .stat-val { font-size: 1.8rem; font-weight: bold; display: block; color: #ffc831; }
         .stat-lbl { font-size: 0.75rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
@@ -135,8 +169,11 @@
             </div>
         </div>
         <div class="wallet-display">
-            <div class="wallet-box" style="color: #ffc831;">🪙 <span id="nav-points">0</span></div>
-            <div class="wallet-box" style="color: #00d4ff;">💎 <span id="nav-diamonds">0</span></div>
+            <div class="wallet-box" style="color: #ffc831;">🪙 <span id="pts">0</span></div>
+            <div class="wallet-box" style="color: #00d4ff;">💎 <span id="dia">0</span></div>
+            <div class="wallet-box" style="color: #cbd5e1;">🎫 <span id="ticket">0</span></div>
+            <div class="wallet-box" style="color: #ffc831;">🎟️ <span id="p-ticket">0</span></div>
+            <div class="wallet-box" style="color: #ffeb3b;">⭐ <span id="star">0</span></div>
         </div>
     </nav>
 
@@ -193,7 +230,7 @@
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                     <div>
                         <h2 id="modalName" style="margin:0; font-size: 2.2rem;">Name</h2>
-                        <div id="modalRarity" style="font-weight: bold; letter-spacing: 2px; margin-bottom: 20px;">GRADE: -</div>
+                        <div id="modalRarity" style="font-weight: bold; letter-spacing: 2px; margin-bottom: 15px;">GRADE: -</div>
                     </div>
                     <button id="btnLockCard" class="btn-lock">🔒 ล็อกการ์ด</button>
                 </div>
@@ -201,6 +238,17 @@
                 <div class="stat-item">
                     <span class="stat-lbl">⚡ ARENA POWER</span>
                     <span id="modalPower" class="stat-val">0</span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="stat-item" style="border-left-color: #00ff88; margin: 0;">
+                        <span class="stat-lbl">💚 HP (พลังชีวิต)</span>
+                        <span id="modalHp" class="stat-val" style="color: #00ff88; font-size: 1.4rem;">0</span>
+                    </div>
+                    <div class="stat-item" style="border-left-color: #00d4ff; margin: 0;">
+                        <span class="stat-lbl">🛡️ DEF (พลังป้องกัน)</span>
+                        <span id="modalDef" class="stat-val" style="color: #00d4ff; font-size: 1.4rem;">0</span>
+                    </div>
                 </div>
 
                 <div id="modalSellPriceBox" style="margin-top: 15px; padding: 15px; background: rgba(0, 255, 136, 0.05); border-radius: 15px; border: 1px solid rgba(0, 255, 136, 0.2); display: flex; justify-content: space-between; align-items: center;">
@@ -221,11 +269,11 @@
                     <div id="modalUpgradeInfo" style="color: #00ff88; font-weight: bold; font-size: 0.85rem; margin-top: 5px;">-</div>
                 </div>
 
-                <div id="lvUpgradeGroup" style="display: flex; gap: 10px; margin-top: auto;">
-                    <button id="btnUpgradeLV" class="btn-action btn-lv" style="flex:2;">⚡ เลเวลอัป</button>
-                    <button id="btnBulkUpgrade" class="btn-action btn-lv" style="flex:1; background: #00ff88; color: #000;">MAX</button>
+                <div id="lvUpgradeGroup" style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button id="btnUpgradeLV" class="btn-action btn-lv" style="flex:2; margin-top:0;">⚡ เลเวลอัป</button>
+                    <button id="btnBulkUpgrade" class="btn-action btn-lv" style="flex:1; background: #00ff88; color: #000; margin-top:0;">MAX</button>
                 </div>
-                <button id="btnUpgradeStar" class="btn-action btn-star" style="display:none; margin-top: auto;">⭐ อัปดาว</button>
+                <button id="btnUpgradeStar" class="btn-action btn-star" style="display:none; margin-top: 15px;">⭐ อัปดาว</button>
                 <div id="maxLevelMessage" style="display:none; text-align:center; color:#ffc831; font-weight:bold; margin-top:15px;"></div>
                 <button class="btn-nav" style="margin-top:15px; border-color: rgba(255,255,255,0.1);" onclick="document.getElementById('cardModal').style.display='none'">ปิด</button>
             </div>
@@ -250,12 +298,29 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    let currentUID = null, userCards = [], currentFilter = 'ALL', searchQuery = '';
+    let currentUID = null, userCards = [], currentFilter = 'ALL', searchQuery = '', globalPoints = 0;
     const MAX_LV = 80;
 
     const rarityOrder = { 'SECRET': 14, 'P': 13, 'USEC': 12, 'EXR': 11, 'CBR': 10, 'SEC': 9, 'SUR': 8, 'SSR': 7, 'PR': 6, 'UR': 5, 'SR': 4, 'R': 3, 'U': 2, 'C': 1 };
     const rarityColors = { 'SECRET': '#D8BFD8', 'P': '#ff00ff', 'USEC': '#ff00ff', 'EXR': '#ff4d4d', 'CBR': '#ff4d4d', 'SEC': '#ffac33', 'SUR': '#33ffad', 'SSR': '#ffc831', 'PR': '#ffc831', 'UR': '#bf40bf', 'SR': '#33aaff', 'R': '#33ff57', 'U': '#ffffff', 'C': '#ffffff' };
-    const RARITY_POWER = { 'SECRET': { base: 7000, perLv: 7500 }, "P": { base: 5000, perLv: 5000 }, "USEC": { base: 8500, perLv: 7000 }, "EXR": { base: 4000, perLv: 4500 }, "CBR": { base: 6600, perLv: 4000 }, "SEC": { base: 3500, perLv: 2000 }, "SUR": { base: 3000, perLv: 1800 }, "SSR": { base: 2500, perLv: 1500 }, "PR": { base: 2000, perLv: 1500 }, "UR": { base: 1500, perLv: 1200 }, "SR": { base: 1000, perLv: 1000 }, "R": { base: 600, perLv: 800 }, "U": { base: 300, perLv: 500 }, "C": { base: 100, perLv: 300 } };
+    
+    const RARITY_POWER = { 
+        'SECRET': { base: 7000, perLv: 7500, baseHp: 15000, perLvHp: 10000, baseDef: 1200, perLvDef: 900 }, 
+        "P": { base: 5000, perLv: 5000, baseHp: 12000, perLvHp: 8000, baseDef: 1000, perLvDef: 700 }, 
+        "USEC": { base: 8500, perLv: 7000, baseHp: 18000, perLvHp: 12000, baseDef: 1500, perLvDef: 1000 }, 
+        "EXR": { base: 4000, perLv: 4500, baseHp: 10000, perLvHp: 7000, baseDef: 800, perLvDef: 600 }, 
+        "CBR": { base: 6600, perLv: 4000, baseHp: 14000, perLvHp: 9000, baseDef: 1100, perLvDef: 800 }, 
+        "SEC": { base: 3500, perLv: 2000, baseHp: 8000, perLvHp: 5000, baseDef: 700, perLvDef: 400 }, 
+        "SUR": { base: 3000, perLv: 1800, baseHp: 7000, perLvHp: 4500, baseDef: 600, perLvDef: 350 }, 
+        "SSR": { base: 2500, perLv: 1500, baseHp: 6000, perLvHp: 4000, baseDef: 500, perLvDef: 300 }, 
+        "PR": { base: 2000, perLv: 1500, baseHp: 5000, perLvHp: 3500, baseDef: 400, perLvDef: 250 }, 
+        "UR": { base: 1500, perLv: 1200, baseHp: 4000, perLvHp: 2500, baseDef: 300, perLvDef: 200 }, 
+        "SR": { base: 1000, perLv: 1000, baseHp: 3000, perLvHp: 2000, baseDef: 200, perLvDef: 150 }, 
+        "R": { base: 600, perLv: 800, baseHp: 2000, perLvHp: 1500, baseDef: 150, perLvDef: 100 }, 
+        "U": { base: 300, perLv: 500, baseHp: 1200, perLvHp: 1000, baseDef: 90, perLvDef: 60 }, 
+        "C": { base: 100, perLv: 300, baseHp: 800, perLvHp: 600, baseDef: 50, perLvDef: 40 } 
+    };
+
     const sellValuesBase = { 'SECRET': 99000, 'P': 10000, 'USEC': 90000, 'EXR': 55000, 'CBR': 50000, 'SEC': 25000, 'SUR': 15000, 'SSR': 15000, 'PR': 10000, 'UR': 1200, 'SR': 1000, 'R': 500, 'U': 200, 'C': 100 };
 
     const ACHIEVEMENTS_DATA = [
@@ -300,6 +365,18 @@
         return Math.floor((config.base + (card.level * config.perLv)) * (1 + ((card.stars||0) * 0.1)));
     }
 
+    function getCardHp(card) {
+        const r = (card.rarity || 'C').toUpperCase();
+        const config = RARITY_POWER[r] || RARITY_POWER['C'];
+        return Math.floor((config.baseHp + (card.level * config.perLvHp)) * (1 + ((card.stars||0) * 0.15)));
+    }
+
+    function getCardDef(card) {
+        const r = (card.rarity || 'C').toUpperCase();
+        const config = RARITY_POWER[r] || RARITY_POWER['C'];
+        return Math.floor((config.baseDef + (card.level * config.perLvDef)) * (1 + ((card.stars||0) * 0.12)));
+    }
+
     function getDynamicSellValue(card) {
         const r = (card.rarity||'C').toUpperCase();
         const base = sellValuesBase[r] || 100;
@@ -318,6 +395,23 @@
         return { reqQty: 3, cost: 2000 };
     }
 
+    // ฟังก์ชันเช็คว่าการ์ดใบนี้สามารถอัปเกรดได้จริงหรือไม่ (ใช้เช็คแสดงไอคอนลูกศร)
+    function canCardBeUpgraded(card, allCards, currentPts) {
+        const r = (card.rarity || 'C').toUpperCase();
+        const unlockedCopies = allCards.filter(c => c.name === card.name && (c.rarity || 'C').toUpperCase() === r && !c.isLocked);
+        
+        // หากเป็นการ์ดหลักตัวนี้ ให้หักจำนวนออก 1 ใบ (เพราะตัวหลักไม่ใช่ใบวัตถุดิบ)
+        const availableMaterialsCount = unlockedCopies.length > 0 ? unlockedCopies.length - 1 : 0;
+
+        if (card.level < MAX_LV) {
+            const req = getUpgradeRequirements(card);
+            return availableMaterialsCount >= req.reqQty && currentPts >= req.cost;
+        } else if (card.stars < 5) {
+            return availableMaterialsCount >= 2; // อัปดาวต้องใช้ 2 ใบซ้ำ
+        }
+        return false;
+    }
+
     onAuthStateChanged(auth, (user) => {
         if (user) {
             currentUID = user.uid;
@@ -334,8 +428,18 @@
                         img: c.img || c.image
                     }));
                     
-                    document.getElementById("nav-points").innerText = (data.points || 0).toLocaleString();
-                    document.getElementById("nav-diamonds").innerText = (data.diamonds || 0).toLocaleString();
+                    globalPoints = data.points || 0;
+                    const diamonds = data.diamonds || 0;
+                    const tickets = data.normal_tickets || data.tickets || 0;
+                    const premiumTickets = data.premium_tickets || 0;
+                    const stars = data.stars || 0;
+
+                    document.getElementById("pts").innerText = globalPoints.toLocaleString();
+                    document.getElementById("dia").innerText = diamonds.toLocaleString();
+                    document.getElementById("ticket").innerText = tickets.toLocaleString();
+                    document.getElementById("p-ticket").innerText = premiumTickets.toLocaleString();
+                    document.getElementById("star").innerText = stars.toLocaleString();
+
                     document.getElementById("display-username").innerText = data.username || "COLLECTOR";
                     renderCards();
                     renderAchievements(data);
@@ -386,16 +490,29 @@
             return 0;
         });
 
+        const FIVE_MINUTES = 5 * 60 * 1000;
+        const now = Date.now();
+
         displayList.forEach(card => {
             const r = (card.rarity||'C').toUpperCase();
+            
+            // เอฟเฟกต์กระพริบ: บอกว่าเป็นการ์ดใหม่ (ได้มาไม่เกิน 5 นาที) หรือมีใบซ้ำ
+            const isRecentNew = card.obtainedAt && (now - card.obtainedAt < FIVE_MINUTES);
+            const hasDuplicates = card.count > 1;
+            const shouldPulse = isRecentNew || hasDuplicates;
+
+            // เช็คว่าสามารถอัปเกรดได้จริงๆ หรือไม่ เพื่อแสดงลูกศรชี้ขึ้น
+            const canUpgrade = canCardBeUpgraded(card, userCards, globalPoints);
+
             const div = document.createElement("div");
-            div.className = `col-card ${card.level >= MAX_LV && card.stars >= 5 ? 'rainbow-effect' : ''}`;
+            div.className = `col-card ${card.level >= MAX_LV && card.stars >= 5 ? 'rainbow-effect' : (shouldPulse ? 'card-pulse-new' : '')}`;
             div.style.border = `1px solid ${rarityColors[r] || '#fff'}44`;
             div.onclick = () => openModal(card);
             div.innerHTML = `
                 ${card.stars > 0 ? `<div class="star-container">${'⭐'.repeat(card.stars)}</div>` : ''}
                 ${card.count > 1 ? `<div class="card-count-badge">x${card.count}</div>` : ''}
                 ${card.isLocked ? `<div class="card-lock-badge">🔒</div>` : ''}
+                ${canUpgrade ? `<div class="card-upgrade-badge" title="สามารถอัปเกรดได้!">⬆️</div>` : ''}
                 <img src="${card.img || card.image}">
                 <div style="padding:10px; background: rgba(0,0,0,0.8);">
                     <div style="color:${rarityColors[r] || '#fff'}; font-size:0.75rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${card.name}</div>
@@ -502,7 +619,6 @@
             grid.appendChild(card);
         });
 
-        // Update Milestone Section
         document.getElementById("totalAchCount").innerText = completedTotalCount;
         document.getElementById("milestoneBarFill").style.width = Math.min((completedTotalCount / 20) * 100, 100) + "%";
         
@@ -572,6 +688,8 @@
         document.getElementById("modalRarity").innerText = "GRADE: " + r;
         document.getElementById("modalRarity").style.color = rarityColors[r] || '#fff';
         document.getElementById("modalPower").innerText = getArenaPower(card).toLocaleString();
+        document.getElementById("modalHp").innerText = getCardHp(card).toLocaleString();
+        document.getElementById("modalDef").innerText = getCardDef(card).toLocaleString();
         document.getElementById("modalLvlDisplay").innerText = "LV. " + card.level;
         document.getElementById("lvlBarFill").style.width = (card.level/MAX_LV*100) + "%";
         document.getElementById("reqQty").innerText = sameCards.length;
@@ -770,7 +888,6 @@
         fCon.appendChild(btn);
     });
 
-    // --- ระบบจับเวลาการใช้งานหน้า collection.html ---
     let sessionSeconds = 0;
     let timerInterval = null;
 
