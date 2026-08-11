@@ -4,299 +4,376 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ARENA AUCTION - LIVE RAFFLE</title>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root { 
             --gold: #ffc831; 
-            --dark-bg: #111; 
-            --box-bg: #ffffff;
-        }
-        
-        * {
-            box-sizing: border-box;
-            font-family: 'Kanit', sans-serif;
+            --gold-glow: rgba(255, 200, 49, 0.3);
+            --blue: #00d2ff; 
+            --blue-glow: rgba(0, 210, 255, 0.3);
+            --bg: #060713; 
+            --card-bg: rgba(15, 18, 36, 0.75);
+            --border-color: rgba(255, 255, 255, 0.08);
         }
 
+        * { box-sizing: border-box; font-family: 'Kanit', sans-serif; }
+
         body { 
-            background: #a3f141; /* พื้นหลังสีเขียวสดใสตามธีมในรูปภาพ */
-            background-image: radial-gradient(circle, #c2f765 20%, #a3f141 80%);
-            color: #000; 
+            background: radial-gradient(circle at center, #111430 0%, var(--bg) 100%);
+            color: #f0f2f5; 
             margin: 0; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            min-height: 100vh; 
+            min-height: 100vh;
+            overflow-x: hidden;
         }
-        
-        /* --- Navbar ดึงข้อมูลผู้ใช้จริง --- */
-        .navbar { 
-            background-color: #000; 
-            width: 100%; 
-            padding: 15px 25px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-bottom: 4px solid #000;
-            color: #fff;
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: rgba(10, 11, 26, 0.85);
+            border-bottom: 2px solid var(--gold);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 5px 25px rgba(0,0,0,0.5);
         }
         .user-stat { 
             color: var(--gold); 
-            font-weight: 900; 
-            font-size: 1.2rem;
-            text-shadow: 1px 1px 0px #000;
+            font-weight: 700; 
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0,0,0,0.4);
+            padding: 6px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
         }
         .btn-home { 
-            background: #fff; 
-            border: 3px solid #000; 
-            color: #000; 
-            padding: 6px 14px; 
-            border-radius: 10px; 
+            background: rgba(255,255,255,0.05); 
+            color: #fff; 
+            border: 1px solid var(--border-color); 
+            padding: 10px 20px; 
+            border-radius: 12px; 
             cursor: pointer; 
-            font-weight: bold; 
+            font-weight: 600; 
             text-decoration: none; 
-            box-shadow: 0 4px 0 #000;
+            transition: all 0.3s ease;
         }
-        .btn-home:active { transform: translateY(4px); box-shadow: none; }
+        .btn-home:hover { background: rgba(255,255,255,0.12); transform: translateY(-2px); border-color: #fff; }
 
-        /* --- Main Layout สไตล์ UI การ์ตูนหนาๆ ตามบอร์ดเกม --- */
+        /* Main Layout */
         .main-layout { 
             display: grid;
             grid-template-columns: 1fr 1.2fr;
-            gap: 20px; 
+            gap: 25px; 
             width: 95%; 
-            max-width: 1050px; 
-            margin-top: 25px; 
-            margin-bottom: 50px;
+            max-width: 1400px; 
+            margin: 30px auto;
         }
-        
-        /* การจัดบล็อกสไตล์บอร์ดเกม (กรอบเส้นดำหนา) */
+
         .game-panel {
-            background: var(--box-bg);
-            border: 5px solid #000;
-            border-radius: 25px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
             padding: 25px;
-            box-shadow: 0 10px 0 #000;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+            backdrop-filter: blur(10px);
             display: flex;
             flex-direction: column;
             align-items: center;
             position: relative;
         }
 
-        /* --- ฝั่งซ้าย: แสดงการ์ดที่กำลังประมูลหลัก --- */
+        /* Timer Banner */
         .timer-banner {
-            background: #ff4757;
+            background: linear-gradient(135deg, #ff4757, #ff6b81);
             color: white;
-            border: 4px solid #000;
-            padding: 5px 20px;
-            border-radius: 15px;
-            font-size: 2.2rem;
-            font-weight: 900;
-            box-shadow: 0 5px 0 #000;
-            margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 8px 25px;
+            border-radius: 14px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            box-shadow: 0 5px 20px rgba(255, 71, 87, 0.4);
+            margin-bottom: 20px;
             letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        
+
+        /* Card Frame */
         .card-frame { 
-            width: 240px; 
-            height: 330px; 
-            border-radius: 20px; 
+            width: 220px; 
+            height: 310px; 
+            border-radius: 16px; 
             overflow: hidden; 
-            border: 5px solid #000; 
+            border: 2px solid rgba(255,255,255,0.15); 
             background: #000; 
-            box-shadow: 5px 5px 0 rgba(0,0,0,0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             position: relative; 
         }
         .card-frame img { width: 100%; height: 100%; object-fit: cover; }
-        
+
         .rarity-tag { 
-            padding: 5px 25px; 
-            border-radius: 10px; 
-            font-weight: 900; 
-            font-size: 1.3rem; 
-            margin: 12px 0; 
-            border: 3px solid #000;
+            padding: 4px 18px; 
+            border-radius: 8px; 
+            font-weight: 700; 
+            font-size: 1.1rem; 
+            margin: 15px 0; 
+            border: 1px solid rgba(255,255,255,0.2);
             text-transform: uppercase; 
             color: #fff; 
-            box-shadow: 0 4px 0 #000;
+            letter-spacing: 0.5px;
         }
 
-        /* --- ฝั่งขวา: แผงควบคุมราคาบิด สู้ราคาด่วน และประวัติผู้ร่วมบิด --- */
-        .section-title {
-            font-size: 1.8rem;
-            font-weight: 900;
-            margin: 0 0 15px 0;
-            text-align: center;
-            text-transform: uppercase;
-        }
-
-        .pool-stats { 
-            width: 100%;
-            padding: 15px; 
-            background: #fff8e1; 
-            border-radius: 15px; 
-            border: 3px solid #000; 
-            text-align: center;
-            margin-bottom: 20px;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
-        }
-
-        .bid-input { 
-            width: 100%; 
-            padding: 12px; 
-            border-radius: 15px; 
-            border: 4px solid #000; 
-            background: #fff; 
-            color: #000; 
-            font-size: 1.6rem; 
-            font-weight: 900;
-            text-align: center; 
-            margin-bottom: 12px; 
-            outline: none;
-        }
-
-        .btn-bid { 
-            width: 100%; 
-            padding: 15px; 
-            background: #ff9000; 
-            color: #fff; 
-            border: 4px solid #000; 
-            border-radius: 15px; 
-            font-weight: 900; 
-            font-size: 1.5rem; 
-            cursor: pointer; 
-            box-shadow: 0 6px 0 #000;
-            text-shadow: 2px 2px 0 #000;
-        }
-        .btn-bid:active { transform: translateY(4px); box-shadow: 0 2px 0 #000; }
-
-        /* ปุ่มลัดเพิ่มราคาสไตล์เกม */
-        .quick-bid-container {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            width: 100%;
-            margin-top: 10px;
-            margin-bottom: 20px;
-        }
-        .btn-quick {
-            background: #00e5ff;
-            border: 3px solid #000;
-            padding: 8px;
-            border-radius: 10px;
-            font-weight: 900;
-            cursor: pointer;
-            box-shadow: 0 4px 0 #000;
-        }
-        .btn-quick:active { transform: translateY(2px); box-shadow: 0 2px 0 #000; }
-
-        /* รายการประวัติคนบิดล่าสุดด้านล่าง */
-        .history-box {
-            width: 100%;
-            background: #f5f5f5;
-            border: 3px solid #000;
-            border-radius: 15px;
-            padding: 12px;
-            max-height: 180px;
-            overflow-y: auto;
-        }
-        .history-item {
-            display: flex;
-            justify-content: space-between;
-            background: #fff;
-            border: 2px solid #000;
-            padding: 8px 12px;
-            border-radius: 10px;
-            margin-bottom: 6px;
-            font-weight: bold;
-            font-size: 0.95rem;
-        }
-
-        /* กล่องส่องใบถัดไปมุมล่าง */
+        /* Next Card Panel */
         .next-card-panel {
             margin-top: 15px;
             width: 100%;
             display: flex;
             align-items: center;
             gap: 15px;
-            background: #f9f9f9;
-            border: 3px solid #000;
-            padding: 10px;
-            border-radius: 15px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color);
+            padding: 12px 16px;
+            border-radius: 16px;
         }
-        .next-frame { width: 60px; height: 85px; border: 2px solid #000; border-radius: 6px; overflow: hidden; }
+        .next-frame { width: 50px; height: 70px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; overflow: hidden; flex-shrink: 0; }
 
-        .swal2-popup { border: 4px solid #000 !important; border-radius: 20px !important; }
+        /* Right Panel Elements */
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 0 0 15px 0;
+            text-align: center;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pool-stats { 
+            width: 100%;
+            padding: 18px; 
+            background: rgba(0,0,0,0.4); 
+            border-radius: 16px; 
+            border: 1px solid var(--border-color); 
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .bid-input { 
+            width: 100%; 
+            padding: 14px; 
+            border-radius: 12px; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            background: rgba(0,0,0,0.5); 
+            color: #fff; 
+            font-size: 1.4rem; 
+            font-weight: 700;
+            text-align: center; 
+            margin-bottom: 12px; 
+            outline: none;
+            transition: 0.25s;
+        }
+        .bid-input:focus { border-color: var(--gold); box-shadow: 0 0 10px var(--gold-glow); }
+
+        .btn-bid { 
+            width: 100%; 
+            padding: 14px; 
+            background: linear-gradient(135deg, var(--gold), #ff9000); 
+            color: #000; 
+            border: none; 
+            border-radius: 12px; 
+            font-weight: 700; 
+            font-size: 1.1rem; 
+            cursor: pointer; 
+            box-shadow: 0 4px 15px var(--gold-glow);
+            transition: 0.3s;
+        }
+        .btn-bid:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 6px 20px var(--gold-glow); }
+
+        /* Quick Bid Grid */
+        .quick-bid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            width: 100%;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        .btn-quick {
+            background: rgba(255,255,255,0.06);
+            color: #fff;
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+        .btn-quick:hover { background: rgba(255,255,255,0.12); border-color: var(--gold); color: var(--gold); }
+
+        /* History Box */
+        .history-box {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 12px;
+            max-height: 150px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 8px 12px;
+            border-radius: 10px;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        /* Challenge/Rank Panel */
+        .challenge-panel {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 12px 15px;
+        }
+        .challenge-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--blue);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .challenge-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 4px;
+        }
+        .challenge-row span:last-child { font-weight: 700; color: #fff; }
+        .progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--blue), var(--gold));
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .swal2-popup { background: #0f1224 !important; color: #fff !important; border: 1px solid rgba(255,255,255,0.1) !important; border-radius: 20px !important; }
+
+        @media (max-width: 1024px) {
+            .main-layout { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
 <nav class="navbar">
     <div style="display: flex; align-items: center; gap: 15px;">
-        <a href="index.html" class="btn-home">🏠 หน้าหลัก</a>
-        <!-- ดึงข้อมูลชื่อผู้ใช้จริงจากระบบฐานข้อมูลเดิม -->
-        <div id="displayUserName" class="user-stat">LOADING...</div>
+        <a href="index.html" class="btn-home"><i class="fa-solid fa-house"></i> หน้าหลัก</a>
+        <div id="displayUserName" class="user-stat"><i class="fa-solid fa-user-shield"></i> LOADING...</div>
     </div>
-    <!-- ดึงข้อมูลเพชรจริงจากระบบฐานข้อมูลเดิม -->
     <div class="user-stat">💎 <span id="nav-diamonds">0</span></div>
 </nav>
 
 <div class="main-layout">
-    <!-- บล็อกฝั่งซ้าย: ตัวแสดงสินค้าประมูล -->
+    <!-- ฝั่งซ้าย: แสดงการ์ดประมูล -->
     <div class="game-panel">
-        <div id="timer" class="timer-banner">00:00</div>
+        <div id="timer" class="timer-banner"><i class="fa-regular fa-clock"></i> 00:00</div>
         
         <div class="card-frame">
-            <img id="cardImg" src="" alt="Premium Card">
+            <img id="cardImg" src="" alt="Auction Card">
         </div>
         
-        <h2 id="cardName" style="font-size: 1.6rem; font-weight:900; margin: 10px 0 5px 0; text-align:center;">---</h2>
+        <h2 id="cardName" style="font-size: 1.3rem; font-weight:700; margin: 15px 0 5px 0; text-align:center;">---</h2>
         <div id="rarityTag" class="rarity-tag">...</div>
         
-        <!-- ข้อมูลของรางวัลใบถัดไปเสิร์ฟต่อเนื่องตามโค้ดเดิม -->
         <div class="next-card-panel">
             <div class="next-frame">
                 <img id="nextCardImg" src="" style="width:100%; height:100%; object-fit:cover;">
             </div>
             <div>
-                <div style="font-size:0.8rem; color:#666; font-weight:bold;">ถัดไปในคิว...</div>
-                <div id="nextCardName" style="font-weight:900; color:#ff9000; font-size:0.95rem;">LOADING</div>
+                <div style="font-size:0.75rem; color:#888; font-weight:600;">ถัดไปในคิวประมูล...</div>
+                <div id="nextCardName" style="font-weight:700; color:var(--gold); font-size:0.9rem;">LOADING</div>
             </div>
         </div>
     </div>
 
-    <!-- บล็อกฝั่งขวา: คอนโซลปุ่มควบคุมสู้ราคาและจัดอันดับบิดเกอร์ -->
+    <!-- ฝั่งขวา: คอนโซลบิดและชาเล้นจ์ยศ -->
     <div class="game-panel">
-        <div class="section-title">⚔️ ENTER TO WIN!</div>
+        <div class="section-title"><i class="fa-solid fa-gavel"></i> ห้องประมูลสด (LIVE RAFFLE)</div>
         
         <div class="pool-stats">
-            <div style="font-size: 1rem; font-weight:bold; color: #555;">💰 มูลค่ากองกลางรอบนี้</div>
-            <div style="font-size: 2.3rem; font-weight: 900; color: #ff9000;">💎 <span id="totalPool">0</span></div>
-            <div style="font-size: 0.9rem; font-weight:bold; margin-top: 4px;">คุณลงสะสมแล้ว: <span id="myTotalBid" style="color: #2ed573;">0</span> 💎</div>
+            <div style="font-size: 0.85rem; font-weight:500; color: #aaa;">💰 มูลค่ากองกลางรอบนี้</div>
+            <div style="font-size: 2.2rem; font-weight: 700; color: var(--gold); margin: 5px 0;">💎 <span id="totalPool">0</span></div>
+            <div style="font-size: 0.85rem; font-weight:500;">คุณลงสะสมแล้ว: <span id="myTotalBid" style="color: #00ff88; font-weight:700;">0</span> 💎</div>
         </div>
 
-        <input type="number" id="bidAmount" class="bid-input" placeholder="ใส่จำนวนเพชรที่จะเพิ่ม">
-        <button class="btn-bid" onclick="placeBid()">ยืนยันส่งเพชรประมูล</button>
+        <input type="number" id="bidAmount" class="bid-input" placeholder="ใส่จำนวนเพชรที่จะร่วมประมูล">
+        <button class="btn-bid" onclick="placeBid()"><i class="fa-solid fa-paper-plane"></i> ยืนยันส่งเพชรประมูล</button>
         
-        <!-- ปุ่มเพิ่มราคาด่วนอ้างอิงจากแถบปุ่มกดด้านล่างในรูปภาพต้นฉบับ -->
         <div class="quick-bid-container">
             <button class="btn-quick" onclick="addQuickAmount(10)">+10</button>
-            <button class="quick-btn btn-quick" onclick="addQuickAmount(50)">+50</button>
-            <button class="quick-btn btn-quick" onclick="addQuickAmount(100)">+100</button>
-            <button class="quick-btn btn-quick" onclick="addQuickAmount(500)">+500</button>
+            <button class="btn-quick" onclick="addQuickAmount(50)">+50</button>
+            <button class="btn-quick" onclick="addQuickAmount(100)">+100</button>
+            <button class="btn-quick" onclick="addQuickAmount(500)">+500</button>
         </div>
 
-        <div style="width:100%; font-weight:bold; font-size:0.95rem; margin-bottom:8px;">
-            🔥 ประวัติผู้เข้าร่วมสู้ราคาล่าสุด (<span id="totalBidders">0</span> คน):
+        <div style="width:100%; font-weight:600; font-size:0.9rem; margin-bottom:8px; color:#aaa;">
+            🔥 ประวัติผู้เข้าร่วมสู้ล่าสุด (<span id="totalBidders">0</span> คน):
         </div>
         
-        <!-- ตารางแสดงชื่อประวัติคนบิดล่าสุดที่ดึงมาจากฐานข้อมูล -->
         <div class="history-box" id="winnerList">
-            <div style="color: #888; text-align: center; padding-top: 20px;">กำลังโหลดประวัติ...</div>
+            <div style="color: #666; font-size: 0.85rem; text-align: center; padding-top: 20px;">กำลังโหลดประวัติ...</div>
+        </div>
+
+        <!-- แผงชาเล้นจ์ยศนักประมูล (ส่งข้อมูลไปหน้า Profile) -->
+        <div class="challenge-panel">
+            <div class="challenge-title"><i class="fa-solid fa-trophy"></i> 🎯 ภารกิจชาเล้นจ์ยศนักประมูล</div>
+            <div class="challenge-row">
+                <span>ยศปัจจุบัน: <b id="currentRankTitle" style="color:var(--gold);">มือใหม่</b></span>
+                <span>ชนะแล้ว: <b id="winCountText">0</b> / 20 ครั้ง</span>
+            </div>
+            <div class="challenge-row" style="margin-top: 4px;">
+                <span id="nextRankHint" style="font-size:0.8rem; color:#888;">เป้าหมายถัดไป: นักประมูลเริ่ม (5 ครั้ง)</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="rankProgressBar"></div>
+            </div>
         </div>
         
-        <div style="margin-top: 15px; font-size: 0.9rem; font-weight:bold; color: #444; text-align:center; width:100%;">
-            โอกาสชนะของคุณในรอบนี้คำนวณเป็น: <span id="myChance" style="color: #2ed573; font-size:1.1rem; font-weight:900;">0%</span>
+        <div style="margin-top: 10px; font-size: 0.85rem; font-weight:500; color: #888; text-align:center; width:100%;">
+            โอกาสชนะของคุณในรอบนี้: <span id="myChance" style="color: #00ff88; font-size:1rem; font-weight:700;">0%</span>
         </div>
     </div>
 </div>
@@ -306,7 +383,6 @@
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, onSnapshot, updateDoc, increment, arrayUnion, setDoc, collection, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // ใช้ Firebase config ชุดเดียวกับระบบหลักของคุณ[cite: 8]
     const firebaseConfig = { 
         apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM", 
         authDomain: "sign-up-73f99.firebaseapp.com", 
@@ -320,14 +396,13 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // ดึงเซ็ตสีและข้อมูลลิสต์ของรางวัลจริงตามโค้ดต้นฉบับของคุณครบถ้วน[cite: 8]
     const rarityColors = { 'USEC': '#ff00ff', 'EXR': '#ff4d4d', 'SEC': '#ffac33', 'SSR': '#ffc831', 'SR': '#33aaff' };
     const rarityAssets = {
-        'USEC': { name: 'เอรา นาคเกล็ดเขียว (USEC)', img: 'https://cdn.bangbon.app/cards/SL02-009.png' },
-        'EXR':  { name: 'White Lily (EXR)', img: 'https://cookierunbraverse.com/data/en_storage/olOZiU0Y2v2FxOl6yWDUrQ.webp' },
-        'SEC':  { name: 'Moon Rabbit Cookie (SEC)', img: 'https://cookierunbraverse.com/data/en_storage/ZiH3DAYad38ydqqiRu6M4w.webp' },
-        'SSR':  { name: 'Herb Cookie (SSR)', img: 'https://cookierunbraverse.com/data/en_storage/QhXEdn1RHleo_rigjpY2AQ.webp' },
-        'SR':   { name: 'Herb Cookie (SR)', img: 'https://cookierunbraverse.com/data/en_storage/slT6LU8WmAEuGLM8kH5XYQ.webp' }
+        'USEC': { name: 'พระพรหม (USEC)', img: 'https://cdn.bangbon.app/cards/SL01-008.png' },
+        'EXR':  { name: 'Cookies of Legend (EXR)', img: 'https://cookierunbraverse.com/data/en_storage/HZeIs1s4LNUNAOJCuXX81A.webp' },
+        'SEC':  { name: 'Space Doughnut (SEC)', img: 'https://cookierunbraverse.com/data/en_storage/5gFY8xq0ttj8VGaVjnk28A.webp' },
+        'SSR':  { name: 'Cream Unicorn Cookie (SSR)', img: 'https://cookierunbraverse.com/data/en_storage/R3OMRPcjhDQi-N-FaTBScA.webp' },
+        'SR':   { name: 'Cream Unicorn Cookie (SR)', img: 'https://cookierunbraverse.com/data/en_storage/R3uVf10nqdLY34LYOw4rhA.webp' }
     };
 
     let currentUID = null;
@@ -344,15 +419,15 @@
         return 'SR';                   
     }
 
-    // ดึงข้อมูลผู้ใช้จาก Firestore ของจริงมาผูกเข้ากับ UI หน้าเว็บ[cite: 8]
     onAuthStateChanged(auth, (user) => {
         if (user) {
             currentUID = user.uid;
             onSnapshot(doc(db, "users", currentUID), (snap) => {
                 if (snap.exists()) {
                     userData = snap.data();
-                    document.getElementById("displayUserName").innerText = userData.username || "PLAYER";
+                    document.getElementById("displayUserName").innerHTML = `<i class="fa-solid fa-user-shield"></i> ${userData.username || "PLAYER"}`;
                     document.getElementById("nav-diamonds").innerText = (userData.diamonds || 0).toLocaleString();
+                    updateChallengeUI(userData.auctionWins || 0);
                 }
             });
         } else { window.location.href = "login.html"; }
@@ -365,24 +440,22 @@
         }
     });
 
-    // ดึงข้อมูลรายชื่อประวัติผู้ร่วมบิดของจริงแบบเรียลไทม์[cite: 8]
     onSnapshot(query(collection(db, "winnerLogs"), orderBy("time", "desc"), limit(5)), (snap) => {
         const list = document.getElementById("winnerList");
         list.innerHTML = "";
         if (snap.empty) {
-            list.innerHTML = `<div style="color: #666; font-size: 0.85rem; text-align: center; padding: 10px;">ไม่มีข้อมูลประวัติล่าสุุด...</div>`;
+            list.innerHTML = `<div style="color: #666; font-size: 0.85rem; text-align: center; padding: 10px;">ไม่มีข้อมูลประวัติล่าสุด...</div>`;
             return;
         }
         snap.forEach(doc => {
             const d = doc.data();
             list.innerHTML += `<div class="history-item">
-                <span>👤 ${d.username}</span>
-                <span style="color:${rarityColors[d.rarity] || '#000'}">[${d.rarity}] CARD</span>
+                <span><i class="fa-solid fa-user" style="color:var(--gold);"></i> ${d.username}</span>
+                <span style="color:${rarityColors[d.rarity] || '#fff'}">[${d.rarity}]</span>
             </div>`;
         });
     });
 
-    // เรนเดอร์การแสดงผลการ์ดและผลรวมเพชรกองกลาง[cite: 8]
     function renderAuction() {
         if (!auctionData) return;
         const currentR = auctionData.rarity || 'SR';
@@ -392,7 +465,7 @@
         
         const rTag = document.getElementById("rarityTag");
         rTag.innerText = currentR;
-        rTag.style.backgroundColor = rarityColors[currentR] || "#eee";
+        rTag.style.backgroundColor = rarityColors[currentR] || "#333";
 
         const nextR = (auctionData.nextCard && auctionData.nextCard.rarity) ? auctionData.nextCard.rarity : 'SSR';
         const nextAsset = rarityAssets[nextR] || rarityAssets['SSR'];
@@ -409,14 +482,34 @@
         document.getElementById("myChance").innerText = totalBid > 0 ? ((myTotalBid/totalBid)*100).toFixed(1) + "%" : "0%";
     }
 
-    // ฟังก์ชันช่วยเซ็ตค่าปุ่มเพิ่มราคาด่วน
+    function updateChallengeUI(wins) {
+        document.getElementById("winCountText").innerText = wins;
+        let rankName = "นักประมูลฝึกหัด";
+        let hint = "เป้าหมายถัดไป: นักประมูลเริ่ม (5 ครั้ง)";
+        let percent = Math.min((wins / 20) * 100, 100);
+
+        if (wins >= 20) {
+            rankName = "👑 นักประมูลผู้ชนะตลอดกาล";
+            hint = "คุณผ่านเงื่อนไขสูงสุดของชาเล้นจ์นี้แล้ว!";
+        } else if (wins >= 15) {
+            rankName = "⭐ นักประมูลชำนาญ";
+            hint = "เป้าหมายถัดไป: นักประมูลผู้ชนะตลอดกาล (20 ครั้ง)";
+        } else if (wins >= 5) {
+            rankName = "🔥 นักประมูลเริ่ม";
+            hint = "เป้าหมายถัดไป: นักประมูลชำนาญ (15 ครั้ง)";
+        }
+
+        document.getElementById("currentRankTitle").innerText = rankName;
+        document.getElementById("nextRankHint").innerText = hint;
+        document.getElementById("rankProgressBar").style.width = percent + "%";
+    }
+
     window.addQuickAmount = (amount) => {
         const bidInput = document.getElementById("bidAmount");
         const currentVal = parseInt(bidInput.value) || 0;
         bidInput.value = currentVal + amount;
     };
 
-    // ส่งข้อมูลราคาประมูลอัปเดตหักเพชรจริงบนระบบ Firestore[cite: 8]
     window.placeBid = async () => {
         const amount = parseInt(document.getElementById("bidAmount").value);
         if (!amount || amount <= 0 || userData.diamonds < amount) return Swal.fire('ผิดพลาด', 'เพชรไม่พอหรือระบุจำนวนผิด', 'error');
@@ -425,12 +518,11 @@
             await updateDoc(doc(db, "auctions", "current"), {
                 participants: arrayUnion({ uid: currentUID, name: userData.username, bid: amount })
             });
-            Swal.fire({ title: 'ส่งแต้มสู้ราคาสำเร็จ!', icon: 'success', timer: 1000, showConfirmButton: false });
+            Swal.fire({ title: 'ส่งแต้มสู้ราคาสำเร็จ!', icon: 'success', timer: 1000, showConfirmButton: false, background: '#0f1224', color: '#fff' });
             document.getElementById("bidAmount").value = "";
         } catch (e) { console.error(e); }
     };
 
-    // Logic จัดการเมื่อหมดเวลารอบประมูล[cite: 8]
     async function handleEndAuction(data) {
         if (isProcessing) return;
         isProcessing = true;
@@ -449,6 +541,36 @@
                 time: Date.now()
             });
 
+            try {
+                const winnerRef = doc(db, "users", winnerUid);
+                const currentWins = (winnerUid === currentUID && userData) ? (userData.auctionWins || 0) + 1 : 1; 
+                
+                let assignedRank = "นักประมูลฝึกหัด";
+                let titleArrayPayload = [];
+                if (currentWins >= 20) {
+                    assignedRank = "นักประมูลผู้ชนะตลอดกาล";
+                    titleArrayPayload = arrayUnion("นักประมูลเริ่ม", "นักประมูลชำนาญ", "นักประมูลผู้ชนะตลอดกาล");
+                } else if (currentWins >= 15) {
+                    assignedRank = "นักประมูลชำนาญ";
+                    titleArrayPayload = arrayUnion("นักประมูลเริ่ม", "นักประมูลชำนาญ");
+                } else if (currentWins >= 5) {
+                    assignedRank = "นักประมูลเริ่ม";
+                    titleArrayPayload = arrayUnion("นักประมูลเริ่ม");
+                }
+
+                let updatePayload = {
+                    auctionWins: increment(1),
+                    auctionRank: assignedRank
+                };
+                if (titleArrayPayload.length > 0) {
+                    updatePayload.titles = titleArrayPayload;
+                }
+
+                await updateDoc(winnerRef, updatePayload);
+            } catch(err) {
+                console.error("Failed to update auction stats:", err);
+            }
+
             if (currentUID === winnerUid) {
                 const asset = rarityAssets[data.rarity] || rarityAssets['SR'];
                 const uniqueId = Date.now().toString() + "_" + Math.random().toString(36).substr(2, 5);
@@ -460,17 +582,17 @@
                         rarity: data.rarity, 
                         img: asset.img, 
                         level: 1, 
-                        stars: 0, 
                         obtainedAt: Date.now() 
                     })
                 });
                 
                 Swal.fire({
                     title: `🎊 ยินดีด้วยคุณชนะได้รับ!`,
-                    html: `<img src="${asset.img}" style="width:180px; border-radius:10px; margin:15px 0;"><br>ได้รับ: ${asset.name}`,
-                    background: '#fff',
-                    color: '#000',
-                    confirmButtonText: 'เก็บเข้าคลังการ์ด'
+                    html: `<img src="${asset.img}" style="width:160px; border-radius:10px; margin:15px 0; border: 2px solid #ffc831;"><br><b style="color:#ffc831;">${asset.name}</b>`,
+                    background: '#0f1224',
+                    color: '#fff',
+                    confirmButtonText: 'เก็บเข้าคลังการ์ด',
+                    confirmButtonColor: '#ffc831'
                 });
             }
         }
@@ -496,7 +618,7 @@
         } else {
             const m = Math.floor(remain / 60000);
             const s = Math.floor((remain % 60000) / 1000);
-            document.getElementById("timer").innerText = `${m}:${s.toString().padStart(2,'0')}`;
+            document.getElementById("timer").innerHTML = `<i class="fa-regular fa-clock"></i> ${m}:${s.toString().padStart(2,'0')}`;
         }
     }, 1000);
 </script>
