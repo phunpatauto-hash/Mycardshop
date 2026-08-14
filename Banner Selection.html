@@ -600,13 +600,17 @@
                 return;
             }
 
-            const confirmBuy = confirm(`คุณต้องการจ่ายแต้มจำนวน ${nextEventCost.toLocaleString()} เพื่อสุ่มเก็บเพชรทันที 15 นาทีใช่หรือไม่? (การซื้อครั้งถัดไปราคาจะคูณสอง)`);
+            const confirmBuy = confirm(`คุณต้องการจ่ายแต้มจำนวน ${nextEventCost.toLocaleString()} เพื่อสุ่มเก็บเพชรทันที 15 นาทีใช่หรือไม่?`);
             if (!confirmBuy) return;
 
             try {
                 const userRef = doc(db, "users", currentUser.uid);
                 const updatedPoints = userCurrentPoints - nextEventCost;
-                const updatedNextCost = nextEventCost * 2; 
+                
+                // คำนวณราคาคูณสอง แต่จำกัดไว้ไม่ให้เกิน 100,000,000 แต้ม
+                let calculatedNextCost = nextEventCost * 2;
+                const MAX_COST = 100000000;
+                let updatedNextCost = calculatedNextCost > MAX_COST ? MAX_COST : calculatedNextCost;
 
                 await updateDoc(userRef, {
                     points: updatedPoints,
@@ -904,7 +908,7 @@
                         points: newTotalPoints,
                         point: newTotalPoints,
                         playCount: updatedPlayCount,
-                        diamondRainPlays: increment(1) // อัปเดตสถิติจำนวนการเล่นกิจกรรมฝนเพชร
+                        diamondRainPlays: increment(1) 
                     };
 
                     if (updatedPlayCount >= 5 && !userHasRank) {
