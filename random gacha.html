@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Gacha System - SUR Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
-    <!-- นำเข้า SweetAlert2 สำหรับรองรับหน้าต่างแจ้งเตือนเลเวลอัป -->
+    <!-- นำเข้า SweetAlert2 สำหรับรองรับหน้าต่างแจ้งเตือน -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         /* --- Style หลัก --- */
@@ -20,14 +20,73 @@
         .points-box { background: #000; color: #ffc831; border: 1px solid #ffc831; padding: 8px 20px; border-radius: 25px; font-weight: bold; }
         .diamond-box { background: #000; color: #00d4ff; border: 1px solid #00d4ff; padding: 8px 20px; border-radius: 25px; font-weight: bold; margin-left: 10px; }
         
-        /* สไตล์กล่องตั๋วสุ่มที่เพิ่มเข้ามา */
         .ticket-box { background: #000; color: #cbd5e1; border: 1px solid #cbd5e1; padding: 8px 20px; border-radius: 25px; font-weight: bold; margin-left: 10px; }
         .premium-ticket-box { background: #000; color: #ffc831; border: 1px solid #ffc831; padding: 8px 20px; border-radius: 25px; font-weight: bold; margin-left: 10px; }
 
-        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .container { max-width: 1400px; margin: 30px auto; padding: 0 20px; }
         .main-layout { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; align-items: flex-start; }
+        
         .gacha-box { flex: 2; background-color: #111; border-radius: 30px; padding: 30px; border: 1px solid #222; min-height: 500px; position: relative; background-image: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%); min-width: 320px; }
         .preview-box { flex: 0.7; background: #111; border-radius: 30px; border: 1px solid #333; padding: 20px; display: flex; flex-direction: column; align-items: center; min-width: 250px; min-height: 600px; }
+        
+        /* --- กล่องแชทประกาศด้านข้าง --- */
+        .broadcast-sidebar {
+            flex: 0.8;
+            background: rgba(17, 17, 17, 0.95);
+            border-radius: 30px;
+            border: 2px solid #ffc831;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            min-width: 280px;
+            max-width: 350px;
+            height: 650px;
+            box-shadow: 0 0 15px rgba(255, 200, 49, 0.2);
+        }
+        .broadcast-header {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #ffc831;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .broadcast-feed {
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            text-align: left;
+            padding-right: 5px;
+            scroll-behavior: smooth;
+        }
+        .broadcast-feed::-webkit-scrollbar {
+            width: 6px;
+        }
+        .broadcast-feed::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 10px;
+        }
+        .broadcast-item {
+            background: linear-gradient(135deg, rgba(30, 30, 30, 0.9), rgba(20, 20, 20, 0.9));
+            border-left: 3px solid #ffc831;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            color: #fffae6;
+            animation: slide-in 0.3s ease-out;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            line-height: 1.4;
+        }
+        @keyframes slide-in {
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
         .scroll-window { width: 100%; height: 320px; overflow: hidden; position: relative; margin: 10px 0; mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent); }
         .slide-track-v { display: flex; flex-direction: column; gap: 15px; animation: scroll-up 20s linear infinite; }
         @keyframes scroll-up { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
@@ -39,6 +98,7 @@
 
         /* --- Colors & Glows --- */
         .color-exr { color: #00d4ff; text-shadow: 0 0 5px #00d4ff; }
+        .color-secret { color: #888888; background: linear-gradient(135deg, #ffffff 0%, #aaaaaa 50%, #555555 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 10px rgba(180, 180, 180, 0.4); font-weight: 900; }
         .color-sec { color: #a020f0; text-shadow: 0 0 5px #a020f0; }
         .color-sur { color: #ff4500; text-shadow: 0 0 5px #ffc831; }
         .color-ur { color: #39ff14; text-shadow: 0 0 5px #39ff14; }
@@ -46,6 +106,12 @@
         .color-sr { color: #ffc831; }
         .color-r { color: #007bff; text-shadow: 0 0 5px #007bff; }
         .color-uc { color: #aaaaaa; }
+
+        .luck-boost-panel { background: rgba(255, 200, 49, 0.05); border: 1px dashed #ffc831; padding: 15px; border-radius: 15px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+        .btn-luck { background: linear-gradient(45deg, #ffc831, #ff9800); color: #000; border: none; padding: 10px 20px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%; max-width: 250px; box-shadow: 0 0 10px rgba(255, 200, 49, 0.4); }
+        .btn-luck:hover:not(:disabled) { transform: scale(1.03); background: linear-gradient(45deg, #ffe066, #ffb300); }
+        .btn-luck:disabled { background: #444; color: #888; box-shadow: none; cursor: not-allowed; }
+        .luck-status { font-size: 0.85rem; color: #ffc831; font-weight: bold; }
 
         .pity-area { max-width: 500px; margin: 0 auto 20px auto; display: flex; flex-direction: column; gap: 10px; }
         .pity-container { background: #1a1a1a; height: 10px; border-radius: 10px; border: 1px solid #333; overflow: hidden; position: relative; }
@@ -72,16 +138,6 @@
 </head>
 <body id="body-main">
 
-    <div id="cutscene-overlay"><div class="cutscene-text" style="font-size:3rem; font-weight:bold; text-shadow: 0 0 20px #ffc831; color: white;">Warmth of Compassion</div></div>
-
-    <div id="rateModal" class="modal">
-        <div class="modal-content">
-            <span style="float:right; cursor:pointer; font-size:24px; color:#aaa;" onclick="closeModal()">&times;</span>
-            <h3 style="color:#ffc831; margin-top: 0;">รายชื่อการ์ดและเรทแยกใบ</h3>
-            <table style="width:100%; border-collapse: collapse;" id="rate-list-body"></table>
-        </div>
-    </div>
-
     <nav class="navbar">
         <div class="nav-left">
             <a href="index.html" class="btn-nav">🏠 เมนูหลัก</a>
@@ -95,14 +151,33 @@
         </div>
     </nav>
 
+    <div id="cutscene-overlay"><div class="cutscene-text" style="font-size:3rem; font-weight:bold; text-shadow: 0 0 20px #ffc831; color: white;">Warmth of Compassion</div></div>
+
+    <div id="rateModal" class="modal">
+        <div class="modal-content">
+            <span style="float:right; cursor:pointer; font-size:24px; color:#aaa;" onclick="closeModal()">&times;</span>
+            <h3 style="color:#ffc831; margin-top: 0;">รายชื่อการ์ดและเรทแยกใบ</h3>
+            <table style="width:100%; border-collapse: collapse;" id="rate-list-body"></table>
+        </div>
+    </div>
+
     <div class="container">
         <div class="main-layout">
+            
+            <!-- กล่องกาชาหลัก -->
             <div class="gacha-box">
+                <!-- ระบบเพิ่มโชค -->
+                <div class="luck-boost-panel">
+                    <div class="luck-status" id="luck-status-text">🍀 เพิ่มโชคพิเศษ: พร้อมใช้งาน (เหลือสิทธิ์ 5/5 ครั้ง)</div>
+                    <button id="btn-boost-luck" class="btn-luck" onclick="boostLuck()">✨ กดเพิ่มโชค (+10 นาที)</button>
+                </div>
+
                 <div class="pity-area">
-                    <div class="pity-label">การันตี SEC: <b id="pity-text-sec">0 / 550</b></div>
-                    <div class="pity-container"><div id="pity-bar-sec" class="pity-bar-sec"></div></div>
                     <div class="pity-label">การันตี EXR: <b id="pity-text-exr">0 / 900</b></div>
                     <div class="pity-container"><div id="pity-bar-exr" class="pity-bar-exr"></div></div>
+                    <div class="pity-label">การันตี SEC: <b id="pity-text-sec">0 / 550</b></div>
+                    <div class="pity-container"><div id="pity-bar-sec" class="pity-bar-sec"></div></div>
+                    
                 </div>
                 <div id="display" class="card-grid"></div>
                 <div class="btn-group">
@@ -111,31 +186,42 @@
                     <button id="pull-50" class="btn-pull" style="background: #00d4ff; color: white;" onclick="pull(50)">สุ่ม 50 ครั้ง (1000) | 🎫30 หรือ 🎟️20</button>
                 </div>
             </div>
+
+            <!-- กล่องแชทประกาศด้านข้าง (ข้อความเพิ่มลงด้านล่างเรื่อยๆ) -->
+            <div class="broadcast-sidebar">
+                <div class="broadcast-header">📢 ประกาศผู้โชคดี</div>
+                <div id="broadcast-feed" class="broadcast-feed">
+                    <div class="broadcast-item">ยินดีต้อนรับสู่ระบบกาชา Gacha System - ลุ้นรับการ์ด SECRET ที่จำกัดเพียง 10,000 ใบเท่านั้น!</div>
+                </div>
+            </div>
             
+            <!-- พรีวิวการ์ดฝั่งขวา -->
             <div class="preview-box">
                 <div style="font-size: 0.8rem; color: #ffc831; font-weight: bold; margin-bottom: 5px;">RARE PREVIEW</div>
                 <div class="scroll-window"><div class="slide-track-v" id="v-track"></div></div>
                 
                 <div class="quick-rate-table">
                     <div style="font-size: 0.7rem; color: #666; margin-bottom: 8px;">RATE BY RARITY</div>
-                    <div class="rate-row"><span class="rate-label color-exr">EXR </span><span>1%เพิ่มโอกาสออก!!</span></div>
+                    <div class="rate-row"><span class="rate-label color-secret">SECRET </span><span id="secret-stock-status">กำลังโหลด...</span></div>
+                    <div class="rate-row"><span class="rate-label color-exr">EXR </span><span>1%</span></div>
                     <div class="rate-row"><span class="rate-label color-sec">SEC </span><span>0.1%</span></div>
                     <div class="rate-row"><span class="rate-label color-sur">SUR </span><span>1.75%</span></div> 
                     <div class="rate-row"><span class="rate-label color-ur">UR </span><span>2.3%</span></div> 
                     <div class="rate-row"><span class="rate-label color-ssr">SSR</span><span>2.0%</span></div>
                     <div class="rate-row"><span class="rate-label color-sr">SR</span><span>6.25%</span></div>
                     <div class="rate-row"><span class="rate-label color-r">R </span><span>10.0%</span></div>
-                    <div class="rate-row"><span class="rate-label color-uc">U / C </span><span>25.0-35.85%</span></div>
+                    <div class="rate-row"><span class="rate-label color-uc">U / C </span><span>25.0-35.80%</span></div>
                 </div>
                 <button class="btn-nav" style="width: 100%; font-size: 0.8rem;" onclick="openModal()">ℹ️ ดูเรทแยกใบ</button>
             </div>
+
         </div>
     </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, updateDoc, arrayUnion, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, updateDoc, arrayUnion, onSnapshot, increment, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
@@ -152,72 +238,82 @@
 
     let userData = null;
     let currentUserUID = null;
+    let currentUserName = "นักสุ่มผู้โชคดี";
     let isPulling = false;
 
-    // --- Card Database ---
-    const allCards = [
+    let luckCount = 5; 
+    let luckExpireTime = 0; 
+    let luckTimerInterval = null;
+    let globalSecretCount = 0;
+
+    const allCards = [ 
+        { id: 999, rarity: "SECRET", name: "Timekeeper Cookie (SECRET)", rate: 0.5, img: "https://cookierunbraverse.com/data/en_storage/wHimgqiUGi1UCjPDNYpBVw.webp", limitedMax: 10001 },
         { id: 2, rarity: "EXR", name: "Pure Vanilla", rate: 1, img: "https://cookierunbraverse.com/data/en_storage/eXN_QVTcLFL7hr0_HG0jVg.webp" },
-        
         { id: 3, rarity: "SEC", name: "Elder Faerie Cookie (SEC)", rate: 0.1, img: "https://cookierunbraverse.com/data/en_storage/GlxuahRzIUHtghiNoBnR8Q.webp" },
         { id: 5, rarity: "SEC", name: "Cookiemals (SEC)", rate: 0.1, img: "https://cookierunbraverse.com/data/en_storage/eYzBPU7vPznUOLqF3sChUg.webp" },
         { id: 6, rarity: "SEC", name: "Towerkeeper Cookie (SEC)", rate: 0.1, img: "https://cookierunbraverse.com/data/en_storage/30mu5UDmY7GF5P0degmldg.webp" },
         { id: 6, rarity: "SEC", name: "Pure Vanilla Cookie (SEC)", rate: 0.1, img: "https://cookierunbraverse.com/data/en_storage/n216nqrESeGD3vqTr5tPEg.webp" },
         { id: 6, rarity: "SEC", name: "Latte Cookie (SEC)", rate: 0.1, img: "https://cookierunbraverse.com/data/en_storage/mxREB5Qnh8K0RLt1m_9lTA.webp" },
-
         { id: 1001, rarity: "SUR", name: "Truthless Recluse (SUR)", rate: 1.75, img: "https://cookierunbraverse.com/data/en_storage/SW4maYQ_Sr5CaMPTKArhHg.webp" },
         { id: 1002, rarity: "SUR", name: "Shadow Milk Cookie(RED) (SUR)", rate: 1.75, img: "https://cookierunbraverse.com/data/en_storage/hkO1emUYo5fE0Whn1AXGAQ.webp" },
         { id: 1002, rarity: "SUR", name: "Shadow Milk Cookie(YELLOW) (SUR)", rate: 1.75, img: "https://cookierunbraverse.com/data/en_storage/nbpUqYDu3Vj6TGqx25hKnA.webp" },
         { id: 1002, rarity: "SUR", name: "Shadow Milk Cookie(GREEN) (SUR)", rate: 1.75, img: "https://cookierunbraverse.com/data/en_storage/utWkhztlRG0-oBe19IYnkw.webp" },
         { id: 1002, rarity: "SUR", name: "Shadow Milk Cookie(PURPLE) (SUR)", rate: 1.75, img: "https://cookierunbraverse.com/data/en_storage/Jvym0Zjq9yVz0xXF7ci8vA.webp" },
         { id: 1002, rarity: "SUR", name: "Shadow Milk Cookie (SUR)", rate: 1.75, img: "https://cookierunbraverse.com/data/en_storage/Cy-HXdB8KFbJHRNXqTCItw.webp" },
-
         { id: 301, rarity: "UR", name: "Truthless Recluse", rate: 2.3, img: "https://cookierunbraverse.com/data/en_storage/y7uAfYrr60xYW2yBa4o3Bw.webp" },
         { id: 302, rarity: "UR", name: "Shadow Milk Cookie(RED)", rate: 2.3, img: "https://cookierunbraverse.com/data/en_storage/MhIiu1Yhpzag7Phn8ZdSWg.webp" },
         { id: 303, rarity: "UR", name: "Shadow Milk Cookie(YELLOW)", rate: 2.3, img: "https://cookierunbraverse.com/data/en_storage/CdFZqA3cNoc6OCoe6_vcdQ.webp" },
         { id: 304, rarity: "UR", name: "Shadow Milk Cookie(GREEN)", rate: 2.3, img: "https://cookierunbraverse.com/data/en_storage/F3fKPZonWDUAfd1BXoVYHA.webp" },
         { id: 304, rarity: "UR", name: "Shadow Milk Cookie(PURPLE)", rate: 2.3, img: "https://cookierunbraverse.com/data/en_storage/IqWJeQWh2zW3FI1veimajw.webp" },
         { id: 305, rarity: "UR", name: "Shadow Milk Cookie", rate: 2.3, img: "https://cookierunbraverse.com/data/en_storage/12WBB-03-cLAJ0tEKoMnog.webp" },
-
         { id: 7, rarity: "SSR", name: "White Lily", rate: 2.0, img: "https://cookierunbraverse.com/data/en_storage/PROSFwH4wlkFjSC9nn3nyg.webp" },
         { id: 8, rarity: "SSR", name: "Pure Vanilla Cookie", rate: 2.0, img: "https://cookierunbraverse.com/data/en_storage/FLfwxLrQcMCD7Y51Wu5UvA.webp" },
         { id: 9, rarity: "SSR", name: "Milky Way Cookie", rate: 2.0, img: "https://assets.cookierunbraverse.com/braverse/images/card_webp/card/en/BS4_092@1.png.webp" },
         { id: 10, rarity: "SSR", name: "Cookiemals", rate: 2.0, img: "https://assets.cookierunbraverse.com/braverse/images/card_webp/card/en/BS4_059@1.png.webp" },
         { id: 10, rarity: "SSR", name: "Wind Archer Cookie", rate: 2.0, img: "https://cookierunbraverse.com/data/en_storage/zu03wvQnUMKJwWsre6Phow.webp" },
         { id: 10, rarity: "SSR", name: "Golden Cheese Cookie", rate: 2.0, img: "https://cookierunbraverse.com/data/en_storage/myHJ_NNKIX2pLS3YG2fVXg.webp" },
-        
-
         { id: 11, rarity: "SR", name: "White Lily (SR)", rate: 6.25, img: "https://cookierunbraverse.com/data/en_storage/4jRaQLO9rqksjrgbkvLDMg.webp" },
         { id: 12, rarity: "SR", name: "Pure Vanilla Cookie (SR)", rate: 6.25, img: "https://cookierunbraverse.com/data/en_storage/qwIOz3Udf_iFsoy3efogQw.webp" },
         { id: 13, rarity: "SR", name: "Milky Way Cookie(SR)", rate: 6.25, img: "https://assets.cookierunbraverse.com/braverse/images/card_webp/card/en/BS4_092.png.webp" },
         { id: 14, rarity: "SR", name: "Cookiemals (SR)", rate: 6.25, img: "https://assets.cookierunbraverse.com/braverse/images/card_webp/card/en/BS4_059.png.webp" },
         { id: 14, rarity: "SR", name: "Wind Archer Cookie (SR)", rate: 6.25, img: "https://cookierunbraverse.com/data/en_storage/RwYYQACXldPCLvuIOWhK5g.webp" },
         { id: 14, rarity: "SR", name: "Golden Cheese Cookie (SR)", rate: 6.25, img: "https://cookierunbraverse.com/data/en_storage/0rGbl8x0NNYi5rwR7zKvyQ.webp" },
-
         { id: 20, rarity: "R", name: "Elder Faerie Cookie", rate: 10.0, img: "https://cookierunbraverse.com/data/en_storage/vCZh6kv-DX6oUMyZNf0Diw.webp" },
         { id: 21, rarity: "R", name: "Cookiemals", rate: 10.0, img: "https://cookierunbraverse.com/data/en_storage/42B7jdp_oeDaOkv42opZ-A.webp" },
         { id: 21, rarity: "R", name: "Towerkeeper Cookie", rate: 10.0, img: "https://cookierunbraverse.com/data/en_storage/Qng3HoV7sowfcPNIIdtksA.webp" },
         { id: 21, rarity: "R", name: "Pure Vanilla Cookie", rate: 10.0, img: "https://cookierunbraverse.com/data/en_storage/GXRVXV-WYMM050t_C6cHJw.webp" },
         { id: 21, rarity: "R", name: "Latte Cookie", rate: 10.0, img: "https://cookierunbraverse.com/data/en_storage/xde3NvsEaSAC96u5-oQzFg.webp" },
-
         { id: 15, rarity: "U", name: "Knight Cookie", rate: 25.0, img: "https://cookierunbraverse.com/data/en_storage/5AoOrNORvc6gfCZGNMzPgA.webp" },
         { id: 16, rarity: "U", name: "Potato Cookie", rate: 25.0, img: "https://assets.cookierunbraverse.com/braverse/images/card_webp/card/en/BS5_045.png.webp" },
         { id: 17, rarity: "U", name: "Cinnamon Cookie", rate: 25.0, img: "https://cookierunbraverse.com/data/en_storage/bix5fJI4le2jr-zoCiQfCQ.webp" },
         { id: 18, rarity: "U", name: "Fairy Cookie", rate: 25.0, img: "https://cookierunbraverse.com/data/en_storage/vHvbL3qhwV434IXg4UsVQQ.webp" },
         { id: 19, rarity: "U", name: "Carol Cookie", rate: 25.0, img: "https://assets.cookierunbraverse.com/braverse/images/card_webp/card/en/BS5_015.png.webp" },
-
-        { id: 19, rarity: "C", name: "Icicle Yeti Cookie", rate: 35.85, img: "https://cookierunbraverse.com/data/en_storage/PIvCKB3m5W1V4IW1nP7ycw.webp" },
-        { id: 19, rarity: "C", name: "Burnt Cheese Cookie", rate: 35.85, img: "https://cookierunbraverse.com/data/en_storage/sR5AzSzLCID5ONrIMRnkbQ.webp" },
-        { id: 19, rarity: "C", name: "Butter Roll Cookie", rate: 35.85, img: "https://cookierunbraverse.com/data/en_storage/ZqqRlBuIetxgNZWb80AS6A.webp" },
-        { id: 19, rarity: "C", name: "Candy Diver Cookie", rate: 35.85, img: "https://cookierunbraverse.com/data/en_storage/JnQqr_u7YzEhX8tTzfbfvQ.webp" },
-        { id: 19, rarity: "C", name: "Prophet Cookie", rate: 35.85, img: "https://cookierunbraverse.com/data/en_storage/FielnNkIkNhNo9NpemKLMg.webp" }
+        { id: 19, rarity: "C", name: "Icicle Yeti Cookie", rate: 35.80, img: "https://cookierunbraverse.com/data/en_storage/PIvCKB3m5W1V4IW1nP7ycw.webp" },
+        { id: 19, rarity: "C", name: "Burnt Cheese Cookie", rate: 35.80, img: "https://cookierunbraverse.com/data/en_storage/sR5AzSzLCID5ONrIMRnkbQ.webp" },
+        { id: 19, rarity: "C", name: "Butter Roll Cookie", rate: 35.80, img: "https://cookierunbraverse.com/data/en_storage/ZqqRlBuIetxgNZWb80AS6A.webp" },
+        { id: 19, rarity: "C", name: "Candy Diver Cookie", rate: 35.80, img: "https://cookierunbraverse.com/data/en_storage/JnQqr_u7YzEhX8tTzfbfvQ.webp" },
+        { id: 19, rarity: "C", name: "Prophet Cookie", rate: 35.80, img: "https://cookierunbraverse.com/data/en_storage/FielnNkIkNhNo9NpemKLMg.webp" }
     ];
 
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
         if (user) {
             currentUserUID = user.uid;
+            loadLuckState();
+            
+            const userDocSnap = await getDoc(doc(db, "users", user.uid));
+            if (userDocSnap.exists()) {
+                userData = userDocSnap.data();
+                currentUserName = userData.username || userData.name || "นักสุ่มผู้โชคดี";
+                updateUI();
+            }
+
             onSnapshot(doc(db, "users", user.uid), (snap) => {
                 if (snap.exists()) { userData = snap.data(); updateUI(); }
             });
+
+            initSecretStockListener();
+            initGlobalBroadcastListener();
+
         } else { window.location.href = 'login.html'; }
     });
 
@@ -225,97 +321,209 @@
         if (!userData) return;
         document.getElementById("balance").innerText = (userData.points || 0).toLocaleString();
         document.getElementById("user-diamonds").innerText = (userData.diamonds || 0).toLocaleString();
-        
-        // อัปเดตจำนวนตั๋วบน UI (ดึงจาก field: normal_tickets และ premium_tickets)
         document.getElementById("user-normal-tickets").innerText = (userData.normal_tickets || 0).toLocaleString();
         document.getElementById("user-premium-tickets").innerText = (userData.premium_tickets || 0).toLocaleString();
 
-        const ps = userData.pitySEC || 0, pe = userData.pityEXR || 0;
-        document.getElementById("pity-bar-sec").style.width = (Math.min(ps, 550) / 550 * 100) + "%";
-        document.getElementById("pity-text-sec").innerText = `${ps} / 550`;
+        const ps = userData.pitySEC || 0, pe = userData.pityEXR || 0; 
         document.getElementById("pity-bar-exr").style.width = (Math.min(pe, 900) / 900 * 100) + "%";
         document.getElementById("pity-text-exr").innerText = `${pe} / 900`;
+        document.getElementById("pity-bar-sec").style.width = (Math.min(ps, 550) / 550 * 100) + "%";
+        document.getElementById("pity-text-sec").innerText = `${ps} / 550`;
+       
     }
 
-    // ฟังก์ชันคำนวณระดับ EXP ประจำระดับเลเวล
-    function getRequiredExpForLevel(lv) {
-        return lv * 120;
+    function initSecretStockListener() {
+        const stockRef = doc(db, "server_stats", "secret_card_stock");
+        onSnapshot(stockRef, async (docSnap) => {
+            const stockStatusEl = document.getElementById("secret-stock-status");
+            if (docSnap.exists()) {
+                globalSecretCount = docSnap.data().count || 0;
+            } else {
+                await setDoc(stockRef, { count: 0 });
+                globalSecretCount = 0;
+            }
+            let remaining = 10000 - globalSecretCount;
+            if (remaining < 0) remaining = 0;
+            
+            if (remaining === 0) {
+                stockStatusEl.innerHTML = `<span style="color: red; font-weight:bold;">หมดแล้ว (0 / 10,000)</span>`;
+            } else {
+                stockStatusEl.innerHTML = `0.05% (เหลือ ${remaining.toLocaleString()} ใบ)`;
+            }
+        });
     }
+
+    function initGlobalBroadcastListener() {
+        const broadcastRef = doc(db, "server_stats", "global_broadcast");
+        onSnapshot(broadcastRef, (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                if (data.message) {
+                    appendBroadcastMessage(data.message);
+                }
+            }
+        });
+    }
+
+    // ฟังก์ชันเพิ่มข้อความใหม่ต่อลงไปด้านล่าง และเลื่อนจอลงอัตโนมัติ
+    function appendBroadcastMessage(msg) {
+        const feed = document.getElementById("broadcast-feed");
+        if (!feed) return;
+        
+        const item = document.createElement("div");
+        item.className = "broadcast-item";
+        item.innerText = msg;
+        feed.appendChild(item);
+
+        // จำกัดประวัติไม่ให้ยาวเกินไป (เก็บไว้ล่าสุด 50 ข้อความ)
+        if (feed.children.length > 50) {
+            feed.removeChild(feed.firstChild);
+        }
+
+        // เลื่อนแถบเลื่อนลงไปล่างสุดเพื่อให้เห็นข้อความล่าสุดเสมอ
+        feed.scrollTop = feed.scrollHeight;
+    }
+
+    async function sendBroadcast(message) {
+        try {
+            const broadcastRef = doc(db, "server_stats", "global_broadcast");
+            await setDoc(broadcastRef, { message: message, timestamp: Date.now() });
+        } catch (err) {
+            console.error("Error sending broadcast: ", err);
+        }
+    }
+
+    function loadLuckState() {
+        const savedCount = localStorage.getItem(`luck_count_${currentUserUID}`);
+        const savedExpire = localStorage.getItem(`luck_expire_${currentUserUID}`);
+        if (savedCount !== null) luckCount = parseInt(savedCount);
+        if (savedExpire !== null) luckExpireTime = parseInt(savedExpire);
+        startLuckTimer();
+        updateLuckUI();
+    }
+
+    window.boostLuck = () => {
+        if (luckCount <= 0) return Swal.fire('หมดสิทธิ์', 'คุณใช้สิทธิ์เพิ่มโชคครบ 5 ครั้งแล้ว!', 'warning');
+        const now = Date.now();
+        if (luckExpireTime > now) {
+            luckExpireTime += 10 * 60 * 1000;
+        } else {
+            luckExpireTime = now + (10 * 60 * 1000);
+        }
+        luckCount--;
+        localStorage.setItem(`luck_count_${currentUserUID}`, luckCount);
+        localStorage.setItem(`luck_expire_${currentUserUID}`, luckExpireTime);
+        Swal.fire({ title: '✨ เพิ่มโชคสำเร็จ!', text: 'เพิ่มอัตราการออกการ์ดระดับสูงเป็นเวลา 10 นาที!', icon: 'success', timer: 2000, showConfirmButton: false });
+        startLuckTimer();
+        updateLuckUI();
+    }
+
+    function startLuckTimer() {
+        if (luckTimerInterval) clearInterval(luckTimerInterval);
+        luckTimerInterval = setInterval(() => { updateLuckUI(); }, 1000);
+    }
+
+    function updateLuckUI() {
+        const now = Date.now();
+        const statusText = document.getElementById("luck-status-text");
+        const btnBoost = document.getElementById("btn-boost-luck");
+        if (luckExpireTime > now) {
+            const timeLeft = Math.floor((luckExpireTime - now) / 1000);
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            statusText.innerHTML = `🍀 บัฟโชคทำงานอยู่! เหลือเวลา: <span style="color:#00ffff;">${minutes}:${seconds < 10 ? '0' : ''}${seconds} นาที</span> (เหลือสิทธิ์ ${luckCount}/5)`;
+        } else {
+            statusText.innerHTML = `🍀 เพิ่มโชคพิเศษ: พร้อมใช้งาน (เหลือสิทธิ์ ${luckCount}/5 ครั้ง)`;
+        }
+        if (luckCount <= 0 && luckExpireTime <= now) {
+            btnBoost.disabled = true;
+            btnBoost.innerText = "❌ ใช้สิทธิ์ครบแล้ว (5/5)";
+        } else {
+            btnBoost.disabled = false;
+        }
+    }
+
+    function getRequiredExpForLevel(lv) { return lv * 120; }
 
     window.pull = async (amount) => {
         if (isPulling || !userData) return;
 
-        // ดึงจำนวนเงินและตั๋วปัจจุบันจากก้อน object
         let currentPoints = userData.points || 0;
         let normalTickets = userData.normal_tickets || 0;
         let premiumTickets = userData.premium_tickets || 0;
-
-        // ประกาศตัวแปรฟิลด์ที่จะใช้สำหรับส่งอัปเดตไปที่ Firebase
         let updateFields = {};
         let costPoints = 0;
-        let passExpGained = amount === 5 ? 50 : (amount === 50 ? 1500 : 1000); // แต้ม Pass เดิม
+        let passExpGained = amount === 5 ? 50 : (amount === 50 ? 1500 : 1000);
+        let playerExpGained = amount === 5 ? 10 : (amount === 10 ? 50 : 100);
 
-        // คำนวณ EXP ประจำเลเวลที่จะได้รับตามโจทย์ (5 ครั้ง=10, 10 ครั้ง=50, 50 ครั้ง=100)
-        let playerExpGained = 0;
-        if (amount === 5) playerExpGained = 10;
-        else if (amount === 10) playerExpGained = 50;
-        else if (amount === 50) playerExpGained = 100;
-
-        // ==================== 🎫 ระบบคำนวณและเช็คเงื่อนไขตั๋วสุ่ม 🎫 ====================
         if (amount === 5) {
-            if (normalTickets >= 10) {
-                updateFields["normal_tickets"] = increment(-10);
-            } else if (premiumTickets >= 5) {
-                updateFields["premium_tickets"] = increment(-5);
-            } else {
-                costPoints = 100;
-                if (currentPoints < costPoints) return alert("แต้มหรือตั๋วสุ่มของคุณไม่เพียงพอ!");
-                updateFields["points"] = increment(-costPoints);
-            }
-        } 
-        else if (amount === 10) {
-            if (normalTickets >= 15) {
-                updateFields["normal_tickets"] = increment(-15);
-            } else if (premiumTickets >= 10) {
-                updateFields["premium_tickets"] = increment(-10);
-            } else {
-                costPoints = 500;
-                if (currentPoints < costPoints) return alert("แต้มหรือตั๋วสุ่มของคุณไม่เพียงพอ!");
-                updateFields["points"] = increment(-costPoints);
-            }
-        } 
-        else if (amount === 50) {
-            if (normalTickets >= 30) {
-                updateFields["normal_tickets"] = increment(-30);
-            } else if (premiumTickets >= 20) {
-                updateFields["premium_tickets"] = increment(-20);
-            } else {
-                costPoints = 1000;
-                if (currentPoints < costPoints) return alert("แต้มหรือตั๋วสุ่มของคุณไม่เพียงพอ!");
-                updateFields["points"] = increment(-costPoints);
-            }
+            if (normalTickets >= 10) updateFields["normal_tickets"] = increment(-10);
+            else if (premiumTickets >= 5) updateFields["premium_tickets"] = increment(-5);
+            else { costPoints = 100; if (currentPoints < costPoints) return alert("แต้มหรือตั๋วสุ่มของคุณไม่เพียงพอ!"); updateFields["points"] = increment(-costPoints); }
+        } else if (amount === 10) {
+            if (normalTickets >= 15) updateFields["normal_tickets"] = increment(-15);
+            else if (premiumTickets >= 10) updateFields["premium_tickets"] = increment(-10);
+            else { costPoints = 500; if (currentPoints < costPoints) return alert("แต้มหรือตั๋วสุ่มของคุณไม่เพียงพอ!"); updateFields["points"] = increment(-costPoints); }
+        } else if (amount === 50) {
+            if (normalTickets >= 30) updateFields["normal_tickets"] = increment(-30);
+            else if (premiumTickets >= 20) updateFields["premium_tickets"] = increment(-20);
+            else { costPoints = 1000; if (currentPoints < costPoints) return alert("แต้มหรือตั๋วสุ่มของคุณไม่เพียงพอ!"); updateFields["points"] = increment(-costPoints); }
         }
 
-        // เริ่มต้นอนิเมชั่นการสุ่ม
         isPulling = true; toggleButtons(true);
         const display = document.getElementById("display");
         display.innerHTML = "";
         
         const results = [];
         let ps = userData.pitySEC || 0, pe = userData.pityEXR || 0;
-        const totalWeight = allCards.reduce((s, c) => s + c.rate, 0);
+
+        const stockRef = doc(db, "server_stats", "secret_card_stock");
+        const stockSnap = await getDoc(stockRef);
+        let liveSecretCount = stockSnap.exists() ? (stockSnap.data().count || 0) : 0;
+        let secretWonCountInThisPull = 0;
+
+        const isLuckActive = luckExpireTime > Date.now();
+        const activeCards = allCards.map(c => {
+            let modifiedRate = c.rate;
+            if (c.rarity === "SECRET" && liveSecretCount >= 10001) {
+                modifiedRate = 0;
+            } else if (isLuckActive && ["EXR", "SECRET", "SEC", "SUR", "UR"].includes(c.rarity)) {
+                modifiedRate *= 2.5; 
+            }
+            return { ...c, currentRate: modifiedRate };
+        });
+
+        const totalWeight = activeCards.reduce((s, c) => s + c.currentRate, 0);
 
         for (let i = 0; i < amount; i++) {
             ps++; pe++;
             let win = null;
-            if (pe >= 900) { win = allCards.filter(c => c.rarity === "EXR")[0]; pe = 0; }
-            else if (ps >= 550) { win = allCards.filter(c => c.rarity === "SEC")[0]; ps = 0; }
+            if (pe >= 900) { win = activeCards.filter(c => c.rarity === "EXR")[0]; pe = 0; }
+            else if (ps >= 550) { win = activeCards.filter(c => c.rarity === "SEC")[0]; ps = 0; }
             else {
                 let r = Math.random() * totalWeight, curr = 0;
-                for (const c of allCards) { curr += c.rate; if (r <= curr) { win = c; break; } }
+                for (const c of activeCards) { curr += c.currentRate; if (r <= curr) { win = c; break; } }
             }
+            if (!win) win = activeCards.filter(c => c.rarity === "C")[0];
+
             if (win.rarity === "SEC") ps = 0;
             if (win.rarity === "EXR") { pe = 0; ps = 0; }
+
+            if (win.rarity === "SECRET") {
+                if (liveSecretCount < 10001) {
+                    liveSecretCount++;
+                    secretWonCountInThisPull++;
+                    sendBroadcast(`🎉 โคตรดวงดี! คุณ ${currentUserName} สุ่มได้การ์ดระดับ [SECRET] ${win.name} (ใบที่ ${liveSecretCount}/10,000)!`);
+                } else {
+                    win = activeCards.filter(c => c.rarity === "EXR")[0] || win;
+                }
+            }
+
+            if (win.rarity === "EXR") {
+                sendBroadcast(`🔥 สุดยอดความเฮง! คุณ ${currentUserName} สุ่มได้การ์ดระดับหายากสูงสุด [EXR] ${win.name}!`);
+            } else if (win.rarity === "SEC") {
+                sendBroadcast(`✨ ยินดีด้วย! คุณ ${currentUserName} สุ่มได้การ์ดระดับ [SEC] ${win.name}!`);
+            }
 
             results.push({ name: win.name, rarity: win.rarity, img: win.img, obtainedDate: Date.now(), level: 1, source: "Gacha ตู้ที่ 1" });
             const cardEl = document.createElement("div");
@@ -324,11 +532,10 @@
             display.appendChild(cardEl);
             setTimeout(() => cardEl.classList.add("revealed"), i * 150);
 
-            if (win.rarity === "EXR") await playEXRCutscene();
+            if (win.rarity === "EXR" || win.rarity === "SECRET") await playEXRCutscene();
             else if (["SEC", "SUR", "SSR", "UR"].includes(win.rarity)) triggerShake();
         }
 
-        // --- คำนวณประมวลผลระบบเลเวลผู้เล่น (Player Level Update Loop) ---
         let finalPlayerLv = parseInt(userData.playerLevel) || 1;
         let finalPlayerExp = parseInt(userData.playerExp) || 0;
         finalPlayerExp += playerExpGained;
@@ -340,7 +547,6 @@
             isLeveledUp = true;
         }
 
-        // อัปเดตข้อมูล Pity, EXP และคลังการ์ดเข้าก้อนที่จะส่งอัปเดตไป Firebase
         updateFields["pitySEC"] = ps;
         updateFields["pityEXR"] = pe;
         updateFields["passExp"] = increment(passExpGained);
@@ -348,23 +554,23 @@
         updateFields["playerExp"] = finalPlayerExp;
         updateFields["collection"] = arrayUnion(...results);
 
-        // บันทึกการเปลี่ยนแปลงลงฐานข้อมูล Firebase คราวเดียว
         await updateDoc(doc(db, "users", currentUserUID), updateFields);
-        
+
+        if (secretWonCountInThisPull > 0) {
+            await setDoc(stockRef, { count: liveSecretCount });
+        }
+
         isPulling = false; toggleButtons(false);
 
-        // แสดงแจ้งเตือน SweetAlert2 เมื่อเลเวลอัปสำเร็จแบบเรียลไทม์
         if (isLeveledUp) {
             Swal.fire({
                 title: '🎉 ยินดีด้วย เลเวลอัปแล้ว! 🎉',
-                html: `<div style="font-size: 1.2rem; margin: 10px 0;">คุณได้เลื่อนระดับเป็น <span style="color: #00e5ff; font-weight: bold; font-size: 1.6rem;">LV. ${finalPlayerLv}</span></div>
-                       <p style="color: #aaa; font-size: 0.9rem;">กลับไปที่หน้าโปรไฟล์หลักเพื่อกดรับไอเทมของรางวัลประจำเลเวลได้เลย!</p>`,
+                html: `<div style="font-size: 1.2rem; margin: 10px 0;">คุณได้เลื่อนระดับเป็น <span style="color: #00e5ff; font-weight: bold; font-size: 1.6rem;">LV. ${finalPlayerLv}</span></div>`,
                 icon: 'success',
                 background: '#1a1a1c',
                 color: '#fff',
                 confirmButtonColor: '#ffc831',
-                confirmButtonText: 'รับทราบ!',
-                backdrop: `rgba(0,0,0,0.8)`
+                confirmButtonText: 'รับทราบ!'
             });
         }
     }
@@ -372,11 +578,13 @@
     async function playEXRCutscene() {
         const overlay = document.getElementById("cutscene-overlay");
         overlay.style.display = "flex";
-        await new Promise(r => setTimeout(r, 1200));
+        await new RuntimePromise(r => setTimeout(r, 1200));
         overlay.style.display = "none";
         const flash = document.createElement("div"); flash.className="exr-flash";
         document.body.appendChild(flash); setTimeout(() => flash.remove(), 800);
     }
+
+    function RuntimePromise(fn) { return new Promise(fn); }
 
     function triggerShake() {
         document.body.classList.add("shake-heavy");
@@ -395,7 +603,7 @@
             <tr>
                 <td><img src="${c.img}" class="modal-card-img"></td>
                 <td>
-                    <div style="font-weight:bold; color: ${getRarityColor(c.rarity)};">[${c.rarity}]</div>
+                    <div class="color-${c.rarity.toLowerCase()}" style="font-weight:bold;">[${c.rarity}]</div>
                     <div style="font-size: 0.9rem;">${c.name}</div>
                 </td>
                 <td style="text-align:right; font-weight:bold; color:#ffc831;">${c.rate}%</td>
@@ -406,21 +614,8 @@
 
     window.closeModal = () => document.getElementById("rateModal").style.display = "none";
 
-    function getRarityColor(rarity) {
-        const colors = { 
-            EXR: '#00d4ff', 
-            SEC: '#a020f0', 
-            SUR: '#ff4500', 
-            UR: '#39ff14', 
-            SSR: '#ff4444', 
-            SR: '#ffc831',
-            R: '#007bff' 
-        };
-        return colors[rarity] || '#aaaaaa';
-    }
-
     const track = document.getElementById("v-track");
-    const rares = allCards.filter(c => ["EXR", "SEC", "SUR", "UR", "SSR", "R"].includes(c.rarity));
+    const rares = allCards.filter(c => ["SECRET","EXR", "SEC", "SUR", "UR", "SSR", "R"].includes(c.rarity));
     track.innerHTML = [...rares, ...rares].map(c => `<div class="preview-card-item"><img src="${c.img}"></div>`).join('');
 </script>
 </body>
