@@ -509,6 +509,84 @@
             opacity: 0.6;
             filter: grayscale(0.5);
         }
+
+        /* ==================== ITEM SELECTION STYLES ==================== */
+        .item-selection-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 600px) {
+            .item-selection-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .item-card-option {
+            background: rgba(20, 20, 35, 0.8);
+            border: 2px solid rgba(255, 200, 49, 0.3);
+            border-radius: 16px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .item-card-option:hover {
+            transform: translateY(-3px);
+            border-color: #ffc831;
+            box-shadow: 0 5px 15px rgba(255, 200, 49, 0.2);
+        }
+
+        .item-card-option.selected {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.1);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+        }
+
+        .item-card-option.selected::after {
+            content: "✓";
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            color: #00ff88;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .item-icon-wrapper {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+        }
+
+        .item-title {
+            color: #ffc831;
+            font-weight: bold;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .item-type-tag {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .type-auto { background: rgba(0, 255, 136, 0.2); color: #00ff88; border: 1px solid rgba(0, 255, 136, 0.4); }
+        .type-manual { background: rgba(255, 144, 0, 0.2); color: #ff9000; border: 1px solid rgba(255, 144, 0, 0.4); }
+
+        .item-desc {
+            font-size: 0.75rem;
+            color: #a0aec0;
+            line-height: 1.3;
+        }
     </style>
 </head>
 <body>
@@ -593,7 +671,7 @@
             <div class="pass-header-card">
                 <div>
                     <h3 style="color: #ffc831; margin: 0 0 5px 0; font-size: 1.4rem;">🎫 Grand Arena Pass</h3>
-                    <p style="font-size: 0.85rem; color: #a0aec0; margin: 0 0 8px 0;">รับ XP จากการต่อสู้ (ชนะ: <b style="color:#00ff88;">+200 XP</b> | แพ้: <b style="color:#ff4d4d;">+50 XP</b>) </p>
+                    <p style="font-size: 0.85rem; color: #a0aec0; margin: 0 0 8px 0;">รับ XP จากการต่อสู้ (ชนะ: <b style="color:#00ff88;">+200 XP</b> | แพ้: <b style="color:#ff4d4d;">+50 XP</b>) ใช้ 200 XP ต่อ 1 ช่อง</p>
                     <div style="font-size: 0.85rem; color: #ff9000; font-weight: bold;">⏳ รีเซ็ตพาสในซีซั่นนี้: <span id="pass-season-countdown">-- วัน --:--:--</span></div>
                 </div>
                 <div style="text-align: right; display: flex; flex-direction: column; gap: 8px; align-items: flex-end;">
@@ -640,6 +718,46 @@
     </div>
 
     <!-- MODALS -->
+    <!-- ITEM PREPARATION POPUP MODAL -->
+    <div id="itemPrepModal" class="modal">
+        <div class="modal-content" style="max-width: 650px; text-align: center;">
+            <span class="close-modal" onclick="toggleModal('itemPrepModal', false)">&times;</span>
+            <h3 style="color:#ffc831; margin-top: 0; font-size: 1.4rem;">🛡️ เลือกไอเทมช่วยต่อสู้</h3>
+            <p style="color:#a0aec0; font-size:0.85rem; margin-bottom: 15px;">เลือกไอเทมที่คุณต้องการนำเข้าไปใช้ในการต่อสู้นี้ (เลือกได้ 1 ชิ้น หรือไม่เลือกเลยก็ได้)</p>
+
+            <div class="item-selection-grid">
+                <!-- ITEM 1: SHIELD -->
+                <div class="item-card-option" id="item-opt-shield" onclick="selectBattleItem('shield')">
+                    <div class="item-icon-wrapper">🛡️</div>
+                    <div class="item-title">โล่ป้องกัน</div>
+                    <span class="item-type-tag type-auto">ทำงานอัตโนมัติ</span>
+                    <div class="item-desc">มอบโล่ 50HP ให้ทีมเมื่อเริ่มสู้ เมื่อโล่หมดจะหายไปทันที</div>
+                </div>
+
+                <!-- ITEM 2: LIGHTNING -->
+                <div class="item-card-option" id="item-opt-lightning" onclick="selectBattleItem('lightning')">
+                    <div class="item-icon-wrapper">⚡</div>
+                    <div class="item-title">สายฟ้าฟาด</div>
+                    <span class="item-type-tag type-manual">กดใช้เอง </span>
+                    <div class="item-desc">เรียกสายฟ้าฟาดใส่ทีมตรงข้าม ทำให้สตันนาน 3 วินาที</div>
+                </div>
+
+                <!-- ITEM 3: SPEED & POWER POTION -->
+                <div class="item-card-option" id="item-opt-potion" onclick="selectBattleItem('potion')">
+                    <div class="item-icon-wrapper">🧪</div>
+                    <div class="item-title">น้ำยาเร่งสปีด</div>
+                    <span class="item-type-tag type-manual">กดใช้เอง</span>
+                    <div class="item-desc">เพิ่มความเร็วเคลื่อนที่ +20% และพลังโจมตี +30% นาน 20 วินาที</div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn-action" style="flex: 1; background: rgba(255,255,255,0.1); color: #fff;" onclick="toggleModal('itemPrepModal', false)">ยกเลิก</button>
+                <button class="btn-action" style="flex: 2; background: linear-gradient(135deg, #00ff88 0%, #00b359 100%); color: #000;" onclick="confirmAndStartBattle()">⚔️ เข้าสู่การต่อสู้!</button>
+            </div>
+        </div>
+    </div>
+
     <div id="rankModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="toggleModal('rankModal', false)">&times;</span>
@@ -723,7 +841,7 @@
         { name: "Supreme MASTER 3", min: 15000, icon: "👑", color: "rainbow", reward: { coin: 100000, gem: 100000, normalTicket: 1000 } },
         { name: "Supreme MASTER 2", min: 17000, icon: "👑", color: "rainbow", reward: { coin: 200000, gem: 200000, normalTicket: 1500 } },
         { name: "Supreme MASTER 1", min: 19000, icon: "👑", color: "rainbow", reward: { coin: 200000, gem: 200000, normalTicket: 1500, premiumTicket: 500 } },
-        { name: "Supreme MASTER PRO!!", min: 21000, icon: "👑🔥", color: "rainbow", reward: { coin: 50000000000, gem: 5000000, normalTicket: 2000, premiumTicket: 900, badgeTitle: "ผู้พิทักษ์อารีน่าแห่งนี้" } }
+        { name: "Supreme MASTER PRO!!", min: 21000, icon: "👑🔥", color: "rainbow", reward: { coin: 500000000000, gem: 5000000, normalTicket: 2000, premiumTicket: 900, badgeTitle: "ผู้พิทักษ์อารีน่าแห่งนี้" } }
     ];
 
     let userDoc = null, tempShowcase = [], tempDefense = [];
@@ -732,6 +850,8 @@
     let showcaseIndex = 0, showcaseTimer = null;
     let isInitialized = false; 
     let allUsersCache = [];
+    let selectedOpponentId = null;
+    let selectedBattleItem = null;
 
     function initSeasonTimer() {
         setInterval(() => {
@@ -870,7 +990,7 @@
                 } else {
                     tempDefense = userDoc.defenseCards.map(dc => {
                         const matched = uniqueCards.find(c => (c.name || c.id) === (dc.name || dc.id));
-                        return matched ? matched : { ...dc, level: dc.level || dc.lv || 1, stars: dc.stars || dc.star || 0 };
+                        return matched ? matched : { ...sc, level: dc.level || dc.lv || 1, stars: dc.stars || dc.star || 0 };
                     });
                 }
                 
@@ -1321,11 +1441,46 @@
             alert("เกิดข้อผิดพลาดในการรับรางวัล");
         }
     };
-    // ==========================================================
 
+    // ==================== BATTLE & ITEM PREPARATION LOGIC ====================
     window.startBattle = function(opponentId) {
-        window.location.href = `battle.html?opponent=${encodeURIComponent(opponentId)}`;
+        selectedOpponentId = opponentId;
+        selectedBattleItem = null;
+        
+        // Reset Item UI
+        ['shield', 'lightning', 'potion'].forEach(item => {
+            const el = document.getElementById(`item-opt-${item}`);
+            if(el) el.classList.remove('selected');
+        });
+
+        toggleModal('itemPrepModal', true);
     };
+
+    window.selectBattleItem = function(itemKey) {
+        if(selectedBattleItem === itemKey) {
+            selectedBattleItem = null;
+            document.getElementById(`item-opt-${itemKey}`).classList.remove('selected');
+        } else {
+            selectedBattleItem = itemKey;
+            ['shield', 'lightning', 'potion'].forEach(item => {
+                const el = document.getElementById(`item-opt-${item}`);
+                if(el) {
+                    if(item === itemKey) el.classList.add('selected');
+                    else el.classList.remove('selected');
+                }
+            });
+        }
+    };
+
+    window.confirmAndStartBattle = function() {
+        if(!selectedOpponentId) return;
+        let url = `battle.html?opponent=${encodeURIComponent(selectedOpponentId)}`;
+        if(selectedBattleItem) {
+            url += `&item=${encodeURIComponent(selectedBattleItem)}`;
+        }
+        window.location.href = url;
+    };
+    // ==========================================================
 
     function initShowcaseSlider() {
         const container = document.getElementById("showcase-container");
