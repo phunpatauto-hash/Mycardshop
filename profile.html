@@ -71,6 +71,7 @@
             display: flex; align-items: center; justify-content: center; cursor: pointer;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
+        .pfp-edit:hover { background: var(--primary); transform: scale(1.1); }
 
         /* User Info & LEVEL System */
         .user-main { z-index: 2; align-self: center; }
@@ -102,60 +103,40 @@
         .whale-title-banner.rank-master { background: linear-gradient(135deg, rgba(255, 200, 49, 0.2) 0%, rgba(255, 144, 0, 0.2) 100%); border: 1px solid rgba(255, 144, 0, 0.5); color: #ff9000; box-shadow: 0 0 15px rgba(255, 144, 0, 0.4); text-shadow: 0 0 5px rgba(255, 144, 0, 0.6); }
         .whale-title-banner.rank-level-traveler { background: linear-gradient(135deg, rgba(0, 229, 255, 0.2) 0%, rgba(0, 102, 255, 0.2) 100%); border: 1px solid rgba(0, 229, 255, 0.5); color: #00e5ff; box-shadow: 0 0 15px rgba(0, 229, 255, 0.4); text-shadow: 0 0 5px rgba(0, 229, 255, 0.6); }
         
-        /* 👑🔥 สไตล์ออร่าพิเศษยศ "ผู้พิทักษ์อารีน่าแห่งนี้" (Supreme MASTER PRO!!) */
         .whale-title-banner.rank-supreme-guardian { 
             background: linear-gradient(135deg, rgba(255, 215, 0, 0.35) 0%, rgba(255, 69, 0, 0.45) 50%, rgba(255, 0, 128, 0.35) 100%); 
-            border: 1px solid #ffd700; 
-            color: #fff; 
+            border: 1px solid #ffd700; color: #fff; 
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 10px rgba(255, 69, 0, 0.6); 
-            text-shadow: 0 0 8px #ff4500, 0 0 12px #ffd700; 
-            font-weight: 800;
+            text-shadow: 0 0 8px #ff4500, 0 0 12px #ffd700; font-weight: 800;
         }
 
-        /* 💎🔥 สไตล์ออร่าพิเศษยศปาร์ตี้ "DIAMONDS" */
         .whale-title-banner.rank-party-diamonds { 
             background: linear-gradient(135deg, rgba(0, 229, 255, 0.35) 0%, rgba(138, 43, 226, 0.45) 50%, rgba(0, 255, 204, 0.35) 100%); 
-            border: 1px solid #00e5ff; 
-            color: #fff; 
+            border: 1px solid #00e5ff; color: #fff; 
             box-shadow: 0 0 22px rgba(0, 229, 255, 0.85), 0 0 12px rgba(138, 43, 226, 0.6); 
-            text-shadow: 0 0 8px #00ffff, 0 0 14px #8a2be2; 
-            font-weight: 800;
+            text-shadow: 0 0 8px #00ffff, 0 0 14px #8a2be2; font-weight: 800;
         }
 
-        /* 🌈✨ สไตล์ออร่ายศสีรุ้ง (Rainbow Animated Gradient) สำหรับนักเดินทางเลเวลขั้นสุดยอด */
         .whale-title-banner.rank-rainbow-ultimate {
             background: linear-gradient(270deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff);
-            background-size: 600% 600%;
-            border: 2px solid rgba(255, 255, 255, 0.8);
-            color: #ffffff;
-            font-weight: 900;
+            background-size: 600% 600%; border: 2px solid rgba(255, 255, 255, 0.8); color: #ffffff; font-weight: 900;
             box-shadow: 0 0 25px rgba(255, 0, 255, 0.8), 0 0 15px rgba(0, 255, 255, 0.6);
             text-shadow: 0 0 8px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 255, 255, 0.9);
             animation: rainbowAnimation 6s ease infinite, titlePulse 2s infinite alternate;
         }
         
-        /* 🔨✨ สไตล์ออร่ายศประมูล */
         .whale-title-banner.rank-auction-starter {
             background: linear-gradient(135deg, rgba(0, 210, 255, 0.25) 0%, rgba(0, 100, 255, 0.3) 100%);
-            border: 1px solid #00d2ff;
-            color: #00d2ff;
-            box-shadow: 0 0 18px rgba(0, 210, 255, 0.5);
-            text-shadow: 0 0 6px rgba(0, 210, 255, 0.6);
+            border: 1px solid #00d2ff; color: #00d2ff; box-shadow: 0 0 18px rgba(0, 210, 255, 0.5); text-shadow: 0 0 6px rgba(0, 210, 255, 0.6);
         }
         .whale-title-banner.rank-auction-pro {
             background: linear-gradient(135deg, rgba(255, 140, 0, 0.3) 0%, rgba(255, 60, 0, 0.35) 100%);
-            border: 1px solid #ff8c00;
-            color: #ffb700;
-            box-shadow: 0 0 20px rgba(255, 140, 0, 0.6);
-            text-shadow: 0 0 6px rgba(255, 140, 0, 0.7);
+            border: 1px solid #ff8c00; color: #ffb700; box-shadow: 0 0 20px rgba(255, 140, 0, 0.6); text-shadow: 0 0 6px rgba(255, 140, 0, 0.7);
         }
         .whale-title-banner.rank-auction-god {
             background: linear-gradient(135deg, rgba(255, 215, 0, 0.4) 0%, rgba(255, 0, 128, 0.4) 100%);
-            border: 2px solid #ffd700;
-            color: #ffffff;
-            font-weight: 900;
-            box-shadow: 0 0 25px rgba(255, 215, 0, 0.85);
-            text-shadow: 0 0 8px #ff007f, 0 0 12px #ffd700;
+            border: 2px solid #ffd700; color: #ffffff; font-weight: 900;
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.85); text-shadow: 0 0 8px #ff007f, 0 0 12px #ffd700;
         }
 
         @keyframes rainbowAnimation {
@@ -208,32 +189,11 @@
         .spinner { width: 50px; height: 50px; border: 3px solid rgba(255,200,49,0.1); border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 1s infinite linear; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* Custom Dropdown Box & Scrollbar inside SweetAlert */
-        .swal-select-custom { 
-            background: #18181c !important; 
-            color: #ffffff !important; 
-            border-radius: 12px !important; 
-            border: 1px solid #3f3f46 !important; 
-            padding: 12px 16px !important;
-            font-size: 0.95rem !important;
-            font-family: 'Kanit', sans-serif !important;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5) !important;
-        }
-
-        .title-scroll-box::-webkit-scrollbar {
-            width: 8px;
-        }
-        .title-scroll-box::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-        }
-        .title-scroll-box::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-        }
-        .title-scroll-box::-webkit-scrollbar-thumb:hover {
-            background: var(--primary);
-        }
+        /* Scrollbar inside SweetAlert */
+        .title-scroll-box::-webkit-scrollbar { width: 8px; }
+        .title-scroll-box::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.3); border-radius: 10px; }
+        .title-scroll-box::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+        .title-scroll-box::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
         @media (max-width: 900px) {
             .hero-section { grid-template-columns: 1fr; text-align: center; padding: 30px; }
@@ -244,10 +204,6 @@
 
         .pfp-frame.blue-luxury-frame { background: linear-gradient(135deg, #00d4ff, #0077ff, #00ff87); background-size: 300% 300%; animation: rotateFrameGradient 4s ease infinite; box-shadow: 0 0 25px rgba(30, 218, 255, 0.87); }
         @keyframes rotateFrameGradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-
-        body.diamond-waterfall-bg { position: relative; background-color: #050508 !important; overflow-x: hidden; }
-        .falling-diamond { position: fixed; top: -50px; z-index: -1; font-size: 1.5rem; pointer-events: none; user-select: none; text-shadow: 0 0 10px rgba(0, 229, 255, 0.6); opacity: 0.7; animation: diamondDrop linear forwards; }
-        @keyframes diamondDrop { 0% { transform: translateY(0) rotate(0deg); opacity: 0; } 10% { opacity: 0.7; } 90% { opacity: 0.7; } 100% { transform: translateY(105vh) rotate(360deg); opacity: 0; } }
     </style>
 </head>
 <body>
@@ -268,7 +224,8 @@
             <div class="pfp-frame">
                 <img id="user-avatar" src="" alt="Avatar">
             </div>
-            <label for="pfp-input" class="pfp-edit"><i class="fas fa-pen"></i></label>
+            <!-- ปุ่มเปลี่ยนรูปโปรไฟล์ที่เรียกไฟล์ในเครื่องโดยตรง -->
+            <div class="pfp-edit" onclick="document.getElementById('pfp-input').click()" title="เปลี่ยนรูปโปรไฟล์"><i class="fas fa-pen"></i></div>
             <input type="file" id="pfp-input" accept="image/*" style="display:none;">
         </div>
 
@@ -284,7 +241,6 @@
                 </button>
             </div>
 
-            <!-- 💠 ระบบหลอดระดับเลเวลผู้เล่น (User Level Progress Bar) -->
             <div class="level-wrapper" onclick="openLevelRewardsModal()" title="คลิกเพื่อดูของรางวัลเลเวล">
                 <div class="level-header-row">
                     <span class="level-lbl" id="player-level-title">LV. 1</span>
@@ -423,7 +379,7 @@
         42: { name: "เพชร 100,000", type: "diamonds", value: 100000 },
         43: { name: "เหรียญ 700,000", type: "points", value: 700000 },
         44: { name: "เพชร 200,000", type: "diamonds", value: 200000 },
-        45: { name: "ตั๋วปกติ 10,000", type: "normal_tickets", value: 10000 },
+        45: { name: "การ์ด EXR แบบเลือกได้", type: "exr_card_select" },
         46: { name: "เหรียญ 800,000", type: "points", value: 800000 },
         47: { name: "เพชร 300,000", type: "diamonds", value: 300000 },
         48: { name: "เหรียญ 900,000", type: "points", value: 900000 },
@@ -471,6 +427,26 @@
             window.location.href = "login.html";
         }
     });
+
+    async function uploadImage(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (file.size > 800000) return alert("ไฟล์ต้องมีขนาดไม่เกิน 800KB");
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = async () => {
+            await updateDoc(doc(db, "users", userUID), { userPhoto: reader.result });
+            Swal.fire({
+                icon: 'success',
+                title: 'อัปโหลดรูปโปรไฟล์สำเร็จ!',
+                timer: 1000,
+                showConfirmButton: false,
+                background: '#1a1a1c',
+                color: '#fff'
+            });
+        };
+    }
 
     async function checkAndProcessLevelUp(uid, data) {
         let currentLv = parseInt(data.playerLevel) || 1;
@@ -665,6 +641,62 @@
                     Swal.fire("สำเร็จ!", "ปลดล็อกและได้รับวัตถุดิบระดับ SS ชิ้นที่คุณเลือกเข้ากระเป๋าเรียบร้อย!", "success");
                 }
             }
+            else if (config.type === "exr_card_select") {
+                const exrChoices = {
+                    'exr_card_1': 'Cookie EXR: Dark Enchantress Cookie',
+                    'exr_card_2': 'Cookie EXR: Golden Cheese Cookie',
+                    'exr_card_3': 'Cookie EXR: Mystic Flour Cookie'
+                };
+
+                const exrImages = {
+                    'exr_card_1': 'https://cookierunbraverse.com/data/en_storage/v3sriD5Yu_o7COb4ttgqTw.webp',
+                    'exr_card_2': 'https://cookierunbraverse.com/data/en_storage/d13fpF4FiA0yxYJ5qr6yig.webp',
+                    'exr_card_3': 'https://cookierunbraverse.com/data/en_storage/CMHoSF_U6LUYwYSH_9obrQ.webp'
+                };
+
+                const { value: selectedExrKey } = await Swal.fire({
+                    title: '✨ เลือกการ์ดระดับ EXR ของคุณ',
+                    input: 'select',
+                    inputOptions: exrChoices,
+                    inputPlaceholder: '-- โปรดเลือกการ์ด EXR 1 ใบ --',
+                    showCancelButton: false,
+                    background: '#1a1a1c',
+                    color: '#fff',
+                    confirmButtonColor: '#ffc831',
+                    customClass: { input: 'swal-select-custom' }
+                });
+
+                if (selectedExrKey) {
+                    const chosenName = exrChoices[selectedExrKey];
+                    const chosenImage = exrImages[selectedExrKey];
+                    let currentCollection = data.collection || [];
+                    
+                    const newCardInstance = {
+                        name: chosenName,
+                        rarity: "EXR",
+                        level: 1,
+                        stars: 0,
+                        isLocked: false,
+                        img: chosenImage,
+                        image: chosenImage
+                    };
+                    
+                    currentCollection.push(newCardInstance);
+                    updatePayload.collection = currentCollection;
+                    updatePayload[`cards_inventory.${chosenName}`] = (data.cards_inventory?.[chosenName] || 0) + 1;
+
+                    await updateDoc(docRef, updatePayload);
+                    Swal.fire({
+                        title: "ยินดีด้วย! เลือกการ์ดสำเร็จ",
+                        text: `คุณได้รับ ${chosenName} (EXR) เข้าคลังการ์ดเรียบร้อย!`,
+                        imageUrl: chosenImage,
+                        imageWidth: 160,
+                        imageHeight: 240,
+                        background: '#1a1a1c',
+                        color: '#fff'
+                    });
+                }
+            }
         } catch (err) {
             console.error(err);
             Swal.fire("ล้มเหลว", "ระบบเกิดข้อผิดพลาดในการรับของรางวัล", "error");
@@ -717,7 +749,6 @@
                 unlockedTitles.includes("ปาร์ตีDIAMONDS") || 
                 diamondRainPlaysCount >= 5;
 
-            // 🔨 ระบบเช็คเงื่อนไขยศประมูลจาก auction.html
             const auctionWinsCount = parseInt(userData.auctionWins || userData.auction_wins || 0);
             const isAuctionStarter = unlockedTitles.includes("นักประมูลเริ่ม") || auctionWinsCount >= 5;
             const isAuctionPro = unlockedTitles.includes("นักประมูลชำนาญ") || auctionWinsCount >= 15;
@@ -728,7 +759,7 @@
                     id: 'none',
                     name: '❌ ไม่แสดงฉายา',
                     isUnlocked: true,
-                    desc: 'ปิดการแสดงผลฉายาบนหน้าโปรไฟล์'
+                    desc: 'ปิดการแสดงผลฉายาบนหน้าโปรไฟล์ของคุณ'
                 },
                 {
                     id: 'นักประมูลผู้ชนะตลอดกาล',
@@ -752,7 +783,7 @@
                     id: 'นักเดินทางเลเวลขั้นสุดยอด',
                     name: 'นักเดินทางเลเวลขั้นสุดยอด',
                     isUnlocked: unlockedTitles.includes("นักเดินทางเลเวลขั้นสุดยอด"),
-                    desc: 'ปลดล็อกจากรางวัลเส้นทางเลเวลผู้เล่น (ถึง LV.50)'
+                    desc: 'ปลดล็อกจากรางวัลเส้นทางเลเวลผู้เล่น (ไปถึงเลเวล 50)'
                 },
                 {
                     id: 'DIAMONDS',
@@ -764,31 +795,31 @@
                     id: 'ผู้พิทักษ์อารีน่าแห่งนี้',
                     name: 'ผู้พิทักษ์อารีน่าแห่งนี้',
                     isUnlocked: isSupremeGuardian,
-                    desc: 'ผู้พิทักษ์อารีน่าแห่งนี้ (เงื่อนไข: แรงค์ Supreme MASTER PRO!!)'
+                    desc: 'ปลดล็อกเมื่อคุณมีแรงค์ถึงระดับ Supreme MASTER PRO!!'
                 },
                 {
                     id: 'กำหนดผู้ชนะ',
                     name: 'กำหนดผู้ชนะ',
                     isUnlocked: isWinnerChampion,
-                    desc: 'ผู้เล่นที่ติด Top ติดต่อกัน 5 ซีซั่นจากหน้า Grand Arena (ปัจจุบัน: ' + consecutiveTopSeasons + '/5 ซีซั่น)'
+                    desc: `ผู้เล่นที่ติด Top ติดต่อกัน 5 ซีซั่นจากหน้า Grand Arena (ปัจจุบัน: ${consecutiveTopSeasons}/5 ซีซั่น)`
                 },
                 {
                     id: 'ผู้พิชิตศึกสงคราม',
                     name: 'ผู้พิชิตศึกสงคราม',
                     isUnlocked: isWarConqueror,
-                    desc: 'ผู้พิชิตศึกสงคราม (เงื่อนไข: แรงค์ MASTER 1)'
+                    desc: 'ปลดล็อกเมื่อคุณมีแรงค์ถึงระดับ MASTER 1'
                 },
                 {
                     id: 'ผู้เดินทางเลเวลชำนาน',
                     name: 'ผู้เดินทางเลเวลชำนาน',
                     isUnlocked: unlockedTitles.includes("ผู้เดินทางเลเวลชำนาน"),
-                    desc: 'ปลดล็อกจากรางวัลเส้นทางเลเวลผู้เล่น (ถึง LV.40)'
+                    desc: 'ปลดล็อกจากรางวัลเส้นทางเลเวลผู้เล่น (ไปถึงเลเวล 40)'
                 },
                 {
                     id: 'นักเดินทางเลเวล',
                     name: 'นักเดินทางเลเวล',
                     isUnlocked: unlockedTitles.includes("นักเดินทางเลเวล"),
-                    desc: 'ปลดล็อกจากรางวัลเส้นทางเลเวลผู้เล่น (ถึง LV.20)'
+                    desc: 'ปลดล็อกจากรางวัลเส้นทางเลเวลผู้เล่น (ไปถึงเลเวล 20)'
                 },
                 {
                     id: 'ผู้ใหญ่ใจบุญ',
@@ -798,100 +829,75 @@
                 }
             ];
 
-            const availableOptions = {};
-            
-            allTitlesMasterList.forEach(t => {
-                if (t.id === 'none') {
-                    availableOptions['none'] = t.name;
-                } else if (t.isUnlocked) {
-                    availableOptions[t.id] = `✅ ${t.name}`;
-                } else {
-                    availableOptions[`disabled_${t.id}`] = `🔒 [ยังไม่ได้ปลดล็อก] ${t.name}`;
-                }
-            });
-
             let titleListHTML = `
-                <div style="text-align: left; margin-bottom: 15px;">
-                    <div style="font-weight: bold; color: #ffc831; margin-bottom: 10px; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
-                        <i class="fas fa-list-ul"></i> รายการยศทั้งหมดในระบบ
+                <div style="text-align: left; margin-bottom: 12px;">
+                    <div style="font-weight: bold; color: #ffc831; margin-bottom: 6px; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
+                        <i class="fas fa-hand-pointer"></i> คลิกที่ชื่อยศด้านล่างเพื่อสวมใส่ทันที:
                     </div>
-                    <div class="title-scroll-box" style="max-height: 220px; overflow-y: auto; padding-right: 6px; display: flex; flex-direction: column; gap: 10px;">
+                </div>
+                <div class="title-scroll-box" style="max-height: 320px; overflow-y: auto; padding-right: 6px; display: flex; flex-direction: column; gap: 10px;">
             `;
 
-            allTitlesMasterList.filter(t => t.id !== 'none').forEach(t => {
+            allTitlesMasterList.forEach(t => {
                 const statusColor = t.isUnlocked ? '#22c55e' : '#ef4444';
                 const statusIcon = t.isUnlocked ? 'fa-unlock' : 'fa-lock';
                 const statusText = t.isUnlocked ? 'ปลดล็อกแล้ว' : 'ยังไม่ได้ปลดล็อก';
+                
+                const clickAction = t.isUnlocked ? `onclick="selectAndEquipTitle('${t.id}')"` : `onclick="Swal.fire('ยังไม่ได้ปลดล็อก', 'ยศนี้ยังไม่ผ่านเงื่อนไขการปลดล็อก', 'warning')"`;
+                const hoverStyle = t.isUnlocked ? `cursor: pointer;` : `opacity: 0.6; cursor: not-allowed;`;
 
                 titleListHTML += `
-                    <div style="background: #121214; border: 1px solid ${t.isUnlocked ? 'rgba(34,197,94,0.4)' : '#27272a'}; border-radius: 12px; padding: 12px; position: relative;">
+                    <div ${clickAction} style="background: #121214; border: 1px solid ${t.isUnlocked ? 'rgba(34,197,94,0.4)' : '#27272a'}; border-radius: 12px; padding: 12px; ${hoverStyle} transition: all 0.2s;" onmouseover="this.style.borderColor='#ffc831'" onmouseout="this.style.borderColor='${t.isUnlocked ? 'rgba(34,197,94,0.4)' : '#27272a'}';">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                            <span style="font-weight: bold; color: #ffffff; font-size: 0.9rem;">${t.name}</span>
+                            <span style="font-weight: bold; color: ${t.isUnlocked ? '#ffc831' : '#ffffff'}; font-size: 1rem;">🏷️ ${t.name}</span>
                             <span style="color: ${statusColor}; font-size: 0.8rem; font-weight: bold; display: flex; align-items: center; gap: 4px;">
                                 <i class="fas ${statusIcon}"></i> ${statusText}
                             </span>
                         </div>
-                        <div style="color: #9ca3af; font-size: 0.78rem; display: flex; align-items: center; gap: 5px;">
-                            <i class="fas fa-thumbtack" style="color: #f43f5e;"></i> เงื่อนไข: ${t.desc}
+                        <div style="color: #9ca3af; font-size: 0.8rem; line-height: 1.4; background: rgba(0,0,0,0.25); padding: 6px 10px; border-radius: 8px; border-left: 3px solid ${t.isUnlocked ? '#22c55e' : '#ef4444'};">
+                            💡 <b>เงื่อนไข:</b> ${t.desc}
                         </div>
                     </div>
                 `;
             });
 
-            titleListHTML += `
-                    </div>
-                </div>
-                <div style="text-align: left; font-size: 0.85rem; color: #9ca3af; margin-bottom: 8px;">
-                    เลือกยศที่คุณต้องการสวมใส่:
-                </div>
-            `;
+            titleListHTML += `</div>`;
 
-            const { value: selectedTitle } = await Swal.fire({
+            Swal.fire({
                 title: '👑 เลือกฉายา / ยศของคุณ',
                 html: titleListHTML,
-                input: 'select',
-                inputOptions: availableOptions,
-                inputPlaceholder: '-- เลือกฉายาที่จะสวมใส่ --',
+                showConfirmButton: false,
                 showCancelButton: true,
+                cancelButtonText: 'ปิดหน้าต่าง',
                 background: '#18181b',
                 color: '#fff',
-                confirmButtonColor: '#eab308',
-                cancelButtonColor: '#4b5563',
-                cancelButtonText: 'ยกเลิก',
-                confirmButtonText: 'ตกลง',
-                customClass: { 
-                    input: 'swal-select-custom'
-                },
-                preConfirm: (value) => {
-                    if (!value) {
-                        Swal.showValidationMessage('กรุณาเลือกฉายาอย่างน้อย 1 รายการ');
-                        return false;
-                    }
-                    if (value.startsWith('disabled_')) {
-                        Swal.showValidationMessage('ยศนี้ยังไม่ได้ปลดล็อก! ไม่สามารถเลือกสวมใส่ได้');
-                        return false;
-                    }
-                    return value;
-                }
+                cancelButtonColor: '#4b5563'
             });
 
-            if (selectedTitle) {
-                await updateDoc(doc(db, "users", userUID), { currentTitle: selectedTitle });
-                Swal.fire({
-                    icon: 'success',
-                    title: 'เปลี่ยนฉายาเรียบร้อย!',
-                    timer: 1200,
-                    showConfirmButton: false,
-                    background: '#18181b',
-                    color: '#fff'
-                });
-            }
         } catch (error) {
             console.error(error);
             Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถโหลดข้อมูลคลังฉายาได้', 'error');
         }
     };
 
+    window.selectAndEquipTitle = async (titleId) => {
+        if (!userUID) return;
+        try {
+            await updateDoc(doc(db, "users", userUID), { currentTitle: titleId });
+            Swal.fire({
+                icon: 'success',
+                title: 'สวมใส่ฉายาเรียบร้อย!',
+                timer: 1000,
+                showConfirmButton: false,
+                background: '#18181b',
+                color: '#fff'
+            });
+        } catch (err) {
+            console.error(err);
+            Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถเปลี่ยนยศได้', 'error');
+        }
+    };
+    
     window.editUsername = async () => {
         const { value: newName } = await Swal.fire({
             title: 'เปลี่ยนชื่อผู้เล่น',
@@ -909,18 +915,6 @@
             await updateDoc(doc(db, "users", userUID), { username: newName.trim() });
         }
     };
-
-    async function uploadImage(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        if (file.size > 800000) return alert("ไฟล์ต้องมีขนาดไม่เกิน 800KB");
-
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = async () => {
-            await updateDoc(doc(db, "users", userUID), { userPhoto: reader.result });
-        };
-    }
 
     function updateUI(data) {
         document.getElementById("username-display").innerText = data.username || "COLLECTOR";
@@ -960,12 +954,6 @@
             titleContainer.style.display = "none";
         }
 
-        if (data.currentBg === "diamond_waterfall_bg") {
-            document.body.classList.add("diamond-waterfall-bg");
-        } else {
-            document.body.classList.remove("diamond-waterfall-bg");
-        }
-
         const avatar = document.getElementById("user-avatar");
         avatar.src = data.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.username}`;
 
@@ -985,22 +973,6 @@
         if (collection.length === 0) {
             grid.innerHTML = `<p style="grid-column:1/-1; text-align:center; opacity:0.3; padding:50px;">ยังไม่มีการ์ดในครอบครอง</p>`;
             return;
-        }
-
-        if (window.diamondInterval) clearInterval(window.diamondInterval);
-
-        if (data.currentBg === "diamond_waterfall_bg") {
-            window.diamondInterval = setInterval(() => {
-                const diamond = document.createElement('div');
-                diamond.classList.add('falling-diamond');
-                diamond.innerText = '💎';
-                diamond.style.left = Math.random() * 100 + 'vw';
-                const duration = Math.random() * 4 + 4;
-                diamond.style.animationDuration = duration + 's';
-                diamond.style.fontSize = (Math.random() * 0.8 + 0.8) + 'rem';
-                document.body.appendChild(diamond);
-                setTimeout(() => diamond.remove(), duration * 1000);
-            }, 300);
         }
 
         const grouped = {};
