@@ -40,18 +40,18 @@
             pointer-events: none;
         }
 
-        /* VS Banner Overlay */
+        /* Top HUD Layout */
         .top-hud {
             position: absolute;
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 15px;
             z-index: 10;
             background: rgba(10, 10, 18, 0.85);
-            padding: 10px 25px;
+            padding: 12px 25px;
             border-radius: 40px;
             border: 2px solid rgba(255, 200, 49, 0.4);
             backdrop-filter: blur(8px);
@@ -59,23 +59,67 @@
             justify-content: space-between;
         }
 
-        .player-info { text-align: right; flex: 1; }
-        .enemy-info { text-align: left; flex: 1; }
+        .player-info { 
+            text-align: left; 
+            flex: 1; 
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .enemy-info { 
+            text-align: right; 
+            flex: 1; 
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
 
         /* Team HP Bar Styles */
         .team-hp-bar {
             width: 100%;
-            height: 10px;
+            height: 12px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
+            border-radius: 6px;
             overflow: hidden;
             margin-top: 4px;
             border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            display: flex;
         }
 
-        .team-hp-fill { height: 100%; width: 100%; transition: width 0.2s ease; }
-        .player-hp-fill { background: linear-gradient(90deg, #00ff88, #10b981); margin-left: auto; }
-        .enemy-hp-fill { background: linear-gradient(90deg, #ef4444, #f87171); }
+        .team-hp-fill { height: 100%; transition: width 0.2s ease; }
+        .player-hp-fill { background: linear-gradient(90deg, #00ff88, #10b981); width: 100%; }
+        .enemy-hp-fill { background: linear-gradient(90deg, #ef4444, #f87171); width: 100%; }
+
+        /* Shield Layer Style */
+        .shield-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            box-shadow: 0 0 8px #00d2ff;
+            transition: width 0.2s ease;
+        }
+
+        /* Status บัฟเร่งสปีด แสดงไว้ใต้หลอดเลือดของทีมผู้ท้าชน */
+        .team-speed-buff-tag {
+            display: none; /* ซ่อนไว้ก่อน จะแสดงเมื่อกดใช้ไอเทม */
+            margin-top: 6px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #ffffff;
+            background: linear-gradient(90deg, #ff0055, #ff5500);
+            border: 1px solid #ff0055;
+            padding: 3px 10px;
+            border-radius: 12px;
+            box-shadow: 0 0 12px rgba(255, 0, 85, 0.8);
+            animation: buffPulse 0.8s infinite alternate;
+            white-space: nowrap;
+        }
+
+        @keyframes buffPulse {
+            from { opacity: 0.85; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1.03); }
+        }
 
         .center-hud-box {
             display: flex;
@@ -144,7 +188,7 @@
             position: absolute;
             border: 2px solid #ffc831;
             box-shadow: 0 0 15px rgba(255, 200, 49, 0.4);
-            transition: transform 0.1s ease;
+            transition: transform 0.1s ease, border-color 0.3s, box-shadow 0.3s;
             overflow: visible;
         }
 
@@ -168,7 +212,13 @@
             z-index: 5;
         }
 
-        /* Health Bar */
+        /* Aura เรืองแสงเวลาตัวละครติดบัฟสปีด */
+        .battle-unit.speed-buffed {
+            border-color: #ff0055 !important;
+            box-shadow: 0 0 20px #ff0055, inset 0 0 10px #ff9000 !important;
+        }
+
+        /* Health Bar Unit */
         .hp-bar-container {
             position: absolute;
             top: -16px;
@@ -180,12 +230,19 @@
             border-radius: 4px;
             overflow: hidden;
             border: 1px solid rgba(255,255,255,0.2);
+            display: flex;
         }
 
         .hp-bar-fill {
             height: 100%;
             background: linear-gradient(90deg, #00ff88, #10b981);
             width: 100%;
+            transition: width 0.2s ease;
+        }
+
+        .unit-shield-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
             transition: width 0.2s ease;
         }
 
@@ -208,6 +265,44 @@
         @keyframes floatUp {
             0% { opacity: 1; transform: translateY(0) scale(1.2); }
             100% { opacity: 0; transform: translateY(-30px) scale(0.8); }
+        }
+
+        /* Item Container UI */
+        .item-hud {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            display: flex;
+            gap: 10px;
+        }
+
+        .item-btn {
+            background: rgba(10, 10, 18, 0.85);
+            border: 2px solid #ffc831;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-family: 'Kanit', sans-serif;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255, 200, 49, 0.4);
+            backdrop-filter: blur(5px);
+            transition: all 0.2s ease;
+        }
+
+        .item-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            background: #ffc831;
+            color: #000;
+        }
+
+        .item-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-color: #666;
         }
 
         /* Result Panel */
@@ -340,12 +435,16 @@
 
         <!-- Top HUD -->
         <div class="top-hud">
+            <!-- ฝ่ายผู้ท้าชน (ทีมผู้เล่น) -->
             <div class="player-info">
-                <div style="font-weight: bold; color: #ffc831;" id="p1-name">กำลังโหลด...</div>
+                <div style="font-weight: bold; color: #ffc831;" id="p1-name">Auto</div>
                 <div style="font-size: 0.8rem; color: #a0aec0;">ฝ่ายผู้ท้าชน</div>
                 <div class="team-hp-bar">
                     <div class="team-hp-fill player-hp-fill" id="p1-team-hp"></div>
+                    <div class="shield-fill" id="p1-team-shield" style="width: 0%;"></div>
                 </div>
+                <!-- แท็กแสดงสถานะบัฟสปีด (อยู่ใต้หลอดเลือดของทีม) -->
+                <div class="team-speed-buff-tag" id="p1-speed-status">⚡ SPEED BOOST (+20% Spd)</div>
             </div>
 
             <div class="center-hud-box">
@@ -353,17 +452,22 @@
                 <div class="timer-display" id="battle-timer">02:00</div>
             </div>
 
+            <!-- ฝ่ายตั้งรับ (คู่ต่อสู้) -->
             <div class="enemy-info">
-                <div style="font-weight: bold; color: #ef4444;" id="p2-name">กำลังโหลด...</div>
+                <div style="font-weight: bold; color: #ef4444;" id="p2-name">test001</div>
                 <div style="font-size: 0.8rem; color: #a0aec0;">ฝ่ายตั้งรับ</div>
                 <div class="team-hp-bar">
                     <div class="team-hp-fill enemy-hp-fill" id="p2-team-hp"></div>
+                    <div class="shield-fill" id="p2-team-shield" style="width: 0%;"></div>
                 </div>
             </div>
         </div>
 
         <!-- Field for 2D Cards -->
         <div class="field" id="battle-field"></div>
+
+        <!-- Item Controller HUD -->
+        <div class="item-hud" id="item-hud"></div>
 
         <!-- Overlay Countdown Screen -->
         <div class="overlay-screen" id="countdown-screen">
@@ -412,6 +516,7 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const opponentId = urlParams.get('opponent') || 'BOT';
+    const selectedItem = urlParams.get('item') || '';
 
     let myCards = [];
     let enemyCards = [];
@@ -424,25 +529,24 @@
     let battleTimeSeconds = 120;
     let timerInterval = null;
 
-    // รายชื่อ Rank ทั้งหมดแบบละเอียด พร้อมค่าคะแนนถ้วย ได้/เสีย
     const RANK_TIERS = [
-        { name: "BRONZE 3", min: 0, icon: "🥉", color: "#cd7f32", win: 15, lose: 5 },
-        { name: "BRONZE 2", min: 100, icon: "🥉", color: "#cd7f32", win: 20, lose: 8 },
-        { name: "BRONZE 1", min: 300, icon: "🥉", color: "#cd7f32", win: 25, lose: 10 },
-        { name: "SILVER 3", min: 600, icon: "🥈", color: "#c0c0c0", win: 30, lose: 15 },
-        { name: "SILVER 2", min: 1000, icon: "🥈", color: "#c0c0c0", win: 35, lose: 18 },
-        { name: "SILVER 1", min: 1400, icon: "🥈", color: "#c0c0c0", win: 40, lose: 20 },
-        { name: "GOLD 3", min: 1800, icon: "🥇", color: "#ffd700", win: 45, lose: 25 },
-        { name: "GOLD 2", min: 2200, icon: "🥇", color: "#ffd700", win: 50, lose: 30 },
-        { name: "GOLD 1", min: 2600, icon: "🥇", color: "#ffd700", win: 55, lose: 35 },
-        { name: "DIAMOND 4", min: 3100, icon: "💎", color: "#00eeee", win: 60, lose: 40 },
-        { name: "DIAMOND 3", min: 3700, icon: "💎", color: "#00eeee", win: 65, lose: 45 },
-        { name: "DIAMOND 2", min: 4400, icon: "💎", color: "#00eeee", win: 70, lose: 50 },
-        { name: "DIAMOND 1", min: 5200, icon: "💎", color: "#00eeee", win: 75, lose: 55 },
-        { name: "MASTER 4", min: 6100, icon: "⚔️", color: "#ff4500", win: 80, lose: 65 },
-        { name: "MASTER 3", min: 7200, icon: "⚔️", color: "#ff4500", win: 85, lose: 70 },
-        { name: "MASTER 2", min: 8500, icon: "⚔️", color: "#ff4500", win: 90, lose: 75 },
-        { name: "MASTER 1", min: 10000, icon: "🔥", color: "#ff0000", win: 100, lose: 85 },
+        { name: "BRONZE 3", min: 0, icon: "🥉", color: "#cd7f32", win: 25, lose: 5 },
+        { name: "BRONZE 2", min: 100, icon: "🥉", color: "#cd7f32", win: 35, lose: 8 },
+        { name: "BRONZE 1", min: 300, icon: "🥉", color: "#cd7f32", win: 40, lose: 10 },
+        { name: "SILVER 3", min: 600, icon: "🥈", color: "#c0c0c0", win: 45, lose: 15 },
+        { name: "SILVER 2", min: 1000, icon: "🥈", color: "#c0c0c0", win: 50, lose: 18 },
+        { name: "SILVER 1", min: 1400, icon: "🥈", color: "#c0c0c0", win: 55, lose: 20 },
+        { name: "GOLD 3", min: 1800, icon: "🥇", color: "#ffd700", win: 60, lose: 25 },
+        { name: "GOLD 2", min: 2200, icon: "🥇", color: "#ffd700", win: 65, lose: 30 },
+        { name: "GOLD 1", min: 2600, icon: "🥇", color: "#ffd700", win: 70, lose: 35 },
+        { name: "DIAMOND 4", min: 3100, icon: "💎", color: "#00eeee", win: 75, lose: 40 },
+        { name: "DIAMOND 3", min: 3700, icon: "💎", color: "#00eeee", win: 80, lose: 45 },
+        { name: "DIAMOND 2", min: 4400, icon: "💎", color: "#00eeee", win: 90, lose: 50 },
+        { name: "DIAMOND 1", min: 5200, icon: "💎", color: "#00eeee", win: 95, lose: 55 },
+        { name: "MASTER 4", min: 6100, icon: "⚔️", color: "#ff4500", win: 100, lose: 65 },
+        { name: "MASTER 3", min: 7200, icon: "⚔️", color: "#ff4500", win: 100, lose: 70 },
+        { name: "MASTER 2", min: 8500, icon: "⚔️", color: "#ff4500", win: 100, lose: 75 },
+        { name: "MASTER 1", min: 10000, icon: "🔥", color: "#ff0000", win: 115, lose: 85 },
         { name: "Supreme MASTER 3", min: 15000, icon: "👑", color: "rainbow", win: 120, lose: 100 },
         { name: "Supreme MASTER 2", min: 17000, icon: "👑", color: "rainbow", win: 140, lose: 110 },
         { name: "Supreme MASTER 1", min: 19000, icon: "👑", color: "rainbow", win: 160, lose: 120 },
@@ -494,6 +598,8 @@
             if (!myCards.length) myCards = generateBotCards('my');
             if (!enemyCards.length) enemyCards = generateBotCards('enemy');
 
+            applyPassiveShield();
+            setupItemUI();
             updateTeamHpHUD();
             startCountdown();
 
@@ -502,6 +608,90 @@
             document.getElementById('countdown-num').innerText = "เกิดข้อผิดพลาดในการโหลดข้อมูล";
         }
     });
+
+    function applyPassiveShield() {
+        const itemLower = selectedItem.toLowerCase();
+        if (itemLower.includes('shield') || itemLower.includes('โล่')) {
+            myCards.forEach(c => {
+                c.shield = 50;
+                c.maxShield = 50;
+            });
+        }
+    }
+
+    function setupItemUI() {
+        const itemHud = document.getElementById('item-hud');
+        itemHud.innerHTML = '';
+
+        const itemLower = selectedItem.toLowerCase();
+        if (!selectedItem || itemLower.includes('shield') || itemLower.includes('โล่')) return;
+
+        const btn = document.createElement('button');
+        btn.className = 'item-btn';
+        
+        if (itemLower.includes('lightning') || itemLower.includes('สายฟ้า')) {
+            btn.innerText = '⚡ สตันฝ่ายตรงข้าม (3 วิ)';
+            btn.onclick = () => useLightningItem(btn);
+        } else {
+            // ปุ่มค่าเริ่มต้นสำหรับไอเทมเพิ่มสปีด/โจมตี
+            btn.innerText = '🧪 ใช้ไอเทมบัฟทีม (+20% Speed)';
+            btn.onclick = () => useSpeedPotionItem(btn);
+        }
+
+        itemHud.appendChild(btn);
+    }
+
+    function triggerSpeedBuffTag(durationMs = 20000) {
+        const tag = document.getElementById('p1-speed-status');
+        if (tag) {
+            tag.style.display = 'inline-block';
+            setTimeout(() => {
+                tag.style.display = 'none';
+            }, durationMs);
+        }
+    }
+
+    function useLightningItem(btn) {
+        if (!battleActive) return;
+        const now = Date.now();
+        enemyCards.forEach(c => {
+            if (c.hp > 0) {
+                c.stunnedUntil = now + 3000;
+                showDamagePop(c.x + 30, c.y - 10, "⚡ STUNNED 3s!");
+            }
+        });
+        btn.disabled = true;
+        btn.innerText = '✨ ใช้แล้ว';
+    }
+
+    function useSpeedPotionItem(btn) {
+        if (!battleActive) return;
+        
+        // เรียกแสดงป้ายเรืองแสงใต้หลอดเลือดผู้ท้าชนทันที
+        triggerSpeedBuffTag(20000);
+
+        myCards.forEach(c => {
+            if (c.hp > 0) {
+                const addedAtk = Math.round(c.atk * 0.3);
+                c.atk += addedAtk;
+                c.speed *= 1.20;
+
+                const cardElem = document.getElementById(`card-${c.id}`);
+                if (cardElem) cardElem.classList.add('speed-buffed');
+
+                showDamagePop(c.x + 30, c.y - 10, "🔥 SPEED BOOST!");
+
+                setTimeout(() => {
+                    c.atk = Math.max(0, c.atk - addedAtk);
+                    c.speed /= 1.20;
+
+                    if (cardElem) cardElem.classList.remove('speed-buffed');
+                }, 20000);
+            }
+        });
+        btn.disabled = true;
+        btn.innerText = '✨ ใช้แล้ว';
+    }
 
     function formatCardsData(cardsList, prefix) {
         return cardsList.map((c, idx) => {
@@ -517,8 +707,11 @@
                 level: level,
                 hp: baseHp,
                 maxHp: baseHp,
+                shield: 0,
+                maxShield: 0,
                 atk: baseAtk,
                 speed: 3 + (Math.random() * 1.5),
+                stunnedUntil: 0,
                 img: c.img || c.image || 'https://via.placeholder.com/150/ffc831/000?text=Card'
             };
         });
@@ -539,8 +732,11 @@
                 level: level,
                 hp: baseHp,
                 maxHp: baseHp,
+                shield: 0,
+                maxShield: 0,
                 atk: 20 + (level * 4),
                 speed: 3.2,
+                stunnedUntil: 0,
                 img: botImgs[idx % botImgs.length]
             };
         });
@@ -573,10 +769,18 @@
         div.style.top = `${c.y}px`;
         div.innerHTML = `
             <div class="unit-lv">Lv.${c.level}</div>
-            <div class="hp-bar-container"><div class="hp-bar-fill" id="hp-${c.id}"></div></div>
+            <div class="hp-bar-container">
+                <div class="hp-bar-fill" id="hp-${c.id}"></div>
+                <div class="unit-shield-fill" id="shield-${c.id}" style="width: 0%;"></div>
+            </div>
             <img src="${c.img}" alt="${c.name}">
         `;
         field.appendChild(div);
+        
+        if (c.shield > 0) {
+            const shieldFill = div.querySelector(`#shield-${c.id}`);
+            if (shieldFill) shieldFill.style.width = `${(c.shield / (c.maxHp + c.maxShield)) * 100}%`;
+        }
     }
 
     function startCountdown() {
@@ -619,8 +823,8 @@
                 clearInterval(timerInterval);
                 battleActive = false;
 
-                const myTotalHp = myCards.reduce((acc, c) => acc + Math.max(0, c.hp), 0);
-                const enemyTotalHp = enemyCards.reduce((acc, c) => acc + Math.max(0, c.hp), 0);
+                const myTotalHp = myCards.reduce((acc, c) => acc + Math.max(0, c.hp) + Math.max(0, c.shield), 0);
+                const enemyTotalHp = enemyCards.reduce((acc, c) => acc + Math.max(0, c.hp) + Math.max(0, c.shield), 0);
 
                 setTimeout(() => {
                     if (myTotalHp > enemyTotalHp) {
@@ -636,22 +840,38 @@
     }
 
     function updateTeamHpHUD() {
-        const myTotalMax = myCards.reduce((acc, c) => acc + c.maxHp, 0);
-        const myCurrent = myCards.reduce((acc, c) => acc + Math.max(0, c.hp), 0);
-        const myPercent = myTotalMax > 0 ? (myCurrent / myTotalMax) * 100 : 0;
-        document.getElementById('p1-team-hp').style.width = `${myPercent}%`;
+        const myTotalMaxHp = myCards.reduce((acc, c) => acc + c.maxHp, 0);
+        const myTotalMaxShield = myCards.reduce((acc, c) => acc + c.maxShield, 0);
+        const myTotalMax = myTotalMaxHp + myTotalMaxShield;
 
-        const enemyTotalMax = enemyCards.reduce((acc, c) => acc + c.maxHp, 0);
-        const enemyCurrent = enemyCards.reduce((acc, c) => acc + Math.max(0, c.hp), 0);
-        const enemyPercent = enemyTotalMax > 0 ? (enemyCurrent / enemyTotalMax) * 100 : 0;
-        document.getElementById('p2-team-hp').style.width = `${enemyPercent}%`;
+        const myCurrentHp = myCards.reduce((acc, c) => acc + Math.max(0, c.hp), 0);
+        const myCurrentShield = myCards.reduce((acc, c) => acc + Math.max(0, c.shield), 0);
+
+        const myHpPercent = myTotalMax > 0 ? (myCurrentHp / myTotalMax) * 100 : 0;
+        const myShieldPercent = myTotalMax > 0 ? (myCurrentShield / myTotalMax) * 100 : 0;
+
+        document.getElementById('p1-team-hp').style.width = `${myHpPercent}%`;
+        document.getElementById('p1-team-shield').style.width = `${myShieldPercent}%`;
+
+        const enemyTotalMaxHp = enemyCards.reduce((acc, c) => acc + c.maxHp, 0);
+        const enemyTotalMaxShield = enemyCards.reduce((acc, c) => acc + c.maxShield, 0);
+        const enemyTotalMax = enemyTotalMaxHp + enemyTotalMaxShield;
+
+        const enemyCurrentHp = enemyCards.reduce((acc, c) => acc + Math.max(0, c.hp), 0);
+        const enemyCurrentShield = enemyCards.reduce((acc, c) => acc + Math.max(0, c.shield), 0);
+
+        const enemyHpPercent = enemyTotalMax > 0 ? (enemyCurrentHp / enemyTotalMax) * 100 : 0;
+        const enemyShieldPercent = enemyTotalMax > 0 ? (enemyCurrentShield / enemyTotalMax) * 100 : 0;
+
+        document.getElementById('p2-team-hp').style.width = `${enemyHpPercent}%`;
+        document.getElementById('p2-team-shield').style.width = `${enemyShieldPercent}%`;
     }
 
     function gameLoop() {
         if (!battleActive) return;
 
-        let aliveMine = myCards.filter(c => c.hp > 0);
-        let aliveEnemy = enemyCards.filter(c => c.hp > 0);
+        let aliveMine = myCards.filter(c => c.hp > 0 || c.shield > 0);
+        let aliveEnemy = enemyCards.filter(c => c.hp > 0 || c.shield > 0);
 
         if (aliveMine.length === 0 || aliveEnemy.length === 0) {
             battleActive = false;
@@ -677,6 +897,8 @@
 
     function updateUnitBehavior(unit, targets) {
         if (targets.length === 0) return;
+
+        if (unit.stunnedUntil && Date.now() < unit.stunnedUntil) return;
 
         let target = targets[0];
         let minDist = 99999;
@@ -715,17 +937,33 @@
         }
 
         let dmg = attacker.atk + Math.floor(Math.random() * 8 - 4);
-        target.hp = Math.max(0, target.hp - dmg);
+        let remainDmg = dmg;
+
+        if (target.shield > 0) {
+            if (target.shield >= remainDmg) {
+                target.shield -= remainDmg;
+                remainDmg = 0;
+            } else {
+                remainDmg -= target.shield;
+                target.shield = 0;
+            }
+        }
+
+        if (remainDmg > 0) {
+            target.hp = Math.max(0, target.hp - remainDmg);
+        }
 
         const hpFill = document.getElementById(`hp-${target.id}`);
-        if (hpFill) {
-            hpFill.style.width = `${(target.hp / target.maxHp) * 100}%`;
-        }
+        const shieldFill = document.getElementById(`shield-${target.id}`);
+        const maxVal = target.maxHp + target.maxShield;
+
+        if (hpFill) hpFill.style.width = `${(target.hp / maxVal) * 100}%`;
+        if (shieldFill) shieldFill.style.width = `${(target.shield / maxVal) * 100}%`;
 
         updateTeamHpHUD();
         showDamagePop(target.x + 30, target.y - 10, dmg);
 
-        if (target.hp <= 0) {
+        if (target.hp <= 0 && target.shield <= 0) {
             const targetElem = document.getElementById(`card-${target.id}`);
             if (targetElem) {
                 targetElem.style.opacity = '0';
@@ -734,12 +972,12 @@
         }
     }
 
-    function showDamagePop(x, y, dmg) {
+    function showDamagePop(x, y, text) {
         const pop = document.createElement('div');
         pop.className = 'damage-pop';
         pop.style.left = `${x}px`;
         pop.style.top = `${y}px`;
-        pop.innerText = `-${dmg}`;
+        pop.innerText = typeof text === 'number' ? `-${text}` : text;
         field.appendChild(pop);
         setTimeout(() => pop.remove(), 600);
     }
@@ -774,13 +1012,13 @@
 
         if (resultType === 'win') {
             trophyDelta = currentRank.win;
-            xpDelta = 200; // ชนะได้รับ 200 XP[cite: 13]
+            xpDelta = 200;
         } else if (resultType === 'lose') {
             trophyDelta = -currentRank.lose;
-            xpDelta = 50;  // แพ้ได้รับ 50 XP[cite: 13]
+            xpDelta = 50;
         } else {
             trophyDelta = 0;
-            xpDelta = 0;   // เสมอไม่ได้ XP เลย[cite: 13]
+            xpDelta = 0;
         }
 
         let newTrophies = Math.max(0, currentTrophies + trophyDelta);
