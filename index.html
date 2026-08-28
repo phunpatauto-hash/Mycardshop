@@ -815,6 +815,15 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    // ฟังก์ชันย่อตัวเลข (K, M, B, T)
+    function formatCompactNumber(number) {
+        if (!number || isNaN(number)) return "0";
+        return new Intl.NumberFormat('en-US', {
+            notation: 'compact',
+            maximumFractionDigits: 1
+        }).format(number);
+    }
+
     const profileContainer = document.getElementById("profile-container");
     const adminModal = document.getElementById("adminModal");
     const profileModal = document.getElementById("profileModal"); 
@@ -1005,10 +1014,10 @@
                 rewardHtml = `
                     <div class="mail-rewards-box">
                         <span style="color:#ffc831; width: 100%; display:block; font-size:0.8rem; margin-bottom:2px;">🎁 ของขวัญแนบมาด้วย:</span>
-                        ${mail.points ? `<span style="color:#ffc831;">🪙 ${mail.points.toLocaleString()} ทอง</span>` : ''}
-                        ${mail.diamonds ? `<span style="color:#00e5ff;">💎 ${mail.diamonds.toLocaleString()} เพชร</span>` : ''}
-                        ${mail.normal_tickets ? `<span style="color:#cbd5e1;">🎫 ตั๋วปกติ x${mail.normal_tickets.toLocaleString()}</span>` : ''}
-                        ${mail.premium_tickets ? `<span style="color:#ffc831;">🎟️ ตั๋วพรีเมี่ยม x${mail.premium_tickets.toLocaleString()}</span>` : ''}
+                        ${mail.points ? `<span style="color:#ffc831;">🪙 ${formatCompactNumber(mail.points)} ทอง</span>` : ''}
+                        ${mail.diamonds ? `<span style="color:#00e5ff;">💎 ${formatCompactNumber(mail.diamonds)} เพชร</span>` : ''}
+                        ${mail.normal_tickets ? `<span style="color:#cbd5e1;">🎫 ตั๋วปกติ x${formatCompactNumber(mail.normal_tickets)}</span>` : ''}
+                        ${mail.premium_tickets ? `<span style="color:#ffc831;">🎟️ ตั๋วพรีเมี่ยม x${formatCompactNumber(mail.premium_tickets)}</span>` : ''}
                     </div>
                 `;
             }
@@ -1057,10 +1066,10 @@
             await updateDoc(userRef, updatePayload);
 
             const rewardSummary = [];
-            if (mail.points) rewardSummary.push(`🪙 ${mail.points.toLocaleString()} ทอง`);
-            if (mail.diamonds) rewardSummary.push(`💎 ${mail.diamonds.toLocaleString()} เพชร`);
-            if (mail.normal_tickets) rewardSummary.push(`🎫 ตั๋วปกติ x${mail.normal_tickets}`);
-            if (mail.premium_tickets) rewardSummary.push(`🎟️ ตั๋วพรีเมี่ยม x${mail.premium_tickets}`);
+            if (mail.points) rewardSummary.push(`🪙 ${formatCompactNumber(mail.points)} ทอง`);
+            if (mail.diamonds) rewardSummary.push(`💎 ${formatCompactNumber(mail.diamonds)} เพชร`);
+            if (mail.normal_tickets) rewardSummary.push(`🎫 ตั๋วปกติ x${formatCompactNumber(mail.normal_tickets)}`);
+            if (mail.premium_tickets) rewardSummary.push(`🎟️ ตั๋วพรีเมี่ยม x${formatCompactNumber(mail.premium_tickets)}`);
 
             if (rewardSummary.length > 0) {
                 alert(`🎉 รับของขวัญเรียบร้อยแล้ว!\n\n${rewardSummary.join('\n')}`);
@@ -1109,10 +1118,10 @@
             await updateDoc(userRef, updatePayload);
 
             const rewardSummary = [];
-            if (totalPoints > 0) rewardSummary.push(`🪙 +${totalPoints.toLocaleString()} ทอง`);
-            if (totalDiamonds > 0) rewardSummary.push(`💎 +${totalDiamonds.toLocaleString()} เพชร`);
-            if (totalNormalTickets > 0) rewardSummary.push(`🎫 +${totalNormalTickets.toLocaleString()} ตั๋วปกติ`);
-            if (totalPremiumTickets > 0) rewardSummary.push(`🎟️ +${totalPremiumTickets.toLocaleString()} ตั๋วพรีเมี่ยม`);
+            if (totalPoints > 0) rewardSummary.push(`🪙 +${formatCompactNumber(totalPoints)} ทอง`);
+            if (totalDiamonds > 0) rewardSummary.push(`💎 +${formatCompactNumber(totalDiamonds)} เพชร`);
+            if (totalNormalTickets > 0) rewardSummary.push(`🎫 +${formatCompactNumber(totalNormalTickets)} ตั๋วปกติ`);
+            if (totalPremiumTickets > 0) rewardSummary.push(`🎟️ +${formatCompactNumber(totalPremiumTickets)} ตั๋วพรีเมี่ยม`);
 
             if (rewardSummary.length > 0) {
                 alert(`🎉 รับรางวัลทั้งหมด (${unclaimedMails.length} รายการ) สำเร็จ!\n\n${rewardSummary.join('\n')}`);
@@ -1135,10 +1144,12 @@
 
                     document.getElementById("profile-container").style.display = "flex";
                     document.getElementById("user-display").innerText = data.username;
-                    document.getElementById("user-points").innerText = (data.points || 0).toLocaleString();
-                    document.getElementById("user-diamonds").innerText = (data.diamonds || 0).toLocaleString();
-                    document.getElementById("user-ticket-normal").innerText = (data.normal_tickets || 0).toLocaleString();
-                    document.getElementById("user-ticket-premium").innerText = (data.premium_tickets || 0).toLocaleString();
+                    
+                    // ปรับการแสดงผลด้วยตัวเลขย่อ (K, M, B)
+                    document.getElementById("user-points").innerText = formatCompactNumber(data.points || 0);
+                    document.getElementById("user-diamonds").innerText = formatCompactNumber(data.diamonds || 0);
+                    document.getElementById("user-ticket-normal").innerText = formatCompactNumber(data.normal_tickets || 0);
+                    document.getElementById("user-ticket-premium").innerText = formatCompactNumber(data.premium_tickets || 0);
 
                     document.getElementById("sidebar-user-card").style.display = "flex";
                     document.getElementById("sidebar-username-txt").innerText = data.username;
@@ -1167,7 +1178,7 @@
                             exp: increment(expGained),
                             lastClaimDate: today
                         });
-                        alert(`ยินดีด้วย! ได้รับ 🪙 ${p} , 💎 ${d} และ Exp ผู้เล่น +${expGained}`);
+                        alert(`ยินดีด้วย! ได้รับ 🪙 ${formatCompactNumber(p)} , 💎 ${formatCompactNumber(d)} และ Exp ผู้เล่น +${expGained}`);
                         fetchAndRenderLeaderboard();
                     };
 
@@ -1230,14 +1241,14 @@
     function openUserProfileModal(player) {
         document.getElementById("popup-user-avatar").src = player.avatar;
         document.getElementById("popup-username").innerText = player.username;
-        document.getElementById("popup-user-points").innerText = "🪙 " + player.points.toLocaleString();
-        document.getElementById("popup-user-diamonds").innerText = "💎 " + player.diamonds.toLocaleString();
-        document.getElementById("popup-user-ticket-normal").innerText = "🎫 " + player.normal_tickets.toLocaleString();
-        document.getElementById("popup-user-ticket-premium").innerText = "🎟️ " + player.premium_tickets.toLocaleString();
-        document.getElementById("popup-user-cards").innerText = "🎴 " + player.cards.toLocaleString() + " ใบ";
+        document.getElementById("popup-user-points").innerText = "🪙 " + formatCompactNumber(player.points);
+        document.getElementById("popup-user-diamonds").innerText = "💎 " + formatCompactNumber(player.diamonds);
+        document.getElementById("popup-user-ticket-normal").innerText = "🎫 " + formatCompactNumber(player.normal_tickets);
+        document.getElementById("popup-user-ticket-premium").innerText = "🎟️ " + formatCompactNumber(player.premium_tickets);
+        document.getElementById("popup-user-cards").innerText = "🎴 " + formatCompactNumber(player.cards) + " ใบ";
         
         if(player.maxRank !== "UNRANKED") {
-            document.getElementById("popup-txt-max-rank").innerText = `${player.maxRank} (${player.maxTrophies.toLocaleString()} 🏆)`;
+            document.getElementById("popup-txt-max-rank").innerText = `${player.maxRank} (${formatCompactNumber(player.maxTrophies)} 🏆)`;
         } else {
             document.getElementById("popup-txt-max-rank").innerText = "UNRANKED (0 🏆)";
         }
@@ -1261,7 +1272,7 @@
                 histDiv.className = "popup-history-item";
                 histDiv.innerHTML = `
                     <span class="history-rank"><i class="fas fa-shield-alt"></i> ${hist.rankName}</span>
-                    <span>🏆 ${hist.trophies.toLocaleString()}</span>
+                    <span>🏆 ${formatCompactNumber(hist.trophies)}</span>
                     <span class="history-date">${hist.date || ''}</span>
                 `;
                 historyContainer.appendChild(histDiv);
@@ -1271,7 +1282,7 @@
                 historyContainer.innerHTML = `
                     <div class="popup-history-item">
                         <span class="history-rank"><i class="fas fa-shield-alt"></i> ${player.maxRank}</span>
-                        <span>🏆 ${player.maxTrophies.toLocaleString()}</span>
+                        <span>🏆 ${formatCompactNumber(player.maxTrophies)}</span>
                         <span class="history-date">สถิติสูงสุดปัจจุบัน</span>
                     </div>
                 `;
@@ -1338,13 +1349,13 @@
                 let scoreText = "";
                 let scoreClass = "";
                 if (currentFilter === "points") {
-                    scoreText = `🪙 ${player.points.toLocaleString()}`;
+                    scoreText = `🪙 ${formatCompactNumber(player.points)}`;
                     scoreClass = "score-points";
                 } else if (currentFilter === "diamonds") {
-                    scoreText = `💎 ${player.diamonds.toLocaleString()}`;
+                    scoreText = `💎 ${formatCompactNumber(player.diamonds)}`;
                     scoreClass = "score-diamonds";
                 } else if (currentFilter === "cards") {
-                    scoreText = `🎴 ${player.cards.toLocaleString()} ใบ`;
+                    scoreText = `🎴 ${formatCompactNumber(player.cards)} ใบ`;
                     scoreClass = "score-cards";
                 }
 
