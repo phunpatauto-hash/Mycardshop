@@ -556,7 +556,7 @@
         const currentLv = parseInt(data.playerLevel) || 1;
         const claimedList = data.claimedLevelRewards || [];
 
-        if (claimedList.includes(lv)) return Swal.fire("ผิดพลาด", "คุณเคยรับรางวัลเลเวลนี้ไปแล้ว", "error");
+        if (claimedList.includes(lv)) return Swal.fire("ผิดพลาด", "คุณเคยรับรางวัลจากเลเวลนี้ไปแล้ว", "error");
         if (currentLv < lv) return Swal.fire("เงื่อนไขไม่ผ่าน", `เลเวลของคุณยังไม่ถึงกำหนด (ปัจจุบัน LV.${currentLv} / ต้องการ LV.${lv})`, "warning");
 
         try {
