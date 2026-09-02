@@ -636,19 +636,13 @@
         </div>
     </div>
 
-    <!-- 🌐 NAVBAR -->
+  <!-- 🌐 NAVBAR -->
     <nav class="navbar">
         <div class="nav-left">
             <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
             <div class="logo">Mycard</div>
         </div>
         <ul class="nav-links">
-            <li><a href="index.html">หน้าแรก</a></li>
-            <li><a href="javascript:void(0)" onclick="checkAuthAndNavigate('collection.html')">สมุดสะสม</a></li>
-            <li><a href="javascript:void(0)" onclick="checkAuthAndNavigate('bag.html')">กระเป๋า</a></li>
-            <li><a href="javascript:void(0)" onclick="checkAuthAndNavigate('crafting.html')" style="color: #ffc831;">ห้องคราฟต์</a></li>
-            <li id="redeem-tab" style="display: none;"><a href="javascript:void(0)" onclick="checkAuthAndNavigate('redeem.html')" style="color: #ffc831;">แลกโค้ด</a></li>
-            <li><a href="javascript:void(0)" onclick="checkAuthAndNavigate('Cookie city.html')">Cookie city</a></li>
             <li id="mailbox-nav-item" style="display: none;">
                 <button class="btn-mailbox" onclick="openMailboxModal()">
                     <i class="fas fa-envelope"></i> จดหมาย
@@ -817,7 +811,7 @@
     // ฟังก์ชันตรวจสอบสิทธิ์ก่อนเข้าสู่หมวดหมู่ต่างๆ
     window.checkAuthAndNavigate = (url) => {
         if (!window.isUserLoggedIn) {
-            alert("⚠️ คุณยังไม่บัญชีนะสมัครสมาชิกก่อนดีไหม??");
+            alert("⚠️ คุณยังไม่มีบัญชีนะ สมัครสมาชิกก่อนดีไหม??");
             window.location.href = "login.html";
         } else {
             window.location.href = url;
@@ -1218,7 +1212,6 @@
             const handleLogout = () => signOut(auth).then(()=>location.reload());
             document.getElementById("sidebar-logout-btn").onclick = handleLogout;
 
-            document.getElementById("redeem-tab").style.display = "block";
             document.getElementById("mailbox-nav-item").style.display = "block";
             document.getElementById("daily-section").style.display = "block";
         } else {
