@@ -817,7 +817,7 @@
     // ฟังก์ชันตรวจสอบสิทธิ์ก่อนเข้าสู่หมวดหมู่ต่างๆ
     window.checkAuthAndNavigate = (url) => {
         if (!window.isUserLoggedIn) {
-            alert("⚠️ ต้องสมัครสมาชิกก่อนจึงจะสามารถเข้าใช้งานหมวดหมู่นี้ได้!");
+            alert("⚠️ คุณยังไม่บัญชีนะสมัครสมาชิกก่อนดีไหม??");
             window.location.href = "login.html";
         } else {
             window.location.href = url;
