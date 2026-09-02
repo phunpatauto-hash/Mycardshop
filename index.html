@@ -642,32 +642,34 @@
             <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
             <div class="logo">Mycard</div>
         </div>
-        <ul class="nav-links">
-            <li id="mailbox-nav-item" style="display: none;">
+
+        <!-- ย้ายส่วนปุ่มจดหมายและโปรไฟล์ให้อยู่นอก .nav-links เพื่อให้แสดงบนมือถือได้ -->
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div id="mailbox-nav-item" style="display: none;">
                 <button class="btn-mailbox" onclick="openMailboxModal()">
                     <i class="fas fa-envelope"></i> จดหมาย
                     <span class="mailbox-badge" id="mail-badge" style="display: none;">0</span>
                 </button>
-            </li>
-            <li>
-                <div class="profile-link" id="profile-container" style="display: none;">
-                    <img src="" id="nav-avatar-img" class="nav-avatar">
-                    <div class="profile-info-block">
-                        <div class="profile-meta-row">
-                            <span id="user-display" style="color: #fff; font-weight: 700; font-size: 0.95rem;"></span>
-                            <span id="user-title-display" class="nav-whale-title" style="display: none;"></span>
-                        </div>
-                        <div class="currency-display">
-                            <span class="point-text">🪙 <span id="user-points">0</span></span>
-                            <span class="diamond-text">💎 <span id="user-diamonds">0</span></span>
-                            <span class="ticket-normal-text">🎫 <span id="user-ticket-normal">0</span></span>
-                            <span class="ticket-premium-text">🎟️ <span id="user-ticket-premium">0</span></span>
-                        </div>
+            </div>
+
+            <div class="profile-link" id="profile-container" style="display: none;">
+                <img src="" id="nav-avatar-img" class="nav-avatar">
+                <div class="profile-info-block">
+                    <div class="profile-meta-row">
+                        <span id="user-display" style="color: #fff; font-weight: 700; font-size: 0.95rem;"></span>
+                        <span id="user-title-display" class="nav-whale-title" style="display: none;"></span>
+                    </div>
+                    <div class="currency-display">
+                        <span class="point-text">🪙 <span id="user-points">0</span></span>
+                        <span class="diamond-text">💎 <span id="user-diamonds">0</span></span>
+                        <span class="ticket-normal-text">🎫 <span id="user-ticket-normal">0</span></span>
+                        <span class="ticket-premium-text">🎟️ <span id="user-ticket-premium">0</span></span>
                     </div>
                 </div>
-            </li>
-            <li><a href="login.html" id="auth-btn" class="btn-blue">เข้าสู่ระบบ</a></li>
-        </ul>
+            </div>
+
+            <a href="login.html" id="auth-btn" class="btn-blue">เข้าสู่ระบบ</a>
+        </div>
     </nav>
 
     <header class="hero">
