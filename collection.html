@@ -44,9 +44,34 @@
         .search-input { background: rgba(255,255,255,0.05); border: 1px solid #444; padding: 10px 20px; border-radius: 12px; color: white; font-family: 'Kanit'; width: 300px; outline: none; transition: 0.3s; }
         .search-input:focus { border-color: #ffc831; box-shadow: 0 0 10px rgba(255,200,49,0.2); }
         .sort-select { background: #222; color: white; border: 1px solid #444; padding: 10px; border-radius: 12px; font-family: 'Kanit'; cursor: pointer; outline: none; }
-        .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+        .filter-bar { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+        .filter-group { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
         .filter-btn { padding: 8px 18px; border-radius: 25px; border: 2px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #aaa; cursor: pointer; font-weight: bold; transition: 0.3s; }
         .filter-btn.active { border-color: #ffc831; color: #fff; background: rgba(255,200,49,0.1); }
+        .filter-btn.type-btn.active { border-color: #00d4ff; color: #fff; background: rgba(0,212,255,0.15); }
+        .filter-btn.halloween-btn.active { border-color: #ff6600; color: #ff9900; background: rgba(255,102,0,0.2); }
+
+        /* Halloween Special Tag & Animation */
+        @keyframes halloween-glow {
+            0% { box-shadow: 0 0 5px #ff6600, inset 0 0 5px #ff6600; }
+            50% { box-shadow: 0 0 15px #ff9900, inset 0 0 10px #ff3300; }
+            100% { box-shadow: 0 0 5px #ff6600, inset 0 0 5px #ff6600; }
+        }
+        .card-halloween-badge {
+            position: absolute;
+            bottom: 60px;
+            left: 8px;
+            background: linear-gradient(45deg, #ff3300, #ff9900);
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            z-index: 6;
+            border: 1px solid #fff;
+            text-transform: uppercase;
+            animation: halloween-glow 1.5s infinite ease-in-out;
+        }
 
         /* Effects */
         @keyframes rainbow-rotate { 100% { filter: hue-rotate(360deg); } }
@@ -101,6 +126,7 @@
         }
 
         .card-count-badge { position: absolute; top: 8px; right: 8px; background: #ffc831; color: #000; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; font-weight: bold; z-index: 5; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        .card-type-badge { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.8); color: #00d4ff; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: bold; z-index: 5; border: 1px solid #00d4ff; }
         .card-lock-badge { position: absolute; bottom: 75px; right: 8px; background: rgba(0,0,0,0.75); color: #ff4d4d; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; z-index: 5; border: 1px solid #ff4d4d; }
 
         /* Modal */
@@ -189,8 +215,11 @@
                 </select>
                 <button id="btnSellAll" class="btn-sell-all">💰 ขายใบซ้ำทั้งหมด</button>
             </div>
+            
+            <!-- FILTER BAR -->
             <div class="filter-bar">
-                <div id="filterContainer" style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;"></div>
+                <div id="categoryFilterContainer" class="filter-group"></div>
+                <div id="filterContainer" class="filter-group"></div>
             </div>
         </div>
 
@@ -229,7 +258,11 @@
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                     <div>
                         <h2 id="modalName" style="margin:0; font-size: 2.2rem;">Name</h2>
-                        <div id="modalRarity" style="font-weight: bold; letter-spacing: 2px; margin-bottom: 15px;">GRADE: -</div>
+                        <div id="modalRarity" style="font-weight: bold; letter-spacing: 2px; margin-bottom: 5px;">GRADE: -</div>
+                        <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 15px;">
+                            <div id="modalType" style="color: #00d4ff; font-weight: bold;">TYPE: CARD</div>
+                            <div id="modalHalloweenTag" style="display:none; background: linear-gradient(45deg, #ff3300, #ff9900); color: #000; font-size: 0.75rem; font-weight: 800; padding: 2px 8px; border-radius: 6px; border: 1px solid #fff;">🎃 HALLOWEEN</div>
+                        </div>
                     </div>
                     <button id="btnLockCard" class="btn-lock">🔒 ล็อกการ์ด</button>
                 </div>
@@ -272,7 +305,7 @@
                     <button id="btnUpgradeLV" class="btn-action btn-lv" style="flex:2; margin-top:0;">⚡ เลเวลอัป</button>
                     <button id="btnBulkUpgrade" class="btn-action btn-lv" style="flex:1; background: #00ff88; color: #000; margin-top:0;">MAX</button>
                 </div>
-                <button id="btnUpgradeStar" class="btn-action btn-star" style="display:none; margin-top: 15px;">⭐ อัปดาว</button>
+                <button id="btnUpgradeStar" class="btn-action btn-star" style="display:none; margin-top: 15px;">⭐ อัปดาว (ใช้เพียง 1 ใบ)</button>
                 <button id="btnAwakenCard" class="btn-action btn-awaken" style="display:none; margin-top: 15px;">🔮 ปลุกพลังการ์ด (AWAKEN)</button>
                 <div id="maxLevelMessage" style="display:none; text-align:center; color:#ffc831; font-weight:bold; margin-top:15px;"></div>
                 <button class="btn-nav" style="margin-top:15px; border-color: rgba(255,255,255,0.1);" onclick="document.getElementById('cardModal').style.display='none'">ปิด</button>
@@ -298,7 +331,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    let currentUID = null, userCards = [], currentFilter = 'ALL', searchQuery = '', globalPoints = 0, globalStars = 0;
+    let currentUID = null, userCards = [], currentFilter = 'ALL', currentCategoryFilter = 'ALL', searchQuery = '', globalPoints = 0, globalStars = 0;
     const MAX_LV = 80;
 
     const rarityOrder = { 'ADMIN': 15, 'SECRET': 14, 'P': 13, 'USEC': 12, 'EXR': 11, 'CBR': 10, 'SEC': 9, 'SUR': 8, 'SSR': 7, 'PR': 6, 'UR': 5, 'SR': 4, 'R': 3, 'U': 2, 'C': 1 };
@@ -355,46 +388,60 @@
         { goal: 20, reward: { points: 10000000, diamonds: 100000 }, title: 'ทำครบ 20 อัน (MAX)' }
     ];
 
+    function isHalloweenCard(card) {
+        const rarityStr = (card && card.rarity ? card.rarity : '').toString().trim().toUpperCase();
+        return rarityStr.endsWith("HALLOWEEN");
+    }
+
+    function getRarityBaseConfig(rarity) {
+        let r = (rarity || 'C').toString().trim().toUpperCase();
+        if (r.endsWith("HALLOWEEN")) {
+            r = r.replace("HALLOWEEN", "").trim();
+        }
+        return RARITY_POWER[r] || RARITY_POWER['C'];
+    }
+
     function getArenaPower(card) {
-        const r = (card.rarity || 'C').toUpperCase();
-        const config = RARITY_POWER[r] || RARITY_POWER['C'];
+        if (!card) return 0;
+        const config = getRarityBaseConfig(card.rarity);
         let multiplier = 1 + ((card.stars || 0) * 0.1);
         if (card.awakening && card.awakening > 0) multiplier += (card.awakening * 0.15);
-        return Math.floor((config.base + (card.level * config.perLv)) * multiplier);
+        const halloweenBonus = isHalloweenCard(card) ? 1.20 : 1.0;
+        return Math.floor((config.base + ((card.level || 1) * config.perLv)) * multiplier * halloweenBonus);
     }
 
     function getCardHp(card) {
-        const r = (card.rarity || 'C').toUpperCase();
-        const config = RARITY_POWER[r] || RARITY_POWER['C'];
+        if (!card) return 0;
+        const config = getRarityBaseConfig(card.rarity);
         let multiplier = 1 + ((card.stars || 0) * 0.15);
         if (card.awakening && card.awakening > 0) multiplier += (card.awakening * 0.2);
-        return Math.floor((config.baseHp + (card.level * config.perLvHp)) * multiplier);
+        const halloweenBonus = isHalloweenCard(card) ? 1.20 : 1.0;
+        return Math.floor((config.baseHp + ((card.level || 1) * config.perLvHp)) * multiplier * halloweenBonus);
     }
 
     function getCardDef(card) {
-        const r = (card.rarity || 'C').toUpperCase();
-        const config = RARITY_POWER[r] || RARITY_POWER['C'];
+        if (!card) return 0;
+        const config = getRarityBaseConfig(card.rarity);
         let multiplier = 1 + ((card.stars || 0) * 0.12);
         if (card.awakening && card.awakening > 0) multiplier += (card.awakening * 0.15);
-        return Math.floor((config.baseDef + (card.level * config.perLvDef)) * multiplier);
+        const halloweenBonus = isHalloweenCard(card) ? 1.20 : 1.0;
+        return Math.floor((config.baseDef + ((card.level || 1) * config.perLvDef)) * multiplier * halloweenBonus);
     }
 
     function getDynamicSellValue(card) {
-        const r = (card.rarity||'C').toUpperCase();
+        if (!card) return 100;
+        let r = (card.rarity || 'C').toString().trim().toUpperCase();
+        if (r.endsWith("HALLOWEEN")) {
+            r = r.replace("HALLOWEEN", "").trim();
+        }
         const base = sellValuesBase[r] || 100;
-        return Math.floor(base * (1 + ((card.level||1) - 1) * 0.1));
+        const halloweenBonus = isHalloweenCard(card) ? 1.20 : 1.0;
+        return Math.floor(base * (1 + ((card.level || 1) - 1) * 0.1) * halloweenBonus);
     }
 
+    // ปรับลดเงื่อนไข: ใช้ใบซ้ำเพียง 1 ใบในการอัปเกรด และใช้ Coins น้อยลง เพื่อให้อัปเกรดง่ายขึ้น
     function getUpgradeRequirements(card) {
-        const r = (card.rarity || 'C').toUpperCase();
-        const lv = card.level || 1;
-        if (r === 'ADMIN' || r === 'USEC' || r === 'EXR' || r === 'SECRET') {
-            if (lv <= 45) return { reqQty: 1, cost: 500 };
-            return { reqQty: 2, cost: 1500 }; 
-        }
-        if (lv <= 35) return { reqQty: 1, cost: 500 };
-        if (lv <= 65) return { reqQty: 2, cost: 1500 };
-        return { reqQty: 3, cost: 2000 };
+        return { reqQty: 1, cost: 100 };
     }
 
     onAuthStateChanged(auth, (user) => {
@@ -405,14 +452,19 @@
                     const data = snap.data();
                     let rawCollection = data.collection || [];
                     
-                    userCards = rawCollection.filter(item => !(item.source === "ตู้สุ่มสัตว์เลี้ยง" || item.id?.startsWith("p") || item.type === "pet")).map(c => ({
-                        ...c, 
-                        level: c.level || 1, 
-                        stars: c.stars || 0, 
-                        awakening: c.awakening || 0,
-                        isLocked: c.isLocked || false,
-                        img: c.img || c.image
-                    }));
+                    userCards = rawCollection
+                        .filter(item => item && !(item.source === "ตู้สุ่มสัตว์เลี้ยง" || (item.id && item.id.startsWith("p")) || item.type === "pet"))
+                        .map(c => ({
+                            ...c, 
+                            level: c.level || 1, 
+                            stars: c.stars || 0, 
+                            awakening: c.awakening || 0,
+                            isLocked: c.isLocked || false,
+                            img: c.img || c.image || '',
+                            type: (c.type || 'CARD').toUpperCase(),
+                            source: c.source || '',
+                            isHalloween: isHalloweenCard(c)
+                        }));
                     
                     globalPoints = data.points || 0;
                     const diamonds = data.diamonds || 0;
@@ -437,7 +489,8 @@
     function getUniqueGroupedCards() {
         const grouped = {};
         userCards.forEach(card => {
-            const key = `${card.name}_${(card.rarity||'C').toUpperCase()}`;
+            if (!card || !card.name) return;
+            const key = `${card.name}_${(card.rarity || 'C').toUpperCase()}_${card.type || 'CARD'}_${isHalloweenCard(card) ? 'HW' : 'NORMAL'}`;
             if (!grouped[key]) grouped[key] = [];
             grouped[key].push(card);
         });
@@ -447,7 +500,7 @@
             const copies = grouped[key];
             copies.sort((a, b) => {
                 if (a.isLocked !== b.isLocked) return b.isLocked ? 1 : -1;
-                return ((b.awakening||0)*1000 + (b.stars||0)*100 + b.level) - ((a.awakening||0)*1000 + (a.stars||0)*100 + a.level);
+                return ((b.awakening || 0) * 1000 + (b.stars || 0) * 100 + (b.level || 1)) - ((a.awakening || 0) * 1000 + (a.stars || 0) * 100 + (a.level || 1));
             });
             displayList.push({...copies[0], count: copies.length});
         }
@@ -456,39 +509,58 @@
 
     function renderCards() {
         const grid = document.getElementById("grid");
+        if (!grid) return;
         grid.innerHTML = "";
         
         let displayList = getUniqueGroupedCards();
-        if (currentFilter !== 'ALL') displayList = displayList.filter(c => (c.rarity||'C').toUpperCase() === currentFilter);
-        if (searchQuery) displayList = displayList.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
+
+        if (currentCategoryFilter === 'HALLOWEEN') {
+            displayList = displayList.filter(c => isHalloweenCard(c));
+        } else if (currentCategoryFilter !== 'ALL') {
+            displayList = displayList.filter(c => (c.type || 'CARD').toUpperCase() === currentCategoryFilter);
+        }
+
+        if (currentFilter !== 'ALL') {
+            displayList = displayList.filter(c => {
+                let r = (c.rarity || 'C').toUpperCase();
+                if (r.endsWith("HALLOWEEN")) r = r.replace("HALLOWEEN", "").trim();
+                return r === currentFilter;
+            });
+        }
+
+        if (searchQuery) {
+            displayList = displayList.filter(c => c.name && c.name.toLowerCase().includes(searchQuery.toLowerCase()));
+        }
         
-        const sortType = document.getElementById("sortSelect").value;
+        const sortElement = document.getElementById("sortSelect");
+        const sortType = sortElement ? sortElement.value : 'rarity_desc';
+
         displayList.sort((a, b) => {
             if (sortType === 'power_desc') return getArenaPower(b) - getArenaPower(a);
             if (sortType === 'power_asc') return getArenaPower(a) - getArenaPower(b);
             if (sortType === 'rarity_desc') {
-                const rA = (a.rarity||'C').toUpperCase();
-                const rB = (b.rarity||'C').toUpperCase();
+                let rA = (a.rarity || 'C').toUpperCase(); if (rA.endsWith("HALLOWEEN")) rA = rA.replace("HALLOWEEN", "").trim();
+                let rB = (b.rarity || 'C').toUpperCase(); if (rB.endsWith("HALLOWEEN")) rB = rB.replace("HALLOWEEN", "").trim();
                 if ((rarityOrder[rB] || 0) === (rarityOrder[rA] || 0)) {
-                    return b.level - a.level;
+                    return (b.level || 1) - (a.level || 1);
                 }
                 return (rarityOrder[rB] || 0) - (rarityOrder[rA] || 0);
             }
             if (sortType === 'rarity_asc') {
-                const rA = (a.rarity||'C').toUpperCase();
-                const rB = (b.rarity||'C').toUpperCase();
+                let rA = (a.rarity || 'C').toUpperCase(); if (rA.endsWith("HALLOWEEN")) rA = rA.replace("HALLOWEEN", "").trim();
+                let rB = (b.rarity || 'C').toUpperCase(); if (rB.endsWith("HALLOWEEN")) rB = rB.replace("HALLOWEEN", "").trim();
                 if ((rarityOrder[rA] || 0) === (rarityOrder[rB] || 0)) {
-                    return b.level - a.level;
+                    return (b.level || 1) - (a.level || 1);
                 }
                 return (rarityOrder[rA] || 0) - (rarityOrder[rB] || 0);
             }
-            if (sortType === 'lv_desc') return b.level - a.level;
-            if (sortType === 'lv_asc') return a.level - b.level;
+            if (sortType === 'lv_desc') return (b.level || 1) - (a.level || 1);
+            if (sortType === 'lv_asc') return (a.level || 1) - (b.level || 1);
             
-            const rA = (a.rarity||'C').toUpperCase();
-            const rB = (b.rarity||'C').toUpperCase();
+            let rA = (a.rarity || 'C').toUpperCase(); if (rA.endsWith("HALLOWEEN")) rA = rA.replace("HALLOWEEN", "").trim();
+            let rB = (b.rarity || 'C').toUpperCase(); if (rB.endsWith("HALLOWEEN")) rB = rB.replace("HALLOWEEN", "").trim();
             if ((rarityOrder[rB] || 0) === (rarityOrder[rA] || 0)) {
-                return b.level - a.level;
+                return (b.level || 1) - (a.level || 1);
             }
             return (rarityOrder[rB] || 0) - (rarityOrder[rA] || 0);
         });
@@ -497,15 +569,17 @@
         const now = Date.now();
 
         displayList.forEach(card => {
-            const r = (card.rarity||'C').toUpperCase();
+            let r = (card.rarity || 'C').toUpperCase();
+            if (r.endsWith("HALLOWEEN")) r = r.replace("HALLOWEEN", "").trim();
+            
             const isRecentNew = card.obtainedAt && (now - card.obtainedAt < FIVE_MINUTES);
             const hasDuplicates = card.count > 1;
             const shouldPulse = isRecentNew || hasDuplicates;
 
             let cardClassName = "col-card";
-            if (card.awakening > 0) {
+            if ((card.awakening || 0) > 0) {
                 cardClassName += " awakening-tier5-ultimate";
-            } else if (card.level >= MAX_LV && card.stars >= 5) {
+            } else if ((card.level || 1) >= MAX_LV && (card.stars || 0) >= 5) {
                 cardClassName += " rainbow-effect";
             } else if (shouldPulse) {
                 cardClassName += " card-pulse-new";
@@ -513,36 +587,40 @@
 
             const div = document.createElement("div");
             div.className = cardClassName;
-            if (card.awakening === 0 && !(card.level >= MAX_LV && card.stars >= 5)) {
+            if ((card.awakening || 0) === 0 && !((card.level || 1) >= MAX_LV && (card.stars || 0) >= 5)) {
                 div.style.border = `1px solid ${rarityColors[r] || '#fff'}44`;
             }
             div.onclick = () => openModal(card);
             
             let starContent = '';
-            if (card.stars > 0) {
+            if ((card.stars || 0) > 0) {
                 let starText = '⭐'.repeat(card.stars);
-                if (card.awakening > 0) {
+                if ((card.awakening || 0) > 0) {
                     starText += ` [AWK ${card.awakening}🔥]`;
                 }
                 starContent = `<div class="star-container">${starText}</div>`;
             }
 
+            const halloweenTagHTML = isHalloweenCard(card) ? `<div class="card-halloween-badge">🎃 HALLOWEEN</div>` : '';
+
             div.innerHTML = `
                 ${starContent}
+                <div class="card-type-badge">${card.type || 'CARD'}</div>
+                ${halloweenTagHTML}
                 ${card.count > 1 ? `<div class="card-count-badge">x${card.count}</div>` : ''}
                 ${card.isLocked ? `<div class="card-lock-badge">🔒</div>` : ''}
-                <img src="${card.img || card.image}">
+                <img src="${card.img || card.image || ''}">
                 <div style="padding:10px; background: rgba(0,0,0,0.8);">
-                    <div style="color:${card.awakening > 0 ? '#00f3ff' : (rarityColors[r] || '#fff')}; font-size:0.75rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${card.name} ${card.awakening > 0 ? '✨🔮' : ''}</div>
+                    <div style="color:${(card.awakening || 0) > 0 ? '#00f3ff' : (rarityColors[r] || '#fff')}; font-size:0.75rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${card.name} ${(card.awakening || 0) > 0 ? '✨🔮' : ''}</div>
                     <div style="color:#ffc831; font-size:0.8rem; font-weight:bold;">⚡ ${getArenaPower(card).toLocaleString()}</div>
-                    <div style="color:#aaa; font-size:0.65rem;">LV. ${card.level}</div>
+                    <div style="color:#aaa; font-size:0.65rem;">LV. ${card.level || 1}</div>
                 </div>`;
             grid.appendChild(div);
         });
     }
 
     function checkAchProgress(ach, userData) {
-        const uniqueCardsCount = new Set(userCards.map(c => `${c.name}_${(c.rarity||'C').toUpperCase()}`)).size;
+        const uniqueCardsCount = new Set(userCards.map(c => `${c.name}_${(c.rarity || 'C').toUpperCase()}`)).size;
         const points = userData.points || 0;
         const arenaCount = userData.arenaBattles || 0; 
         const timeInCollection = userData.collectionTime || 0;
@@ -554,12 +632,12 @@
             case 'lv80_medium': return userCards.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;
             case 'lv80_hard': return userCards.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;
             case 'lv80_impossible': return userCards.filter(c => (parseInt(c.level) || 0) >= 80 && (parseInt(c.stars) || 0) >= 5).length;
-            case 'god_tier': return userCards.some(c => ['ADMIN', 'USEC', 'EXR'].includes((c.rarity||'').toUpperCase())) ? 1 : 0;
-            case 'rainbow_master': return userCards.some(c => (c.level||1) >= 80 && (c.stars||0) >= 5) ? 1 : 0;
-            case 'whale_secret_usec': return userCards.filter(c => (c.rarity || '').toUpperCase() === 'USEC' && (c.level || 1) >= 80 && (c.stars || 0) >= 5).length;
-            case 'whale_secret_exr': return userCards.filter(c => (c.rarity || '').toUpperCase() === 'EXR' && (c.level || 1) >= 80 && (c.stars || 0) >= 5).length;
-            case 'whale_secret_SECRET': return userCards.filter(c => (c.rarity || '').toUpperCase() === 'SECRET' && (c.level || 1) >= 80 && (c.stars || 0) >= 5).length;
-            case 'p_collector_secret': return userCards.some(c => (c.rarity || '').toUpperCase() === 'P') ? 1 : 0;
+            case 'god_tier': return userCards.some(c => ['ADMIN', 'USEC', 'EXR'].includes((c.rarity || '').toUpperCase().replace('HALLOWEEN','').trim())) ? 1 : 0;
+            case 'rainbow_master': return userCards.some(c => (c.level || 1) >= 80 && (c.stars || 0) >= 5) ? 1 : 0;
+            case 'whale_secret_usec': return userCards.filter(c => (c.rarity || '').toUpperCase().replace('HALLOWEEN','').trim() === 'USEC' && (c.level || 1) >= 80 && (c.stars || 0) >= 5).length;
+            case 'whale_secret_exr': return userCards.filter(c => (c.rarity || '').toUpperCase().replace('HALLOWEEN','').trim() === 'EXR' && (c.level || 1) >= 80 && (c.stars || 0) >= 5).length;
+            case 'whale_secret_SECRET': return userCards.filter(c => (c.rarity || '').toUpperCase().replace('HALLOWEEN','').trim() === 'SECRET' && (c.level || 1) >= 80 && (c.stars || 0) >= 5).length;
+            case 'p_collector_secret': return userCards.some(c => (c.rarity || '').toUpperCase().replace('HALLOWEEN','').trim() === 'P') ? 1 : 0;
             case 'arena_starter':
             case 'arena_adept':
             case 'arena_expert':
@@ -574,6 +652,7 @@
 
     function renderAchievements(userData) {
         const grid = document.getElementById("achievementGrid");
+        if (!grid) return;
         grid.innerHTML = "";
         const claimedAchs = userData.claimedAchievements || [];
         const claimedMilestones = userData.claimedMilestones || [];
@@ -583,7 +662,7 @@
             const progress = checkAchProgress(ach, userData);
             const isCompleted = progress >= ach.goal;
             const isClaimed = claimedAchs.includes(ach.id);
-            const percent = (progress / ach.goal) * 100;
+            const percent = Math.min((progress / ach.goal) * 100, 100);
             if (isCompleted) completedTotalCount++;
 
             const card = document.createElement("div");
@@ -607,23 +686,27 @@
             grid.appendChild(card);
         });
 
-        document.getElementById("totalAchCount").innerText = completedTotalCount;
-        document.getElementById("milestoneBarFill").style.width = Math.min((completedTotalCount / 20) * 100, 100) + "%";
+        const totalAchCountEl = document.getElementById("totalAchCount");
+        const milestoneBarFillEl = document.getElementById("milestoneBarFill");
+        if (totalAchCountEl) totalAchCountEl.innerText = completedTotalCount;
+        if (milestoneBarFillEl) milestoneBarFillEl.style.width = Math.min((completedTotalCount / 20) * 100, 100) + "%";
         
         const mGrid = document.getElementById("milestoneGrid");
-        mGrid.innerHTML = "";
-        MILESTONES.forEach(ms => {
-            const isReached = completedTotalCount >= ms.goal;
-            const isClaimed = claimedMilestones.includes(ms.goal);
-            const msDiv = document.createElement("div");
-            msDiv.className = `milestone-card ${isReached ? 'completed' : ''}`;
-            msDiv.innerHTML = `
-                <div style="font-weight:bold; color:${isReached ? '#ffc831' : '#fff'};">${ms.title}</div>
-                <div style="font-size:0.75rem; color:#aaa; margin:5px 0;">🎁 ${ms.reward.points.toLocaleString()} 🪙 | ${ms.reward.diamonds.toLocaleString()} 💎</div>
-                <button class="btn-claim" style="font-size:0.75rem; padding:5px;" ${!isReached || isClaimed ? 'disabled' : ''} onclick="claimMilestoneReward(${ms.goal})">${isClaimed ? 'รับแล้ว' : (isReached ? 'รับรางวัล' : 'ยังไม่ถึง')}</button>
-            `;
-            mGrid.appendChild(msDiv);
-        });
+        if (mGrid) {
+            mGrid.innerHTML = "";
+            MILESTONES.forEach(ms => {
+                const isReached = completedTotalCount >= ms.goal;
+                const isClaimed = claimedMilestones.includes(ms.goal);
+                const msDiv = document.createElement("div");
+                msDiv.className = `milestone-card ${isReached ? 'completed' : ''}`;
+                msDiv.innerHTML = `
+                    <div style="font-weight:bold; color:${isReached ? '#ffc831' : '#fff'};">${ms.title}</div>
+                    <div style="font-size:0.75rem; color:#aaa; margin:5px 0;">🎁 ${ms.reward.points.toLocaleString()} 🪙 | ${ms.reward.diamonds.toLocaleString()} 💎</div>
+                    <button class="btn-claim" style="font-size:0.75rem; padding:5px;" ${!isReached || isClaimed ? 'disabled' : ''} onclick="claimMilestoneReward(${ms.goal})">${isClaimed ? 'รับแล้ว' : (isReached ? 'รับรางวัล' : 'ยังไม่ถึง')}</button>
+                `;
+                mGrid.appendChild(msDiv);
+            });
+        }
     }
 
     window.claimReward = async (achId) => {
@@ -653,18 +736,31 @@
     };
 
     window.openModal = (card) => {
-        const r = (card.rarity||'C').toUpperCase();
-        const sameCards = userCards.filter(c => c.name === card.name && (c.rarity||'C').toUpperCase() === r);
+        if (!card) return;
+        let r = (card.rarity || 'C').toUpperCase();
+        let displayR = r;
+        if (r.endsWith("HALLOWEEN")) r = r.replace("HALLOWEEN", "").trim();
+
+        const sameCards = userCards.filter(c => c.name === card.name && (c.rarity || 'C').toUpperCase() === (card.rarity || 'C').toUpperCase() && isHalloweenCard(c) === isHalloweenCard(card));
         
-        document.getElementById("modalImg").src = card.img || card.image;
-        document.getElementById("modalName").innerText = card.name;
-        document.getElementById("modalRarity").innerText = "GRADE: " + r + (card.awakening > 0 ? ` [AWK: ${card.awakening}]` : '');
-        document.getElementById("modalRarity").style.color = card.awakening > 0 ? '#00f3ff' : (rarityColors[r] || '#fff');
+        document.getElementById("modalImg").src = card.img || card.image || '';
+        document.getElementById("modalName").innerText = card.name || 'Unknown';
+        document.getElementById("modalRarity").innerText = "GRADE: " + displayR + ((card.awakening || 0) > 0 ? ` [AWK: ${card.awakening}]` : '');
+        document.getElementById("modalRarity").style.color = (card.awakening || 0) > 0 ? '#00f3ff' : (rarityColors[r] || '#fff');
+        document.getElementById("modalType").innerText = "TYPE: " + (card.type || 'CARD').toUpperCase();
+        
+        const hwTag = document.getElementById("modalHalloweenTag");
+        if (isHalloweenCard(card)) {
+            hwTag.style.display = "inline-block";
+        } else {
+            hwTag.style.display = "none";
+        }
+
         document.getElementById("modalPower").innerText = getArenaPower(card).toLocaleString();
         document.getElementById("modalHp").innerText = getCardHp(card).toLocaleString();
         document.getElementById("modalDef").innerText = getCardDef(card).toLocaleString();
-        document.getElementById("modalLvlDisplay").innerText = "LV. " + card.level;
-        document.getElementById("lvlBarFill").style.width = (card.level/MAX_LV*100) + "%";
+        document.getElementById("modalLvlDisplay").innerText = "LV. " + (card.level || 1);
+        document.getElementById("lvlBarFill").style.width = ((card.level || 1) / MAX_LV * 100) + "%";
         document.getElementById("reqQty").innerText = sameCards.length;
         document.getElementById("modalSellPrice").innerText = getDynamicSellValue(card).toLocaleString() + " 🪙";
 
@@ -681,7 +777,10 @@
         const lvGroup = document.getElementById("lvUpgradeGroup"), starBtn = document.getElementById("btnUpgradeStar"), awakenBtn = document.getElementById("btnAwakenCard"), maxMsg = document.getElementById("maxLevelMessage");
         awakenBtn.style.display = "none";
         
-        if (card.level < MAX_LV) {
+        const cardLevel = card.level || 1;
+        const cardStars = card.stars || 0;
+
+        if (cardLevel < MAX_LV) {
             lvGroup.style.display = "flex"; starBtn.style.display = "none"; maxMsg.style.display = "none";
             const req = getUpgradeRequirements(card);
             document.getElementById("modalUpgradeInfo").innerText = `เงื่อนไข: ใช้ใบซ้ำ ${req.reqQty} ใบ + ${req.cost} 🪙`;
@@ -689,10 +788,11 @@
             document.getElementById("btnBulkUpgrade").onclick = () => handleUpgrade(card, 'BULK');
         } else {
             lvGroup.style.display = "none";
-            if (card.stars < 5) {
+            if (cardStars < 5) {
                 starBtn.style.display = "block"; maxMsg.style.display = "block";
-                maxMsg.innerText = "✨ พร้อมวิวัฒนาการดาว (ใช้ 2 ใบซ้ำ) ✨";
-                starBtn.onclick = () => handleUpgrade(card, 'STAR', (card.stars+1)*1000);
+                maxMsg.innerText = "✨ พร้อมวิวัฒนาการดาว (ใช้เพียง 1 ใบซ้ำ) ✨";
+                // ลดการใช้อัญมณีในการอัปดาวลงเหลือ 100 เม็ด
+                starBtn.onclick = () => handleUpgrade(card, 'STAR', 100);
             } else {
                 starBtn.style.display = "none";
                 maxMsg.style.display = "block";
@@ -700,13 +800,13 @@
                 if (currentAwakening < 5) {
                     awakenBtn.style.display = "block";
                     const nextAwkLevel = currentAwakening + 1;
-                    const awakenCost = nextAwkLevel * 1000; 
+                    const awakenCost = nextAwkLevel * 200; // ลดค่าใช้จ่ายดาวในการปลุกพลังลง
                     awakenBtn.innerText = `🔮 ปลุกพลังดาวที่ ${nextAwkLevel} (ใช้ ⭐ ${awakenCost.toLocaleString()})`;
                     awakenBtn.onclick = () => handleAwaken(card, awakenCost);
                     maxMsg.innerText = `⚡ การ์ดเงื่อนไขถึงกำหนด พร้อมปลุกพลัง! (ดาวปัจจุบัน: ${currentAwakening}/5)`;
                 } else {
                     awakenBtn.style.display = "none";
-                    maxMsg.innerText = "🌈 ปลุกพลังเต็มพิกัด! 🌈";
+                    maxMsg.innerText = "🌈 ปลุกพลังเต็มขั้นสูงสุดสมบูรณ์แบบ! (Awakening Max) 🌈";
                 }
             }
         }
@@ -715,15 +815,17 @@
     };
 
     async function saveStateToFirebase(updatedLocalCollection) {
+        if (!currentUID) return;
         await updateDoc(doc(db, "users", currentUID), { collection: updatedLocalCollection });
     }
 
     async function handleToggleLock(card) {
         let updated = [...userCards];
-        const idx = updated.findIndex(c => c.name === card.name && (c.rarity||'').toUpperCase() === (card.rarity||'').toUpperCase() && c.level === card.level && c.stars === card.stars && (c.awakening||0) === (card.awakening||0));
+        const idx = updated.findIndex(c => c.name === card.name && (c.rarity || '').toUpperCase() === (card.rarity || '').toUpperCase() && c.level === card.level && c.stars === card.stars && (c.awakening || 0) === (card.awakening || 0) && isHalloweenCard(c) === isHalloweenCard(card));
         if (idx > -1) {
             updated[idx].isLocked = !updated[idx].isLocked;
             await saveStateToFirebase(updated);
+            openModal(updated[idx]);
         }
     }
 
@@ -731,7 +833,7 @@
         if (globalStars < costStars) return alert(`❌ หน่วยเงิน ⭐ (Star) ของคุณไม่พอสำหรับการปลุกพลังนี้ (ต้องการ ${costStars.toLocaleString()} ⭐)`);
 
         let updated = [...userCards];
-        const idx = updated.findIndex(c => c.name === card.name && (c.rarity||'').toUpperCase() === (card.rarity||'').toUpperCase() && c.level === card.level && c.stars === card.stars && (c.awakening||0) === (card.awakening||0));
+        const idx = updated.findIndex(c => c.name === card.name && (c.rarity || '').toUpperCase() === (card.rarity || '').toUpperCase() && c.level === card.level && c.stars === card.stars && (c.awakening || 0) === (card.awakening || 0) && isHalloweenCard(c) === isHalloweenCard(card));
         if (idx === -1) return alert("ไม่พบการ์ดที่ต้องการปลุกพลัง");
 
         updated[idx].awakening = (updated[idx].awakening || 0) + 1;
@@ -752,7 +854,7 @@
         let currentDiamonds = data.diamonds || 0;
 
         let localCollection = [...userCards];
-        let mainIdx = localCollection.findIndex(c => c.name === card.name && (c.rarity||'').toUpperCase() === (card.rarity||'').toUpperCase() && (c.level||1) === card.level && (c.stars||0) === card.stars && (c.awakening||0) === (card.awakening||0));
+        let mainIdx = localCollection.findIndex(c => c.name === card.name && (c.rarity || '').toUpperCase() === (card.rarity || '').toUpperCase() && (c.level || 1) === card.level && (c.stars || 0) === card.stars && (c.awakening || 0) === (card.awakening || 0) && isHalloweenCard(c) === isHalloweenCard(card));
         if (mainIdx === -1) return alert("ไม่พบการ์ดหลัก");
 
         let totalCostPoints = 0;
@@ -764,7 +866,7 @@
                 const req = getUpgradeRequirements(localCollection[mainIdx]);
                 let materialIndices = [];
                 for (let i = 0; i < localCollection.length; i++) {
-                    if (i !== mainIdx && localCollection[i].name === card.name && (localCollection[i].rarity||'').toUpperCase() === (card.rarity||'').toUpperCase() && !localCollection[i].isLocked) {
+                    if (i !== mainIdx && localCollection[i].name === card.name && (localCollection[i].rarity || '').toUpperCase() === (card.rarity || '').toUpperCase() && !localCollection[i].isLocked && isHalloweenCard(localCollection[i]) === isHalloweenCard(card)) {
                         materialIndices.push(i);
                         if (materialIndices.length >= req.reqQty) break;
                     }
@@ -786,15 +888,15 @@
                 if (type === 'LV') break;
             }
         } else if (type === 'STAR') {
-            let reqQty = 2;
+            let reqQty = 1; // อัปดาวใช้แค่ 1 ใบ
             let materialIndices = [];
             for (let i = 0; i < localCollection.length; i++) {
-                if (i !== mainIdx && localCollection[i].name === card.name && (localCollection[i].rarity||'').toUpperCase() === (card.rarity||'').toUpperCase() && !localCollection[i].isLocked) {
+                if (i !== mainIdx && localCollection[i].name === card.name && (localCollection[i].rarity || '').toUpperCase() === (card.rarity || '').toUpperCase() && !localCollection[i].isLocked && isHalloweenCard(localCollection[i]) === isHalloweenCard(card)) {
                     materialIndices.push(i);
                     if (materialIndices.length >= reqQty) break;
                 }
             }
-            if (materialIndices.length < reqQty) return alert("ต้องการใบซ้ำที่ไม่ได้ล็อก 2 ใบเพื่ออัปดาว");
+            if (materialIndices.length < reqQty) return alert("ต้องการใบซ้ำที่ไม่ได้ล็อก 1 ใบเพื่ออัปดาว");
             if (currentDiamonds < starCost) return alert("Diamonds ไม่พอ");
             materialIndices.sort((a, b) => b - a).forEach(idx => {
                 localCollection.splice(idx, 1);
@@ -819,7 +921,7 @@
         if (card.isLocked) return alert("❌ ไม่สามารถขายได้เนื่องจากเปิดระบบล็อกการ์ดไว้ ปลดล็อกก่อนทำการขาย!");
         if(!confirm(`ขายการ์ด ${card.name} หรือไม่?`)) return;
         let updated = [...userCards];
-        const idx = updated.findIndex(c => c.name === card.name && (c.rarity||'').toUpperCase() === (card.rarity||'').toUpperCase() && c.level === card.level && c.stars === card.stars && (c.awakening||0) === (card.awakening||0));
+        const idx = updated.findIndex(c => c.name === card.name && (c.rarity || '').toUpperCase() === (card.rarity || '').toUpperCase() && c.level === card.level && c.stars === card.stars && (c.awakening || 0) === (card.awakening || 0) && isHalloweenCard(c) === isHalloweenCard(card));
         if(idx > -1) {
             const gain = getDynamicSellValue(card);
             updated.splice(idx, 1);
@@ -829,52 +931,80 @@
         }
     }
 
-    document.getElementById("btnSellAll").onclick = async () => {
-        if (!confirm("ระบบจะเก็บการ์ดที่เลเวลและดาวสูงสุดไว้ 1 ใบ และขายใบซ้ำอื่นที่ไม่ได้ล็อกทิ้งทั้งหมด ยืนยันหรือไม่?")) return;
-        const grouped = {};
-        userCards.forEach(card => {
-            const key = `${card.name}_${(card.rarity||'C').toUpperCase()}`;
-            if (!grouped[key]) grouped[key] = [];
-            grouped[key].push(card);
-        });
-        let newCollection = [], totalGain = 0, sellCount = 0;
-        for (const key in grouped) {
-            const copies = grouped[key];
-            copies.sort((a, b) => ((b.awakening||0)*1000 + (b.stars||0)*100 + b.level) - ((a.awakening||0)*1000 + (a.stars||0)*100 + b.level));
-            newCollection.push(copies[0]); 
-            for (let i = 1; i < copies.length; i++) {
-                if (copies[i].isLocked) {
-                    newCollection.push(copies[i]); 
-                } else {
-                    totalGain += getDynamicSellValue(copies[i]);
-                    sellCount++;
+    const btnSellAllEl = document.getElementById("btnSellAll");
+    if (btnSellAllEl) {
+        btnSellAllEl.onclick = async () => {
+            if (!confirm("ระบบจะเก็บการ์ดที่เลเวลและดาวสูงสุดไว้ 1 ใบ และขายใบซ้ำอื่นที่ไม่ได้ล็อกทิ้งทั้งหมด ยืนยันหรือไม่?")) return;
+            const grouped = {};
+            userCards.forEach(card => {
+                if (!card || !card.name) return;
+                const key = `${card.name}_${(card.rarity || 'C').toUpperCase()}_${isHalloweenCard(card) ? 'HW' : 'NORMAL'}`;
+                if (!grouped[key]) grouped[key] = [];
+                grouped[key].push(card);
+            });
+            let newCollection = [], totalGain = 0, sellCount = 0;
+            for (const key in grouped) {
+                const copies = grouped[key];
+                copies.sort((a, b) => ((b.awakening || 0) * 1000 + (b.stars || 0) * 100 + (b.level || 1)) - ((a.awakening || 0) * 1000 + (a.stars || 0) * 100 + (a.level || 1)));
+                newCollection.push(copies[0]); 
+                for (let i = 1; i < copies.length; i++) {
+                    if (copies[i].isLocked) {
+                        newCollection.push(copies[i]); 
+                    } else {
+                        totalGain += getDynamicSellValue(copies[i]);
+                        sellCount++;
+                    }
                 }
             }
-        }
-        if (sellCount === 0) return alert("ไม่มีใบซ้ำที่ปลดล็อกเหลือให้ขาย");
-        
-        await saveStateToFirebase(newCollection);
-        await updateDoc(doc(db, "users", currentUID), { points: increment(totalGain) });
-        alert(`ขายการ์ดซ้ำสำเร็จทั้งหมด ${sellCount} ใบ ได้รับ ${totalGain.toLocaleString()} 🪙`);
-    };
-
-    document.getElementById("searchInput").oninput = (e) => { searchQuery = e.target.value; renderCards(); };
-    document.getElementById("sortSelect").onchange = () => renderCards();
-    
-    // ปุ่มกรองการ์ด
-    const fCon = document.getElementById("filterContainer");
-    ['ALL','SECRET','P','USEC','EXR','CBR','SEC','SUR','SSR','PR','UR','SR','R','U','C'].forEach(r => {
-        const btn = document.createElement("button");
-        btn.className = `filter-btn ${r === 'ALL' ? 'active' : ''}`;
-        btn.innerText = r;
-        btn.onclick = () => {
-            currentFilter = r;
-            document.querySelectorAll('#filterContainer .filter-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            renderCards();
+            if (sellCount === 0) return alert("ไม่มีใบซ้ำที่ปลดล็อกเหลือให้ขาย");
+            
+            await saveStateToFirebase(newCollection);
+            await updateDoc(doc(db, "users", currentUID), { points: increment(totalGain) });
+            alert(`ขายการ์ดซ้ำสำเร็จทั้งหมด ${sellCount} ใบ ได้รับ ${totalGain.toLocaleString()} 🪙`);
         };
-        fCon.appendChild(btn);
-    });
+    }
+
+    const searchInputEl = document.getElementById("searchInput");
+    if (searchInputEl) searchInputEl.oninput = (e) => { searchQuery = e.target.value; renderCards(); };
+    
+    const sortSelectEl = document.getElementById("sortSelect");
+    if (sortSelectEl) sortSelectEl.onchange = () => renderCards();
+    
+    const catCon = document.getElementById("categoryFilterContainer");
+    if (catCon) {
+        [
+            { id: 'ALL', label: '🌐 ทั้งหมด' },
+            { id: 'CARD', label: '🎴 การ์ด (CARD)' },
+            { id: 'HALLOWEEN', label: '🎃 HALLOWEEN', isSpecial: true }
+        ].forEach(cat => {
+            const btn = document.createElement("button");
+            btn.className = `filter-btn type-btn ${cat.isSpecial ? 'halloween-btn' : ''} ${cat.id === 'ALL' ? 'active' : ''}`;
+            btn.innerText = cat.label;
+            btn.onclick = () => {
+                currentCategoryFilter = cat.id;
+                document.querySelectorAll('#categoryFilterContainer .filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderCards();
+            };
+            catCon.appendChild(btn);
+        });
+    }
+
+    const fCon = document.getElementById("filterContainer");
+    if (fCon) {
+        ['ALL','P','SECRET','USEC','EXR','CBR','SEC','SUR','PR','UR','SSR','SR','R','U','C'].forEach(r => {
+            const btn = document.createElement("button");
+            btn.className = `filter-btn ${r === 'ALL' ? 'active' : ''}`;
+            btn.innerText = r;
+            btn.onclick = () => {
+                currentFilter = r;
+                document.querySelectorAll('#filterContainer .filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderCards();
+            };
+            fCon.appendChild(btn);
+        });
+    }
 
     let sessionSeconds = 0;
     let timerInterval = null;
