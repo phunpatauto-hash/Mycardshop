@@ -150,11 +150,6 @@
         .max-rank-banner { display: inline-flex; align-items: center; gap: 6px; background: rgba(230, 57, 70, 0.15); border: 1px solid rgba(230, 57, 70, 0.4); color: #ff4d6d; padding: 4px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: bold; margin-top: 8px; }
         .last-rank-banner { display: inline-flex; align-items: center; gap: 6px; background: rgba(0, 229, 255, 0.12); border: 1px solid rgba(0, 229, 255, 0.3); color: #00e5ff; padding: 4px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: bold; margin-top: 8px; margin-left: 8px; }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 25px; }
-        .stat-card { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 20px; border: 1px solid var(--glass-border); text-align: center; }
-        .stat-card i { font-size: 1.2rem; margin-bottom: 5px; display: block; }
-        .stat-val { font-size: 1.1rem; font-weight: 700; }
-
         /* Featured Showcase Slot */
         .featured-display { z-index: 2; background: rgba(0,0,0,0.5); border-radius: 25px; border: 2px dashed var(--glass-border); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; cursor: pointer; }
         .featured-display img { width: 100%; height: 100%; object-fit: cover; }
@@ -197,7 +192,6 @@
 
         @media (max-width: 900px) {
             .hero-section { grid-template-columns: 1fr; text-align: center; padding: 30px; }
-            .stats-grid { grid-template-columns: 1fr 1fr 1fr; }
             .featured-display { height: 250px; width: 180px; margin: 20px auto 0; }
             .last-rank-banner { margin-left: 0; }
         }
@@ -263,24 +257,6 @@
                 </div>
                 <div class="last-rank-banner">
                     <i class="fas fa-calendar-check"></i> อารีน่าซีซั่นล่าสุด: <span id="profile-last-rank">ไม่มีประวัติซีซั่นก่อนหน้า</span>
-                </div>
-            </div>
-            
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <i class="fas fa-coins" style="color: var(--primary);"></i>
-                    <div class="stat-val" id="stat-points">0</div>
-                    <div style="font-size: 0.6rem; opacity: 0.5;">POINTS</div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-gem" style="color: var(--accent);"></i>
-                    <div class="stat-val" id="stat-diamonds">0</div>
-                    <div style="font-size: 0.6rem; opacity: 0.5;">DIAMONDS</div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-star" style="color: #fff;"></i>
-                    <div class="stat-val" id="stat-stars">0</div>
-                    <div style="font-size: 0.6rem; opacity: 0.5;">STARS</div>
                 </div>
             </div>
         </div>
@@ -727,17 +703,13 @@
             const isWinnerChampion = unlockedTitles.includes("นักสู้ผู้ไม่ย่อท้อ") || 
                 (userData.grandArenaPassUnlocked === true);
 
-            // --- แก้ไขเงื่อนไขการรับยศใหม่ ---
             const lastSeasonStr = (userData.lastSeasonRank || "").toUpperCase();
 
-            // 1. ยศ "ผู้พิชิตศึกสงคราม" มอบให้รางวัลหลังสรุปซีซั่นสำหรับผู้ที่อยู่แรงค์ MASTER 1 เท่านั้น
             const isWarConqueror = unlockedTitles.includes("ผู้พิชิตศึกสงคราม") ||
                 lastSeasonStr.includes("MASTER 1");
 
-            // 2. ยศ "ผู้พิทักษ์อารีน่าแห่งนี้" มอบให้รางวัลหลังสรุปซีซั่นสำหรับผู้ที่อยู่แรงค์ Supreme MASTER PRO!! เท่านั้น
             const isSupremeGuardian = unlockedTitles.includes("ผู้พิทักษ์อารีน่าแห่งนี้") ||
                 lastSeasonStr.includes("SUPREME MASTER PRO");
-            // -----------------------------------------------------------------
 
             const diamondRainPlaysCount = parseInt(userData.diamondRainPlays) || 0;
             const isPartyDiamonds = unlockedTitles.includes("DIAMONDS") || 
@@ -913,9 +885,6 @@
 
     function updateUI(data) {
         document.getElementById("username-display").innerText = data.username || "COLLECTOR";
-        document.getElementById("stat-points").innerText = (data.points || 0).toLocaleString();
-        document.getElementById("stat-diamonds").innerText = (data.diamonds || 0).toLocaleString();
-        document.getElementById("stat-stars").innerText = (data.stars || 0).toLocaleString();
         
         const titleContainer = document.getElementById("whale-title-container");
         const titleBanner = document.getElementById("whale-title-banner-main");
