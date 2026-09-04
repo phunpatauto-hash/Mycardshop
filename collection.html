@@ -439,7 +439,6 @@
         return Math.floor(base * (1 + ((card.level || 1) - 1) * 0.1) * halloweenBonus);
     }
 
-    // ปรับลดเงื่อนไข: ใช้ใบซ้ำเพียง 1 ใบในการอัปเกรด และใช้ Coins น้อยลง เพื่อให้อัปเกรดง่ายขึ้น
     function getUpgradeRequirements(card) {
         return { reqQty: 1, cost: 100 };
     }
@@ -452,8 +451,9 @@
                     const data = snap.data();
                     let rawCollection = data.collection || [];
                     
+                    // ป้องกัน Error โดยการแปลง item.id เป็น String ก่อนเรียก .startsWith() เสมอ
                     userCards = rawCollection
-                        .filter(item => item && !(item.source === "ตู้สุ่มสัตว์เลี้ยง" || (item.id && item.id.startsWith("p")) || item.type === "pet"))
+                        .filter(item => item && !(item.source === "ตู้สุ่มสัตว์เลี้ยง" || (item.id != null && String(item.id).startsWith("p")) || item.type === "pet"))
                         .map(c => ({
                             ...c, 
                             level: c.level || 1, 
@@ -791,7 +791,6 @@
             if (cardStars < 5) {
                 starBtn.style.display = "block"; maxMsg.style.display = "block";
                 maxMsg.innerText = "✨ พร้อมวิวัฒนาการดาว (ใช้เพียง 1 ใบซ้ำ) ✨";
-                // ลดการใช้อัญมณีในการอัปดาวลงเหลือ 100 เม็ด
                 starBtn.onclick = () => handleUpgrade(card, 'STAR', 100);
             } else {
                 starBtn.style.display = "none";
@@ -800,7 +799,7 @@
                 if (currentAwakening < 5) {
                     awakenBtn.style.display = "block";
                     const nextAwkLevel = currentAwakening + 1;
-                    const awakenCost = nextAwkLevel * 200; // ลดค่าใช้จ่ายดาวในการปลุกพลังลง
+                    const awakenCost = nextAwkLevel * 200;
                     awakenBtn.innerText = `🔮 ปลุกพลังดาวที่ ${nextAwkLevel} (ใช้ ⭐ ${awakenCost.toLocaleString()})`;
                     awakenBtn.onclick = () => handleAwaken(card, awakenCost);
                     maxMsg.innerText = `⚡ การ์ดเงื่อนไขถึงกำหนด พร้อมปลุกพลัง! (ดาวปัจจุบัน: ${currentAwakening}/5)`;
@@ -888,7 +887,7 @@
                 if (type === 'LV') break;
             }
         } else if (type === 'STAR') {
-            let reqQty = 1; // อัปดาวใช้แค่ 1 ใบ
+            let reqQty = 1;
             let materialIndices = [];
             for (let i = 0; i < localCollection.length; i++) {
                 if (i !== mainIdx && localCollection[i].name === card.name && (localCollection[i].rarity || '').toUpperCase() === (card.rarity || '').toUpperCase() && !localCollection[i].isLocked && isHalloweenCard(localCollection[i]) === isHalloweenCard(card)) {
