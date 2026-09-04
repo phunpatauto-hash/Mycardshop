@@ -875,7 +875,10 @@
             const slot = document.getElementById(isMySide ? `mySlot_${i}` : `peerSlot_${i}`);
             if (flatList[i]) {
                 const card = flatList[i];
+                // เพิ่มการตรวจสอบจำนวนชิ้นส่วนการ์ดซ้ำในช่องสล็อต (ถ้ามีค่ามากกว่า 1 ให้แสดงป้าย x...)
+                const countBadgeHtml = card.count > 1 ? `<div class="slot-card-count">x${card.count}</div>` : '';
                 slot.innerHTML = `
+                    ${countBadgeHtml}
                     <img class="slot-card-img" src="${card.img || 'https://via.placeholder.com/150'}">
                     <div class="slot-card-info">
                         <div class="slot-card-name">${card.name}</div>
@@ -1019,7 +1022,7 @@
         input.value = "";
     }
 
-    function renderChatHeader(chatList) {} // Dummy placeholder
+    function renderChatHeader(chatList) {} 
 
     function renderChatHistory(chatList) {
         const board = document.getElementById("chatMessages");
