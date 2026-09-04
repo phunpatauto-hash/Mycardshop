@@ -747,22 +747,16 @@
                     desc: `เงื่อนไข: ประมูลชนะครบ 5 ครั้ง (ปัจจุบัน: ${auctionWinsCount}/5 ครั้ง)`
                 },
                 {
-                    id: 'นักเดินทางเลเวลขั้นสุดยอด',
-                    name: 'นักเดินทางเลเวลขั้นสุดยอด',
-                    isUnlocked: unlockedTitles.includes("นักเดินทางเลเวลขั้นสุดยอด"),
-                    desc: 'ปลดล็อกจากรางวัลเส้นทางเลเวลผู้เล่น (ไปถึงเลเวล 50)'
-                },
-                {
-                    id: 'DIAMONDS',
-                    name: 'DIAMONDS',
-                    isUnlocked: isPartyDiamonds,
-                    desc: `เล่นกิจกรรมฝนเพชรหน้า Banner Selection ครบ 5 ครั้ง (ปัจจุบัน: ${diamondRainPlaysCount}/5 ครั้ง)`
-                },
-                {
                     id: 'ผู้พิทักษ์อารีน่าแห่งนี้',
                     name: 'ผู้พิทักษ์อารีน่าแห่งนี้',
                     isUnlocked: isSupremeGuardian,
                     desc: 'เงื่อนไข: มอบให้รางวัลหลังสรุปซีซั่นสำหรับผู้ที่อยู่แรงค์ Supreme MASTER PRO!! เท่านั้น'
+                },
+                {
+                    id: 'ผู้พิชิตศึกสงคราม',
+                    name: 'ผู้พิชิตศึกสงคราม',
+                    isUnlocked: isWarConqueror,
+                    desc: 'เงื่อนไข: มอบให้รางวัลหลังสรุปซีซั่นสำหรับผู้ที่อยู่แรงค์ MASTER 1 เท่านั้น'
                 },
                 {
                     id: 'นักสู้ผู้ไม่ย่อท้อ',
@@ -771,10 +765,10 @@
                     desc: 'ปลดล็อกจากรางวัล Grand Arena Pass'
                 },
                 {
-                    id: 'ผู้พิชิตศึกสงคราม',
-                    name: 'ผู้พิชิตศึกสงคราม',
-                    isUnlocked: isWarConqueror,
-                    desc: 'เงื่อนไข: มอบให้รางวัลหลังสรุปซีซั่นสำหรับผู้ที่อยู่แรงค์ MASTER 1 เท่านั้น'
+                    id: 'นักเดินทางเลเวลขั้นสุดยอด',
+                    name: 'นักเดินทางเลเวลขั้นสุดยอด',
+                    isUnlocked: unlockedTitles.includes("นักเดินทางเลเวลขั้นสุดยอด"),
+                    desc: 'ปลดล็อกจากรางวัลเส้นทางเลเวลผู้เล่น (ไปถึงเลเวล 50)'
                 },
                 {
                     id: 'ผู้เดินทางเลเวลชำนาน',
@@ -787,6 +781,12 @@
                     name: 'นักเดินทางเลเวล',
                     isUnlocked: unlockedTitles.includes("นักเดินทางเลเวล"),
                     desc: 'ปลดล็อกจากรางวัลเส้นทางเลเวลผู้เล่น (ไปถึงเลเวล 20)'
+                },
+                 {
+                    id: 'DIAMONDS',
+                    name: 'DIAMONDS',
+                    isUnlocked: isPartyDiamonds,
+                    desc: `เล่นกิจกรรมฝนเพชรหน้า Banner Selection ครบ 5 ครั้ง (ปัจจุบัน: ${diamondRainPlaysCount}/5 ครั้ง)`
                 },
                 {
                     id: 'ผู้ใหญ่ใจบุญ',
