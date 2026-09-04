@@ -724,25 +724,20 @@
             const unlockedTitles = userData.titles || userData.unlockedTitles || [];
             const isWhale = (userData.title_prefix === "ผู้ใหญ่ใจบุญ" || userData.bought_daddy_pack === true);
 
-            const consecutiveTopSeasons = parseInt(userData.consecutiveTopSeasons || userData.consecutive_top_seasons) || 0;
-            const isWinnerChampion = unlockedTitles.includes("กำหนดผู้ชนะ") || 
-                consecutiveTopSeasons >= 5 ||
-                (userData.maxRank && userData.maxRank.includes("5_CONSECUTIVE_TOP")) ||
-                (userData.lastSeasonRank && userData.lastSeasonRank.includes("กำหนดผู้ชนะ"));
+            const isWinnerChampion = unlockedTitles.includes("นักสู้ผู้ไม่ย่อท้อ") || 
+                (userData.grandArenaPassUnlocked === true);
 
-            const currentRankStr = (userData.rank || userData.currentRank || "").toUpperCase();
-            const maxRankStr = (userData.maxRank || "").toUpperCase();
+            // --- แก้ไขเงื่อนไขการรับยศใหม่ ---
             const lastSeasonStr = (userData.lastSeasonRank || "").toUpperCase();
 
+            // 1. ยศ "ผู้พิชิตศึกสงคราม" มอบให้รางวัลหลังสรุปซีซั่นสำหรับผู้ที่อยู่แรงค์ MASTER 1 เท่านั้น
             const isWarConqueror = unlockedTitles.includes("ผู้พิชิตศึกสงคราม") ||
-                currentRankStr.includes("MASTER 1") || 
-                maxRankStr.includes("MASTER 1") ||
                 lastSeasonStr.includes("MASTER 1");
 
+            // 2. ยศ "ผู้พิทักษ์อารีน่าแห่งนี้" มอบให้รางวัลหลังสรุปซีซั่นสำหรับผู้ที่อยู่แรงค์ Supreme MASTER PRO!! เท่านั้น
             const isSupremeGuardian = unlockedTitles.includes("ผู้พิทักษ์อารีน่าแห่งนี้") ||
-                currentRankStr.includes("SUPREME MASTER PRO") ||
-                maxRankStr.includes("SUPREME MASTER PRO") ||
                 lastSeasonStr.includes("SUPREME MASTER PRO");
+            // -----------------------------------------------------------------
 
             const diamondRainPlaysCount = parseInt(userData.diamondRainPlays) || 0;
             const isPartyDiamonds = unlockedTitles.includes("DIAMONDS") || 
@@ -795,19 +790,19 @@
                     id: 'ผู้พิทักษ์อารีน่าแห่งนี้',
                     name: 'ผู้พิทักษ์อารีน่าแห่งนี้',
                     isUnlocked: isSupremeGuardian,
-                    desc: 'ปลดล็อกเมื่อคุณมีแรงค์ถึงระดับ Supreme MASTER PRO!!'
+                    desc: 'เงื่อนไข: มอบให้รางวัลหลังสรุปซีซั่นสำหรับผู้ที่อยู่แรงค์ Supreme MASTER PRO!! เท่านั้น'
                 },
                 {
-                    id: 'กำหนดผู้ชนะ',
-                    name: 'กำหนดผู้ชนะ',
+                    id: 'นักสู้ผู้ไม่ย่อท้อ',
+                    name: 'นักสู้ผู้ไม่ย่อท้อ',
                     isUnlocked: isWinnerChampion,
-                    desc: `ผู้เล่นที่ติด Top ติดต่อกัน 5 ซีซั่นจากหน้า Grand Arena (ปัจจุบัน: ${consecutiveTopSeasons}/5 ซีซั่น)`
+                    desc: 'ปลดล็อกจากรางวัล Grand Arena Pass'
                 },
                 {
                     id: 'ผู้พิชิตศึกสงคราม',
                     name: 'ผู้พิชิตศึกสงคราม',
                     isUnlocked: isWarConqueror,
-                    desc: 'ปลดล็อกเมื่อคุณมีแรงค์ถึงระดับ MASTER 1'
+                    desc: 'เงื่อนไข: มอบให้รางวัลหลังสรุปซีซั่นสำหรับผู้ที่อยู่แรงค์ MASTER 1 เท่านั้น'
                 },
                 {
                     id: 'ผู้เดินทางเลเวลชำนาน',
@@ -943,7 +938,7 @@
                 titleBanner.classList.add("rank-party-diamonds");
             } else if (data.currentTitle === "ผู้พิทักษ์อารีน่าแห่งนี้") {
                 titleBanner.classList.add("rank-supreme-guardian");
-            } else if (data.currentTitle === "กำหนดผู้ชนะ") {
+            } else if (data.currentTitle === "นักสู้ผู้ไม่ย่อท้อ") {
                 titleBanner.classList.add("rank-pro");
             } else if (data.currentTitle === "ผู้พิชิตศึกสงคราม") {
                 titleBanner.classList.add("rank-master");
