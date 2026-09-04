@@ -367,6 +367,28 @@
         return lv * 120;
     }
 
+    // 🛡️ ฟังก์ชันจัดระเบียบและเติมข้อมูลเริ่มต้นป้องกันผู้เล่นเก่า Error
+    function sanitizeUserData(rawData) {
+        return {
+            username: rawData?.username || "COLLECTOR",
+            playerLevel: Number(rawData?.playerLevel) || 1,
+            playerExp: Number(rawData?.playerExp) || 0,
+            diamonds: Number(rawData?.diamonds) || 0,
+            points: Number(rawData?.points) || 0,
+            collection: Array.isArray(rawData?.collection) ? rawData.collection : [],
+            titles: Array.isArray(rawData?.titles) ? rawData.titles : [],
+            claimedLevelRewards: Array.isArray(rawData?.claimedLevelRewards) ? rawData.claimedLevelRewards : [],
+            currentTitle: rawData?.currentTitle || "none",
+            auctionWins: Number(rawData?.auctionWins || rawData?.auction_wins) || 0,
+            userPhoto: rawData?.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${rawData?.username || 'default'}`,
+            lastSeasonRank: rawData?.lastSeasonRank || null,
+            featuredCard: rawData?.featuredCard || null,
+            cards_inventory: rawData?.cards_inventory || {},
+            inventory_materials: rawData?.inventory_materials || {},
+            diamondRainPlays: Number(rawData?.diamondRainPlays) || 0
+        };
+    }
+
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             userUID = user.uid;
@@ -386,7 +408,9 @@
 
             onSnapshot(doc(db, "users", user.uid), async (snap) => {
                 if (snap.exists()) {
-                    const userData = snap.data();
+                    const rawData = snap.data();
+                    
+                    const userData = sanitizeUserData(rawData);
                     globalUserData = userData;
                     
                     await checkAndProcessLevelUp(user.uid, userData);
@@ -697,7 +721,8 @@
             if (!userSnap.exists()) return;
             const userData = userSnap.data();
 
-            const unlockedTitles = userData.titles || userData.unlockedTitles || [];
+            // 🛡️ ป้องกันข้อมูล Array เป็น null/undefined
+            const unlockedTitles = Array.isArray(userData.titles) ? userData.titles : (Array.isArray(userData.unlockedTitles) ? userData.unlockedTitles : []);
             const isWhale = (userData.title_prefix === "ผู้ใหญ่ใจบุญ" || userData.bought_daddy_pack === true);
 
             const isWinnerChampion = unlockedTitles.includes("นักสู้ผู้ไม่ย่อท้อ") || 
@@ -842,7 +867,7 @@
             });
 
         } catch (error) {
-            console.error(error);
+            console.error("Title Selector Error:", error);
             Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถโหลดข้อมูลคลังฉายาได้', 'error');
         }
     };
