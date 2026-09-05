@@ -226,7 +226,10 @@
 <div class="container" id="main-content">
     <header class="nav-header">
         <a href="index.html" class="back-btn"><i class="fas fa-chevron-left"></i> หน้าหลัก</a>
-        <button onclick="logout()" class="back-btn" style="color: #ff5e5e; border-color: rgba(255,94,94,0.2);"><i class="fas fa-sign-out-alt"></i></button>
+        <div style="display: flex; gap: 10px;">
+            <button onclick="openAccountSettingsModal()" class="back-btn" style="color: var(--accent); border-color: rgba(0,229,255,0.3);" title="ตั้งค่าบัญชี & รหัสผ่าน"><i class="fas fa-user-cog"></i> ตั้งค่าไอดี/รหัสผ่าน</button>
+            <button onclick="logout()" class="back-btn" style="color: #ff5e5e; border-color: rgba(255,94,94,0.2);" title="ออกจากระบบ"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
     </header>
 
     <section class="hero-section" id="hero-profile-card">
@@ -293,7 +296,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, signOut, updatePassword, updateEmail, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, onSnapshot, updateDoc, getDoc, arrayUnion, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -727,6 +730,78 @@
         document.getElementById("auction-wins-display").innerText = `${auctionWinsCount} ครั้ง`;
     } 
 
+    // ระบบตั้งค่าไอดี / เปลี่ยนรหัสผ่าน / เปลี่ยนอีเมล
+    window.openAccountSettingsModal = () => {
+        const currentUser = auth.currentUser;
+        if (!currentUser) return;
+
+        Swal.fire({
+            title: '⚙️ ตั้งค่าบัญชีผู้ใช้',
+            html: `
+                <div style="text-align: left; display: flex; flex-direction: column; gap: 12px; color: #fff;">
+                    <div>
+                        <label style="font-size: 0.85rem; color: #aaa;">อีเมลไอดีปัจจุบัน:</label>
+                        <input type="text" id="setting-email" value="${currentUser.email || ''}" readonly style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #888; font-family: 'Kanit';" />
+                    </div>
+                    <hr style="border-color: rgba(255,255,255,0.1); margin: 5px 0;">
+                    <div>
+                        <label style="font-size: 0.85rem; color: #ffc831; font-weight: bold;">🔑 เปลี่ยนรหัสผ่านใหม่:</label>
+                        <input type="password" id="setting-old-pass" placeholder="รหัสผ่านปัจจุบัน" style="width: 100%; padding: 10px; margin-top: 5px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-family: 'Kanit';" />
+                        <input type="password" id="setting-new-pass" placeholder="รหัสผ่านใหม่ (อย่างน้อย 6 ตัวอักษร)" style="width: 100%; padding: 10px; margin-top: 8px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-family: 'Kanit';" />
+                    </div>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: '💾 บันทึกรหัสผ่านใหม่',
+            cancelButtonText: 'ยกเลิก',
+            background: '#18181b',
+            color: '#fff',
+            confirmButtonColor: '#ffc831',
+            cancelButtonColor: '#4b5563',
+            preConfirm: async () => {
+                const oldPass = document.getElementById('setting-old-pass').value;
+                const newPass = document.getElementById('setting-new-pass').value;
+
+                if (!oldPass || !newPass) {
+                    Swal.showValidationMessage('กรุณากรอกรหัสผ่านปัจจุบันและรหัสผ่านใหม่ให้ครบถ้วน');
+                    return false;
+                }
+                if (newPass.length < 6) {
+                    Swal.showValidationMessage('รหัสผ่านใหม่ต้องมีความยาวอย่างน้อย 6 ตัวอักษรขึ้นไป');
+                    return false;
+                }
+
+                try {
+                    const credential = EmailAuthProvider.credential(currentUser.email, oldPass);
+                    await reauthenticateWithCredential(currentUser, credential);
+                    await updatePassword(currentUser, newPass);
+                    return true;
+                } catch (error) {
+                    console.error(error);
+                    let errMsg = 'เกิดข้อผิดพลาดในการเปลี่ยนรหัสผ่าน';
+                    if (error.code === 'auth/wrong-password') {
+                        errMsg = 'รหัสผ่านปัจจุบันไม่ถูกต้อง';
+                    } else if (error.code === 'auth/weak-password') {
+                        errMsg = 'รหัสผ่านใหม่มีความปลอดภัยต่ำเกินไป';
+                    }
+                    Swal.showValidationMessage(errMsg);
+                    return false;
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'เปลี่ยนรหัสผ่านสำเร็จ!',
+                    text: 'กรุณาใช้รหัสผ่านใหม่ในการเข้าสู่ระบบครั้งถัดไป',
+                    background: '#18181b',
+                    color: '#fff',
+                    confirmButtonColor: '#ffc831'
+                });
+            }
+        });
+    };
+
     window.openTitleSelector = async () => {
         if (!userUID) return;
         
@@ -765,7 +840,6 @@
             const isHappyHalloween = unlockedTitles.includes("happy HALLOWEEN 🎃") || 
                 (userData.happyHalloweenUnlocked === true);
 
-            // จัดหมวดหมู่ยศทั้งหมด
             const categories = [
                 {
                     catName: "🎃 หมวดกิจกรรม & พิเศษ (Event & Special)",
@@ -870,7 +944,6 @@
 
         titleListHTML += `</div>`;
 
-        // ตรวจสอบว่าเปิด modal อยู่แล้วหรือไม่ ถ้าเปิดอยู่ให้แค่อัปเดตเนื้อหาภายใน
         if (Swal.isVisible() && document.getElementById('title-category-container')) {
             document.getElementById('title-category-container').outerHTML = titleListHTML.match(/<div class="title-scroll-box"[\s\S]*<\/div>/)[0];
             const input = document.getElementById('title-search-input');
@@ -894,7 +967,6 @@
     };
 
     window.filterTitles = (query) => {
-        // ดึงข้อมูล Categories กลับมาสร้างใหม่เพื่อกรอง
         const unlockedTitles = Array.isArray(globalUserData.titles) ? globalUserData.titles : [];
         const isWhale = (globalUserData.title_prefix === "ผู้ใหญ่ใจบุญ" || globalUserData.bought_daddy_pack === true);
         const isWinnerChampion = unlockedTitles.includes("นักสู้ผู้ไม่ย่อท้อ") || (globalUserData.grandArenaPassUnlocked === true);
