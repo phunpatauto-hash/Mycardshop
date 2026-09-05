@@ -139,6 +139,22 @@
             box-shadow: 0 0 25px rgba(255, 215, 0, 0.85); text-shadow: 0 0 8px #ff007f, 0 0 12px #ffd700;
         }
 
+        .whale-title-banner.rank-halloween-time {
+            background: linear-gradient(135deg, rgba(255, 107, 0, 0.4) 0%, rgba(138, 43, 226, 0.45) 50%, rgba(255, 140, 0, 0.4) 100%);
+            border: 2px solid #ff6b00; color: #ffeb3b; font-weight: 900;
+            box-shadow: 0 0 25px rgba(255, 107, 0, 0.8), 0 0 15px rgba(138, 43, 226, 0.6);
+            text-shadow: 0 0 8px #ff4500, 0 0 12px #8a2be2;
+            animation: titlePulse 1.5s infinite alternate;
+        }
+
+        .whale-title-banner.rank-happy-halloween {
+            background: linear-gradient(135deg, rgba(147, 51, 234, 0.45) 0%, rgba(234, 88, 12, 0.45) 50%, rgba(16, 185, 129, 0.35) 100%);
+            border: 2px solid #a855f7; color: #34d399; font-weight: 900;
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.8), 0 0 15px rgba(234, 88, 12, 0.6);
+            text-shadow: 0 0 8px #9333ea, 0 0 12px #ea580c;
+            animation: titlePulse 1.5s infinite alternate;
+        }
+
         @keyframes rainbowAnimation {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -367,7 +383,6 @@
         return lv * 120;
     }
 
-    // 🛡️ ฟังก์ชันจัดระเบียบและเติมข้อมูลเริ่มต้นป้องกันผู้เล่นเก่า Error
     function sanitizeUserData(rawData) {
         return {
             username: rawData?.username || "COLLECTOR",
@@ -409,7 +424,6 @@
             onSnapshot(doc(db, "users", user.uid), async (snap) => {
                 if (snap.exists()) {
                     const rawData = snap.data();
-                    
                     const userData = sanitizeUserData(rawData);
                     globalUserData = userData;
                     
@@ -721,7 +735,6 @@
             if (!userSnap.exists()) return;
             const userData = userSnap.data();
 
-            // 🛡️ ป้องกันข้อมูล Array เป็น null/undefined
             const unlockedTitles = Array.isArray(userData.titles) ? userData.titles : (Array.isArray(userData.unlockedTitles) ? userData.unlockedTitles : []);
             const isWhale = (userData.title_prefix === "ผู้ใหญ่ใจบุญ" || userData.bought_daddy_pack === true);
 
@@ -746,115 +759,124 @@
             const isAuctionPro = unlockedTitles.includes("นักประมูลชำนาญ") || auctionWinsCount >= 15;
             const isAuctionGod = unlockedTitles.includes("นักประมูลผู้ชนะตลอดกาล") || auctionWinsCount >= 20;
 
-            const allTitlesMasterList = [
+            const isHalloweenTime = unlockedTitles.includes("Halloween is Time 🎃") || 
+                (userData.halloweenTitleUnlocked === true);
+
+            const isHappyHalloween = unlockedTitles.includes("happy HALLOWEEN 🎃") || 
+                (userData.happyHalloweenUnlocked === true);
+
+            // จัดหมวดหมู่ยศทั้งหมด
+            const categories = [
                 {
-                    id: 'none',
-                    name: '❌ ไม่แสดงฉายา',
-                    isUnlocked: true,
-                    desc: 'ปิดการแสดงผลฉายาบนหน้าโปรไฟล์ของคุณ'
+                    catName: "🎃 หมวดกิจกรรม & พิเศษ (Event & Special)",
+                    titles: [
+                        { id: 'none', name: '❌ ไม่แสดงฉายา', isUnlocked: true, desc: 'ปิดการแสดงผลฉายาบนหน้าโปรไฟล์ของคุณ' },
+                        { id: 'happy HALLOWEEN 🎃', name: 'happy HALLOWEEN 🎃', isUnlocked: isHappyHalloween, desc: 'รับได้จากหน้าอีเว้นท์ halloween_event ในวันที่ 31 ตุลาคม เท่านั้น!' },
+                        { id: 'Halloween is Time 🎃', name: 'Halloween is Time 🎃', isUnlocked: isHalloweenTime, desc: 'สามารถรับได้จาก DIAMOND SHOP ในระยะเวลาจำกัดเท่านั้น' },
+                        { id: 'DIAMONDS', name: 'DIAMONDS', isUnlocked: isPartyDiamonds, desc: `เล่นกิจกรรมฝนเพชรหน้า Banner Selection ครบ 5 ครั้ง (ปัจจุบัน: ${diamondRainPlaysCount}/5 ครั้ง)` },
+                        { id: 'ผู้ใหญ่ใจบุญ', name: 'ผู้ใหญ่ใจบุญ', isUnlocked: isWhale || unlockedTitles.includes("ผู้ใหญ่ใจบุญ"), desc: 'ปลดล็อกจากแพ็กเกจผู้ใหญ่ใจบุญ หรือการสนับสนุนระบบ' }
+                    ]
                 },
                 {
-                    id: 'นักประมูลผู้ชนะตลอดกาล',
-                    name: 'นักประมูลผู้ชนะตลอดกาล',
-                    isUnlocked: isAuctionGod,
-                    desc: `เงื่อนไข: ประมูลชนะครบ 20 ครั้ง (ปัจจุบัน: ${auctionWinsCount}/20 ครั้ง)`
+                    catName: "🏆 หมวดอารีน่า & การแข่งขัน (Arena & Combat)",
+                    titles: [
+                        { id: 'ผู้พิทักษ์อารีน่าแห่งนี้', name: 'ผู้พิทักษ์อารีน่าแห่งนี้', isUnlocked: isSupremeGuardian, desc: 'มอบให้รางวัลหลังสรุปซีซั่นสำหรับผู้ที่อยู่แรงค์ Supreme MASTER PRO!! เท่านั้น' },
+                        { id: 'ผู้พิชิตศึกสงคราม', name: 'ผู้พิชิตศึกสงคราม', isUnlocked: isWarConqueror, desc: 'มอบให้รางวัลหลังสรุปซีซั่นสำหรับผู้ที่อยู่แรงค์ MASTER 1 เท่านั้น' },
+                        { id: 'นักสู้ผู้ไม่ย่อท้อ', name: 'นักสู้ผู้ไม่ย่อท้อ', isUnlocked: isWinnerChampion, desc: 'ปลดล็อกจากรางวัล Grand Arena Pass' }
+                    ]
                 },
                 {
-                    id: 'นักประมูลชำนาญ',
-                    name: 'นักประมูลชำนาญ',
-                    isUnlocked: isAuctionPro,
-                    desc: `เงื่อนไข: ประมูลชนะครบ 15 ครั้ง (ปัจจุบัน: ${auctionWinsCount}/15 ครั้ง)`
+                    catName: "💰 หมวดประมูลสินค้า (Auction)",
+                    titles: [
+                        { id: 'นักประมูลผู้ชนะตลอดกาล', name: 'นักประมูลผู้ชนะตลอดกาล', isUnlocked: isAuctionGod, desc: `ประมูลชนะครบ 20 ครั้ง (ปัจจุบัน: ${auctionWinsCount}/20 ครั้ง)` },
+                        { id: 'นักประมูลชำนาญ', name: 'นักประมูลชำนาญ', isUnlocked: isAuctionPro, desc: `ประมูลชนะครบ 15 ครั้ง (ปัจจุบัน: ${auctionWinsCount}/15 ครั้ง)` },
+                        { id: 'นักประมูลเริ่ม', name: 'นักประมูลเริ่ม', isUnlocked: isAuctionStarter, desc: `ประมูลชนะครบ 5 ครั้ง (ปัจจุบัน: ${auctionWinsCount}/5 ครั้ง)` }
+                    ]
                 },
                 {
-                    id: 'นักประมูลเริ่ม',
-                    name: 'นักประมูลเริ่ม',
-                    isUnlocked: isAuctionStarter,
-                    desc: `เงื่อนไข: ประมูลชนะครบ 5 ครั้ง (ปัจจุบัน: ${auctionWinsCount}/5 ครั้ง)`
-                },
-                {
-                    id: 'ผู้พิทักษ์อารีน่าแห่งนี้',
-                    name: 'ผู้พิทักษ์อารีน่าแห่งนี้',
-                    isUnlocked: isSupremeGuardian,
-                    desc: 'เงื่อนไข: มอบให้รางวัลหลังสรุปซีซั่นสำหรับผู้ที่อยู่แรงค์ Supreme MASTER PRO!! เท่านั้น'
-                },
-                {
-                    id: 'ผู้พิชิตศึกสงคราม',
-                    name: 'ผู้พิชิตศึกสงคราม',
-                    isUnlocked: isWarConqueror,
-                    desc: 'เงื่อนไข: มอบให้รางวัลหลังสรุปซีซั่นสำหรับผู้ที่อยู่แรงค์ MASTER 1 เท่านั้น'
-                },
-                {
-                    id: 'นักสู้ผู้ไม่ย่อท้อ',
-                    name: 'นักสู้ผู้ไม่ย่อท้อ',
-                    isUnlocked: isWinnerChampion,
-                    desc: 'ปลดล็อกจากรางวัล Grand Arena Pass'
-                },
-                {
-                    id: 'นักเดินทางเลเวลขั้นสุดยอด',
-                    name: 'นักเดินทางเลเวลขั้นสุดยอด',
-                    isUnlocked: unlockedTitles.includes("นักเดินทางเลเวลขั้นสุดยอด"),
-                    desc: 'ปลดล็อกจากรางวัลเส้นทางเลเวลผู้เล่น (ไปถึงเลเวล 50)'
-                },
-                {
-                    id: 'ผู้เดินทางเลเวลชำนาน',
-                    name: 'ผู้เดินทางเลเวลชำนาน',
-                    isUnlocked: unlockedTitles.includes("ผู้เดินทางเลเวลชำนาน"),
-                    desc: 'ปลดล็อกจากรางวัลเส้นทางเลเวลผู้เล่น (ไปถึงเลเวล 40)'
-                },
-                {
-                    id: 'นักเดินทางเลเวล',
-                    name: 'นักเดินทางเลเวล',
-                    isUnlocked: unlockedTitles.includes("นักเดินทางเลเวล"),
-                    desc: 'ปลดล็อกจากรางวัลเส้นทางเลเวลผู้เล่น (ไปถึงเลเวล 20)'
-                },
-                 {
-                    id: 'DIAMONDS',
-                    name: 'DIAMONDS',
-                    isUnlocked: isPartyDiamonds,
-                    desc: `เล่นกิจกรรมฝนเพชรหน้า Banner Selection ครบ 5 ครั้ง (ปัจจุบัน: ${diamondRainPlaysCount}/5 ครั้ง)`
-                },
-                {
-                    id: 'ผู้ใหญ่ใจบุญ',
-                    name: 'ผู้ใหญ่ใจบุญ',
-                    isUnlocked: isWhale || unlockedTitles.includes("ผู้ใหญ่ใจบุญ"),
-                    desc: 'ปลดล็อกจากแพ็กเกจผู้ใหญ่ใจบุญ หรือการสนับสนุนระบบ'
+                    catName: "⭐ หมวดเลเวลผู้เล่น (Level Progress)",
+                    titles: [
+                        { id: 'นักเดินทางเลเวลขั้นสุดยอด', name: 'นักเดินทางเลเวลขั้นสุดยอด', isUnlocked: unlockedTitles.includes("นักเดินทางเลเวลขั้นสุดยอด"), desc: 'ปลดล็อกจากรางวัลเส้นทางเลเวลผู้เล่น (ไปถึงเลเวล 50)' },
+                        { id: 'ผู้เดินทางเลเวลชำนาน', name: 'ผู้เดินทางเลเวลชำนาน', isUnlocked: unlockedTitles.includes("ผู้เดินทางเลเวลชำนาน"), desc: 'ปลดล็อกจากรางวัลเส้นทางเลเวลผู้เล่น (ไปถึงเลเวล 40)' },
+                        { id: 'นักเดินทางเลเวล', name: 'นักเดินทางเลเวล', isUnlocked: unlockedTitles.includes("นักเดินทางเลเวล"), desc: 'ปลดล็อกจากรางวัลเส้นทางเลเวลผู้เล่น (ไปถึงเลเวล 20)' }
+                    ]
                 }
             ];
 
-            let titleListHTML = `
-                <div style="text-align: left; margin-bottom: 12px;">
-                    <div style="font-weight: bold; color: #ffc831; margin-bottom: 6px; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
-                        <i class="fas fa-hand-pointer"></i> คลิกที่ชื่อยศด้านล่างเพื่อสวมใส่ทันที:
-                    </div>
+            renderTitleSelectorModal(categories);
+
+        } catch (error) {
+            console.error("Title Selector Error:", error);
+            Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถโหลดข้อมูลคลังฉายาได้', 'error');
+        }
+    };
+
+    window.renderTitleSelectorModal = (categories, filterText = "") => {
+        let titleListHTML = `
+            <div style="text-align: left; margin-bottom: 12px;">
+                <div style="font-weight: bold; color: #ffc831; margin-bottom: 8px; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-search"></i> ค้นหาชื่อยศหรือฉายา:
                 </div>
-                <div class="title-scroll-box" style="max-height: 320px; overflow-y: auto; padding-right: 6px; display: flex; flex-direction: column; gap: 10px;">
-            `;
+                <input type="text" id="title-search-input" value="${filterText}" placeholder="พิมพ์ชื่อยศที่ต้องการค้นหา..." oninput="filterTitles(this.value)" style="width: 100%; padding: 10px 14px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: #fff; font-family: 'Kanit', sans-serif; outline: none; font-size: 0.9rem;" />
+            </div>
+            <div class="title-scroll-box" id="title-category-container" style="max-height: 300px; overflow-y: auto; padding-right: 6px; display: flex; flex-direction: column; gap: 15px; text-align: left;">
+        `;
 
-            allTitlesMasterList.forEach(t => {
-                const statusColor = t.isUnlocked ? '#22c55e' : '#ef4444';
-                const statusIcon = t.isUnlocked ? 'fa-unlock' : 'fa-lock';
-                const statusText = t.isUnlocked ? 'ปลดล็อกแล้ว' : 'ยังไม่ได้ปลดล็อก';
-                
-                const clickAction = t.isUnlocked ? `onclick="selectAndEquipTitle('${t.id}')"` : `onclick="Swal.fire('ยังไม่ได้ปลดล็อก', 'ยศนี้ยังไม่ผ่านเงื่อนไขการปลดล็อก', 'warning')"`;
-                const hoverStyle = t.isUnlocked ? `cursor: pointer;` : `opacity: 0.6; cursor: not-allowed;`;
+        let hasResults = false;
 
+        categories.forEach(cat => {
+            const filteredTitles = cat.titles.filter(t => t.name.toLowerCase().includes(filterText.toLowerCase()) || t.desc.toLowerCase().includes(filterText.toLowerCase()));
+            
+            if (filteredTitles.length > 0) {
+                hasResults = true;
                 titleListHTML += `
-                    <div ${clickAction} style="background: #121214; border: 1px solid ${t.isUnlocked ? 'rgba(34,197,94,0.4)' : '#27272a'}; border-radius: 12px; padding: 12px; ${hoverStyle} transition: all 0.2s;" onmouseover="this.style.borderColor='#ffc831'" onmouseout="this.style.borderColor='${t.isUnlocked ? 'rgba(34,197,94,0.4)' : '#27272a'}';">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                            <span style="font-weight: bold; color: ${t.isUnlocked ? '#ffc831' : '#ffffff'}; font-size: 1rem;">🏷️ ${t.name}</span>
-                            <span style="color: ${statusColor}; font-size: 0.8rem; font-weight: bold; display: flex; align-items: center; gap: 4px;">
-                                <i class="fas ${statusIcon}"></i> ${statusText}
-                            </span>
+                    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 10px 12px;">
+                        <div style="font-size: 0.85rem; font-weight: bold; color: var(--accent); margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px;">
+                            ${cat.catName}
                         </div>
-                        <div style="color: #9ca3af; font-size: 0.8rem; line-height: 1.4; background: rgba(0,0,0,0.25); padding: 6px 10px; border-radius: 8px; border-left: 3px solid ${t.isUnlocked ? '#22c55e' : '#ef4444'};">
-                            💡 <b>เงื่อนไข:</b> ${t.desc}
-                        </div>
-                    </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
                 `;
-            });
 
-            titleListHTML += `</div>`;
+                filteredTitles.forEach(t => {
+                    const statusColor = t.isUnlocked ? '#22c55e' : '#ef4444';
+                    const statusIcon = t.isUnlocked ? 'fa-unlock' : 'fa-lock';
+                    const statusText = t.isUnlocked ? 'ปลดล็อกแล้ว' : 'ยังไม่ได้ปลดล็อก';
+                    
+                    const clickAction = t.isUnlocked ? `onclick="selectAndEquipTitle('${t.id}')"` : `onclick="Swal.fire('ยังไม่ได้ปลดล็อก', 'ยศนี้ยังไม่ผ่านเงื่อนไขการปลดล็อก', 'warning')"`;
+                    const hoverStyle = t.isUnlocked ? `cursor: pointer;` : `opacity: 0.6; cursor: not-allowed;`;
 
+                    titleListHTML += `
+                        <div ${clickAction} style="background: #121214; border: 1px solid ${t.isUnlocked ? 'rgba(34,197,94,0.4)' : '#27272a'}; border-radius: 10px; padding: 10px; ${hoverStyle} transition: all 0.2s;" onmouseover="this.style.borderColor='#ffc831'" onmouseout="this.style.borderColor='${t.isUnlocked ? 'rgba(34,197,94,0.4)' : '#27272a'}';">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                <span style="font-weight: bold; color: ${t.isUnlocked ? '#ffc831' : '#ffffff'}; font-size: 0.95rem;">🏷️ ${t.name}</span>
+                                <span style="color: ${statusColor}; font-size: 0.75rem; font-weight: bold; display: flex; align-items: center; gap: 4px;">
+                                    <i class="fas ${statusIcon}"></i> ${statusText}
+                                </span>
+                            </div>
+                            <div style="color: #9ca3af; font-size: 0.75rem; line-height: 1.3; background: rgba(0,0,0,0.25); padding: 5px 8px; border-radius: 6px; border-left: 3px solid ${t.isUnlocked ? '#22c55e' : '#ef4444'};">
+                                💡 <b>เงื่อนไข:</b> ${t.desc}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                titleListHTML += `</div></div>`;
+            }
+        });
+
+        if (!hasResults) {
+            titleListHTML += `<div style="text-align: center; color: #777; padding: 20px;">ไม่พบฉายาที่คุณค้นหา</div>`;
+        }
+
+        titleListHTML += `</div>`;
+
+        // ตรวจสอบว่าเปิด modal อยู่แล้วหรือไม่ ถ้าเปิดอยู่ให้แค่อัปเดตเนื้อหาภายใน
+        if (Swal.isVisible() && document.getElementById('title-category-container')) {
+            document.getElementById('title-category-container').outerHTML = titleListHTML.match(/<div class="title-scroll-box"[\s\S]*<\/div>/)[0];
+            const input = document.getElementById('title-search-input');
+            input.focus();
+            input.setSelectionRange(input.value.length, input.value.length);
+        } else {
             Swal.fire({
                 title: '👑 เลือกฉายา / ยศของคุณ',
                 html: titleListHTML,
@@ -863,13 +885,69 @@
                 cancelButtonText: 'ปิดหน้าต่าง',
                 background: '#18181b',
                 color: '#fff',
-                cancelButtonColor: '#4b5563'
+                cancelButtonColor: '#4b5563',
+                didOpen: () => {
+                    document.getElementById('title-search-input').focus();
+                }
             });
-
-        } catch (error) {
-            console.error("Title Selector Error:", error);
-            Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถโหลดข้อมูลคลังฉายาได้', 'error');
         }
+    };
+
+    window.filterTitles = (query) => {
+        // ดึงข้อมูล Categories กลับมาสร้างใหม่เพื่อกรอง
+        const unlockedTitles = Array.isArray(globalUserData.titles) ? globalUserData.titles : [];
+        const isWhale = (globalUserData.title_prefix === "ผู้ใหญ่ใจบุญ" || globalUserData.bought_daddy_pack === true);
+        const isWinnerChampion = unlockedTitles.includes("นักสู้ผู้ไม่ย่อท้อ") || (globalUserData.grandArenaPassUnlocked === true);
+        const lastSeasonStr = (globalUserData.lastSeasonRank || "").toUpperCase();
+        const isWarConqueror = unlockedTitles.includes("ผู้พิชิตศึกสงคราม") || lastSeasonStr.includes("MASTER 1");
+        const isSupremeGuardian = unlockedTitles.includes("ผู้พิทักษ์อารีน่าแห่งนี้") || lastSeasonStr.includes("SUPREME MASTER PRO");
+        const diamondRainPlaysCount = parseInt(globalUserData.diamondRainPlays) || 0;
+        const isPartyDiamonds = unlockedTitles.includes("DIAMONDS") || unlockedTitles.includes("ปาร์ตีDIAMONDS") || diamondRainPlaysCount >= 5;
+        const auctionWinsCount = parseInt(globalUserData.auctionWins || globalUserData.auction_wins || 0);
+        const isAuctionStarter = unlockedTitles.includes("นักประมูลเริ่ม") || auctionWinsCount >= 5;
+        const isAuctionPro = unlockedTitles.includes("นักประมูลชำนาญ") || auctionWinsCount >= 15;
+        const isAuctionGod = unlockedTitles.includes("นักประมูลผู้ชนะตลอดกาล") || auctionWinsCount >= 20;
+        const isHalloweenTime = unlockedTitles.includes("Halloween is Time 🎃") || (globalUserData.halloweenTitleUnlocked === true);
+        const isHappyHalloween = unlockedTitles.includes("happy HALLOWEEN 🎃") || (globalUserData.happyHalloweenUnlocked === true);
+
+        const categories = [
+            {
+                catName: "🎃 หมวดกิจกรรม & พิเศษ (Event & Special)",
+                titles: [
+                    { id: 'none', name: '❌ ไม่แสดงฉายา', isUnlocked: true, desc: 'ปิดการแสดงผลฉายาบนหน้าโปรไฟล์ของคุณ' },
+                    { id: 'happy HALLOWEEN 🎃', name: 'happy HALLOWEEN 🎃', isUnlocked: isHappyHalloween, desc: 'รับได้จากหน้าอีเว้นท์ halloween_event ในวันที่ 31 ตุลาคม เท่านั้น!' },
+                    { id: 'Halloween is Time 🎃', name: 'Halloween is Time 🎃', isUnlocked: isHalloweenTime, desc: 'สามารถรับได้จาก DIAMOND SHOP ในระยะเวลาจำกัดเท่านั้น' },
+                    { id: 'DIAMONDS', name: 'DIAMONDS', isUnlocked: isPartyDiamonds, desc: `เล่นกิจกรรมฝนเพชรหน้า Banner Selection ครบ 5 ครั้ง (ปัจจุบัน: ${diamondRainPlaysCount}/5 ครั้ง)` },
+                    { id: 'ผู้ใหญ่ใจบุญ', name: 'ผู้ใหญ่ใจบุญ', isUnlocked: isWhale || unlockedTitles.includes("ผู้ใหญ่ใจบุญ"), desc: 'ปลดล็อกจากแพ็กเกจผู้ใหญ่ใจบุญ หรือการสนับสนุนระบบ' }
+                ]
+            },
+            {
+                catName: "🏆 หมวดอารีน่า & การแข่งขัน (Arena & Combat)",
+                titles: [
+                    { id: 'ผู้พิทักษ์อารีน่าแห่งนี้', name: 'ผู้พิทักษ์อารีน่าแห่งนี้', isUnlocked: isSupremeGuardian, desc: 'มอบให้รางวัลหลังสรุปซีซั่นสำหรับผู้ที่อยู่แรงค์ Supreme MASTER PRO!! เท่านั้น' },
+                    { id: 'ผู้พิชิตศึกสงคราม', name: 'ผู้พิชิตศึกสงคราม', isUnlocked: isWarConqueror, desc: 'มอบให้รางวัลหลังสรุปซีซั่นสำหรับผู้ที่อยู่แรงค์ MASTER 1 เท่านั้น' },
+                    { id: 'นักสู้ผู้ไม่ย่อท้อ', name: 'นักสู้ผู้ไม่ย่อท้อ', isUnlocked: isWinnerChampion, desc: 'ปลดล็อกจากรางวัล Grand Arena Pass' }
+                ]
+            },
+            {
+                catName: "💰 หมวดประมูลสินค้า (Auction)",
+                titles: [
+                    { id: 'นักประมูลผู้ชนะตลอดกาล', name: 'นักประมูลผู้ชนะตลอดกาล', isUnlocked: isAuctionGod, desc: `ประมูลชนะครบ 20 ครั้ง (ปัจจุบัน: ${auctionWinsCount}/20 ครั้ง)` },
+                    { id: 'นักประมูลชำนาญ', name: 'นักประมูลชำนาญ', isUnlocked: isAuctionPro, desc: `ประมูลชนะครบ 15 ครั้ง (ปัจจุบัน: ${auctionWinsCount}/15 ครั้ง)` },
+                    { id: 'นักประมูลเริ่ม', name: 'นักประมูลเริ่ม', isUnlocked: isAuctionStarter, desc: `ประมูลชนะครบ 5 ครั้ง (ปัจจุบัน: ${auctionWinsCount}/5 ครั้ง)` }
+                ]
+            },
+            {
+                catName: "⭐ หมวดเลเวลผู้เล่น (Level Progress)",
+                titles: [
+                    { id: 'นักเดินทางเลเวลขั้นสุดยอด', name: 'นักเดินทางเลเวลขั้นสุดยอด', isUnlocked: unlockedTitles.includes("นักเดินทางเลเวลขั้นสุดยอด"), desc: 'ปลดล็อกจากรางวัลเส้นทางเลเวลผู้เล่น (ไปถึงเลเวล 50)' },
+                    { id: 'ผู้เดินทางเลเวลชำนาน', name: 'ผู้เดินทางเลเวลชำนาน', isUnlocked: unlockedTitles.includes("ผู้เดินทางเลเวลชำนาน"), desc: 'ปลดล็อกจากรางวัลเส้นทางเลเวลผู้เล่น (ไปถึงเลเวล 40)' },
+                    { id: 'นักเดินทางเลเวล', name: 'นักเดินทางเลเวล', isUnlocked: unlockedTitles.includes("นักเดินทางเลเวล"), desc: 'ปลดล็อกจากรางวัลเส้นทางเลเวลผู้เล่น (ไปถึงเลเวล 20)' }
+                ]
+            }
+        ];
+
+        renderTitleSelectorModal(categories, query);
     };
 
     window.selectAndEquipTitle = async (titleId) => {
@@ -918,9 +996,13 @@
             document.getElementById("whale-title-text").innerText = data.currentTitle;
             titleContainer.style.display = "block";
             
-            titleBanner.classList.remove("rank-pro", "rank-master", "rank-level-traveler", "rank-supreme-guardian", "rank-party-diamonds", "rank-rainbow-ultimate", "rank-auction-starter", "rank-auction-pro", "rank-auction-god");
+            titleBanner.classList.remove("rank-pro", "rank-master", "rank-level-traveler", "rank-supreme-guardian", "rank-party-diamonds", "rank-rainbow-ultimate", "rank-auction-starter", "rank-auction-pro", "rank-auction-god", "rank-halloween-time", "rank-happy-halloween");
             
-            if (data.currentTitle === "นักประมูลผู้ชนะตลอดกาล") {
+            if (data.currentTitle === "happy HALLOWEEN 🎃") {
+                titleBanner.classList.add("rank-happy-halloween");
+            } else if (data.currentTitle === "Halloween is Time 🎃") {
+                titleBanner.classList.add("rank-halloween-time");
+            } else if (data.currentTitle === "นักประมูลผู้ชนะตลอดกาล") {
                 titleBanner.classList.add("rank-auction-god");
             } else if (data.currentTitle === "นักประมูลชำนาญ") {
                 titleBanner.classList.add("rank-auction-pro");
