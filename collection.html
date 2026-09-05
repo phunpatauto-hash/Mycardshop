@@ -377,7 +377,7 @@
         { id: 'whale_secret_exr', tier: 'secret', title: '???', desc: 'มีการ์ดระดับ EXR Full Power (LV.80 และ 5 ดาว) 2 ใบ', goal: 2, reward: { points: 50000000, diamonds: 50000000 } },
         { id: 'p_collector_secret', tier: 'secret', title: '???', desc: 'ครอบครองการ์ดระดับ P อย่างน้อย 1 ใบ', goal: 1, reward: { points: 10000000, diamonds: 10000000 } },
         { id: 'arena_legend_secret', tier: 'secret', title: '???', desc: 'ตำนานแห่ง Battle ARENA ต่อสู้ครบ 1000 ครั้ง', goal: 1000, reward: { points: 500000000, diamonds: 500000000 } },
-        { id: 'whale_secret_coins', tier: 'secret', title: '???', desc: 'สะสม Coins ในตัวให้มากกว่า 1,000,000', goal: 1000000, reward: { points: 0, diamonds: 100000000 } },
+        { id: 'whale_secret_coins', tier: 'secret', title: '???', desc: 'สะสม Coins ในตัวให้มากกว่า 1,000,000', goal: 1000000, reward: { points: 0, diamonds: 10000000 } },
         { id: 'power_Full_Allcollector', tier: 'secret', title: '???', desc: 'สะสมการ์ด Level 80 และ 5 ดาวให้ครบตามจำนวน', goal: 150, reward: { points: 100000000, diamonds: 100000000 } }
     ];
 
@@ -387,6 +387,13 @@
         { goal: 15, reward: { points: 2000000, diamonds: 20000 }, title: 'ทำครบ 15 อัน' },
         { goal: 20, reward: { points: 10000000, diamonds: 100000 }, title: 'ทำครบ 20 อัน (MAX)' }
     ];
+
+    function formatShortCurrency(num) {
+        if (num >= 1000000000) return (num / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
+        if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+        if (num >= 1000) return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+        return num.toString();
+    }
 
     function isHalloweenCard(card) {
         const rarityStr = (card && card.rarity ? card.rarity : '').toString().trim().toUpperCase();
@@ -451,7 +458,6 @@
                     const data = snap.data();
                     let rawCollection = data.collection || [];
                     
-                    // ป้องกัน Error โดยการแปลง item.id เป็น String ก่อนเรียก .startsWith() เสมอ
                     userCards = rawCollection
                         .filter(item => item && !(item.source === "ตู้สุ่มสัตว์เลี้ยง" || (item.id != null && String(item.id).startsWith("p")) || item.type === "pet"))
                         .map(c => ({
@@ -472,11 +478,11 @@
                     const premiumTickets = data.premium_tickets || 0;
                     globalStars = data.stars || 0;
 
-                    document.getElementById("pts").innerText = globalPoints.toLocaleString();
-                    document.getElementById("dia").innerText = diamonds.toLocaleString();
-                    document.getElementById("ticket").innerText = tickets.toLocaleString();
-                    document.getElementById("p-ticket").innerText = premiumTickets.toLocaleString();
-                    document.getElementById("star").innerText = globalStars.toLocaleString();
+                    document.getElementById("pts").innerText = formatShortCurrency(globalPoints);
+                    document.getElementById("dia").innerText = formatShortCurrency(diamonds);
+                    document.getElementById("ticket").innerText = formatShortCurrency(tickets);
+                    document.getElementById("p-ticket").innerText = formatShortCurrency(premiumTickets);
+                    document.getElementById("star").innerText = formatShortCurrency(globalStars);
                     document.getElementById("display-username").innerText = data.username || "COLLECTOR";
                     
                     renderCards();
@@ -612,7 +618,7 @@
                 <img src="${card.img || card.image || ''}">
                 <div style="padding:10px; background: rgba(0,0,0,0.8);">
                     <div style="color:${(card.awakening || 0) > 0 ? '#00f3ff' : (rarityColors[r] || '#fff')}; font-size:0.75rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${card.name} ${(card.awakening || 0) > 0 ? '✨🔮' : ''}</div>
-                    <div style="color:#ffc831; font-size:0.8rem; font-weight:bold;">⚡ ${getArenaPower(card).toLocaleString()}</div>
+                    <div style="color:#ffc831; font-size:0.8rem; font-weight:bold;">⚡ ${formatShortCurrency(getArenaPower(card))}</div>
                     <div style="color:#aaa; font-size:0.65rem;">LV. ${card.level || 1}</div>
                 </div>`;
             grid.appendChild(div);
@@ -672,13 +678,17 @@
             const displayTitle = (isSecret && !isCompleted) ? "ภารกิจลับที่ยังไม่เปิดเผย" : ach.title;
             const displayDesc = (isSecret && !isCompleted) ? "เงื่อนไข: เป็นความลับจนกว่าจะทำสำเร็จ" : ach.desc;
             const displayTier = (isSecret && !isCompleted) ? "???" : ach.tier;
-            const progressDisplay = ach.id === 'collection_time_2h' ? `${Math.floor(progress / 60)} / ${Math.floor(ach.goal / 60)} นาที` : `${progress.toLocaleString()} / ${ach.goal.toLocaleString()}`;
+            const progressDisplay = ach.id === 'collection_time_2h' ? `${Math.floor(progress / 60)} / ${Math.floor(ach.goal / 60)} นาที` : `${formatShortCurrency(progress)} / ${formatShortCurrency(ach.goal)}`;
+
+            let rewardStr = '';
+            if (ach.reward.points > 0) rewardStr += formatShortCurrency(ach.reward.points) + ' 🪙 ';
+            if (ach.reward.diamonds > 0) rewardStr += formatShortCurrency(ach.reward.diamonds) + ' 💎';
 
             card.innerHTML = `
                 <span class="ach-tier tier-${ach.tier}">${displayTier}</span>
                 <div class="ach-title">${displayTitle}</div>
                 <div class="ach-desc">${displayDesc}</div>
-                <span class="reward-tag">🎁 ${ach.reward.points > 0 ? ach.reward.points.toLocaleString() + ' 🪙' : ''} ${ach.reward.diamonds > 0 ? ach.reward.diamonds.toLocaleString() + ' 💎' : ''}</span>
+                <span class="reward-tag">🎁 ${rewardStr}</span>
                 <div class="ach-progress-container"><div class="ach-progress-bar" style="width: ${percent}%"></div></div>
                 <div style="font-size: 0.75rem; color: #888; margin-bottom: 12px;">ความคืบหน้า: ${progressDisplay}</div>
                 <button class="btn-claim" ${!isCompleted || isClaimed ? 'disabled' : ''} onclick="claimReward('${ach.id}')">${isClaimed ? 'รับรางวัลแล้ว' : (isCompleted ? 'รับของรางวัล' : 'ยังไม่สำเร็จ')}</button>
@@ -701,7 +711,7 @@
                 msDiv.className = `milestone-card ${isReached ? 'completed' : ''}`;
                 msDiv.innerHTML = `
                     <div style="font-weight:bold; color:${isReached ? '#ffc831' : '#fff'};">${ms.title}</div>
-                    <div style="font-size:0.75rem; color:#aaa; margin:5px 0;">🎁 ${ms.reward.points.toLocaleString()} 🪙 | ${ms.reward.diamonds.toLocaleString()} 💎</div>
+                    <div style="font-size:0.75rem; color:#aaa; margin:5px 0;">🎁 ${formatShortCurrency(ms.reward.points)} 🪙 | ${formatShortCurrency(ms.reward.diamonds)} 💎</div>
                     <button class="btn-claim" style="font-size:0.75rem; padding:5px;" ${!isReached || isClaimed ? 'disabled' : ''} onclick="claimMilestoneReward(${ms.goal})">${isClaimed ? 'รับแล้ว' : (isReached ? 'รับรางวัล' : 'ยังไม่ถึง')}</button>
                 `;
                 mGrid.appendChild(msDiv);
@@ -718,7 +728,7 @@
                 diamonds: increment(ach.reward.diamonds || 0),
                 claimedAchievements: arrayUnion(achId)
             });
-            alert(`🎉 ยินดีด้วย! คุณได้รับรางวัลจากความสำเร็จ: ${ach.title}\n💎 +${ach.reward.diamonds} | 🪙 +${ach.reward.points}`);
+            alert(`🎉 ยินดีด้วย! คุณได้รับรางวัลจากความสำเร็จ: ${ach.title}\n💎 +${formatShortCurrency(ach.reward.diamonds)} | 🪙 +${formatShortCurrency(ach.reward.points)}`);
         } catch (e) { console.error(e); }
     };
 
@@ -731,7 +741,7 @@
                 diamonds: increment(ms.reward.diamonds || 0),
                 claimedMilestones: arrayUnion(goal)
             });
-            alert(`🎉 ยินดีด้วย! คุณได้รับรางวัลการทำสะสมครบ ${goal} อัน\n💎 +${ms.reward.diamonds.toLocaleString()} | 🪙 +${ms.reward.points.toLocaleString()}`);
+            alert(`🎉 ยินดีด้วย! คุณได้รับรางวัลการทำสะสมครบ ${goal} อัน\n💎 +${formatShortCurrency(ms.reward.diamonds)} | 🪙 +${formatShortCurrency(ms.reward.points)}`);
         } catch (e) { console.error(e); }
     };
 
@@ -756,13 +766,13 @@
             hwTag.style.display = "none";
         }
 
-        document.getElementById("modalPower").innerText = getArenaPower(card).toLocaleString();
-        document.getElementById("modalHp").innerText = getCardHp(card).toLocaleString();
-        document.getElementById("modalDef").innerText = getCardDef(card).toLocaleString();
+        document.getElementById("modalPower").innerText = formatShortCurrency(getArenaPower(card));
+        document.getElementById("modalHp").innerText = formatShortCurrency(getCardHp(card));
+        document.getElementById("modalDef").innerText = formatShortCurrency(getCardDef(card));
         document.getElementById("modalLvlDisplay").innerText = "LV. " + (card.level || 1);
         document.getElementById("lvlBarFill").style.width = ((card.level || 1) / MAX_LV * 100) + "%";
         document.getElementById("reqQty").innerText = sameCards.length;
-        document.getElementById("modalSellPrice").innerText = getDynamicSellValue(card).toLocaleString() + " 🪙";
+        document.getElementById("modalSellPrice").innerText = formatShortCurrency(getDynamicSellValue(card)) + " 🪙";
 
         const lockBtn = document.getElementById("btnLockCard");
         if (card.isLocked) {
@@ -783,7 +793,7 @@
         if (cardLevel < MAX_LV) {
             lvGroup.style.display = "flex"; starBtn.style.display = "none"; maxMsg.style.display = "none";
             const req = getUpgradeRequirements(card);
-            document.getElementById("modalUpgradeInfo").innerText = `เงื่อนไข: ใช้ใบซ้ำ ${req.reqQty} ใบ + ${req.cost} 🪙`;
+            document.getElementById("modalUpgradeInfo").innerText = `เงื่อนไข: ใช้ใบซ้ำ ${req.reqQty} ใบ + ${formatShortCurrency(req.cost)} 🪙`;
             document.getElementById("btnUpgradeLV").onclick = () => handleUpgrade(card, 'LV');
             document.getElementById("btnBulkUpgrade").onclick = () => handleUpgrade(card, 'BULK');
         } else {
@@ -800,7 +810,7 @@
                     awakenBtn.style.display = "block";
                     const nextAwkLevel = currentAwakening + 1;
                     const awakenCost = nextAwkLevel * 200;
-                    awakenBtn.innerText = `🔮 ปลุกพลังดาวที่ ${nextAwkLevel} (ใช้ ⭐ ${awakenCost.toLocaleString()})`;
+                    awakenBtn.innerText = `🔮 ปลุกพลังดาวที่ ${nextAwkLevel} (ใช้ ⭐ ${formatShortCurrency(awakenCost)})`;
                     awakenBtn.onclick = () => handleAwaken(card, awakenCost);
                     maxMsg.innerText = `⚡ การ์ดเงื่อนไขถึงกำหนด พร้อมปลุกพลัง! (ดาวปัจจุบัน: ${currentAwakening}/5)`;
                 } else {
@@ -829,7 +839,7 @@
     }
 
     async function handleAwaken(card, costStars) {
-        if (globalStars < costStars) return alert(`❌ หน่วยเงิน ⭐ (Star) ของคุณไม่พอสำหรับการปลุกพลังนี้ (ต้องการ ${costStars.toLocaleString()} ⭐)`);
+        if (globalStars < costStars) return alert(`❌ หน่วยเงิน ⭐ (Star) ของคุณไม่พอสำหรับการปลุกพลังนี้ (ต้องการ ${formatShortCurrency(costStars)} ⭐)`);
 
         let updated = [...userCards];
         const idx = updated.findIndex(c => c.name === card.name && (c.rarity || '').toUpperCase() === (card.rarity || '').toUpperCase() && c.level === card.level && c.stars === card.stars && (c.awakening || 0) === (card.awakening || 0) && isHalloweenCard(c) === isHalloweenCard(card));
@@ -959,7 +969,7 @@
             
             await saveStateToFirebase(newCollection);
             await updateDoc(doc(db, "users", currentUID), { points: increment(totalGain) });
-            alert(`ขายการ์ดซ้ำสำเร็จทั้งหมด ${sellCount} ใบ ได้รับ ${totalGain.toLocaleString()} 🪙`);
+            alert(`ขายการ์ดซ้ำสำเร็จทั้งหมด ${sellCount} ใบ ได้รับ ${formatShortCurrency(totalGain)} 🪙`);
         };
     }
 
