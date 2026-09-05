@@ -10,11 +10,13 @@
         .box { background: #1e1e1e; padding: 40px 30px; border-radius: 20px; text-align: center; border: 1px solid #444; width: 340px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
         h2 { color: #ffc831; margin-bottom: 5px; font-size: 1.8rem; }
         p { color: #888; font-size: 0.85rem; margin-bottom: 25px; }
-        input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; border: 1px solid #333; background: #222; color: #ffc831; text-align: center; font-size: 1rem; box-sizing: border-box; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; border: 1px solid #333; background: #222; color: #ffc831; text-align: center; font-size: 1rem; box-sizing: border-box; outline: none; transition: 0.3s; }
+        input:focus { border-color: #ffc831; }
         button { width: 100%; padding: 14px; background: #ffc831; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; color: #111; font-size: 1.1rem; margin-top: 15px; }
         button:hover { background: #fff; transform: translateY(-2px); }
         .link { margin-top: 20px; font-size: 0.85rem; color: #888; }
         .link a { color: #28a745; text-decoration: none; font-weight: bold; }
+        .link a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -23,8 +25,8 @@
         <h2>🎮 เข้าสู่ระบบ</h2>
         <p>กรุณากรอกข้อมูลเพื่อเข้าเล่นเกม</p>
         
-        <input type="email" id="email" placeholder="อีเมลผู้ใช้งาน" autocomplete="on">
-        <input type="password" id="pass" placeholder="รหัสผ่าน">
+        <input type="email" id="email" placeholder="อีเมลผู้ใช้งาน" autocomplete="email">
+        <input type="password" id="pass" placeholder="รหัสผ่าน" autocomplete="current-password">
         
         <button id="login-btn">เข้าสู่เกม</button>
         
@@ -49,18 +51,21 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    document.getElementById("login-btn").onclick = async () => {
+    const handleLogin = async () => {
         const email = document.getElementById("email").value.trim();
         const pass = document.getElementById("pass").value.trim();
 
-        if (!email || !pass) return alert("⚠️ กรุณากรอกอีเมลและรหัสผ่าน");
+        if (!email || !pass) {
+            alert("⚠️ กรุณากรอกอีเมลและรหัสผ่าน");
+            return;
+        }
 
         try {
-            // 1. ล็อกอินผ่าน Firebase Auth
+            // 1. ล็อกอินผ่าน Firebase Auth[cite: 17]
             const userCredential = await signInWithEmailAndPassword(auth, email, pass);
             const user = userCredential.user;
 
-            // 2. เช็คข้อมูลใน Firestore โดยใช้ UID
+            // 2. เช็คข้อมูลใน Firestore โดยใช้ UID[cite: 17]
             const userRef = doc(db, "users", user.uid);
             const userSnap = await getDoc(userRef);
 
@@ -68,7 +73,7 @@
                 alert("ยินดีต้อนรับกลับครับ!");
                 window.location.href = "index.html"; 
             } else {
-                // 3. ถ้าล็อกอินผ่านแต่ไม่มีข้อมูลใน Firestore (สร้างให้ใหม่)
+                // 3. ถ้าล็อกอินผ่านแต่ไม่มีข้อมูลใน Firestore (สร้างให้ใหม่)[cite: 17]
                 await setDoc(userRef, {
                     username: user.email.split('@')[0],
                     points: 0,
@@ -84,9 +89,21 @@
             let message = "❌ อีเมลหรือรหัสผ่านไม่ถูกต้อง";
             if (error.code === 'auth/user-not-found') message = "❌ ไม่พบชื่อผู้ใช้นี้";
             if (error.code === 'auth/wrong-password') message = "❌ รหัสผ่านผิด";
+            if (error.code === 'auth/invalid-email') message = "❌ รูปแบบอีเมลไม่ถูกต้อง";
+            if (error.code === 'auth/invalid-credential') message = "❌ อีเมลหรือรหัสผ่านไม่ถูกต้อง";
             alert(message);
         }
     };
+
+    // ผูก Event กดปุ่มล็อกอิน
+    document.getElementById("login-btn").onclick = handleLogin;
+
+    // รองรับการกดปุ่ม Enter ที่ช่องรหัสผ่านเพื่อล็อกอินทันที
+    document.getElementById("pass").addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            handleLogin();
+        }
+    });
 </script>
 </body>
 </html>
