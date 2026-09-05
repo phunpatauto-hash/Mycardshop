@@ -381,10 +381,10 @@
         <!-- ==================== SECTION 2: แพ็คข้อเสนอสุดคุ้ม ==================== -->
         <div class="section-title offer"><i class="fas fa-percentage"></i> แพ็คข้อเสนอสุดคุ้ม</div>
         <div class="shop-grid">
-            <!-- แพ็ค ยินดีต้อนรับสู่วันฮาโลวีน 🎃 (เพิ่มใหม่) -->
+            <!-- แพ็ค ยินดีต้อนรับสู่วันฮาโลวีน 🎃 (ปรับตำแหน่ง: นับถอยหลังเปิดตัวไว้ข้างบน ก่อนถึงสถานะ) -->
             <div class="shop-item halloween-theme" data-type="halloween-pack" id="item-pack-halloween-box" onclick="buyHalloweenPack()">
                 <div class="sold-out-overlay" id="sold-pack-halloween"><div class="sold-out-text" id="halloween-sold-text">SOLD OUT</div></div>
-                <span style="position:absolute; top:15px; right:15px; background:linear-gradient(135deg, #ff7518, #ffa500); color:#fff; padding:5px 12px; border-radius:8px; font-size:0.75rem; font-weight:bold; box-shadow: 0 0 10px rgba(255,117,24,0.5); z-index: 6;">1 ต.ค. - 31 ต.ค. เท่านั้น</span>
+                <span style="position:absolute; top:15px; right:15px; background:linear-gradient(135deg, #ff7518, #ffa500); color:#fff; padding:5px 12px; border-radius:8px; font-size:0.75rem; font-weight:bold; box-shadow: 0 0 10px rgba(255,117,24,0.5); z-index: 6;">จำกัด 1 ครั้ง/ไอดี</span>
                 <div class="item-icon-wrapper">
                     <div class="halloween-pack-layout">
                         <i class="fas fa-ghost h-ghost"></i>
@@ -394,7 +394,10 @@
                 </div>
                 <h3 class="item-title" style="color: #ffb074;">🎃 ยินดีต้อนรับสู่วันฮาโลวีน</h3>
                 <p class="item-desc">รับยศพิเศษ <span style="color:#ffc831; font-weight:bold;">Halloween is Time 🎃</span>, ตั๋วปกติ <span style="color:#00d4ff; font-weight:bold;">1,000 ใบ</span> และตั๋วพรีเมี่ยม <span style="color:#ffc831; font-weight:bold;">500 ใบ</span></p>
-                <div class="item-stock" style="color: #ffa500;">สถานะเวลาขาย: <span id="halloween-status-text" style="color:#fff;">ตรวจสอบเวลา...</span></div>
+                <div class="item-stock" style="color: #ffa500;">
+                    เปิดใน: <span id="halloween-countdown" style="color:#fff; font-family: monospace;">00วัน 00ชม. 00นาที</span><br>
+                    สถานะ: <span id="halloween-status-text" style="color:#00ff87;">ตรวจสอบ...</span>
+                </div>
                 <div class="price-box">💎 800K</div>
                 <button class="btn-buy" id="btn-buy-pack-halloween" onclick="event.stopPropagation(); buyHalloweenPack()">ซื้อแพ็คฮาโลวีน</button>
             </div>
@@ -654,7 +657,7 @@
         const BASE_PREMIUM_PRICE = 3500;
         const DADDY_PACK_PRICE = 1500000;
         const MATERIAL_PACK_PRICE = 2990000; 
-        const HALLOWEEN_PACK_PRICE = 800000; // ราคาตั้งต้น 800K เพชร (สามารถปรับเปลี่ยนได้ตามต้องการ)
+        const HALLOWEEN_PACK_PRICE = 800000;
 
         function formatCurrency(num) {
             if (num >= 1000000) {
@@ -779,20 +782,21 @@
                     hasNotifiedRestock = false;
                 }
                 
-                // อัปเดตสถานะเวลาฮาโลวีนทุก ๆ วินาที
                 checkHalloweenTimeStatus();
             }, 1000);
         }
 
-        // ฟังก์ชันตรวจสอบเงื่อนไขเวลาฮาโลวีน (1 ตุลาคม - 31 ตุลาคม)
+        // ฟังก์ชันตรวจสอบเวลาและปรับข้อความนับถอยหลังของแพ็คฮาโลวีน (ก่อนเปิด = นับถอยหลังเปิดตัว / หลังเปิด = นับถอยหลังหมดเขต)
         function checkHalloweenTimeStatus() {
             const now = new Date();
-            const currentMonth = now.getMonth() + 1; // มกราคม = 1, ตุลาคม = 10
-            const currentDay = now.getDate();
-
-            const isHalloweenActive = (currentMonth === 10 && currentDay >= 1 && currentDay <= 31);
+            const year = now.getFullYear();
             
+            const halloweenStart = new Date(year, 9, 1, 0, 0, 0); 
+            const halloweenEnd = new Date(year, 9, 31, 23, 59, 59);
+
             const statusTextEl = document.getElementById("halloween-status-text");
+            const countdownEl = document.getElementById("halloween-countdown");
+            const countdownLabelEl = countdownEl.previousElementSibling; // ป้ายข้อความกำกับเวลาก่อนหน้า
             const soldOverlayEl = document.getElementById("sold-pack-halloween");
             const soldTextEl = document.getElementById("halloween-sold-text");
             const buyBtnEl = document.getElementById("btn-buy-pack-halloween");
@@ -801,19 +805,50 @@
                 soldTextEl.innerText = "ซื้อแล้ว";
                 soldOverlayEl.style.display = "flex";
                 buyBtnEl.disabled = true;
-                statusTextEl.innerText = "ซื้อสำเร็จแล้ว";
+                statusTextEl.innerText = "จำกัด 1 ครั้งต่อบัญชี (ซื้อแล้ว)";
                 statusTextEl.style.color = "#ff3366";
-            } else if (!isHalloweenActive) {
-                soldTextEl.innerText = "ยังไม่ถึงกำหนด/หมดเขต";
+                countdownEl.innerText = "สิ้นสุดสิทธิ์";
+                return;
+            }
+
+            if (now < halloweenStart) {
+                // ก่อนเปิดตัว: แสดงการนับเวลาถอยหลัง "เปิดตัวแพ็คนี้"
+                if (countdownLabelEl) countdownLabelEl.textContent = "เปิดใน: ";
+                
+                const diff = halloweenStart - now;
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                
+                countdownEl.innerText = `${days}วัน ${hours}ชม. ${minutes}น.`;
+                soldTextEl.innerText = "ยังไม่เปิดขาย";
                 soldOverlayEl.style.display = "flex";
                 buyBtnEl.disabled = true;
-                statusTextEl.innerText = "จำหน่าย 1-31 ต.ค. เท่านั้น";
-                statusTextEl.style.color = "#e53e3e";
-            } else {
+                statusTextEl.innerText = "รอเปิดจำหน่าย 1 ต.ค.";
+                statusTextEl.style.color = "#ff9f00";
+            } else if (now >= halloweenStart && now <= halloweenEnd) {
+                // ระหว่างเปิดขาย/หลังเปิดแล้ว: เอาการนับเวลาถอยหลังไปไว้ตอนหลังเปิด (นับถอยหลังหมดเขต)
+                if (countdownLabelEl) countdownLabelEl.textContent = "สิ้นสุดใน: ";
+
+                const diff = halloweenEnd - now;
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+                countdownEl.innerText = `${days}วัน ${hours}ชม. ${minutes}น.`;
                 soldOverlayEl.style.display = "none";
                 buyBtnEl.disabled = false;
                 statusTextEl.innerText = "เปิดจำหน่ายอยู่!";
                 statusTextEl.style.color = "#00ff87";
+            } else {
+                // หมดเขตช่วงฮาโลวีนแล้ว
+                if (countdownLabelEl) countdownLabelEl.textContent = "สิ้นสุดใน: ";
+                countdownEl.innerText = "หมดเวลา";
+                soldTextEl.innerText = "หมดเขต";
+                soldOverlayEl.style.display = "flex";
+                buyBtnEl.disabled = true;
+                statusTextEl.innerText = "สิ้นสุดกิจกรรมแล้ว";
+                statusTextEl.style.color = "#e53e3e";
             }
         }
 
@@ -948,7 +983,7 @@
             const packCount = parseInt(document.getElementById("pack-buy-qty").value) || 1;
             const costDiamonds = packCount * 100;
 
-            if (userDiamonds < costDiamonds) { alert("❌ จำนวนเพชรของคุณไม่เพียงพอสำหรับการซื้อซองการ์ดนี้!"); return; }
+            if (userDiamonds < costDiamonds) { alert("❌ จำนวนเพชรของคุณไม่เพียงพอสำหรับการซื้อซองการ์ดยี้!"); return; }
 
             if (confirm(`คุณต้องการซื้อ "ซองการ์ด Age of Heroes" จำนวน ${packCount} ซอง เป็นจำนวน 💎 ${costDiamonds.toLocaleString()} เพชร ใช่หรือไม่?`)) {
                 try {
@@ -965,23 +1000,23 @@
             }
         }
 
-        // ฟังก์ชันซื้อแพ็คฮาโลวีน
         window.buyHalloweenPack = async function() {
             if (!currentUser) { alert("❌ กรุณาเข้าสู่ระบบก่อนทำการสั่งซื้อ"); return; }
-            if (hasPurchasedHalloweenPack) { alert("❌ คุณได้ซื้อแพ็คเกจฮาโลวีนนี้ไปแล้ว!"); return; }
+            if (hasPurchasedHalloweenPack) { alert("❌ คุณได้ซื้อแพ็คเกจวันฮาโลวีนนี้ไปแล้ว (จำกัด 1 ครั้งต่อ 1 บัญชี)!"); return; }
 
-            // ตรวจสอบช่วงเวลาก่อนทำรายการอีกรอบเพื่อความปลอดภัย
             const now = new Date();
-            const currentMonth = now.getMonth() + 1;
-            const currentDay = now.getDate();
-            if (!(currentMonth === 10 && currentDay >= 1 && currentDay <= 31)) {
-                alert("❌ ไม่สามารถซื้อแพ็คเกจนอกเหนือจากวันที่ 1 ตุลาคม ถึง 31 ตุลาคม ได้!");
+            const year = now.getFullYear();
+            const halloweenStart = new Date(year, 9, 1, 0, 0, 0);
+            const halloweenEnd = new Date(year, 9, 31, 23, 59, 59);
+
+            if (now < halloweenStart || now > halloweenEnd) {
+                alert("❌ ไม่สามารถซื้อแพ็คเกจนอกเหนือช่วงเวลากิจกรรมวันฮาโลวีน (1-31 ตุลาคม) ได้!");
                 return;
             }
 
             if (userDiamonds < HALLOWEEN_PACK_PRICE) { alert("❌ เพชรของคุณไม่เพียงพอสำหรับการซื้อแพ็คฮาโลวีนนี้!"); return; }
 
-            if (confirm(`คุณต้องการซื้อ "แพ็ค ยินดีต้อนรับสู่วันฮาโลวีน 🎃" (รับยศ Halloween is Time 🎃, ตั๋วปกติ 1,000 ใบ, ตั๋วพรีเมี่ยม 500 ใบ) ใช่หรือไม่?`)) {
+            if (confirm(`คุณต้องการซื้อ "แพ็ค ยินดีต้อนรับสู่วันฮาโลวีน 🎃" (จำกัด 1 ครั้ง/ไอดี) ใช่หรือไม่?`)) {
                 try {
                     const userRef = doc(db, "users", currentUser.uid);
                     await updateDoc(userRef, {
