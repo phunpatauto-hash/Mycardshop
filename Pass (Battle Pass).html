@@ -165,7 +165,7 @@
 
     <div class="container">
         <div class="header-info" style="text-align: center; margin-bottom: 20px;">
-            <h1 style="font-size: 2.2rem; font-weight: 900; color: #ffc831; margin: 0;">BATTLE PASS SS5 เรื่องวุ้นๆของสัตว์ตัวน้อย</h1>
+            <h1 style="font-size: 2.2rem; font-weight: 900; color: #ffc831; margin: 0;">BATTLE PASS SS6 ผู้พิทักษ์พฤกษา</h1>
             <div class="timer-container">
                 <i class="fas fa-clock"></i> ซีซั่นจะรีเซ็ตใน: <span id="reset-timer">-- วัน -- ชม. -- นาที -- วิ</span>
             </div>
@@ -277,9 +277,9 @@
         normalTicket: "🎫",
         premiumTicket: "🎟️",
         star: "⭐",
-        cardSR: "https://cookierunbraverse.com/data/en_storage/nHjlzG2kUGizwj6MU0vqYQ.webp",
-        cardSSR: "https://cookierunbraverse.com/data/en_storage/pzoTS9yRb87NKVWHqCuhJA.webp",
-        cardUltimate: "https://cookierunbraverse.com/data/en_storage/QUgkeFanzc5hIWlpWPyJcg.webp"
+        cardSR: "https://cookierunbraverse.com/data/en_storage/D7LKjG_SR8EhOQQZCqqtjA.webp",
+        cardSSR: "https://cookierunbraverse.com/data/en_storage/DoKfhWCdPNFtfVSNP-EtZA.webp",
+        cardUltimate: "https://cookierunbraverse.com/data/en_storage/aPQYArn_ulLZMaydfgNsMQ.webp"
     };
 
     const passData = [];
@@ -288,7 +288,7 @@
 
         // FREE TRACK
         if (i === 50) {
-            freeReward = { id: `free_card_${i}`, name: 'Snapdragon Cookie(SR)', amount: 1, icon: imgAssets.cardSR, isImage: true, isCard: true };
+            freeReward = { id: `free_card_${i}`, name: 'Wind Archer Cookie(SR)', amount: 1, icon: imgAssets.cardSR, isImage: true, isCard: true };
         } else if (i % 5 === 0) {
             freeReward = { id: `free_ticket_${i}`, name: 'Normal Ticket', amount: Math.floor(i / 10) + 1, icon: imgAssets.normalTicket, isImage: false };
         } else if (i % 2 === 0) {
@@ -299,7 +299,7 @@
 
         // PREMIUM TRACK
         if (i === 50) {
-            premiumReward = { id: `prem_card_${i}`, name: 'Snapdragon Cookie(SSR)', amount: 1, icon: imgAssets.cardSSR, isImage: true, isCard: true };
+            premiumReward = { id: `prem_card_${i}`, name: 'Wind Archer Cookie(SSR)', amount: 1, icon: imgAssets.cardSSR, isImage: true, isCard: true };
         } else if (i % 5 === 0) {
             premiumReward = { id: `prem_ticket_${i}`, name: 'Premium Ticket', amount: Math.floor(i / 10) + 1, icon: imgAssets.premiumTicket, isImage: false };
         } else if (i % 2 === 0) {
@@ -310,7 +310,7 @@
 
         // SUPER+ TRACK
         if (i === 50) {
-            superReward = { id: `super_card_${i}`, name: 'Cream Ferret Cookie(SEC)', amount: 1, icon: imgAssets.cardUltimate, isImage: true, isCard: true };
+            superReward = { id: `super_card_${i}`, name: 'Silverbell Cookie(SEC)', amount: 1, icon: imgAssets.cardUltimate, isImage: true, isCard: true };
         } else if (i % 5 === 0) {
             superReward = { id: `super_ticket_${i}`, name: 'Premium Ticket', amount: Math.max(1, Math.floor(i / 5)), icon: imgAssets.premiumTicket, isImage: false };
         } else if (i % 2 === 0) {
