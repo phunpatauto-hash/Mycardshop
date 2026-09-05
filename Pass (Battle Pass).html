@@ -290,7 +290,7 @@
         if (i === 50) {
             freeReward = { id: `free_card_${i}`, name: 'Wind Archer Cookie(SR)', amount: 1, icon: imgAssets.cardSR, isImage: true, isCard: true };
         } else if (i % 5 === 0) {
-            freeReward = { id: `free_ticket_${i}`, name: 'Normal Ticket', amount: Math.floor(i / 10) + 1, icon: imgAssets.normalTicket, isImage: false };
+            freeReward = { id: `free_ticket_${i}`, name: 'Normal Ticket', amount: Math.floor(i / 10) + 50, icon: imgAssets.normalTicket, isImage: false };
         } else if (i % 2 === 0) {
             freeReward = { id: `free_dia_${i}`, name: 'Diamonds', amount: 500, icon: imgAssets.diamond, isImage: false };
         } else {
@@ -301,7 +301,7 @@
         if (i === 50) {
             premiumReward = { id: `prem_card_${i}`, name: 'Wind Archer Cookie(SSR)', amount: 1, icon: imgAssets.cardSSR, isImage: true, isCard: true };
         } else if (i % 5 === 0) {
-            premiumReward = { id: `prem_ticket_${i}`, name: 'Premium Ticket', amount: Math.floor(i / 10) + 1, icon: imgAssets.premiumTicket, isImage: false };
+            premiumReward = { id: `prem_ticket_${i}`, name: 'Premium Ticket', amount: Math.floor(i / 10) + 10, icon: imgAssets.premiumTicket, isImage: false };
         } else if (i % 2 === 0) {
             premiumReward = { id: `prem_gold_${i}`, name: 'Gold', amount: i * 2000, icon: imgAssets.coin, isImage: false };
         } else {
@@ -312,7 +312,7 @@
         if (i === 50) {
             superReward = { id: `super_card_${i}`, name: 'Silverbell Cookie(SEC)', amount: 1, icon: imgAssets.cardUltimate, isImage: true, isCard: true };
         } else if (i % 5 === 0) {
-            superReward = { id: `super_ticket_${i}`, name: 'Premium Ticket', amount: Math.max(1, Math.floor(i / 5)), icon: imgAssets.premiumTicket, isImage: false };
+            superReward = { id: `super_ticket_${i}`, name: 'Premium Ticket', amount: Math.max(10, Math.floor(i / 5)), icon: imgAssets.premiumTicket, isImage: false };
         } else if (i % 2 === 0) {
             superReward = { id: `super_gold_${i}`, name: 'Gold', amount: i * 3000, icon: imgAssets.coin, isImage: false };
         } else {
