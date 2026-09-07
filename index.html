@@ -364,12 +364,6 @@
         .popup-card-name { font-weight: bold; color: #fff; font-size: 1rem; margin: 0; }
         .popup-card-stat { font-size: 0.8rem; color: #ff477e; font-weight: bold; margin-top: 4px; }
 
-        .popup-history-list { background: rgba(0,0,0,0.4); border-radius: 14px; border: 1px solid rgba(255,255,255,0.05); max-height: 120px; overflow-y: auto; padding: 5px; }
-        .popup-history-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.85rem; }
-        .popup-history-item:last-child { border-bottom: none; }
-        .history-date { color: #a0aec0; font-size: 0.75rem; }
-        .history-rank { color: #00e5ff; font-weight: bold; }
-
         /* --- Hero --- */
         .hero { 
             height: 400px; display: flex; flex-direction: column; justify-content: center; align-items: center; 
@@ -626,11 +620,6 @@
                     <span class="popup-info-value score-cards" id="popup-user-cards">0 ใบ</span>
                 </div>
             </div>
-
-            <div class="popup-section-title"><i class="fas fa-history"></i> ประวัติอันดับใน Battle Arena</div>
-            <div class="popup-history-list" id="popup-history-container">
-                <div style="text-align:center; padding:15px; color:#a0aec0; font-size:0.8rem;">ไม่มีประวัติการบันทึกอันดับ</div>
-            </div>
             
             <button class="btn-cancel" style="width: 100%; padding: 12px; margin-top: 20px; font-weight: bold; border-radius: 12px;" onclick="closeProfileModal()">ปิดหน้าต่าง</button>
         </div>
@@ -757,7 +746,7 @@
 
             <!-- Battle Pass -->
             <div class="modern-banner" style="background: linear-gradient(135deg, #ffc831, #ff8c00); color: #000; grid-column: span 2;" onclick="checkAuthAndNavigate('Pass (Battle Pass).html')">
-                <h3>🏆 Battle Pass SS6 : ผู้พิทักษ์พฤกษา</h3>
+                <h3>🏆 Battle Pass SS5 : เรื่องวุ้นๆของสัตว์ตัวน้อย</h3>
                 <p>ทำภารกิจเพื่อรับการ์ดระดับพรีเมียมประจำซีซั่น!</p>
                 <i class="fas fa-trophy main-icon"></i>
             </div>
@@ -1236,7 +1225,6 @@
                 }
             });
             
-            // จัดการปุ่มออกจากระบบบน Navbar (ซ่อนไปเพราะย้ายไปไว้ใน Sidebar) และแสดงปุ่มใน Sidebar แทน
             document.getElementById("auth-btn").style.display = "none";
             document.getElementById("sidebar-logout-item").style.display = "block";
             const handleLogout = () => signOut(auth).then(()=>location.reload());
@@ -1305,33 +1293,6 @@
             document.getElementById("popup-card-stat").innerText = "ATK: -- / DEF: --";
         }
 
-        const historyContainer = document.getElementById("popup-history-container");
-        historyContainer.innerHTML = ""; 
-
-        if (player.arenaHistory && player.arenaHistory.length > 0) {
-            player.arenaHistory.forEach(hist => {
-                const histDiv = document.createElement("div");
-                histDiv.className = "popup-history-item";
-                histDiv.innerHTML = `
-                    <span class="history-rank"><i class="fas fa-shield-alt"></i> ${hist.rankName}</span>
-                    <span>🏆 ${formatCompactNumber(hist.trophies)}</span>
-                    <span class="history-date">${hist.date || ''}</span>
-                `;
-                historyContainer.appendChild(histDiv);
-            });
-        } else {
-            if(player.maxRank !== "UNRANKED") {
-                historyContainer.innerHTML = `
-                    <div class="popup-history-item">
-                        <span class="history-rank"><i class="fas fa-shield-alt"></i> ${player.maxRank}</span>
-                        <span>🏆 ${formatCompactNumber(player.maxTrophies)}</span>
-                        <span class="history-date">สถิติสูงสุดปัจจุบัน</span>
-                    </div>
-                `;
-            } else {
-                historyContainer.innerHTML = `<div style="text-align:center; padding:15px; color:#a0aec0; font-size:0.8rem;">ไม่มีประวัติการบันทึกอันดับ</div>`;
-            }
-        }
         profileModal.style.display = "flex";
     }
 
@@ -1354,8 +1315,7 @@
                     avatar: data.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.username || 'default'}`,
                     maxRank: data.maxRank || "UNRANKED",
                     maxTrophies: data.maxTrophies || 0,
-                    decoratedCard: data.decoratedCard || null, 
-                    arenaHistory: data.arenaHistory || []      
+                    decoratedCard: data.decoratedCard || null
                 });
             });
 
