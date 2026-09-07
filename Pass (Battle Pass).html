@@ -539,27 +539,26 @@
         modal.style.display = 'flex';
     };
 
-    // Helper ช่วยจัดรูปแบบ Object การ์ดให้เข้ากับ collection.html
     function formatCardObject(reward) {
-        const rarity = reward.name.includes('SSR') ? "SSR" : reward.name.includes('SR') ? "SR" : "SEC";
-        const cleanName = reward.name.replace(/\(SR\)|\(SSR\)|\(SEC\)/g, '').trim();
-        
+        let rarity = "SR";
+        if (reward.name.includes("SSR")) rarity = "SSR";
+        else if (reward.name.includes("SEC")) rarity = "SEC";
+
         return {
-            id: reward.id,
             name: reward.name,
-            cardName: cleanName,
-            img: reward.icon,
+            rarity: rarity, 
             image: reward.icon,
-            count: reward.amount,
-            qty: reward.amount,
-            rarity: rarity,
+            type: "CARD",
             level: 1,
             stars: 0,
-            obtainedAt: new Date().toISOString()
+            awakening: 0,
+            isLocked: false,
+            source: "Battle Pass",
+            obtainedAt: Date.now()
         };
     }
 
-    // 🎁 แก้ไขระบบรับรางวัลชิ้นเดียว
+    // 🎁 ระบบรับรางวัลชิ้นเดียว
     async function claimSingleReward(reward) {
         const user = auth.currentUser;
         if (!user) return;
@@ -584,19 +583,14 @@
             } else if (itemName.includes('premium ticket')) { 
                 updateData.premium_tickets = increment(reward.amount); 
             } else if (reward.isCard || reward.isImage) {
-                // เพิ่มการ์ดเข้า collection
-                const idx = currentCollection.findIndex(c => c.name === reward.name || c.id === reward.id);
-                if (idx > -1) { 
-                    currentCollection[idx].count = (currentCollection[idx].count || 1) + reward.amount; 
-                    currentCollection[idx].qty = (currentCollection[idx].qty || 1) + reward.amount;
-                } else { 
-                    currentCollection.push(formatCardObject(reward)); 
-                }
+                // สร้างข้อมูลการ์ดตามโครงสร้างใหม่แล้ว push เข้า collection
+                const newCard = formatCardObject(reward);
+                currentCollection.push(newCard);
                 updateData.collection = currentCollection;
             }
 
             await updateDoc(userRef, updateData);
-            alert(`🎁 รับ ${reward.name} เรียบร้อย! เข้าไปดูได้ที่หน้า คอลเลกชัน`);
+            alert(`🎁 รับ ${reward.name} เรียบร้อย! เข้าไปดูได้ที่หน้า collection.html`);
             closeRewardDetail();
         } catch (err) {
             console.error("Claim reward error:", err);
@@ -604,7 +598,7 @@
         }
     }
 
-    // 🎊 แก้ไขระบบกดรับรางวัลทั้งหมด
+    // 🎊 ระบบกดรับรางวัลทั้งหมด
     document.getElementById("claim-btn").onclick = async () => {
         const btn = document.getElementById("claim-btn");
         btn.disabled = true;
@@ -639,12 +633,9 @@
                         } else if (itemName.includes('premium ticket')) { 
                             addPremiumTickets += r.amount; 
                         } else if (r.isCard || r.isImage) {
-                            const idx = currentCollection.findIndex(c => c.name === r.name || c.id === r.id);
-                            if (idx > -1) { 
-                                currentCollection[idx].count = (currentCollection[idx].count || 1) + r.amount; 
-                                currentCollection[idx].qty = (currentCollection[idx].qty || 1) + r.amount;
-                            } else { 
-                                currentCollection.push(formatCardObject(r)); 
+                            // ลูปสร้างการ์ดตามจำนวนซ้ำ (ถ้ามี amount มากกว่า 1) หรือ push ตามจำนวนชิ้น
+                            for (let k = 0; k < r.amount; k++) {
+                                currentCollection.push(formatCardObject(r));
                             }
                         }
                         newlyClaimedIds.push(r.id);
@@ -663,7 +654,7 @@
                 if (addPremiumTickets > 0) updateData.premium_tickets = increment(addPremiumTickets);
 
                 await updateDoc(userRef, updateData);
-                alert(`🎊 รับรางวัลทั้งหมดสำเร็จ! ตรวจสอบการ์ดที่ได้ที่หน้า คอลเลกชัน`);
+                alert(`🎊 รับรางวัลทั้งหมดสำเร็จ! ตรวจสอบการ์ดที่ได้ที่หน้า collection.html`);
             }
         } catch (err) { 
             console.error(err);
