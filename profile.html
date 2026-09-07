@@ -164,7 +164,6 @@
         @keyframes titlePulse { from { transform: scale(1); } to { transform: scale(1.02); } }
 
         .max-rank-banner { display: inline-flex; align-items: center; gap: 6px; background: rgba(230, 57, 70, 0.15); border: 1px solid rgba(230, 57, 70, 0.4); color: #ff4d6d; padding: 4px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: bold; margin-top: 8px; }
-        .last-rank-banner { display: inline-flex; align-items: center; gap: 6px; background: rgba(0, 229, 255, 0.12); border: 1px solid rgba(0, 229, 255, 0.3); color: #00e5ff; padding: 4px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: bold; margin-top: 8px; margin-left: 8px; }
 
         /* Featured Showcase Slot */
         .featured-display { z-index: 2; background: rgba(0,0,0,0.5); border-radius: 25px; border: 2px dashed var(--glass-border); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; cursor: pointer; }
@@ -209,7 +208,6 @@
         @media (max-width: 900px) {
             .hero-section { grid-template-columns: 1fr; text-align: center; padding: 30px; }
             .featured-display { height: 250px; width: 180px; margin: 20px auto 0; }
-            .last-rank-banner { margin-left: 0; }
         }
 
         .pfp-frame.blue-luxury-frame { background: linear-gradient(135deg, #00d4ff, #0077ff, #00ff87); background-size: 300% 300%; animation: rotateFrameGradient 4s ease infinite; box-shadow: 0 0 25px rgba(30, 218, 255, 0.87); }
@@ -273,9 +271,6 @@
             <div style="margin-top: 5px;">
                 <div class="max-rank-banner" id="max-rank-display">
                     <i class="fas fa-gavel"></i> ชนะประมูลรวม: <span id="auction-wins-display">0 ครั้ง</span>
-                </div>
-                <div class="last-rank-banner">
-                    <i class="fas fa-calendar-check"></i> อารีน่าซีซั่นล่าสุด: <span id="profile-last-rank">ไม่มีประวัติซีซั่นก่อนหน้า</span>
                 </div>
             </div>
         </div>
@@ -399,7 +394,6 @@
             currentTitle: rawData?.currentTitle || "none",
             auctionWins: Number(rawData?.auctionWins || rawData?.auction_wins) || 0,
             userPhoto: rawData?.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${rawData?.username || 'default'}`,
-            lastSeasonRank: rawData?.lastSeasonRank || null,
             featuredCard: rawData?.featuredCard || null,
             cards_inventory: rawData?.cards_inventory || {},
             inventory_materials: rawData?.inventory_materials || {},
@@ -722,10 +716,6 @@
 
     function updateProfileUI(userData) {
         if (!userData) return;
-        const profileRankEl = document.getElementById("profile-last-rank");
-        if (profileRankEl) {
-            profileRankEl.innerText = userData.lastSeasonRank ? userData.lastSeasonRank : "ไม่มีประวัติซีซั่นก่อนหน้า";
-        }
         const auctionWinsCount = parseInt(userData.auctionWins || userData.auction_wins || 0);
         document.getElementById("auction-wins-display").innerText = `${auctionWinsCount} ครั้ง`;
     } 
