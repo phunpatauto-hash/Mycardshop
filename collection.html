@@ -72,6 +72,22 @@
             text-transform: uppercase;
             animation: halloween-glow 1.5s infinite ease-in-out;
         }
+        
+        .card-expired-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            color: #ff4d4d;
+            font-weight: bold;
+            text-align: center;
+            padding: 10px;
+            backdrop-filter: blur(2px);
+        }
 
         /* Effects */
         @keyframes rainbow-rotate { 100% { filter: hue-rotate(360deg); } }
@@ -116,6 +132,8 @@
         .collection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
         .col-card { background: #111; border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); position: relative; transition: 0.3s; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
         .col-card:hover { transform: translateY(-8px); border-color: #ffc831; box-shadow: 0 0 20px rgba(255, 200, 49, 0.3); }
+        .col-card.expired { opacity: 0.6; filter: grayscale(0.8); cursor: not-allowed; }
+        .col-card.expired:hover { transform: none; border-color: rgba(255,255,255,0.1); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
         .col-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; transition: 0.3s; }
         
         .star-container { 
@@ -393,6 +411,19 @@
         return rarityStr.endsWith("HALLOWEEN");
     }
 
+    // ฟังก์ชันตรวจสอบว่าหมดเขตอีเวนต์ Halloween หรือยัง (1 ตุลาคม - 31 ตุลาคม)
+    function isHalloweenExpired() {
+        const now = new Date();
+        const currentMonth = now.getMonth() + 1; // 10 = ตุลาคม
+        const currentDay = now.getDate();
+        
+        // ถ้าไม่ใช่เดือนตุลาคม หรือเลยวันที่ 31 ตุลาคมไปแล้ว ถือว่าหมดเขต
+        if (currentMonth > 10) return true;
+        if (currentMonth < 10) return true; // หากยังไม่ถึงตุลาคม (เผื่อระบบเปิดล่วงหน้า) หรือปรับตามเงื่อนไข
+        if (currentDay > 31) return true;
+        return false;
+    }
+
     function getRarityBaseConfig(rarity) {
         let r = (rarity || 'C').toString().trim().toUpperCase();
         if (r.endsWith("HALLOWEEN")) {
@@ -403,6 +434,7 @@
 
     function getArenaPower(card) {
         if (!card) return 0;
+        if (isHalloweenCard(card) && isHalloweenExpired()) return 0; // หมดเขตการ์ดอีเวนต์ พลังเป็น 0
         const config = getRarityBaseConfig(card.rarity);
         let multiplier = 1 + ((card.stars || 0) * 0.1);
         if (card.awakening && card.awakening > 0) multiplier += (card.awakening * 0.15);
@@ -412,6 +444,7 @@
 
     function getCardHp(card) {
         if (!card) return 0;
+        if (isHalloweenCard(card) && isHalloweenExpired()) return 0;
         const config = getRarityBaseConfig(card.rarity);
         let multiplier = 1 + ((card.stars || 0) * 0.15);
         if (card.awakening && card.awakening > 0) multiplier += (card.awakening * 0.2);
@@ -421,6 +454,7 @@
 
     function getCardDef(card) {
         if (!card) return 0;
+        if (isHalloweenCard(card) && isHalloweenExpired()) return 0;
         const config = getRarityBaseConfig(card.rarity);
         let multiplier = 1 + ((card.stars || 0) * 0.12);
         if (card.awakening && card.awakening > 0) multiplier += (card.awakening * 0.15);
@@ -451,7 +485,6 @@
                     const data = snap.data();
                     let rawCollection = data.collection || [];
                     
-                    // ป้องกัน Error โดยการแปลง item.id เป็น String ก่อนเรียก .startsWith() เสมอ
                     userCards = rawCollection
                         .filter(item => item && !(item.source === "ตู้สุ่มสัตว์เลี้ยง" || (item.id != null && String(item.id).startsWith("p")) || item.type === "pet"))
                         .map(c => ({
@@ -567,17 +600,23 @@
 
         const FIVE_MINUTES = 5 * 60 * 1000;
         const now = Date.now();
+        const expiredH = isHalloweenCard(card => card) && isHalloweenExpired();
 
         displayList.forEach(card => {
             let r = (card.rarity || 'C').toUpperCase();
             if (r.endsWith("HALLOWEEN")) r = r.replace("HALLOWEEN", "").trim();
             
+            const isHCard = isHalloweenCard(card);
+            const isExpired = isHCard && isHalloweenExpired();
+
             const isRecentNew = card.obtainedAt && (now - card.obtainedAt < FIVE_MINUTES);
             const hasDuplicates = card.count > 1;
             const shouldPulse = isRecentNew || hasDuplicates;
 
             let cardClassName = "col-card";
-            if ((card.awakening || 0) > 0) {
+            if (isExpired) {
+                cardClassName += " expired";
+            } else if ((card.awakening || 0) > 0) {
                 cardClassName += " awakening-tier5-ultimate";
             } else if ((card.level || 1) >= MAX_LV && (card.stars || 0) >= 5) {
                 cardClassName += " rainbow-effect";
@@ -587,13 +626,13 @@
 
             const div = document.createElement("div");
             div.className = cardClassName;
-            if ((card.awakening || 0) === 0 && !((card.level || 1) >= MAX_LV && (card.stars || 0) >= 5)) {
+            if (!isExpired && (card.awakening || 0) === 0 && !((card.level || 1) >= MAX_LV && (card.stars || 0) >= 5)) {
                 div.style.border = `1px solid ${rarityColors[r] || '#fff'}44`;
             }
             div.onclick = () => openModal(card);
             
             let starContent = '';
-            if ((card.stars || 0) > 0) {
+            if (!isExpired && (card.stars || 0) > 0) {
                 let starText = '⭐'.repeat(card.stars);
                 if ((card.awakening || 0) > 0) {
                     starText += ` [AWK ${card.awakening}🔥]`;
@@ -601,18 +640,20 @@
                 starContent = `<div class="star-container">${starText}</div>`;
             }
 
-            const halloweenTagHTML = isHalloweenCard(card) ? `<div class="card-halloween-badge">🎃 HALLOWEEN</div>` : '';
+            const halloweenTagHTML = isHCard ? `<div class="card-halloween-badge">🎃 HALLOWEEN</div>` : '';
+            const expiredOverlay = isExpired ? `<div class="card-expired-overlay"><span>⌛ หมดเขตกิจกรรม</span><span style="font-size:0.6rem; color:#aaa;">ไม่สามารถใช้งานได้แล้ว \nเจอกันใหม่ปีหน้า!!</span></div>` : '';
 
             div.innerHTML = `
                 ${starContent}
                 <div class="card-type-badge">${card.type || 'CARD'}</div>
                 ${halloweenTagHTML}
-                ${card.count > 1 ? `<div class="card-count-badge">x${card.count}</div>` : ''}
-                ${card.isLocked ? `<div class="card-lock-badge">🔒</div>` : ''}
+                ${expiredOverlay}
+                ${card.count > 1 && !isExpired ? `<div class="card-count-badge">x${card.count}</div>` : ''}
+                ${card.isLocked && !isExpired ? `<div class="card-lock-badge">🔒</div>` : ''}
                 <img src="${card.img || card.image || ''}">
                 <div style="padding:10px; background: rgba(0,0,0,0.8);">
-                    <div style="color:${(card.awakening || 0) > 0 ? '#00f3ff' : (rarityColors[r] || '#fff')}; font-size:0.75rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${card.name} ${(card.awakening || 0) > 0 ? '✨🔮' : ''}</div>
-                    <div style="color:#ffc831; font-size:0.8rem; font-weight:bold;">⚡ ${getArenaPower(card).toLocaleString()}</div>
+                    <div style="color:${isExpired ? '#777' : ((card.awakening || 0) > 0 ? '#00f3ff' : (rarityColors[r] || '#fff'))}; font-size:0.75rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${card.name} ${(card.awakening || 0) > 0 && !isExpired ? '✨🔮' : ''}</div>
+                    <div style="color:${isExpired ? '#777' : '#ffc831'}; font-size:0.8rem; font-weight:bold;">⚡ ${isExpired ? '0 (หมดอายุ)' : getArenaPower(card).toLocaleString()}</div>
                     <div style="color:#aaa; font-size:0.65rem;">LV. ${card.level || 1}</div>
                 </div>`;
             grid.appendChild(div);
@@ -737,6 +778,12 @@
 
     window.openModal = (card) => {
         if (!card) return;
+        
+        // ถ้าเป็นการ์ด Halloween และหมดเขตแล้ว จะไม่สามารถกดเปิดดูรายละเอียดเพื่อใช้งานได้
+        if (isHalloweenCard(card) && isHalloweenExpired()) {
+            return alert("⌛ การ์ดอีเวนต์ HALLOWEEN นี้หมดเขตการใช้งานแล้ว (สิ้นสุดวันที่ 31 ตุลาคม) ไม่สามารถใช้งานได้อีกต่อไป");
+        }
+
         let r = (card.rarity || 'C').toUpperCase();
         let displayR = r;
         if (r.endsWith("HALLOWEEN")) r = r.replace("HALLOWEEN", "").trim();
@@ -782,21 +829,6 @@
 
         if (cardLevel < MAX_LV) {
             lvGroup.style.display = "flex"; starBtn.style.display = "none"; maxMsg.style.display = "none";
-            
-            // // ตัวอย่างโครงสร้างข้อมูลการ์ดที่จะ push เข้าไปใน collection ของผู้ใช้
-            // const newCard = {
-            //     name: "ชื่อการ์ด",
-            //     rarity: "SSR", // หรือระดับอื่นๆ
-            //     image: "URL_รูปภาพ",
-            //     type: "CARD",
-            //     level: 1,
-            //     stars: 0,
-            //     awakening: 0,
-            //     isLocked: false,
-            //     source: "Battle Pass",
-            //     obtainedAt: Date.now()
-            // };
-
             const req = getUpgradeRequirements(card);
             document.getElementById("modalUpgradeInfo").innerText = `เงื่อนไข: ใช้ใบซ้ำ ${req.reqQty} ใบ + ${req.cost} 🪙`;
             document.getElementById("btnUpgradeLV").onclick = () => handleUpgrade(card, 'LV');
