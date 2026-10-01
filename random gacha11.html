@@ -211,10 +211,7 @@
     // --- รายชื่อการ์ดคงเดิม ---
     const allCards = [
         { id: 1, rarity: "USEC", name: "อย่าให้มีครั้งที่ 2 (USEC)", rate: 0.2, img: "https://cdn.bangbon.app/cards/SL02-007.png" },
-        { id: 1, rarity: "USEC", name: "เตียวเลี้ยว ขุนพลมือปราบแห่งวุยก๊ก (USEC)", rate: 0.2, img: "https://cdn.bangbon.app/cards/SL02-004.png" },
-        { id: 1, rarity: "USEC", name: "เจค นักฆ่ามือเก๋า (USEC)", rate: 0.2, img: "https://cdn.bangbon.app/cards/SL02-003.png" },
-        { id: 1, rarity: "USEC", name: "พลังแฝง (USEC)", rate: 0.2, img: "https://cdn.bangbon.app/cards/SL02-008.png" },
-
+    
         { id: 2, rarity: "CBR", name: "สุดยอดท่าไม้ตายผู้กล้า THE END (CBR)", rate: 0.01, img: "https://cdn.bangbon.app/cards/KD04-012-CBR.png" },
         { id: 2, rarity: "CBR", name: "ฮันโซ นินจาในตำนาน (CBR)", rate: 0.01, img: "https://cdn.bangbon.app/cards/BT10-005-CBR.png" },
         { id: 2, rarity: "CBR", name: "จัน หนวดเขี้ยว (CBR)", rate: 0.01, img: "https://cdn.bangbon.app/cards/SD06-001-CBR.png" },
@@ -232,34 +229,34 @@
         { id: 4, rarity: "SEC", name: "พรของอิศวร (SEC)", rate: 1.5, img: "https://cdn.bangbon.app/cards/CC01-042-SCR.png" },
         { id: 4, rarity: "SEC", name: "วีรบุรุษสุดซอย (SEC)", rate: 1.5, img: "https://cdn.bangbon.app/cards/CC01-007-SCR.png" },
 
-        { id: 5, rarity: "UR", name: "พี่หน่วง พิธีกรผมสวย", rate: 12.5, img: "https://cdn.bangbon.app/cards/FPRO-003.png" },
-        { id: 5, rarity: "UR", name: "ทาโกะซัง สูตรสวรรค์", rate: 12.5, img: "https://cdn.bangbon.app/cards/ODY1-001.png" },
-        { id: 5, rarity: "UR", name: "ทาโกะซัง สูตรมนุษย์", rate: 12.5, img: "https://cdn.bangbon.app/cards/ODY1-002.png" },
-        { id: 5, rarity: "UR", name: "ทาโกะซัง สูตรนรก", rate: 12.5, img: "https://cdn.bangbon.app/cards/ODY1-003.png" },
-        { id: 5, rarity: "UR", name: "เสามงคล ทรงจีน", rate: 12.5, img: "https://cdn.bangbon.app/cards/CC01-018.png" },
-        { id: 5, rarity: "UR", name: "เล่าปี่ ผู้นำคุณธรรมแห่งจ๊กก๊ก", rate: 12.5, img: "https://cdn.bangbon.app/cards/BT08-035.png" },
+        { id: 5, rarity: "UR", name: "พี่หน่วง พิธีกรผมสวย", rate: 12.5, img: "" },
+        { id: 5, rarity: "UR", name: "ทาโกะซัง สูตรสวรรค์", rate: 12.5, img: "" },
+        { id: 5, rarity: "UR", name: "ทาโกะซัง สูตรมนุษย์", rate: 12.5, img: "" },
+        { id: 5, rarity: "UR", name: "ทาโกะซัง สูตรนรก", rate: 12.5, img: "" },
+        { id: 5, rarity: "UR", name: "เสามงคล ทรงจีน", rate: 12.5, img: "" },
+        { id: 5, rarity: "UR", name: "เล่าปี่ ผู้นำคุณธรรมแห่งจ๊กก๊ก", rate: 12.5, img: "" },
 
-        { id: 6, rarity: "SR", name: "พ่อบุญใหญ่ (SR)", rate: 26.0, img: "https://cdn.bangbon.app/cards/BT01-013.png" },
-        { id: 6, rarity: "SR", name: "เดซี่ แห่งสายรุ้ง (SR)", rate: 26.0, img: "https://cdn.bangbon.app/cards/BT07-033.png" },
-        { id: 6, rarity: "SR", name: "ขวาน 7 สี (SR)", rate: 26.0, img: "https://cdn.bangbon.app/cards/BT08-061.png" },
-        { id: 6, rarity: "SR", name: "มยุราซัง ไอดอลยุค 80 (SR)", rate: 26.0, img: "https://cdn.bangbon.app/cards/BT05-043.png" },
-        { id: 6, rarity: "SR", name: "ราชินีหิมะ ชีหลิน (SR)", rate: 26.0, img: "https://cdn.bangbon.app/cards/BT07-019.png" },
-        { id: 6, rarity: "SR", name: "ไอ้หนุ่มรด. (SR)", rate: 26.0, img: "https://cdn.bangbon.app/cards/CC01-041.png" },
+        { id: 6, rarity: "SR", name: "พ่อบุญใหญ่ (SR)", rate: 26.0, img: "" },
+        { id: 6, rarity: "SR", name: "เดซี่ แห่งสายรุ้ง (SR)", rate: 26.0, img: "" },
+        { id: 6, rarity: "SR", name: "ขวาน 7 สี (SR)", rate: 26.0, img: "" },
+        { id: 6, rarity: "SR", name: "มยุราซัง ไอดอลยุค 80 (SR)", rate: 26.0, img: "" },
+        { id: 6, rarity: "SR", name: "ราชินีหิมะ ชีหลิน (SR)", rate: 26.0, img: "" },
+        { id: 6, rarity: "SR", name: "ไอ้หนุ่มรด. (SR)", rate: 26.0, img: "" },
 
-        { id: 8, rarity: "R", name: "พระเวสสุกรรม", rate: 46.0, img: "https://cdn.bangbon.app/cards/BT01-003.png" },
-        { id: 8, rarity: "R", name: "ไอ้นัท - คนใจเด็ด", rate: 46.0, img: "https://cdn.bangbon.app/cards/BT04-003.png" },
-        { id: 8, rarity: "R", name: "พูดไทยได้ 5 คำ", rate: 46.0, img: "https://cdn.bangbon.app/cards/BT05-050.png" },
-        { id: 8, rarity: "R", name: "น้องมี่ 3.0", rate: 46.0, img: "https://cdn.bangbon.app/cards/BT06-041.png" },
-        { id: 8, rarity: "R", name: "จิตมุ่งมั่นของพระนารายณ์", rate: 46.0, img: "https://cdn.bangbon.app/cards/BT06-047.png" },
-        { id: 8, rarity: "R", name: "หมอเลิฟ ฟันเหยิน", rate: 46.0, img: "https://cdn.bangbon.app/cards/BT07-040.png" },
+        { id: 8, rarity: "R", name: "พระเวสสุกรรม", rate: 46.0, img: "" },
+        { id: 8, rarity: "R", name: "ไอ้นัท - คนใจเด็ด", rate: 46.0, img: "" },
+        { id: 8, rarity: "R", name: "พูดไทยได้ 5 คำ", rate: 46.0, img: "" },
+        { id: 8, rarity: "R", name: "น้องมี่ 3.0", rate: 46.0, img: "" },
+        { id: 8, rarity: "R", name: "จิตมุ่งมั่นของพระนารายณ์", rate: 46.0, img: "" },
+        { id: 8, rarity: "R", name: "หมอเลิฟ ฟันเหยิน", rate: 46.0, img: "" },
 
-        { id: 9, rarity: "C", name: "อรุณีย์ ข้าวมันไก่เมียจ่า", rate: 50.2, img: "https://cdn.bangbon.app/cards/SD04-008.png" },
-        { id: 9, rarity: "C", name: "พิธีกรสารคดีดวงโบ๋", rate: 50.2, img: "https://cdn.bangbon.app/cards/SD05-011.png" },
-        { id: 9, rarity: "C", name: "บึงทมิฬ People - คุณบึกบึน", rate: 50.2, img: "https://cdn.bangbon.app/cards/SD05-007.png" },
-        { id: 9, rarity: "C", name: "พม่าข้าศึก 2310", rate: 50.2, img: "https://cdn.bangbon.app/cards/SD06-009.png" },
-        { id: 9, rarity: "C", name: "อ้วนเสี้ยว ผู้นำขุนพล 18 หัวเมือง", rate: 50.2, img: "https://cdn.bangbon.app/cards/SD07-008.png" },
-        { id: 9, rarity: "C", name: "ลูกกบ", rate: 50.2, img: "https://cdn.bangbon.app/cards/BT01-023.png" },
-        { id: 9, rarity: "C", name: "อ๊บ", rate: 50.2, img: "https://cdn.bangbon.app/cards/BT02-007.png" }
+        { id: 9, rarity: "C", name: "อรุณีย์ ข้าวมันไก่เมียจ่า", rate: 50.2, img: "" },
+        { id: 9, rarity: "C", name: "พิธีกรสารคดีดวงโบ๋", rate: 50.2, img: "" },
+        { id: 9, rarity: "C", name: "บึงทมิฬ People - คุณบึกบึน", rate: 50.2, img: "" },
+        { id: 9, rarity: "C", name: "พม่าข้าศึก 2310", rate: 50.2, img: "" },
+        { id: 9, rarity: "C", name: "อ้วนเสี้ยว ผู้นำขุนพล 18 หัวเมือง", rate: 50.2, img: "" },
+        { id: 9, rarity: "C", name: "ลูกกบ", rate: 50.2, img: "" },
+        { id: 9, rarity: "C", name: "อ๊บ", rate: 50.2, img: "" }
     ];
 
     onAuthStateChanged(auth, (user) => {
