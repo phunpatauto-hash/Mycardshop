@@ -466,6 +466,45 @@
         .banner-diamond-shop { background: linear-gradient(135deg, #091a3a 0%, #0055ff 50%, #00e5ff 100%); color: white; border: 1px solid rgba(0, 229, 255, 0.3); box-shadow: 0 0 15px rgba(0, 229, 255, 0.1); }
         .banner-diamond-shop:hover { border-color: #00e5ff; box-shadow: 0 0 25px rgba(0, 229, 255, 0.4); }
         .banner-diamond-shop .shop-glow-icon { color: #00e5ff; text-shadow: 0 0 15px rgba(0, 229, 255, 0.8); }
+
+        /* --- ✨ Halloween Metallic/Glossy Shimmer Effect for Profile Link --- */
+        .profile-link.halloween-glossy-bg {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #2a0845 0%, #ff7518 50%, #43cea2 100%);
+            background-size: 250% 250%;
+            animation: halloweenMetallicShimmer 6s ease infinite;
+            border: 1px solid rgba(255, 117, 24, 0.8);
+            box-shadow: 0 0 15px rgba(255, 117, 24, 0.4);
+        }
+        /* ชั้นเงาแสงกวาดผ่าน (Glossy Reflection Bar) */
+        .profile-link.halloween-glossy-bg::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.25) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(30deg) translate(-100%, -100%);
+            animation: glossySweep 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes halloweenMetallicShimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes glossySweep {
+            0% { transform: rotate(30deg) translate(-100%, -100%); }
+            20% { transform: rotate(30deg) translate(100%, 100%); }
+            100% { transform: rotate(30deg) translate(100%, 100%); }
+        }
     </style>
 </head>
 <body>
@@ -699,7 +738,7 @@
             </div>
 
             <!-- Diamond Shop -->
-            <div class="modern-banner banner-diamond-shop" onclick="checkAuthAndNavigate('index.html')">
+            <div class="modern-banner banner-diamond-shop" onclick="checkAuthAndNavigate('DIAMOND SHOP.html')">
                 <h3><i class="fas fa-shopping-basket"></i> DIAMOND SHOP</h3>
                 <p>ร้านค้าเพชรและไอเทมสุดพิเศษ!</p>
                 <i class="fas fa-gem main-icon shop-glow-icon"></i>
@@ -733,7 +772,7 @@
             
             <!-- Halloween Event Banner (เปิดให้เข้าเฉพาะ 1 ต.ค. - 31 ต.ค.) -->
             <div class="modern-banner" style="background: linear-gradient(135deg, #ff7518, #2a0845); color: white; grid-column: span 2;" onclick="checkHalloweenEvent()">
-                <h3>🎃 Halloween Event (เปิดให้เข้าวันที่ 10 ตุลาคมนี้!!!)</h3>
+                <h3>🎃 Halloween Event (เปิดให้เข้าวันที่ 1 ตุลาคมนี้!!!)</h3>
                 <p>อีเวนต์สุดพิเศษต้อนรับวันฮาโลวีน ออกไปขอลูกกวาดและสนุกกับเพื่อนกันเถอะ!</p>
                 <i class="fas fa-ghost main-icon"></i>
             </div>
@@ -746,8 +785,8 @@
 
             <!-- Battle Pass -->
             <div class="modern-banner" style="background: linear-gradient(135deg, #ffc831, #ff8c00); color: #000; grid-column: span 2;" onclick="checkAuthAndNavigate('Pass (Battle Pass).html')">
-                <h3>🏆 Battle Pass SS6 : ผู้พิทักษ์พฤกษา</h3>
-                <p>รับการ์ดระดับพรีเมียมประจำซีซั่น!</p>
+                <h3>🏆 Battle Pass SS5 : เรื่องวุ้นๆของสัตว์ตัวน้อย</h3>
+                <p>ทำภารกิจเพื่อรับการ์ดระดับพรีเมียมประจำซีซั่น!</p>
                 <i class="fas fa-trophy main-icon"></i>
             </div>
 
@@ -764,9 +803,9 @@
             </div>
 
             <!-- Coming Soon -->
-            <div class="modern-banner" style="background: rgba(255, 255, 255, 0.05); color: #888; border: 1px dashed rgba(255,255,255,0.2);" onclick="alert('กำลังอยู่ในการพัฒนา!')">
+            <div class="modern-banner" style="background: rgba(255, 255, 255, 0.05); color: #888; border: 1px dashed rgba(255,255,255,0.2);" onclick="alert('ระบบใหม่กำลังอยู่ในการพัฒนา!')">
                 <h3>🚀 Coming Soon</h3>
-                <p>กำลังอยู่ระหว่างการพัฒนา โปรดติดตาม!</p>
+                <p>ฟีเจอร์ใหม่กำลังอยู่ระหว่างการพัฒนา โปรดติดตาม!</p>
                 <i class="fas fa-lock main-icon"></i>
             </div>
         </div>
@@ -826,14 +865,14 @@
         }
 
         const now = new Date();
-        const month = now.getMonth() + 10; // เดือน (มกราคม = 1, ตุลาคม = 10)
+        const month = now.getMonth() + 1; // เดือน (มกราคม = 1, ตุลาคม = 10)
         const date = now.getDate();     // วันที่ (1-31)
 
         // ตรวจสอบว่าเป็นเดือนตุลาคม (10) และวันที่อยู่ระหว่าง 1 ถึง 31 หรือไม่
-        if (month === 10 && date >= 10 && date <= 31) {
+        if (month === 10 && date >= 1 && date <= 31) {
             window.location.href = "halloween_event.html";
         } else {
-            alert("🎃 กิจกรรม Halloween ยังไม่เปิดให้บริการ! จะเปิดให้ในวันที่ 10 ตุลาคม ถึง 31 ตุลาคม เท่านั้น อดทนรอก่อนน้า!!!");
+            alert("🎃 กิจกรรม Halloween ยังไม่เปิดให้บริการ! จะเปิดให้ในวันที่ 1 ตุลาคม ถึง 31 ตุลาคม เท่านั้น อดทนรอก่อนน้า!!!");
         }
     };
 
@@ -1171,7 +1210,7 @@
                     document.getElementById("user-points").innerText = formatCompactNumber(data.points || 0);
                     document.getElementById("user-diamonds").innerText = formatCompactNumber(data.diamonds || 0);
                     document.getElementById("user-ticket-normal").innerText = formatCompactNumber(data.normal_tickets || 0);
-                    document.getElementById("user-ticket-premium").innerText = formatCompactNumber(data.premium_tickets || 0);
+                    document.getElementById("user-ticket-premium").innerText = formatCompactNumber(data.ticket_premium || data.premium_tickets || 0);
 
                     document.getElementById("sidebar-user-card").style.display = "flex";
                     document.getElementById("sidebar-username-txt").innerText = data.username;
@@ -1214,12 +1253,23 @@
                     }
 
                     const titleDisplay = document.getElementById("user-title-display");
+                    const profileLinkBox = document.getElementById("profile-container");
+                    
                     if (titleDisplay) {
                         if (data.currentTitle && data.currentTitle !== "none") {
                             titleDisplay.innerText = data.currentTitle;
                             titleDisplay.style.display = "inline-block";
                         } else {
                             titleDisplay.style.display = "none";
+                        }
+                    }
+
+                    // --- ✨ ตรวจสอบเงื่อนไขยศพิเศษ Halloween เพื่อเปิดใช้งานพื้นหลังสีมันเงา ---
+                    if (profileLinkBox) {
+                        if (data.currentTitle === "Halloween is Time 🎃" || data.currentTitle === "happy HALLOWEEN 🎃") {
+                            profileLinkBox.classList.add("halloween-glossy-bg");
+                        } else {
+                            profileLinkBox.classList.remove("halloween-glossy-bg");
                         }
                     }
                 }
