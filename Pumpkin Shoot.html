@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>มินิเกม: ยิงฟักทองฮาโลวีน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Firebase SDK & Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
+            authDomain: "sign-up-73f99.firebaseapp.com",
+            projectId: "sign-up-73f99",
+            storageBucket: "sign-up-73f99.appspot.com",
+            messagingSenderId: "916335559099",
+            appId: "1:916335559099:web:3a8ed896ba26e38991849e"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUserProfile = {
+            name: "ผู้เล่นทั่วไป",
+            uid: null
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUserProfile.uid = user.uid;
+                try {
+                    const userDocRef = doc(db, "users", user.uid);
+                    const userDocSnap = await getDoc(userDocRef);
+
+                    if (userDocSnap.exists()) {
+                        const userData = userDocSnap.data();
+                        currentUserProfile.name = userData.username || user.email || "ผู้เล่นเกม";
+                    } else {
+                        currentUserProfile.name = user.email || "ผู้ใช้งานระบบ";
+                    }
+                } catch (error) {
+                    console.error("Error loading user profile:", error);
+                    currentUserProfile.name = user.email || "ผู้เล่นเกม";
+                }
+            } else {
+                alert("⚠️ กรุณาเข้าสู่ระบบก่อนเล่นเกม");
+                window.location.href = "login.html";
+            }
+        });
+
+        window.saveScoreToFirebase = async function(score) {
+            try {
+                await addDoc(collection(db, "candyHuntScores"), {
+                    name: currentUserProfile.name,
+                    uid: currentUserProfile.uid,
+                    score: score,
+                    timestamp: new Date()
+                });
+                console.log("บันทึกคะแนนยิงฟักทองลง Firebase สำเร็จ");
+            } catch (e) {
+                console.error("เกิดข้อผิดพลาดในการบันทึกข้อมูล: ", e);
+            }
+        };
+    </script>
+
+    <style>
+        :root {
+            --primary: #ff7500;
+            --secondary: #4ecdc4;
+            --bg-dark: #12121f;
+        }
+
+        * { box-sizing: border-box; transition: all 0.2s ease; touch-action: manipulation; }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: var(--bg-dark);
+            color: #fff;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-image: radial-gradient(circle at 50% 50%, #291b3d 0%, #12121f 100%);
+            padding: 10px;
+            overflow-x: hidden;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 750px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+
+        h1 { margin-top: 0; color: #ff9f43; font-size: 1.6rem; text-shadow: 0 0 10px rgba(255,159,67,0.4); margin-bottom: 10px; }
+
+        .game-info {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0,0,0,0.4);
+            padding: 8px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .info-item span { color: #00e5ff; font-weight: bold; }
+        .timer-warning { color: #ff6b6b !important; }
+
+        .shooting-arena {
+            width: 100%;
+            height: 340px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+            cursor: crosshair;
+            margin-bottom: 12px;
+            background-image: linear-gradient(to bottom, #1a102f, #0d0914);
+        }
+
+        .pumpkin {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        .pumpkin-small { width: 50px; height: 50px; font-size: 2rem; }
+        .pumpkin-medium { width: 70px; height: 70px; font-size: 2.8rem; }
+        .pumpkin-large { width: 100px; height: 100px; font-size: 4rem; filter: drop-shadow(0 0 10px #ffeb3b); }
+
+        .pumpkin-score-tag {
+            font-size: 0.7rem;
+            font-weight: bold;
+            background: rgba(0,0,0,0.7);
+            padding: 1px 5px;
+            border-radius: 6px;
+            margin-top: -5px;
+        }
+
+        .pumpkin-small .pumpkin-score-tag { color: #4ecdc4; }
+        .pumpkin-medium .pumpkin-score-tag { color: #ffeb3b; }
+        .pumpkin-large .pumpkin-score-tag { color: #ff6b6b; font-size: 0.8rem; }
+
+        .ball {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle at 30% 30%, #fff, #ff9f43);
+            border-radius: 50%;
+            pointer-events: none;
+            box-shadow: 0 0 10px #ff9f43;
+            z-index: 10;
+            transition: all 0.25s ease-out;
+        }
+
+        .instruction {
+            color: #aaa;
+            font-size: 0.85rem;
+        }
+
+        @media (min-width: 600px) {
+            .game-container { padding: 20px 30px; }
+            h1 { font-size: 2rem; }
+            .game-info { font-size: 1.1rem; }
+            .shooting-arena { height: 380px; }
+            .instruction { font-size: 0.95rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h1>🎃 ศึกยิงฟักทองฮาโลวีน 🎯</h1>
+    
+    <div class="game-info">
+        <div class="info-item">เวลาที่เหลือ: <span id="time-left">5:00</span></div>
+        <div class="info-item">คะแนนสะสม: <span id="current-score">0</span> คะแนน</div>
+    </div>
+
+    <div class="shooting-arena" id="arena">
+        <!-- ฟักทองจะสุ่มโผล่ขึ้นมาตรงนี้ -->
+    </div>
+
+    <div class="instruction">แตะที่สนามเพื่อยิงลูกบอลใส่ฟักทอง! (เล็ก: 50 | กลาง: 100 | ใหญ่: 1000)</div>
+</div>
+
+<script>
+    let score = 0;
+    let timeLeft = 300; 
+    let gameInterval = null;
+    let spawnerTimeout = null;
+    let isPlaying = false;
+
+    const arena = document.getElementById("arena");
+
+    arena.addEventListener("pointerdown", (event) => {
+        shootBall(event);
+    });
+
+    function prepareGame() {
+        score = 0;
+        timeLeft = 300;
+        isPlaying = false;
+        document.getElementById("current-score").innerText = score;
+        arena.innerHTML = "";
+        document.getElementById("time-left").innerText = "5:00";
+
+        let count = 3;
+        Swal.fire({
+            title: 'เตรียมตัวให้พร้อม!',
+            html: `<div style="font-size: 3.5rem; color: #ff9f43; font-weight: bold; margin: 10px 0;" id="countdown-val">${count}</div><div style="color: #aaa;">เกมกำลังจะเริ่มใน...</div>`,
+            background: '#12121f',
+            color: '#fff',
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            didOpen: () => {
+                let cdInterval = setInterval(() => {
+                    count--;
+                    const el = document.getElementById("countdown-val");
+                    if (el) el.innerText = count;
+
+                    if (count <= 0) {
+                        clearInterval(cdInterval);
+                        Swal.close();
+                        startActualGame();
+                    }
+                }, 1000);
+            }
+        });
+    }
+
+    function startActualGame() {
+        isPlaying = true;
+
+        gameInterval = setInterval(() => {
+            timeLeft--;
+            updateTimerDisplay();
+
+            if (timeLeft <= 0) {
+                endGame();
+            }
+        }, 1000);
+
+        scheduleSpawn();
+    }
+
+    function scheduleSpawn() {
+        if (!isPlaying) return;
+
+        spawnPumpkin();
+
+        let delay = 900; 
+        if (timeLeft <= 60) {
+            delay = 350; 
+        } else if (timeLeft <= 180) {
+            delay = 600; 
+        }
+
+        spawnerTimeout = setTimeout(scheduleSpawn, delay);
+    }
+
+    function updateTimerDisplay() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        const timeStr = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        const timerEl = document.getElementById("time-left");
+        timerEl.innerText = timeStr;
+
+        if (timeLeft <= 60) {
+            timerEl.classList.add("timer-warning");
+        }
+    }
+
+    function spawnPumpkin() {
+        if (!isPlaying) return;
+
+        const randType = Math.random();
+        let type = 'small';
+        let pts = 50;
+        let className = 'pumpkin pumpkin-small';
+        let emoji = '🎃';
+
+        if (randType < 0.05) {
+            type = 'large';
+            pts = 1000;
+            className = 'pumpkin pumpkin-large';
+            emoji = '👑🎃';
+        } else if (randType < 0.40) {
+            type = 'medium';
+            pts = 100;
+            className = 'pumpkin pumpkin-medium';
+            emoji = '🎃';
+        }
+
+        const pumpkin = document.createElement("div");
+        pumpkin.className = className;
+        pumpkin.innerHTML = `<div>${emoji}</div><div class="pumpkin-score-tag">+${pts}</div>`;
+
+        const maxX = arena.clientWidth - 80;
+        const maxY = arena.clientHeight - 80;
+        const randomX = Math.floor(Math.random() * Math.max(10, maxX));
+        const randomY = Math.floor(Math.random() * Math.max(10, maxY));
+
+        pumpkin.style.left = `${randomX}px`;
+        pumpkin.style.top = `${randomY}px`;
+
+        pumpkin.addEventListener("pointerdown", (e) => {
+            e.stopPropagation();
+            hitPumpkin(pumpkin, pts);
+        });
+
+        arena.appendChild(pumpkin);
+
+        let lifetime = type === 'large' ? 1800 : (type === 'medium' ? 2200 : 2500);
+        setTimeout(() => {
+            if (pumpkin.parentElement) {
+                pumpkin.remove();
+            }
+        }, lifetime);
+    }
+
+    function shootBall(event) {
+        if (!isPlaying) return;
+
+        const rect = arena.getBoundingClientRect();
+        const clickX = event.clientX - rect.left;
+        const clickY = event.clientY - rect.top;
+
+        const ball = document.createElement("div");
+        ball.className = "ball";
+        ball.style.left = `${arena.clientWidth / 2 - 10}px`;
+        ball.style.top = `${arena.clientHeight - 25}px`;
+        arena.appendChild(ball);
+
+        setTimeout(() => {
+            ball.style.left = `${clickX - 10}px`;
+            ball.style.top = `${clickY - 10}px`;
+        }, 20);
+
+        setTimeout(() => {
+            ball.remove();
+        }, 270);
+    }
+
+    function hitPumpkin(pumpkinEl, points) {
+        score += points;
+        document.getElementById("current-score").innerText = score;
+
+        pumpkinEl.style.transform = "scale(1.4) rotate(25deg)";
+        pumpkinEl.style.opacity = "0";
+        setTimeout(() => {
+            pumpkinEl.remove();
+        }, 200);
+    }
+
+    async function endGame() {
+        isPlaying = false;
+        clearInterval(gameInterval);
+        clearTimeout(spawnerTimeout);
+        arena.innerHTML = "";
+
+        if (window.saveScoreToFirebase) {
+            await window.saveScoreToFirebase(score);
+        }
+
+        Swal.fire({
+            title: '🎉 หมดเวลาการแข่งขัน! 🎉',
+            html: `
+                <div style="font-size: 1.1rem; margin: 15px 0; line-height: 1.6;">
+                    คะแนนยิงฟักทองที่คุณทำได้: <b style="color: #ffeb3b; font-size: 1.6rem;">${score} คะแนน</b><br>
+                    <div style="margin-top: 15px; font-size: 0.9rem; color: #aaa;">✨ บันทึกคะแนนสะสมลงกระดานผู้นำเรียบร้อยแล้ว!</div>
+                </div>
+            `,
+            background: '#12121f',
+            color: '#fff',
+            confirmButtonText: '🏠 ไปหน้าเลือกเกม',
+            confirmButtonColor: '#4ecdc4',
+            allowOutsideClick: false
+        }).then(() => {
+            // เมื่อกดปุ่มตกลง จะพากลับไปยังหน้าเลือกเกมทันที
+            window.location.href = 'minigame.html';
+        });
+    }
+
+    prepareGame();
+</script>
+
+</body>
+</html>

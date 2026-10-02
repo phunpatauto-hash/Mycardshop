@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>มินิเกม: ตามหาลูกกวาด</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Firebase SDK & Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
+            authDomain: "sign-up-73f99.firebaseapp.com",
+            projectId: "sign-up-73f99",
+            storageBucket: "sign-up-73f99.appspot.com",
+            messagingSenderId: "916335559099",
+            appId: "1:916335559099:web:3a8ed896ba26e38991849e"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUserProfile = {
+            name: "ผู้เล่นทั่วไป",
+            uid: null
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUserProfile.uid = user.uid;
+                try {
+                    const userDocRef = doc(db, "users", user.uid);
+                    const userDocSnap = await getDoc(userDocRef);
+
+                    if (userDocSnap.exists()) {
+                        const userData = userDocSnap.data();
+                        currentUserProfile.name = userData.username || user.email || "ผู้เล่นเกม";
+                    } else {
+                        currentUserProfile.name = user.email || "ผู้ใช้งานระบบ";
+                    }
+                } catch (error) {
+                    console.error("Error loading user profile:", error);
+                    currentUserProfile.name = user.email || "ผู้เล่นเกม";
+                }
+            } else {
+                alert("⚠️ กรุณาเข้าสู่ระบบก่อนเล่นเกม");
+                window.location.href = "login.html";
+            }
+        });
+
+        window.saveScoreToFirebase = async function(score) {
+            try {
+                await addDoc(collection(db, "candyHuntScores"), {
+                    name: currentUserProfile.name,
+                    uid: currentUserProfile.uid,
+                    score: score,
+                    timestamp: new Date()
+                });
+                console.log("บันทึกคะแนนลง Firebase สำเร็จ");
+            } catch (e) {
+                console.error("เกิดข้อผิดพลาดในการบันทึกข้อมูล: ", e);
+            }
+        };
+    </script>
+
+    <style>
+        :root {
+            --primary: #ff6b6b;
+            --secondary: #4ecdc4;
+            --bg-dark: #1a1a2e;
+            --card-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        * { box-sizing: border-box; transition: all 0.3s ease; touch-action: manipulation; }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: var(--bg-dark);
+            color: #fff;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-image: radial-gradient(circle at 50% 50%, #2b2b48 0%, #1a1a2e 100%);
+            padding: 10px;
+            overflow-x: hidden;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 20px 15px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        h1 { margin-top: 0; color: #ffeb3b; font-size: 1.6rem; text-shadow: 0 0 10px rgba(255,235,59,0.4); margin-bottom: 10px; }
+
+        .game-info {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .info-item span { color: #00e5ff; font-weight: bold; }
+        .timer-warning { color: #ff6b6b !important; animation: pulse 0.8s infinite; }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        .cups-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .cup-card {
+            background: var(--card-bg);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            height: 110px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .cup-card:hover:not(.revealed) {
+            border-color: #ffeb3b;
+            transform: translateY(-3px);
+            background: rgba(255,255,255,0.1);
+            box-shadow: 0 8px 15px rgba(255,235,59,0.2);
+        }
+
+        .cup-icon {
+            font-size: 2.3rem;
+            margin-bottom: 3px;
+        }
+
+        .cup-label {
+            font-size: 0.85rem;
+            color: #d1d5db;
+        }
+
+        .cup-card.revealed {
+            cursor: default;
+        }
+
+        .cup-card.candy {
+            background: rgba(46, 204, 113, 0.2);
+            border-color: #2ecc71;
+        }
+
+        .cup-card.bomb {
+            background: rgba(231, 76, 60, 0.2);
+            border-color: #e74c3c;
+        }
+
+        @media (min-width: 500px) {
+            .game-container { padding: 30px; }
+            h1 { font-size: 2rem; }
+            .game-info { font-size: 1.1rem; }
+            .cups-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+            .cup-card { height: 140px; }
+            .cup-icon { font-size: 3rem; }
+            .cup-label { font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h1>🍬 ตามหาลูกกวาด 💣</h1>
+    
+    <div class="game-info">
+        <div class="info-item">รอบที่: <span id="current-round">1</span> / 5</div>
+        <div class="info-item">เวลา: <span id="time-left">20</span> วิ</div>
+        <div class="info-item">คะแนนรวม: <span id="total-score">0</span> คะแนน</div>
+    </div>
+
+    <p id="instruction" style="color: #aaa; margin-bottom: 15px; font-size: 0.9rem;">เลือกแก้ว 1 ใบจาก 6 ใบ ภายในเวลาที่กำหนด!</p>
+
+    <div class="cups-grid" id="cups-grid"></div>
+</div>
+
+<script>
+    let currentRound = 1;
+    let totalScore = 0;
+    let roundOver = false;
+    let timeLeft = 20;
+    let timerInterval = null;
+    let missedRounds = [];
+
+    const candyValues = [10, 20, 50, 100, 1000];
+
+    function initRound() {
+        roundOver = false;
+        timeLeft = 20;
+        document.getElementById("current-round").innerText = currentRound;
+        document.getElementById("instruction").innerText = "เลือกแก้ว 1 ใบจาก 6 ใบ ภายในเวลาที่กำหนด!";
+        
+        const timerEl = document.getElementById("time-left");
+        timerEl.innerText = timeLeft;
+        timerEl.classList.remove("timer-warning");
+
+        let roundItems = [...candyValues, -90];
+        roundItems.sort(() => Math.random() - 0.5);
+
+        const grid = document.getElementById("cups-grid");
+        grid.innerHTML = "";
+
+        for (let i = 0; i < 6; i++) {
+            const cup = document.createElement("div");
+            cup.className = "cup-card";
+            cup.innerHTML = `<div class="cup-icon">🥤</div><div class="cup-label">แก้วที่ ${i + 1}</div>`;
+            cup.dataset.value = roundItems[i];
+            cup.onclick = () => selectCup(cup);
+            grid.appendChild(cup);
+        }
+
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            timerEl.innerText = timeLeft;
+
+            if (timeLeft <= 5) timerEl.classList.add("timer-warning");
+
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                timeOutRound();
+            }
+        }, 1000);
+    }
+
+    function timeOutRound() {
+        if (roundOver) return;
+        roundOver = true;
+        clearInterval(timerInterval);
+        missedRounds.push(currentRound);
+
+        const allCups = document.querySelectorAll(".cup-card");
+        allCups.forEach(cup => {
+            cup.style.pointerEvents = "none";
+            const cupVal = parseInt(cup.dataset.value);
+            if (cupVal === -90) {
+                cup.className = "cup-card revealed bomb";
+                cup.innerHTML = `<div class="cup-icon">💣</div><span style="color:#e74c3c; font-weight:bold; font-size:0.8rem;">ระเบิด!</span>`;
+            } else {
+                cup.className = "cup-card revealed candy";
+                cup.innerHTML = `<div class="cup-icon">🍬</div><span style="color:#2ecc71; font-weight:bold; font-size:0.8rem;">+${cupVal}</span>`;
+            }
+        });
+
+        document.getElementById("instruction").innerText = "หมดเวลา! ไม่ได้รับคะแนนในรอบนี้";
+
+        Swal.fire({
+            icon: 'warning',
+            title: 'หมดเวลา!',
+            text: 'คุณไม่ได้เลือกแก้วในเวลาที่กำหนด (0 คะแนน)',
+            background: '#1a1a2e',
+            color: '#fff',
+            timer: 2000,
+            showConfirmButton: false
+        });
+
+        proceedToNextOrSummary();
+    }
+
+    function selectCup(selectedCup) {
+        if (roundOver) return;
+        roundOver = true;
+        clearInterval(timerInterval);
+
+        const val = parseInt(selectedCup.dataset.value);
+        const allCups = document.querySelectorAll(".cup-card");
+
+        allCups.forEach(cup => {
+            cup.style.pointerEvents = "none";
+            const cupVal = parseInt(cup.dataset.value);
+            
+            if (cupVal === -90) {
+                cup.className = "cup-card revealed bomb";
+                cup.innerHTML = `<div class="cup-icon">💣</div><span style="color:#e74c3c; font-weight:bold; font-size:0.8rem;">ระเบิด! (-90)</span>`;
+            } else {
+                cup.className = "cup-card revealed candy";
+                cup.innerHTML = `<div class="cup-icon">🍬</div><span style="color:#2ecc71; font-weight:bold; font-size:0.8rem;">+${cupVal} คะแนน</span>`;
+            }
+        });
+
+        totalScore += val;
+        document.getElementById("total-score").innerText = totalScore;
+
+        if (val === -90) {
+            Swal.fire({
+                icon: 'error',
+                title: 'เจอระเบิด!',
+                text: 'โดนหัก 90 คะแนน!',
+                background: '#1a1a2e',
+                color: '#fff',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        } else {
+            Swal.fire({
+                icon: 'success',
+                title: `ยอดเยี่ยม! เจอไอเทม +${val} คะแนน`,
+                background: '#1a1a2e',
+                color: '#fff',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }
+
+        proceedToNextOrSummary();
+    }
+
+    function proceedToNextOrSummary() {
+        if (currentRound < 5) {
+            let countdown = 5;
+            document.getElementById("instruction").innerHTML = `รอบถัดไปจะเริ่มใน <span style="color:#00e5ff; font-weight:bold;" id="countdown-num">${countdown}</span> วินาที...`;
+            
+            let cdInterval = setInterval(() => {
+                countdown--;
+                const cdEl = document.getElementById("countdown-num");
+                if (cdEl) cdEl.innerText = countdown;
+
+                if (countdown <= 0) {
+                    clearInterval(cdInterval);
+                    currentRound++;
+                    initRound();
+                }
+            }, 1000);
+        } else {
+            setTimeout(promptSaveScore, 1200);
+        }
+    }
+
+    async function promptSaveScore() {
+        let missedText = missedRounds.length > 0 
+            ? `<span style="color: #ff6b6b;">รอบที่ไม่ได้เล่น (หมดเวลา): รอบที่ ${missedRounds.join(', ')}</span>`
+            : `<span style="color: #2ecc71;">ยอดเยี่ยม! เล่นทันทุกรอบ ไม่มีรอบที่พลาดเลย 🎉</span>`;
+
+        if (window.saveScoreToFirebase) {
+            await window.saveScoreToFirebase(totalScore);
+        }
+
+        Swal.fire({
+            title: '🎉 สรุปผลคะแนนทั้งหมด 🎉',
+            html: `
+                <div style="font-size: 1rem; margin: 15px 0; line-height: 1.6;">
+                    คะแนนสุทธิที่คุณทำได้: <b style="color: #ffeb3b; font-size: 1.5rem;">${totalScore} คะแนน</b><br>
+                    <div style="margin: 10px 0;">${missedText}</div>
+                    <div style="margin-top: 15px; font-size: 0.85rem; color: #aaa;">✨ บันทึกคะแนนลงกระดานผู้นำด้วยชื่อบัญชีของคุณเรียบร้อยแล้ว!</div>
+                </div>
+            `,
+            background: '#1a1a2e',
+            color: '#fff',
+            confirmButtonText: '🏠 ไปหน้าเลือกเกม',
+            confirmButtonColor: '#4ecdc4',
+            allowOutsideClick: false
+        }).then(() => {
+            // เมื่อกดตกลง จะพากลับไปยังหน้าเลือกเกมทันที
+            window.location.href = 'minigame.html';
+        });
+    }
+
+    initRound();
+</script>
+</body>
+</html>

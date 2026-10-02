@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HALLOWEEN EVENT - My card game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: #0d0714; color: white; line-height: 1.6; }
+        
+        /* --- Navbar --- */
+        .navbar { 
+            background: rgba(18, 10, 26, 0.85); backdrop-filter: blur(15px);
+            padding: 0 30px; display: flex; justify-content: space-between; align-items: center; 
+            position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid rgba(255, 107, 0, 0.3); height: 75px; 
+        }
+        .nav-left { display: flex; align-items: center; gap: 20px; }
+        .sidebar-toggle { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; transition: 0.3s; }
+        .sidebar-toggle:hover { color: #ff6b00; }
+        .navbar .logo { font-size: 1.6rem; font-weight: 700; color: #ff6b00; text-transform: uppercase; text-shadow: 0 0 10px rgba(255, 107, 0, 0.5); }
+        .nav-links { list-style: none; display: flex; gap: 20px; margin: 0; align-items: center; }
+        .nav-links a { color: rgba(255,255,255,0.8); text-decoration: none; transition: 0.3s; font-size: 0.95rem; cursor: pointer; }
+        .nav-links a:hover { color: #ff6b00; }
+
+        /* --- Sidebar Menu Custom --- */
+        .sidebar {
+            position: fixed; top: 0; left: -320px; width: 320px; height: 100%;
+            background: #120a1a; border-right: 1px solid rgba(255, 107, 0, 0.3);
+            z-index: 2000; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 25px;
+            box-shadow: 5px 0 25px rgba(0,0,0,0.8); display: flex; flex-direction: column; overflow-y: auto;
+        }
+        .sidebar.active { left: 0; }
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .sidebar-title { color: #ff6b00; font-weight: bold; font-size: 1.2rem; }
+        .sidebar-close { background: none; border: none; color: #888; font-size: 1.2rem; cursor: pointer; }
+        .sidebar-close:hover { color: #ff4d4d; }
+
+        .sidebar-user-card {
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 107, 0, 0.3);
+            border-radius: 16px; padding: 12px; display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+        }
+        .sidebar-avatar { width: 48px; height: 48px; border-radius: 50%; border: 2px solid #ff6b00; object-fit: cover; background: #222; }
+        .sidebar-user-info { display: flex; flex-direction: column; overflow: hidden; }
+        .sidebar-username { font-weight: bold; font-size: 1rem; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sidebar-user-status { font-size: 0.75rem; color: #a855f7; }
+
+        .sidebar-menu { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+        .sidebar-menu li a { display: flex; align-items: center; gap: 15px; color: #eee; text-decoration: none; padding: 12px 16px; border-radius: 12px; transition: 0.2s; font-size: 1rem; }
+        .sidebar-menu li a:hover { background: rgba(255, 107, 0, 0.15); color: #ff6b00; }
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 1999; }
+        .sidebar-overlay.active { display: block; }
+
+        .profile-info-block { display: flex; flex-direction: column; gap: 4px; }
+        .profile-meta-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .profile-link { 
+            text-decoration: none; display: flex; align-items: center; gap: 14px;
+            padding: 8px 20px; border-radius: 20px; background: rgba(255, 255, 255, 0.05); 
+            border: 1px solid rgba(255, 107, 0, 0.3); cursor: pointer; 
+            transition: transform 0.2s, background 0.2s; user-select: none;
+        }
+        .nav-avatar { width: 42px; height: 42px; border-radius: 50%; border: 2px solid #ff6b00; background: #222; object-fit: cover; }
+        
+        .currency-display { display: flex; gap: 14px; font-size: 0.85rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 4px; margin-top: 2px; }
+        .diamond-text { color: #00e5ff; font-weight: bold; }
+        .halloween-coin-text { color: #ff6b00; font-weight: bold; text-shadow: 0 0 5px rgba(255, 107, 0, 0.6); }
+
+        .btn-purple { 
+            background: linear-gradient(135deg, #a855f7, #6b21a8); 
+            padding: 10px 22px; border-radius: 12px; font-weight: 600; cursor: pointer; border: none; color: white; text-decoration: none;
+        }
+
+        /* --- Halloween Hero --- */
+        .hero-halloween { 
+            height: 380px; display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            text-align: center; position: relative; overflow: hidden;
+            background: linear-gradient(180deg, rgba(168, 85, 247, 0.3) 0%, rgba(13, 7, 20, 1) 100%), 
+                        url('https://images.unsplash.com/photo-1508739773434-c26b3d09e071?auto=format&fit=crop&w=1350&q=80');
+            background-size: cover; background-position: center;
+        }
+        .hero-halloween h1 { 
+            font-size: 3.8rem; margin: 0; font-weight: 800; 
+            color: #ff6b00; text-shadow: 0 0 25px rgba(255, 107, 0, 0.9), 0 0 10px rgba(168, 85, 247, 0.8);
+            letter-spacing: 2px;
+        }
+        .hero-halloween p { font-size: 1.2rem; color: #e2e8f0; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); margin-top: 10px; }
+
+        .container { max-width: 1140px; margin: 0 auto; padding: 40px 20px; }
+        
+        .category-title {
+            font-size: 1.4rem; font-weight: 700; color: #ff6b00;
+            margin: 30px 0 15px 0; display: flex; align-items: center; gap: 10px;
+            border-bottom: 2px solid rgba(255, 107, 0, 0.3); padding-bottom: 8px;
+            text-shadow: 0 0 10px rgba(255, 107, 0, 0.3);
+        }
+
+        /* --- Daily Check-in Section --- */
+        .daily-reward { 
+            background: linear-gradient(135deg, #1f102e 0%, #0d0714 100%); 
+            padding: 40px; border-radius: 24px; border: 2px solid #ff6b00; 
+            text-align: center; box-shadow: 0 10px 30px rgba(255, 107, 0, 0.2);
+        }
+        .btn-spin { 
+            background: linear-gradient(135deg, #ff6b00, #a855f7); 
+            color: #fff; padding: 14px 40px; border-radius: 50px; border: none; 
+            font-size: 1.2rem; font-weight: 800; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 107, 0, 0.4);
+        }
+        .btn-spin:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(168, 85, 247, 0.6); }
+        .btn-spin:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+
+        /* --- Gacha Banner & Modern Banner --- */
+        .gacha-banner, .modern-banner {
+            border-radius: 24px; padding: 35px; min-height: 180px; display: flex; flex-direction: column;
+            justify-content: center; position: relative; cursor: pointer; overflow: hidden;
+            transition: 0.3s; margin-bottom: 20px;
+        }
+        .gacha-banner {
+            background: linear-gradient(135deg, #5b21b6 0%, #991b1b 50%, #ff6b00 100%);
+            border: 2px solid #ff6b00; box-shadow: 0 10px 25px rgba(168, 85, 247, 0.3);
+        }
+        .gacha-banner:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(255, 107, 0, 0.5); }
+        .gacha-banner h3 { font-size: 2rem; margin: 0; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); }
+        .gacha-banner p { margin: 8px 0 0 0; font-size: 1rem; color: #f3e8ff; max-width: 70%; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
+        .gacha-banner .main-icon { position: absolute; right: 30px; bottom: 10px; font-size: 6rem; opacity: 0.3; transform: rotate(-10deg); transition: 0.4s; }
+        .gacha-banner:hover .main-icon { opacity: 0.7; transform: rotate(0deg) scale(1.1); }
+
+        .modern-banner h3 { font-size: 2rem; margin: 0; color: #fff; }
+        .modern-banner p { margin: 8px 0 0 0; font-size: 1rem; color: #aaa; max-width: 70%; }
+        .modern-banner .main-icon { position: absolute; right: 30px; bottom: 10px; font-size: 5rem; opacity: 0.2; transform: rotate(-10deg); transition: 0.4s; }
+        .modern-banner:hover { background: rgba(255, 255, 255, 0.08) !important; transform: translateY(-3px); }
+        .modern-banner:hover .main-icon { opacity: 0.5; transform: rotate(0deg) scale(1.1); }
+
+        /* --- Pack Store Grid --- */
+        .pack-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .pack-card {
+            background: rgba(30, 16, 48, 0.7); border: 1px solid rgba(255, 107, 0, 0.3);
+            border-radius: 20px; padding: 25px; text-align: center; display: flex; flex-direction: column;
+            align-items: center; justify-content: space-between; backdrop-filter: blur(10px);
+            transition: all 0.3s ease; position: relative; overflow: hidden;
+        }
+        .pack-card:hover { transform: translateY(-5px); border-color: #ff6b00; box-shadow: 0 10px 25px rgba(255, 107, 0, 0.25); }
+        .pack-icon { font-size: 3.5rem; margin-bottom: 15px; filter: drop-shadow(0 0 10px rgba(255, 107, 0, 0.6)); }
+        .pack-title { font-size: 1.25rem; font-weight: bold; color: #ff6b00; margin-bottom: 5px; }
+        .pack-coin { font-size: 1.5rem; font-weight: 800; color: #a855f7; margin-bottom: 15px; }
+        .btn-buy-pack {
+            background: linear-gradient(135deg, #ff6b00, #d97706); color: #fff; font-weight: 800;
+            border: none; padding: 12px 25px; border-radius: 12px; width: 100%; cursor: pointer;
+            font-family: 'Kanit', sans-serif; font-size: 1rem; transition: 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-buy-pack:hover { transform: scale(1.03); box-shadow: 0 0 15px rgba(255, 107, 0, 0.6); }
+    </style>
+</head>
+<body>
+
+    <!-- 📁 SIDEBAR SLIDER MENU -->
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div id="sidebarMenu" class="sidebar">
+        <div class="sidebar-header">
+            <span class="sidebar-title"><i class="fas fa-ghost"></i> HALLOWEEN EVENT</span>
+            <button class="sidebar-close" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div class="sidebar-user-card" id="sidebar-user-card" style="display: none;">
+            <img src="" id="sidebar-avatar-img" class="sidebar-avatar">
+            <div class="sidebar-user-info">
+                <span class="sidebar-username" id="sidebar-username-txt">กำลังโหลด...</span>
+                <span class="sidebar-user-status" id="sidebar-title-txt">ผู้เล่นการ์ดเกม</span>
+            </div>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li><a href="index.html"><i class="fas fa-home"></i> กลับหน้าหลัก</a></li>
+            <li><a href="javascript:void(0)" style="color: #ff6b00;"><i class="fas fa-ghost"></i> HALLOWEEN EVENT</a></li>
+            <li><a href="collection.html"><i class="fas fa-book-open"></i> สมุดสะสม</a></li>
+            <li><a href="bag.html"><i class="fas fa-shopping-bag"></i> กระเป๋า</a></li>
+            <li><a href="profile.html"><i class="fas fa-user"></i> โปรไฟล์</a></li>
+            <li><a href="Banner Selection.html"><i class="fas fa-magic"></i> เลือกตู้สุ่มการ์ด</a></li>
+            <li><a href="minigame.html"><i class="fas fa-gamepad"></i> โซนมินิเกมฮาโลวีน</a></li>
+        </ul>
+    </div>
+
+    <!-- 🌐 NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <div class="logo">HALLOWEEN EVENT 🎃</div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">หน้าแรกเว็บ</a></li>
+            <li><a href="collection.html">สมุดสะสม</a></li>
+            <li><a href="bag.html">กระเป๋า</a></li>
+            <li>
+                <div class="profile-link" id="profile-container" style="display: none;" onclick="window.location.href='profile.html'">
+                    <img src="" id="nav-avatar-img" class="nav-avatar">
+                    <div class="profile-info-block">
+                        <div class="profile-meta-row">
+                            <span id="user-display" style="color: #fff; font-weight: 700; font-size: 0.95rem;"></span>
+                        </div>
+                        <div class="currency-display">
+                            <span class="diamond-text">💎 <span id="user-diamonds">0</span></span>
+                            <span class="halloween-coin-text">🎃 <span id="user-halloween-coins">0</span></span>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li><a href="login.html" id="auth-btn" class="btn-purple">เข้าสู่ระบบ</a></li>
+        </ul>
+    </nav>
+
+    <!-- 🎃 HERO HEADER -->
+    <header class="hero-halloween">
+        <h1>HALLOWEEN EVENT</h1>
+        <p>ต้อนรับคืนวันปล่อยผี สะสมเหรียญฟักทองเพื่อลุ้นรับการ์ดลิมิเต็ดกัน!</p>
+    </header>
+
+    <main class="container">
+
+        <!-- ==================== 1. ยศ Halloween is Time (สำหรับซื้อด้วย 20B Coins) ==================== -->
+        <div class="category-title" style="margin-top: 0;">
+            <i class="fas fa-crown"></i>ยศพิเศษ Halloween is Time
+        </div>
+
+        <div class="daily-reward" id="title-section" style="border-color: #ff8c00; margin-bottom: 30px;">
+            <h3 style="margin-top:0; color: #ff8c00; font-size: 1.6rem;">🎃 Halloween is Time</h3>
+            <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px;">ซื้อยศสุดเท่ <span style="color: #ff8c00; font-weight: bold; text-shadow: 0 0 8px rgba(255,140,0,0.8);">Halloween is Time 🎃</span> (เงื่อนไข: ต้องมี 🎃 20B HALLOWEEN Coin)</p>
+            <button id="buy-title-btn" class="btn-spin" style="background: linear-gradient(135deg, #ff8c00, #ff4500);">ซื้อยศ (ใช้ 20B Coins)</button>
+        </div>
+
+        <!-- ==================== 2. DAILY CHECK-IN & ยศ happy HALLOWEEN ==================== -->
+        <div class="category-title">
+            <i class="fas fa-calendar-check"></i>เช็คอินรายวัน & ยศพิเศษประจำวัน
+        </div>
+
+        <div class="daily-reward" id="daily-section">
+            <h3 style="margin-top:0; color: #ff6b00; font-size: 1.8rem;">🎁 เช็คอินรับเหรียญ HALLOWEEN EVENT</h3>
+            <p style="color: rgba(255,255,255,0.8); margin-bottom: 25px;">เข้าเช็คอินทุกวันเพื่อรับ 🎃 5,000 HALLOWEEN Coin ฟรี!</p>
+            <button id="spin-btn" class="btn-spin">กดรับเหรียญวันนี้</button>
+        </div>
+
+        <!-- ยศ happy HALLOWEEN (รับฟรีเฉพาะ 31 ตุลาคม) -->
+        <div class="daily-reward" style="margin-top: 20px; border-color: #a855f7;">
+            <h3 style="margin-top:0; color: #a855f7; font-size: 1.6rem;">ลิมิเต็ดยศอีเว้นท์ happy HALLOWEEN</h3>
+            <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px;">รับยศ <span style="color: #a855f7; font-weight: bold; text-shadow: 0 0 8px rgba(168,85,247,0.8);">happy HALLOWEEN 🎃</span> ฟรี! (เปิดให้รับเฉพาะวันที่ 31 ตุลาคม เท่านั้น)</p>
+            <button id="claim-title-btn" class="btn-spin" style="background: linear-gradient(135deg, #a855f7, #6b21a8);">กดรับยศพิเศษ</button>
+        </div>
+
+        <!-- ==================== 3. GACHA BANNER ==================== -->
+        <div class="category-title" style="margin-top: 40px;">
+            <i class="fas fa-box-open"></i>ตู้สุ่มและกิจกรรมอื่นๆ
+        </div>
+
+        <div class="gacha-banner" onclick="window.location.href='random gachahalloween.html'">
+            <h3>🎰 ตู้สุ่ม HALLOWEEN EVENT</h3>
+            <p>สุ่มรับการ์ดลิมิเต็ดเฉพาะเทศกาลฮาโลวีนนี้เท่านั้น!</p>
+            <i class="fas fa-jack-o-lantern main-icon"></i>
+        </div>
+
+        <!-- 🎮 ปุ่มทางเข้ามินิเกมฮาโลวีน -->
+        <div class="modern-banner" style="background: linear-gradient(135deg, #059669 0%, #065f46 50%, #10b981 100%); border: 2px solid #34d399; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);" onclick="window.location.href='minigame.html'">
+            <h3 style="color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">🎮มินิเกม</h3>
+            <p style="color: #e6fffa; text-shadow: 1px 1px 3px rgba(0,0,0,0.8);">เล่นสนุกไปกับมินเกมและลุ้นรับ HALLOWEEN Coin มากมาย</p>
+            <i class="fas fa-gamepad main-icon" style="color: #fff;"></i>
+        </div>
+
+        <div class="modern-banner" style="background: rgba(255, 255, 255, 0.05); color: #888; border: 1px dashed rgba(255,255,255,0.2);" onclick="alert('รอติดตามอัปเดต!')">
+            <h3>🚀 Coming Soon</h3>
+            <p>โปรดติดตาม!</p>
+            <i class="fas fa-lock main-icon"></i>
+        </div>
+
+        <!-- ==================== 4. COIN PACKAGES ==================== -->
+        <div class="category-title">
+            <i class="fas fa-store"></i>แพ็คเหรียญ HALLOWEEN Coin
+        </div>
+
+        <div class="pack-grid">
+            <!-- Pack 1 -->
+            <div class="pack-card">
+                <div class="pack-icon">🎃</div>
+                <div class="pack-title">Spooky Pack HALLOWEEN Coin</div>
+                <div class="pack-coin">10,000 Coins</div>
+                <button class="btn-buy-pack" onclick="buyCoinPack(10000, 5000)">
+                    <span>ใช้ 💎 5,000</span>
+                </button>
+            </div>
+
+            <!-- Pack 2 -->
+            <div class="pack-card">
+                <div class="pack-icon">🎃</div>
+                <div class="pack-title">Spooky Pack HALLOWEEN Coin </div>
+                <div class="pack-coin">100,000 Coins</div>
+                <button class="btn-buy-pack" onclick="buyCoinPack(100000, 10000)">
+                    <span>ใช้ 💎 10,000</span>
+                </button>
+            </div>
+
+            <!-- Pack 3 -->
+            <div class="pack-card">
+                <div class="pack-icon">🎃</div>
+                <div class="pack-title">Spooky Pack HALLOWEEN Coin</div>
+                <div class="pack-coin">500,000 Coins</div>
+                <button class="btn-buy-pack" onclick="buyCoinPack(500000, 500050)">
+                    <span>ใช้ 💎 50,000</span>
+                </button>
+            </div>
+
+            <!-- Pack 4 -->
+            <div class="pack-card">
+                <div class="pack-icon">🎃</div>
+                <div class="pack-title">Spooky Pack HALLOWEEN Coin</div>
+                <div class="pack-coin">1,000,000 Coins</div>
+                <button class="btn-buy-pack" onclick="buyCoinPack(1000000, 100000)">
+                    <span>ใช้ 💎 100,000</span>
+                </button>
+            </div>
+
+            <!-- Pack 5 -->
+            <div class="pack-card">
+                <div class="pack-icon">🎃</div>
+                <div class="pack-title">Spooky Pack HALLOWEEN Coin</div>
+                <div class="pack-coin">5,000,000 Coins</div>
+                <button class="btn-buy-pack" onclick="buyCoinPack(5000000, 500000)">
+                    <span>ใช้ 💎 500,000</span>
+                </button>
+            </div>
+
+            <!-- Pack 6 -->
+            <div class="pack-card">
+                <div class="pack-icon">🎃</div>
+                <div class="pack-title">Spooky Pack HALLOWEEN Coin(คุ้มสุด!!)</div>
+                <div class="pack-coin">10,000,000 Coins</div>
+                <button class="btn-buy-pack" onclick="buyCoinPack(10000000, 1000000)">
+                    <span>ใช้ 💎 1,000,000</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="pack-card" style="margin-top: 20px;">
+            <div class="pack-icon">🎃</div>
+            <div class="pack-title">Spooky Pack HALLOWEEN Coin(โครตจะคุ้มสุด!!)</div>
+            <div class="pack-coin">1 Coins</div>
+            <button class="btn-buy-pack" onclick="buyCoinPack(20000000000000000, 1000000000000000000)">
+                <span>ใช้ 💎 100,000,000,000,000,000,000</span>
+            </button>
+        </div>
+
+    </main>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, updateDoc, increment, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
+        authDomain: "sign-up-73f99.firebaseapp.com",
+        projectId: "sign-up-73f99",
+        storageBucket: "sign-up-73f99.appspot.com",
+        messagingSenderId: "916335559099",
+        appId: "1:916335559099:web:3a8ed896ba26e38991849e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // ฟังก์ชันย่อตัวเลข (เช่น 1,500 -> 1.5K, 1,000,000 -> 1M, 20,000,000,000 -> 20B)
+    function formatCompactNumber(number) {
+        if (!number || isNaN(number)) return "0";
+        const num = Number(number);
+        if (num >= 1e12) {
+            return (num / 1e12).toFixed(1).replace(/\.0$/, '') + 'T';
+        }
+        if (num >= 1e9) {
+            return (num / 1e9).toFixed(1).replace(/\.0$/, '') + 'B';
+        }
+        if (num >= 1e6) {
+            return (num / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+        }
+        if (num >= 1e3) {
+            return (num / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
+        }
+        return num.toString();
+    }
+
+    let currentUserId = null;
+    let currentUserData = null;
+
+    window.toggleSidebar = () => {
+        document.getElementById("sidebarMenu").classList.toggle("active");
+        document.getElementById("sidebarOverlay").classList.toggle("active");
+    };
+
+    // ฟังก์ชันซื้อแพ็คเหรียญ Halloween
+    window.buyCoinPack = async (coinsToReceive, diamondCost) => {
+        if (!currentUserId || !currentUserData) {
+            alert("กรุณาเข้าสู่ระบบก่อนทำการซื้อแพ็คไอเทม");
+            return;
+        }
+
+        const currentDiamonds = currentUserData.diamonds || 0;
+        if (currentDiamonds < diamondCost) {
+            alert(`❌ เพชรไม่พอ! คุณมี 💎 ${formatCompactNumber(currentDiamonds)} แต่ต้องใช้ 💎 ${formatCompactNumber(diamondCost)}`);
+            return;
+        }
+
+        if (confirm(`คุณต้องการใช้ 💎 ${diamondCost.toLocaleString()} เพชร เพื่อซื้อ 🎃 ${coinsToReceive.toLocaleString()} HALLOWEEN Coin ใช่หรือไม่?`)) {
+            try {
+                const userRef = doc(db, "users", currentUserId);
+                await updateDoc(userRef, {
+                    diamonds: increment(-diamondCost),
+                    halloween_coins: increment(coinsToReceive),
+                    halloweenCoins: increment(coinsToReceive)
+                });
+                alert(`🎉 สั่งซื้อสำเร็จ! คุณได้รับ 🎃 ${coinsToReceive.toLocaleString()} HALLOWEEN Coin เรียบร้อยแล้ว`);
+            } catch (err) {
+                console.error("Error buying pack:", err);
+                alert("❌ เกิดข้อผิดพลาดในการทำรายการ กรุณาลองใหม่อีกครั้ง");
+            }
+        }
+    };
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUserId = user.uid;
+            onSnapshot(doc(db, "users", user.uid), (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    currentUserData = data;
+
+                    document.getElementById("profile-container").style.display = "flex";
+                    document.getElementById("user-display").innerText = data.username || "ผู้เล่น";
+                    
+                    const userDiamonds = data.diamonds ?? data.diamond ?? 0;
+                    const userHalloweenCoins = data.halloween_coins ?? data.halloweenCoins ?? data.halloweenCoin ?? 0;
+
+                    document.getElementById("user-diamonds").innerText = formatCompactNumber(userDiamonds);
+                    document.getElementById("user-halloween-coins").innerText = formatCompactNumber(userHalloweenCoins);
+
+                    document.getElementById("sidebar-user-card").style.display = "flex";
+                    document.getElementById("sidebar-username-txt").innerText = data.username || "ผู้เล่น";
+                    document.getElementById("sidebar-title-txt").innerText = data.currentTitle && data.currentTitle !== "none" ? data.currentTitle : "ผู้เล่นการ์ดเกม";
+
+                    const avatarUrl = data.userPhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.username}`;
+                    document.getElementById("nav-avatar-img").src = avatarUrl;
+                    document.getElementById("sidebar-avatar-img").src = avatarUrl;
+                    
+                    // เช็คอินรายวันเฉพาะอีเว้นท์ Halloween
+                    const today = new Date().toDateString();
+                    const spinBtn = document.getElementById("spin-btn");
+                    spinBtn.disabled = (data.lastHalloweenClaimDate === today);
+                    spinBtn.innerText = spinBtn.disabled ? "รับเหรียญอีเว้นท์แล้ว ✓" : "กดรับเหรียญอีเว้นท์วันนี้";
+
+                    spinBtn.onclick = async () => {
+                        const halloweenCoinsReward = 5000;
+                        await updateDoc(doc(db, "users", user.uid), {
+                            halloween_coins: increment(halloweenCoinsReward),
+                            halloweenCoins: increment(halloweenCoinsReward),
+                            lastHalloweenClaimDate: today
+                        });
+                        alert(`🎉 ยินดีด้วย! คุณได้รับ 🎃 ${halloweenCoinsReward.toLocaleString()} HALLOWEEN Coin สำหรับเช็คอินวันนี้`);
+                    };
+
+                    // --- 1. ระบบซื้อยศ "Halloween is Time 🎃" (เงื่อนไขต้องมี 20B HALLOWEEN Coin) ---
+                    const buyTitleBtn = document.getElementById("buy-title-btn");
+                    const buyTitleName = "Halloween is Time 🎃";
+                    const requiredCoins = 20000000000; // 20B (20,000,000,000)
+                    const userTitles = data.titles || [];
+
+                    if (userTitles.includes(buyTitleName)) {
+                        buyTitleBtn.disabled = true;
+                        buyTitleBtn.innerText = "ซื้อยศนี้แล้ว ✓";
+                    } else {
+                        buyTitleBtn.onclick = async () => {
+                            if (userHalloweenCoins < requiredCoins) {
+                                alert(`❌ HALLOWEEN Coin ของคุณไม่พอ! ต้องการ 🎃 20B Coins แต่คุณมี 🎃 ${formatCompactNumber(userHalloweenCoins)} Coins`);
+                                return;
+                            }
+
+                            if (confirm(`คุณต้องการใช้ 🎃 20B HALLOWEEN Coin เพื่อซื้อยศ [${buyTitleName}] ใช่หรือไม่?`)) {
+                                try {
+                                    const userRef = doc(db, "users", user.uid);
+                                    await updateDoc(userRef, {
+                                        halloween_coins: increment(-requiredCoins),
+                                        halloweenCoins: increment(-requiredCoins),
+                                        titles: arrayUnion(buyTitleName),
+                                        currentTitle: buyTitleName
+                                    });
+                                    alert(`🎉 ซื้อยศสำเร็จ! ระบบได้ส่งข้อมูลยศ [${buyTitleName}] ไปยังหน้า profile.html เรียบร้อยแล้ว`);
+                                } catch (err) {
+                                    console.error("Error buying title:", err);
+                                    alert("❌ เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง");
+                                }
+                            }
+                        };
+                    }
+
+                    // --- 2. ระบบกดรับยศพิเศษประจำเทศกาล "happy HALLOWEEN 🎃" ---
+                    const claimTitleBtn = document.getElementById("claim-title-btn");
+                    const freeTitleName = "happy HALLOWEEN 🎃";
+
+                    if (userTitles.includes(freeTitleName)) {
+                        claimTitleBtn.disabled = true;
+                        claimTitleBtn.innerText = "รับยศพิเศษแล้ว ✓";
+                    } else {
+                        claimTitleBtn.onclick = async () => {
+                            const now = new Date();
+                            const month = now.getMonth(); // เดือนเริ่มที่ 0 (9 คือ ตุลาคม)
+                            const date = now.getDate();
+
+                            if (month !== 9 || date !== 31) {
+                                alert("❌ กิจกรรมเปิดให้กดรับเฉพาะวันที่ 31 ตุลาคม เท่านั้น!");
+                                return;
+                            }
+
+                            try {
+                                const userRef = doc(db, "users", user.uid);
+                                await updateDoc(userRef, {
+                                    titles: arrayUnion(freeTitleName),
+                                    currentTitle: freeTitleName
+                                });
+                                alert(`🎉 คุณได้รับยศพิเศษ [${freeTitleName}] เรียบร้อยแล้ว! สามารถไปเลือกเปลี่ยนยศได้ที่หน้า profile.html`);
+                            } catch (err) {
+                                console.error("Error claiming title:", err);
+                                alert("❌ เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง");
+                            }
+                        };
+                    }
+                }
+            });
+            document.getElementById("auth-btn").innerText = "ออกจากระบบ";
+            document.getElementById("auth-btn").onclick = () => signOut(auth).then(()=>location.reload());
+        } else {
+            document.getElementById("profile-container").style.display = "none";
+            document.getElementById("sidebar-user-card").style.display = "none";
+            document.getElementById("title-section").style.display = "none";
+            document.getElementById("daily-section").style.display = "none";
+        }
+    });
+</script>
+</body>
+</html>
