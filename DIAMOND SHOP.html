@@ -125,17 +125,6 @@
             border-color: rgba(0, 255, 135, 0.7) !important;
             box-shadow: 0 20px 45px rgba(0, 255, 135, 0.3) !important;
         }
-
-        /* Halloween Theme */
-        .shop-item.halloween-theme {
-            background: linear-gradient(145deg, #241106 0%, #0f0502 100%) !important;
-            border: 1px solid rgba(255, 117, 24, 0.3) !important;
-            box-shadow: 0 15px 40px rgba(255, 117, 24, 0.15) !important;
-        }
-        .shop-item.halloween-theme:hover {
-            border-color: rgba(255, 117, 24, 0.7) !important;
-            box-shadow: 0 20px 45px rgba(255, 117, 24, 0.3) !important;
-        }
         
         .item-icon-wrapper {
             width: 120px; height: 120px; background: rgba(0,0,0,0.25);
@@ -149,7 +138,6 @@
         .shop-item[data-type="vip-pack"] .item-icon-wrapper { border-color: rgba(255, 51, 102, 0.3); }
         .shop-item[data-type="whale-pack"] .item-icon-wrapper { border-color: rgba(168, 85, 247, 0.4); }
         .shop-item[data-type="material-pack"] .item-icon-wrapper { border-color: rgba(0, 255, 135, 0.4); }
-        .shop-item[data-type="halloween-pack"] .item-icon-wrapper { border-color: rgba(255, 117, 24, 0.4); }
         
         .pack-img-display {
             width: 100%; height: 100%; object-fit: contain;
@@ -179,11 +167,6 @@
         .whale-pack-layout i.w-ticket-normal { position: absolute; font-size: 3.6rem; color: #cbd5e1; transform: rotate(-15deg) translateX(-15px) translateY(8px); z-index: 2; }
         .whale-pack-layout i.w-ticket-premium { position: absolute; font-size: 3.9rem; color: #ffc831; transform: rotate(15deg) translateX(15px) translateY(4px); z-index: 3; }
 
-        .halloween-pack-layout { position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
-        .halloween-pack-layout i.h-ghost { position: absolute; font-size: 3.5rem; color: #ff7518; z-index: 3; filter: drop-shadow(0 0 12px rgba(255,117,24,0.5)); }
-        .halloween-pack-layout i.h-ticket-normal { position: absolute; font-size: 2.5rem; color: #cbd5e1; transform: rotate(-25deg) translateX(-18px) translateY(10px); z-index: 2; }
-        .halloween-pack-layout i.h-ticket-premium { position: absolute; font-size: 2.8rem; color: #ffc831; transform: rotate(20deg) translateX(18px) translateY(4px); z-index: 4; }
-
         .material-pack-layout { position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
         .material-pack-layout i.m-box { position: absolute; font-size: 3.8rem; color: #00ff87; z-index: 3; filter: drop-shadow(0 0 12px rgba(0,255,135,0.4)); }
         .material-pack-layout i.m-sparkle-1 { position: absolute; font-size: 1.1rem; color: #ffea00; top: 12px; left: 12px; z-index: 4; }
@@ -203,7 +186,6 @@
         .shop-item.offer-item .price-box { color: #ffaf24; }
         .shop-item.whale-theme .price-box { color: #d8b4fe !important; }
         .shop-item.material-theme .price-box { color: #7efcc3 !important; }
-        .shop-item.halloween-theme .price-box { color: #ffbe88 !important; }
         .original-price { font-size: 0.85rem; text-decoration: line-through; color: #64748b; margin-left: 5px; font-weight: 400; }
 
         .quantity-selector {
@@ -230,9 +212,6 @@
         .shop-item.material-theme .btn-buy { background: linear-gradient(135deg, #00ff87, #00b359) !important; color: #07080c !important; box-shadow: 0 4px 15px rgba(0,255,135,0.3) !important; }
         .shop-item.material-theme .btn-buy:hover { background: linear-gradient(135deg, #33ff9e, #33cc7a) !important; box-shadow: 0 6px 20px rgba(0,255,135,0.5) !important; }
 
-        .shop-item.halloween-theme .btn-buy { background: linear-gradient(135deg, #ff7518, #ffa500) !important; color: white !important; box-shadow: 0 4px 15px rgba(255,117,24,0.3) !important; }
-        .shop-item.halloween-theme .btn-buy:hover { background: linear-gradient(135deg, #ff8c3a, #ffb733) !important; box-shadow: 0 6px 20px rgba(255,117,24,0.5) !important; }
-
         .btn-buy:disabled { background: #1e293b !important; color: #64748b !important; cursor: not-allowed; box-shadow: none !important; transform: none !important; }
 
         .sold-out-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(7, 8, 12, 0.88); border-radius: 24px; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 5; border: 2px dashed rgba(239, 68, 68, 0.5); backdrop-filter: blur(4px); }
@@ -242,8 +221,6 @@
         .whale-theme .sold-out-text { color: #c084fc !important; border-color: #c084fc !important; box-shadow: 0 0 15px rgba(168,85,247,0.3) !important; }
         .material-theme .sold-out-overlay { border-color: rgba(0, 255, 135, 0.5) !important; }
         .material-theme .sold-out-text { color: #33ff9e !important; border-color: #33ff9e !important; box-shadow: 0 0 15px rgba(0,255,135,0.3) !important; }
-        .halloween-theme .sold-out-overlay { border-color: rgba(255, 117, 24, 0.5) !important; }
-        .halloween-theme .sold-out-text { color: #ffa500 !important; border-color: #ffa500 !important; box-shadow: 0 0 15px rgba(255,117,24,0.3) !important; }
     
         /* Modal Style */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); display: none; align-items: center; justify-content: center; z-index: 1000; }
@@ -406,30 +383,8 @@
             </div>
         </div>
 
-        <!-- ==================== SECTION 2: แพ็คข้อเสนอสุดคุ้ม ==================== -->
-        <div class="section-title offer"><i class="fas fa-percentage"></i> แพ็คข้อเสนอสุดคุ้ม</div>
+        <div class="section-title offer"><i class="fas fa-boxes"></i> แพ็คเกจสุดคุ้ม</div>
         <div class="shop-grid">
-            <!-- แพ็ค ยินดีต้อนรับสู่วันฮาโลวีน 🎃 -->
-            <div class="shop-item halloween-theme" data-type="halloween-pack" id="item-pack-halloween-box" onclick="buyHalloweenPack()">
-                <div class="sold-out-overlay" id="sold-pack-halloween"><div class="sold-out-text" id="halloween-sold-text">SOLD OUT</div></div>
-                <span style="position:absolute; top:15px; right:15px; background:linear-gradient(135deg, #ff7518, #ffa500); color:#fff; padding:4px 10px; border-radius:8px; font-size:0.7rem; font-weight:700; box-shadow: 0 0 10px rgba(255,117,24,0.4); z-index: 6;">จำกัด 1 ครั้ง/ไอดี</span>
-                <div class="item-icon-wrapper">
-                    <div class="halloween-pack-layout">
-                        <i class="fas fa-ghost h-ghost"></i>
-                        <i class="fas fa-ticket-alt h-ticket-normal"></i>
-                        <i class="fas fa-ticket-alt h-ticket-premium"></i>
-                    </div>
-                </div>
-                <h3 class="item-title" style="color: #ffb074;">🎃 ยินดีต้อนรับสู่วันฮาโลวีน</h3>
-                <p class="item-desc">รับยศพิเศษ <span style="color:#ffc831; font-weight:700;">Halloween is Time 🎃</span>, ตั๋วปกติ <span style="color:#00d4ff; font-weight:700;">1,000 ใบ</span> และตั๋วพรีเมี่ยม <span style="color:#ffc831; font-weight:700;">500 ใบ</span></p>
-                <div class="item-stock" style="color: #ffa500;">
-                    เปิดใน: <span id="halloween-countdown" style="color:#fff; font-family: monospace;">00วัน 00ชม. 00นาที</span><br>
-                    สถานะ: <span id="halloween-status-text" style="color:#00ff87;">ตรวจสอบ...</span>
-                </div>
-                <div class="price-box">💎 800K</div>
-                <button class="btn-buy" id="btn-buy-pack-halloween" onclick="event.stopPropagation(); buyHalloweenPack()">ซื้อแพ็คฮาโลวีน</button>
-            </div>
-
             <!-- แพ็ควัตถุดิบอันมีค่า -->
             <div class="shop-item material-theme" data-type="material-pack" id="item-pack-precious-material-box" onclick="openPreciousMaterialModal()">
                 <div class="sold-out-overlay" id="sold-pack-material-precious"><div class="sold-out-text">ครบกำหนด</div></div>
@@ -665,7 +620,6 @@
         let diamondFieldKey = "diamonds";
         let hasPurchasedDaddyPack = false;
         let materialPackPurchasedCount = 0; 
-        let hasPurchasedHalloweenPack = false;
         let selectedCardName = "";
         let shiningStarTier = 1;
         let hasNotifiedRestock = false;
@@ -685,7 +639,6 @@
         const BASE_PREMIUM_PRICE = 3500;
         const DADDY_PACK_PRICE = 1500000;
         const MATERIAL_PACK_PRICE = 2990000; 
-        const HALLOWEEN_PACK_PRICE = 800000;
 
         function formatCurrency(num) {
             if (num >= 100000000000) {
@@ -757,7 +710,6 @@
                         
                         document.getElementById("nav-diamonds").innerText = formatCurrency(userDiamonds);
                         hasPurchasedDaddyPack = data.bought_daddy_pack === true;
-                        hasPurchasedHalloweenPack = data.bought_halloween_pack === true;
                         materialPackPurchasedCount = data.material_pack_purchased_count !== undefined ? data.material_pack_purchased_count : 0;
 
                         if (data.shining_star_tier !== undefined) {
@@ -811,71 +763,7 @@
                         `${hours.toString().padStart(2,'0')}ชม. ${minutes.toString().padStart(2,'0')}นาที ${seconds.toString().padStart(2,'0')}วิ`;
                     hasNotifiedRestock = false;
                 }
-                
-                checkHalloweenTimeStatus();
             }, 1000);
-        }
-
-        function checkHalloweenTimeStatus() {
-            const now = new Date();
-            const year = now.getFullYear();
-            
-            const halloweenStart = new Date(year, 9, 1, 0, 0, 0); 
-            const halloweenEnd = new Date(year, 9, 31, 23, 59, 59);
-
-            const statusTextEl = document.getElementById("halloween-status-text");
-            const countdownEl = document.getElementById("halloween-countdown");
-            const countdownLabelEl = countdownEl.previousElementSibling; 
-            const soldOverlayEl = document.getElementById("sold-pack-halloween");
-            const soldTextEl = document.getElementById("halloween-sold-text");
-            const buyBtnEl = document.getElementById("btn-buy-pack-halloween");
-
-            if (hasPurchasedHalloweenPack) {
-                soldTextEl.innerText = "ซื้อแล้ว";
-                soldOverlayEl.style.display = "flex";
-                buyBtnEl.disabled = true;
-                statusTextEl.innerText = "จำกัด 1 ครั้งต่อบัญชี (ซื้อแล้ว)";
-                statusTextEl.style.color = "#ff3366";
-                countdownEl.innerText = "สิ้นสุดสิทธิ์";
-                return;
-            }
-
-            if (now < halloweenStart) {
-                if (countdownLabelEl) countdownLabelEl.textContent = "เปิดใน: ";
-                
-                const diff = halloweenStart - now;
-                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                
-                countdownEl.innerText = `${days}วัน ${hours}ชม. ${minutes}น.`;
-                soldTextEl.innerText = "ยังไม่เปิดขาย";
-                soldOverlayEl.style.display = "flex";
-                buyBtnEl.disabled = true;
-                statusTextEl.innerText = "รอเปิดจำหน่าย 1 ต.ค.";
-                statusTextEl.style.color = "#ff9f00";
-            } else if (now >= halloweenStart && now <= halloweenEnd) {
-                if (countdownLabelEl) countdownLabelEl.textContent = "สิ้นสุดใน: ";
-
-                const diff = halloweenEnd - now;
-                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-
-                countdownEl.innerText = `${days}วัน ${hours}ชม. ${minutes}น.`;
-                soldOverlayEl.style.display = "none";
-                buyBtnEl.disabled = false;
-                statusTextEl.innerText = "เปิดจำหน่ายอยู่!";
-                statusTextEl.style.color = "#00ff87";
-            } else {
-                if (countdownLabelEl) countdownLabelEl.textContent = "สิ้นสุดใน: ";
-                countdownEl.innerText = "หมดเวลา";
-                soldTextEl.innerText = "หมดเขต";
-                soldOverlayEl.style.display = "flex";
-                buyBtnEl.disabled = true;
-                statusTextEl.innerText = "สิ้นสุดกิจกรรมแล้ว";
-                statusTextEl.style.color = "#ef4444";
-            }
         }
 
         function restockProducts() {
@@ -961,8 +849,6 @@
                 document.getElementById("stock-pack-shining-star-text").innerText = "หมดแล้ว";
                 document.getElementById("stock-pack-shining-star-text").style.color = "#ff3366";
             }
-            
-            checkHalloweenTimeStatus();
         }
 
         window.updateCardPackPriceUI = function() {
@@ -1023,39 +909,6 @@
                     closePackDetailModal();
                     alert(`🛍️ ซื้อสำเร็จ! ได้รับซองการ์ดจำนวน ${packCount} ซองแล้ว สามารถไปกดเปิดสุ่มเองได้ที่หน้ากระเป๋า`);
                 } catch (error) { alert("เกิดข้อผิดพลาดในการซื้อซองสินค้า กรุณาลองใหม่อีกครั้ง"); }
-            }
-        }
-
-        window.buyHalloweenPack = async function() {
-            if (!currentUser) { alert("❌ กรุณาเข้าสู่ระบบก่อนทำการสั่งซื้อ"); return; }
-            if (hasPurchasedHalloweenPack) { alert("❌ คุณได้ซื้อแพ็คเกจวันฮาโลวีนนี้ไปแล้ว (จำกัด 1 ครั้งต่อ 1 บัญชี)!"); return; }
-
-            const now = new Date();
-            const year = now.getFullYear();
-            const halloweenStart = new Date(year, 9, 1, 0, 0, 0);
-            const halloweenEnd = new Date(year, 9, 31, 23, 59, 59);
-
-            if (now < halloweenStart || now > halloweenEnd) {
-                alert("❌ ไม่สามารถซื้อแพ็คเกจนอกเหนือช่วงเวลากิจกรรมวันฮาโลวีน (1-31 ตุลาคม) ได้!");
-                return;
-            }
-
-            if (userDiamonds < HALLOWEEN_PACK_PRICE) { alert("❌ เพชรของคุณไม่เพียงพอสำหรับการซื้อแพ็คฮาโลวีนนี้!"); return; }
-
-            if (confirm(`คุณต้องการซื้อ "แพ็ค ยินดีต้อนรับสู่วันฮาโลวีน 🎃" (จำกัด 1 ครั้ง/ไอดี) ใช่หรือไม่?`)) {
-                try {
-                    const userRef = doc(db, "users", currentUser.uid);
-                    await updateDoc(userRef, {
-                        [diamondFieldKey]: increment(-HALLOWEEN_PACK_PRICE),
-                        normal_tickets: increment(1000),
-                        premium_tickets: increment(500),
-                        title_prefix: "Halloween is Time 🎃",
-                        bought_halloween_pack: true
-                    });
-                    hasPurchasedHalloweenPack = true;
-                    updateUI();
-                    alert("🎃 สุขสันต์วันฮาโลวีน! ซื้อแพ็คเกจสำเร็จและได้รับของรางวัลทั้งหมดเรียบร้อยแล้ว!");
-                } catch (error) { alert("เกิดข้อผิดพลาดในการสั่งซื้อแพ็คเกจฮาโลวีน กรุณาลองใหม่อีกครั้ง"); }
             }
         }
 
@@ -1327,65 +1180,79 @@
             }
         }
 
-        window.buyItem = async function(type, price, count = 1) {
-            if (!currentUser) { alert("❌ กรุณาเข้าสู่ระบบก่อนทำการสั่งซื้อ"); return; }
-            if (currentStock[type] <= 0) { alert("❌ แพ็คเกจนี้หมดคลังชั่วคราว!"); return; }
-            if (userDiamonds < price) { alert("❌ เพชรของคุณไม่เพียงพอ!"); return; }
+        window.buyItem = async function(packKey, price, count) {
+            if (!currentUser) { alert("❌ กรุณาเข้าสู่ระบบก่อนทำการซื้อแพ็คเกจ"); return; }
+            if (currentStock[packKey] <= 0) { alert("❌ แพ็คเกจนี้หมดสต็อกแล้ว!"); return; }
+            if (userDiamonds < price) { alert("❌ เพชรของคุณไม่เพียงพอสำหรับการซื้อแพ็คเกจนี้!"); return; }
 
-            if (confirm(`คุณต้องการสั่งซื้อแพ็คเกจนี้ใช่หรือไม่?`)) {
-                try {
-                    const userRef = doc(db, "users", currentUser.uid);
-                    let updateData = { [diamondFieldKey]: increment(-price) };
+            let confirmMsg = `คุณต้องการซื้อแพ็คเกจนี้ในราคา 💎 ${price.toLocaleString()} เพชร ใช่หรือไม่?`;
+            if (packKey === 'pack_special_select') {
+                document.getElementById("card-modal").style.display = "flex";
+                selectedCardName = "";
+                document.getElementById("btn-confirm-card").disabled = true;
+                window.pendingPackPurchase = { packKey, price, count };
+                return;
+            }
 
-                    if (type === 'pack_normal_10') { updateData['normal_tickets'] = increment(10); } 
-                    else if (type === 'pack_combo') { updateData['normal_tickets'] = increment(3); updateData['premium_tickets'] = increment(1); } 
-                    else if (type === 'pack_super') { updateData['normal_tickets'] = increment(100); updateData['premium_tickets'] = increment(50); } 
-                    else if (type === 'pack_mega') { updateData['normal_tickets'] = increment(500); updateData['premium_tickets'] = increment(150); } 
-                    else if (type === 'pack_special_select') { updateData['normal_tickets'] = increment(550); updateData['premium_tickets'] = increment(150); }
-
-                    await updateDoc(userRef, updateData);
-                    currentStock[type] -= 1;
-                    localStorage.setItem(STOCK_KEY, JSON.stringify(currentStock));
-                    updateUI();
-
-                    if (type === 'pack_special_select') { openCardSelectionModal(); } 
-                    else { alert("🎉 ซื้อแพ็คเกจสำเร็จ! ของรางวัลทั้งหมดถูกส่งเข้าคลังกระเป๋าของคุณเรียบร้อยแล้ว"); }
-                } catch (error) { alert("เกิดข้อผิดพลาดในการสั่งซื้อ"); }
+            if (confirm(confirmMsg)) {
+                await executePackPurchase(packKey, price, count, null);
             }
         }
 
-        function openCardSelectionModal() {
-            selectedCardName = "";
-            document.getElementById("btn-confirm-card").disabled = true;
-            document.querySelectorAll('.card-option').forEach(opt => opt.classList.remove('selected'));
-            document.getElementById("card-modal").style.display = "flex";
-        }
-
         window.selectCardOption = function(cardName, element) {
-            selectedCardName = cardName;
-            document.querySelectorAll('.card-option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelectorAll('.card-option').forEach(el => el.classList.remove('selected'));
             element.classList.add('selected');
+            selectedCardName = cardName;
             document.getElementById("btn-confirm-card").disabled = false;
         }
 
         window.confirmCardSelection = async function() {
-            if (!currentUser || !selectedCardName) return;
+            if (!selectedCardName) return;
+            document.getElementById("card-modal").style.display = "none";
+            const { packKey, price, count } = window.pendingPackPurchase;
+            await executePackPurchase(packKey, price, count, selectedCardName);
+        }
+
+        async function executePackPurchase(packKey, price, count, cardName) {
             try {
                 const userRef = doc(db, "users", currentUser.uid);
-                await updateDoc(userRef, {
-                    last_selected_exclusive_card: selectedCardName,
-                    [`cards_inventory.${selectedCardName}`]: increment(1)
-                });
-                document.getElementById("card-modal").style.display = "none";
-                alert(`✨ รับการ์ดเสร็จสิ้น! บันทึก "${selectedCardName}" เข้าคลังแล้ว!`);
-            } catch (error) { alert("เกิดความผิดพลาดในการบันทึกข้อมูลรางวัล"); }
+                let updateData = {
+                    [diamondFieldKey]: increment(-price)
+                };
+
+                if (packKey === 'pack_normal_10') {
+                    updateData.normal_tickets = increment(10);
+                } else if (packKey === 'pack_combo') {
+                    updateData.normal_tickets = increment(3);
+                    updateData.premium_tickets = increment(1);
+                } else if (packKey === 'pack_super') {
+                    updateData.normal_tickets = increment(100);
+                    updateData.premium_tickets = increment(50);
+                } else if (packKey === 'pack_mega') {
+                    updateData.normal_tickets = increment(500);
+                    updateData.premium_tickets = increment(150);
+                } else if (packKey === 'pack_special_select') {
+                    updateData.normal_tickets = increment(550);
+                    updateData.premium_tickets = increment(150);
+                    updateData[`cards.${cardName}`] = increment(1);
+                }
+
+                await updateDoc(userRef, updateData);
+
+                currentStock[packKey] -= 1;
+                localStorage.setItem(STOCK_KEY, JSON.stringify(currentStock));
+                updateUI();
+                alert(`🎉 ซื้อแพ็คเกจสำเร็จ! ระบบได้เพิ่มไอเทมเข้าสู่บัญชีของคุณเรียบร้อยแล้ว`);
+            } catch (error) {
+                alert("เกิดข้อผิดพลาดในการซื้อแพ็คเกจ กรุณาลองใหม่อีกครั้ง");
+            }
         }
 
         window.closePackDetailModal = function() {
             document.getElementById("pack-detail-modal").style.display = "none";
         }
 
-        window.onload = function() { initShopSystem(); };
+        initShopSystem();
     </script>
 </body>
 </html>
