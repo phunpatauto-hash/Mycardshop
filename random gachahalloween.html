@@ -157,7 +157,7 @@
     </nav>
 
     <div class="container">
-        <h2 style="color: #ff7700; text-shadow: 0 0 10px #ff7700; margin-bottom: 20px;">🎃 ตู้สุ่มพิเศษ HALLOWEEN EVENT 🎃</h2>
+        <h2 style="color: #ff7700; text-shadow: 0 0 10px #ff7700; margin-bottom: 20px;">🎃 ตู้สุ่มHALLOWEEN EVENT 🎃</h2>
         <div class="main-layout">
             <div class="gacha-box">
                 <div class="pity-area">
@@ -190,10 +190,10 @@
                 
                 <div class="quick-rate-table">
                     <div style="font-size: 0.7rem; color: #aaa; margin-bottom: 8px;">RATE BY RARITY</div>
-                    <div class="rate-row"><span class="rate-label color-secret">SECRET HALLOWEEN</span><span>จำกัดรายใบ (0.05%)</span></div>
-                    <div class="rate-row"><span class="rate-label color-usec">USEC HALLOWEEN</span><span>จำกัดรายใบ (0.2%)</span></div>
-                    <div class="rate-row"><span class="rate-label color-exr">EXR HALLOWEEN</span><span>1% </span></div>
-                    <div class="rate-row"><span class="rate-label color-sec">SEC HALLOWEEN</span><span>0.1%</span></div>
+                    <div class="rate-row"><span class="rate-label color-secret">SECRET HALLOWEEN</span><span>0.5%</span></div>
+                    <div class="rate-row"><span class="rate-label color-usec">USEC HALLOWEEN</span><span>0.2%/span></div>
+                    <div class="rate-row"><span class="rate-label color-exr">EXR HALLOWEEN</span><span>0.1% </span></div>
+                    <div class="rate-row"><span class="rate-label color-sec">SEC HALLOWEEN</span><span>1%</span></div>
                     <div class="rate-row"><span class="rate-label color-sur">SUR HALLOWEEN</span><span>1.75%</span></div> 
                     <div class="rate-row"><span class="rate-label color-ur">UR HALLOWEEN</span><span>2.3%</span></div> 
                     <div class="rate-row"><span class="rate-label color-ssr">SSR HALLOWEEN</span><span>2.0%</span></div>
@@ -243,25 +243,25 @@
 
     // --- Card Database (Halloween Theme) เพิ่ม SECRET และ USEC พร้อม key สำหรับแยกสต็อก ---
     const allCards = [
-        { key: "bon_secret", id: 9991, rarity: "SECRET HALLOWEEN", name: "Bon (SECRET)", rate: 0.05, img: "https://i.pinimg.com/736x/4d/01/be/4d01beb0c0e657cfad968ae30c04daa9.jpg", limitedMax: 50000 },
-        { key: "pitaya_secret", id: 9991, rarity: "SECRET HALLOWEEN", name: "Pitaya Dragon Cookie (SECRET)", rate: 0.05, img: "https://cookierunbraverse.com/data/en_storage/iykwTAbVji2fS4tmoaVM4A.webp", limitedMax: 50000 },
-        { key: "longan_secret", id: 9991, rarity: "SECRET HALLOWEEN", name: "Longan Dragon Cookie (SECRET)", rate: 0.05, img: "https://cookierunbraverse.com/data/en_storage/rErWzADzVUUbYuZFW3vPFw.webp", limitedMax: 50000 },
-        { key: "black_pearl_secret", id: 9991, rarity: "SECRET HALLOWEEN", name: "Black Pearl Cookie (SECRET)", rate: 0.05, img: "https://cookierunbraverse.com/data/en_storage/y4iBScY9qPqMkhWx2i8VEQ.webp", limitedMax: 50000 },
+        { key: "bon_secret", id: 9991, rarity: "SECRET HALLOWEEN", name: "Bon (SECRET)", rate: 0.5, img: "https://i.pinimg.com/736x/4d/01/be/4d01beb0c0e657cfad968ae30c04daa9.jpg", limitedMax: 50000 },
+        { key: "pitaya_secret", id: 9991, rarity: "SECRET HALLOWEEN", name: "Pitaya Dragon Cookie (SECRET)", rate: 0.5, img: "https://cookierunbraverse.com/data/en_storage/iykwTAbVji2fS4tmoaVM4A.webp", limitedMax: 50000 },
+        { key: "longan_secret", id: 9991, rarity: "SECRET HALLOWEEN", name: "Longan Dragon Cookie (SECRET)", rate: 0.5, img: "https://cookierunbraverse.com/data/en_storage/rErWzADzVUUbYuZFW3vPFw.webp", limitedMax: 50000 },
+        { key: "black_pearl_secret", id: 9991, rarity: "SECRET HALLOWEEN", name: "Black Pearl Cookie (SECRET)", rate: 0.5, img: "https://cookierunbraverse.com/data/en_storage/y4iBScY9qPqMkhWx2i8VEQ.webp", limitedMax: 50000 },
 
         { key: "phra_isuan_usec", id: 9992, rarity: "USEC HALLOWEEN", name: "พระอิศวร (USEC)", rate: 0.2, img: "https://cdn.bottcg.com/cards/SL01-003.png", limitedMax: 50000 },
         { key: "anan_usec", id: 9992, rarity: "USEC HALLOWEEN", name: "อนันต์ ราชาแห่งนาค (USEC)", rate: 0.2, img: "https://cdn.bottcg.com/cards/SL02-010.png", limitedMax: 50000 },
         { key: "era_usec", id: 9992, rarity: "USEC HALLOWEEN", name: "เอรา นาคเกล็ดเขียว (USEC)", rate: 0.2, img: "https://cdn.bottcg.com/cards/SL02-009.png", limitedMax: 50000 },
 
-        { key: "pure_vanilla_exr", id: 2, rarity: "EXR HALLOWEEN", name: "Pure Vanilla", rate: 1, img: "https://cookierunbraverse.com/data/en_storage/eXN_QVTcLFL7hr0_HG0jVg.webp" },
-        { key: "poison_mushroom_exr", id: 2, rarity: "EXR HALLOWEEN", name: "Poison Mushroom Cookie", rate: 1, img: "https://cookierunbraverse.com/data/en_storage/4JZ692x-o-ukC_4jSm_ItA.webp" },
-        { key: "legend_cookies_exr", id: 2, rarity: "EXR HALLOWEEN", name: "Cookies of Legend", rate: 1, img: "https://cookierunbraverse.com/data/en_storage/HZeIs1s4LNUNAOJCuXX81A.webp" },
+        { key: "pure_vanilla_exr", id: 2, rarity: "EXR HALLOWEEN", name: "Pure Vanilla", rate: 0.1, img: "https://cookierunbraverse.com/data/en_storage/eXN_QVTcLFL7hr0_HG0jVg.webp" },
+        { key: "poison_mushroom_exr", id: 2, rarity: "EXR HALLOWEEN", name: "Poison Mushroom Cookie", rate: 0.1, img: "https://cookierunbraverse.com/data/en_storage/4JZ692x-o-ukC_4jSm_ItA.webp" },
+        { key: "legend_cookies_exr", id: 2, rarity: "EXR HALLOWEEN", name: "Cookies of Legend", rate: 0.1, img: "https://cookierunbraverse.com/data/en_storage/HZeIs1s4LNUNAOJCuXX81A.webp" },
         
-        { key: "moonlight_sec", id: 3, rarity: "SEC HALLOWEEN", name: "Moonlight Cookie (SEC)", rate: 0.1, img: "https://cookierunbraverse.com/data/en_storage/SPO2L6D-iDD6-ypFihsKIw.webp" },
-        { key: "sea_fairy_sec", id: 3, rarity: "SEC HALLOWEEN", name: "Sea Fairy Cookie (SEC)", rate: 0.1, img: "https://cookierunbraverse.com/data/en_storage/GEXJXjdw6q6WTlEpkCds_A.webp" },
-        { key: "gingerbrave_sec", id: 5, rarity: "SEC HALLOWEEN", name: "GingerBrave (SEC)", rate: 0.1, img: "https://cookierunbraverse.com/data/en_storage/HsW8Sn2BaM1JaUccRE6a9A.webp" },
-        { key: "fire_spirit_sec", id: 6, rarity: "SEC HALLOWEEN", name: "Fire Spirit Cookie (SEC)", rate: 0.1, img: "https://cookierunbraverse.com/data/en_storage/3RJJejL0v0fWyKDIJD66BA.webp" },
-        { key: "millennial_sec", id: 6, rarity: "SEC HALLOWEEN", name: "Millennial Tree Cookie (SEC)", rate: 0.1, img: "https://cookierunbraverse.com/data/en_storage/Thflv8T2UZwOCbCAAj6ETQ.webp" },
-        { key: "wind_archer_sec", id: 6, rarity: "SEC HALLOWEEN", name: "Wind Archer Cookie (SEC)", rate: 0.1, img: "https://cookierunbraverse.com/data/en_storage/nF9jKJuspDHr_Fi_OLxTKQ.webp" },
+        { key: "moonlight_sec", id: 3, rarity: "SEC HALLOWEEN", name: "Moonlight Cookie (SEC)", rate: 1, img: "https://cookierunbraverse.com/data/en_storage/SPO2L6D-iDD6-ypFihsKIw.webp" },
+        { key: "sea_fairy_sec", id: 3, rarity: "SEC HALLOWEEN", name: "Sea Fairy Cookie (SEC)", rate: 1, img: "https://cookierunbraverse.com/data/en_storage/GEXJXjdw6q6WTlEpkCds_A.webp" },
+        { key: "gingerbrave_sec", id: 5, rarity: "SEC HALLOWEEN", name: "GingerBrave (SEC)", rate: 1, img: "https://cookierunbraverse.com/data/en_storage/HsW8Sn2BaM1JaUccRE6a9A.webp" },
+        { key: "fire_spirit_sec", id: 6, rarity: "SEC HALLOWEEN", name: "Fire Spirit Cookie (SEC)", rate: 1, img: "https://cookierunbraverse.com/data/en_storage/3RJJejL0v0fWyKDIJD66BA.webp" },
+        { key: "millennial_sec", id: 6, rarity: "SEC HALLOWEEN", name: "Millennial Tree Cookie (SEC)", rate: 1, img: "https://cookierunbraverse.com/data/en_storage/Thflv8T2UZwOCbCAAj6ETQ.webp" },
+        { key: "wind_archer_sec", id: 6, rarity: "SEC HALLOWEEN", name: "Wind Archer Cookie (SEC)", rate: 1, img: "https://cookierunbraverse.com/data/en_storage/nF9jKJuspDHr_Fi_OLxTKQ.webp" },
 
         { key: "timekeeper_sur", id: 1001, rarity: "SUR HALLOWEEN", name: "Timekeeper Cookie (SUR)", rate: 1.75, img: "https://cookierunbraverse.com/data/en_storage/xRkP57IaklprjxaATWAfYg.webp" },
         { key: "avatar_ruin_sur", id: 1002, rarity: "SUR HALLOWEEN", name: "Avatar of Ruin (SUR)", rate: 1.75, img: "https://cookierunbraverse.com/data/en_storage/pJn6qPTCDDtkH7lc8h_S8w.webp" },
