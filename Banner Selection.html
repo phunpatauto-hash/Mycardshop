@@ -2,12 +2,12 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>GACHA SELECTION - เลือกตู้สุ่ม</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { 
             font-family: 'Kanit', sans-serif; 
             margin: 0; 
@@ -19,7 +19,7 @@
         }
         .navbar { 
             background: rgba(15, 15, 15, 0.85); 
-            padding: 0 40px; 
+            padding: 0 20px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
@@ -32,9 +32,9 @@
         }
         .btn-nav { 
             background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.1); 
-            padding: 8px 18px; border-radius: 50px; text-decoration: none; 
-            font-size: 0.85rem; transition: 0.3s; 
-            display: flex; align-items: center; gap: 8px;
+            padding: 8px 14px; border-radius: 50px; text-decoration: none; 
+            font-size: 0.8rem; transition: 0.3s; 
+            display: flex; align-items: center; gap: 6px;
         }
         .btn-nav:hover { background: #ffc831; color: #000; border-color: #ffc831; transform: scale(1.05); }
         .announcement-container { max-width: 1200px; margin: 25px auto 0; padding: 0 20px; }
@@ -45,73 +45,75 @@
         @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 200, 49, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(255, 200, 49, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 200, 49, 0); } }
         .container { max-width: 1200px; margin: auto; padding: 40px 20px 80px; text-align: center; }
-        h1 { font-size: 2.8rem; font-weight: 800; color: #fff; margin-bottom: 10px; letter-spacing: -1px; }
+        h1 { font-size: 2.5rem; font-weight: 800; color: #fff; margin-bottom: 10px; letter-spacing: -1px; }
         h1 span { color: #ffc831; }
-        .subtitle { color: rgba(255,255,255,0.5); margin-bottom: 50px; font-size: 1rem; }
-        .banner-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 35px; }
-        .banner-item { position: relative; background: #151515; border-radius: 30px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); transition: 0.4s cubic-bezier(0.2, 1, 0.3, 1); text-decoration: none; display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
-        .banner-item:hover { transform: translateY(-15px) scale(1.02); border-color: #ffc831; box-shadow: 0 30px 60px rgba(255,200,49,0.1); }
-        .banner-img-wrapper { width: 100%; height: 240px; position: relative; overflow: hidden; }
+        .subtitle { color: rgba(255,255,255,0.5); margin-bottom: 40px; font-size: 0.95rem; }
+        .banner-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+        .banner-item { position: relative; background: #151515; border-radius: 25px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); transition: 0.4s cubic-bezier(0.2, 1, 0.3, 1); text-decoration: none; display: flex; flex-direction: column; box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
+        .banner-item:hover { transform: translateY(-10px) scale(1.01); border-color: #ffc831; box-shadow: 0 20px 40px rgba(255,200,49,0.1); }
+        .banner-img-wrapper { width: 100%; height: 220px; position: relative; overflow: hidden; }
         .banner-img { width: 100%; height: 100%; object-fit: cover; transition: 0.8s; }
-        .banner-item:hover .banner-img { transform: scale(1.1) rotate(1deg); }
+        .banner-item:hover .banner-img { transform: scale(1.08) rotate(0.5deg); }
         .banner-img-wrapper::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 60%; background: linear-gradient(to top, #151515, transparent); }
-        .banner-content { padding: 30px; text-align: left; }
-        .banner-type { position: absolute; top: 25px; left: 25px; padding: 6px 16px; border-radius: 10px; font-size: 0.7rem; font-weight: 800; z-index: 10; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
+        .banner-content { padding: 25px; text-align: left; }
+        .banner-type { position: absolute; top: 20px; left: 20px; padding: 5px 14px; border-radius: 8px; font-size: 0.65rem; font-weight: 800; z-index: 10; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
         .type-standard { background: linear-gradient(135deg, #ffc831, #ff9f00); color: #000; }
         .type-event { background: linear-gradient(135deg, #00d4ff, #005f7a); color: #fff; }
-        .banner-title { font-size: 1.5rem; margin: 0 0 12px 0; color: #fff; font-weight: 700; }
-        .banner-desc { color: rgba(255,255,255,0.4); font-size: 0.9rem; line-height: 1.6; margin-bottom: 25px; min-height: 50px; }
-        .banner-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
-        .price-tag { color: #ffc831; font-weight: 800; font-size: 1.2rem; }
-        .pity-info { color: rgba(255,255,255,0.3); font-size: 0.7rem; font-weight: 400; text-align: right; }
+        .banner-title { font-size: 1.35rem; margin: 0 0 10px 0; color: #fff; font-weight: 700; }
+        .banner-desc { color: rgba(255,255,255,0.4); font-size: 0.85rem; line-height: 1.5; margin-bottom: 20px; min-height: 45px; }
+        .banner-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; }
+        .price-tag { color: #ffc831; font-weight: 800; font-size: 1.1rem; }
+        .pity-info { color: rgba(255,255,255,0.3); font-size: 0.65rem; font-weight: 400; text-align: right; }
         .banner-item::before { content: ""; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent); transition: 0.5s; z-index: 5; }
         .banner-item:hover::before { left: 150%; }
 
         .rate-up-badge {
             position: absolute;
-            top: 65px; 
-            left: 25px;
+            top: 55px; 
+            left: 20px;
             background: linear-gradient(135deg, #00ff87, #60efff);
             color: #000;
-            padding: 5px 12px;
-            border-radius: 8px;
-            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
             font-weight: 800;
             z-index: 10;
             display: flex;
             align-items: center;
-            gap: 6px;
-            box-shadow: 0 5px 15px rgba(0, 255, 135, 0.3);
+            gap: 5px;
+            box-shadow: 0 4px 12px rgba(0, 255, 135, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.2);
             animation: floatArrow 1.5s ease-in-out infinite alternate;
         }
 
         @keyframes floatArrow {
             0% { transform: translateY(0); }
-            100% { transform: translateY(-4px); }
+            100% { transform: translateY(-3px); }
         }
         .rate-up-badge i {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             animation: arrowPush 0.8s ease-in-out infinite alternate;
         }
         @keyframes arrowPush {
             0% { transform: scale(0.9); }
-            100% { transform: scale(1.2); }
+            100% { transform: scale(1.15); }
         }
 
         /* ==================== 💎 ส่วนของระบบฝนเพชร 💎 ==================== */
         .event-bar {
             background: linear-gradient(90deg, #111, #bd10e0, #111);
             color: white;
-            padding: 12px 40px;
+            padding: 10px 20px;
             text-align: center;
             font-weight: bold;
             display: flex;
-            justify-content: space-between;
+            flex-wrap: wrap;
+            justify-content: center;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
             box-shadow: 0 4px 15px rgba(189, 16, 224, 0.3);
             border-bottom: 2px solid #ffc831;
+            font-size: 0.9rem;
         }
         .event-controls {
             display: flex;
@@ -121,12 +123,13 @@
         .event-bar button {
             color: black;
             border: none;
-            padding: 8px 20px;
+            padding: 6px 16px;
             font-family: 'Kanit', sans-serif;
             font-weight: bold;
             border-radius: 20px;
             cursor: pointer;
             transition: 0.2s;
+            font-size: 0.85rem;
         }
         .btn-join-free {
             background: #00ff87;
@@ -145,52 +148,54 @@
             transform: scale(1.05);
         }
 
-        /* หน้าจอเลเยอร์สำหรับเล่นเกม */
+        /* หน้าจอเลเยอร์สำหรับเล่นเกมบนมือถือให้เสถียร */
         #game-overlay {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(5, 5, 5, 0.92);
+            background: rgba(5, 5, 5, 0.95);
             z-index: 999;
             display: none;
             flex-direction: column;
             justify-content: space-between;
             pointer-events: auto;
-            transition: background-color 0.3s;
-            touch-action: none;
+            touch-action: none; /* ป้องกันการเลื่อนหน้าจอระบบเวลากดเล่นบนมือถือ */
+            overflow: hidden;
         }
         #game-overlay.frenzy-active {
-            background: radial-gradient(circle, rgba(255,200,49,0.2) 0%, rgba(5,5,5,0.95) 100%);
-            border: 4px solid #ffc831;
+            background: radial-gradient(circle, rgba(255,200,49,0.2) 0%, rgba(5,5,5,0.96) 100%);
+            border: 3px solid #ffc831;
         }
         .game-header {
             background: rgba(20,20,20,0.95);
-            padding: 15px 25px;
+            padding: 10px 15px;
             display: flex;
-            justify-content: space-around;
+            flex-wrap: wrap;
+            justify-content: space-between;
             align-items: center;
+            gap: 8px;
             border-bottom: 2px solid #ffc831;
             z-index: 10;
         }
         .game-status-box {
-            font-size: 1.2rem;
+            font-size: 0.95rem;
             font-weight: bold;
             background: rgba(255,255,255,0.03);
-            padding: 8px 20px;
+            padding: 6px 12px;
             border-radius: 50px;
             border: 1px solid rgba(255,255,255,0.1);
         }
         .frenzy-badge {
             background: linear-gradient(135deg, #ffc831, #ff4757);
             color: #000;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.75rem;
             font-weight: 800;
             display: none;
             animation: pulse 1s infinite;
         }
         .item-status-badge {
-            padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: 800; display: none;
+            padding: 4px 10px; border-radius: 15px; font-size: 0.75rem; font-weight: 800; display: none;
         }
         #slow-badge { background: #00d4ff; color: #000; animation: pulse 1s infinite; }
 
@@ -199,41 +204,40 @@
             position: relative;
             overflow: hidden;
             cursor: pointer;
+            width: 100%;
         }
         .diamond-drop {
             position: absolute;
-            font-size: 3.5rem; 
+            font-size: 3rem; 
             cursor: pointer;
             user-select: none;
             animation: fall linear forwards;
-            filter: drop-shadow(0 0 15px #60efff);
+            filter: drop-shadow(0 0 10px #60efff);
             transition: transform 0.1s;
         }
-        .diamond-drop:hover { transform: scale(1.15); }
-        
         .diamond-drop.frenzy-trigger {
-            filter: drop-shadow(0 0 25px #ffc831);
+            filter: drop-shadow(0 0 20px #ffc831);
             animation: fall linear forwards, spin 2s linear infinite;
         }
-        .diamond-drop.item-bomb { filter: drop-shadow(0 0 20px #ff4757); }
-        .diamond-drop.item-clock { filter: drop-shadow(0 0 20px #00d4ff); }
+        .diamond-drop.item-bomb { filter: drop-shadow(0 0 15px #ff4757); }
+        .diamond-drop.item-clock { filter: drop-shadow(0 0 15px #00d4ff); }
 
         @keyframes fall {
-            0% { transform: translateY(-80px) rotate(0deg); opacity: 1; }
+            0% { transform: translateY(-70px) rotate(0deg); opacity: 1; }
             90% { opacity: 1; }
-            100% { transform: translateY(105vh) rotate(180deg); opacity: 0; }
+            100% { transform: translateY(102vh) rotate(180deg); opacity: 0; }
         }
         @keyframes spin {
-            0% { transform: translateY(-80px) rotateY(0deg); }
-            100% { transform: translateY(105vh) rotateY(360deg); }
+            0% { transform: translateY(-70px) rotateY(0deg); }
+            100% { transform: translateY(102vh) rotateY(360deg); }
         }
 
         #paddle {
-            position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%);
-            width: 140px; height: 26px; background: linear-gradient(135deg, #ffc831, #ff9f00);
-            border: 3px solid #fff; border-radius: 15px;
-            box-shadow: 0 0 20px rgba(255, 200, 49, 0.8), inset 0 0 10px rgba(255,255,255,0.5);
-            display: flex; justify-content: center; align-items: center; font-size: 1.1rem;
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 120px; height: 24px; background: linear-gradient(135deg, #ffc831, #ff9f00);
+            border: 2px solid #fff; border-radius: 12px;
+            box-shadow: 0 0 15px rgba(255, 200, 49, 0.8), inset 0 0 8px rgba(255,255,255,0.5);
+            display: flex; justify-content: center; align-items: center; font-size: 1rem;
             color: #000; pointer-events: none; z-index: 5;
         }
 
@@ -243,21 +247,21 @@
             transform: translate(-50%, -50%);
             background: #151515;
             border: 3px solid #ffc831;
-            border-radius: 25px;
-            padding: 40px;
+            border-radius: 20px;
+            padding: 30px 20px;
             text-align: center;
             z-index: 1000;
             display: none;
             box-shadow: 0 0 40px rgba(255,200,49,0.3);
-            max-width: 450px;
+            max-width: 400px;
             width: 90%;
         }
-        #result-popup h2 { color: #ffc831; margin-top: 0; font-size: 2.2rem; font-weight: 800; }
-        #result-popup p { font-size: 1.2rem; color: #eee; margin: 15px 0; }
+        #result-popup h2 { color: #ffc831; margin-top: 0; font-size: 1.8rem; font-weight: 800; }
+        #result-popup p { font-size: 1.05rem; color: #eee; margin: 12px 0; }
         .result-btn {
-            background: #ffc831; color: black; border: none; padding: 12px 30px;
-            border-radius: 50px; font-weight: bold; cursor: pointer; margin-top: 15px;
-            font-family: 'Kanit', sans-serif; width: 100%; font-size: 1.1rem; transition: 0.2s;
+            background: #ffc831; color: black; border: none; padding: 10px 20px;
+            border-radius: 50px; font-weight: bold; cursor: pointer; margin-top: 10px;
+            font-family: 'Kanit', sans-serif; width: 100%; font-size: 1rem; transition: 0.2s;
         }
         .result-btn:hover { background: white; transform: scale(1.02); }
 
@@ -267,22 +271,22 @@
             transform: translate(-50%, -50%);
             background: linear-gradient(135deg, #151515, #2a1a35);
             border: 4px solid #00ff87;
-            border-radius: 25px;
-            padding: 40px;
+            border-radius: 20px;
+            padding: 30px 20px;
             text-align: center;
             z-index: 1100;
             display: none;
             box-shadow: 0 0 50px rgba(0,255,135,0.5);
-            max-width: 450px;
+            max-width: 400px;
             width: 90%;
             animation: pulse 2s infinite;
         }
-        #rank-popup h2 { color: #00ff87; margin-top: 0; font-size: 2.2rem; font-weight: 800; }
-        #rank-popup p { font-size: 1.2rem; color: #eee; margin: 15px 0; }
+        #rank-popup h2 { color: #00ff87; margin-top: 0; font-size: 1.8rem; font-weight: 800; }
+        #rank-popup p { font-size: 1.05rem; color: #eee; margin: 12px 0; }
         .rank-btn {
-            background: #00ff87; color: black; border: none; padding: 12px 30px;
-            border-radius: 50px; font-weight: bold; cursor: pointer; margin-top: 15px;
-            font-family: 'Kanit', sans-serif; width: 100%; font-size: 1.1rem; transition: 0.2s;
+            background: #00ff87; color: black; border: none; padding: 10px 20px;
+            border-radius: 50px; font-weight: bold; cursor: pointer; margin-top: 10px;
+            font-family: 'Kanit', sans-serif; width: 100%; font-size: 1rem; transition: 0.2s;
         }
         .rank-btn:hover { background: white; transform: scale(1.02); }
     </style>
@@ -292,15 +296,15 @@
     <div class="event-bar" id="event-banner">
         <span><i class="fas fa-gem"></i> <span id="event-status-text">กำลังตรวจสอบสถานะกิจกรรมฝนเพชร...</span></span>
         <div class="event-controls">
-            <button id="join-event-btn" class="btn-join-free" style="display:none;" onclick="startDiamondGame(true)">🎉 เข้าร่วมกิจกรรมฟรี!</button>
-            <button id="buy-event-btn" class="btn-buy-early" onclick="buyEarlyAccess()">⚡ เล่นก่อนเลย (🪙 <span id="next-cost-text">100,000</span>)</button>
+            <button id="join-event-btn" class="btn-join-free" style="display:none;" onclick="startDiamondGame(true)">🎉 เข้าร่วมฟรี!</button>
+            <button id="buy-event-btn" class="btn-buy-early" onclick="buyEarlyAccess()">⚡ เล่นก่อน (🪙 <span id="next-cost-text">100,000</span>)</button>
         </div>
     </div>
 
     <nav class="navbar">
-        <a href="index.html" class="btn-nav"><i class="fas fa-arrow-left"></i> กลับไปหน้าหลัก</a>
-        <div style="color: #ffc831; font-weight: 800; letter-spacing: 4px; font-size: 1.4rem; text-shadow: 0 0 20px rgba(255,200,49,0.4);">GACHA CENTER</div>
-        <div style="width: 150px; text-align: right;">
+        <a href="index.html" class="btn-nav"><i class="fas fa-arrow-left"></i> หน้าหลัก</a>
+        <div style="color: #ffc831; font-weight: 800; letter-spacing: 2px; font-size: 1.1rem; text-shadow: 0 0 15px rgba(255,200,49,0.4);">GACHA CENTER</div>
+        <div style="font-size: 0.9rem; text-align: right;">
             <i class="fas fa-coins" style="color: #ffc831;"></i> <span id="nav-points">0</span>
         </div> 
     </nav>
@@ -327,7 +331,7 @@
                     <h3 class="banner-title">Battle of Talingchan</h3>
                     <p class="banner-desc">Battle of Talingchan ศึกประชันใครคือสุดยอดพระเจ้า!!!!!</p>
                     <div class="banner-footer">
-                        <span class="price-tag">🪙 100 <small style="font-size: 0.7rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
+                        <span class="price-tag">🪙 100 <small style="font-size: 0.65rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
                         <div class="pity-info">การันตี USEC ที่ 900 รอบ<br>การันตี SEC ที่ 550 รอบ</div>
                     </div>
                 </div>
@@ -341,7 +345,7 @@
                     <h3 class="banner-title">Battle of Talingchan</h3>
                     <p class="banner-desc">Battle of Talingchan ศึกประชันใครคือสุดยอดพระเจ้า!!!!!</p>
                     <div class="banner-footer">
-                        <span class="price-tag">🪙 100 <small style="font-size: 0.7rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
+                        <span class="price-tag">🪙 100 <small style="font-size: 0.65rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
                         <div class="pity-info">การันตี USEC ที่ 900 รอบ<br>การันตี SEC ที่ 550 รอบ</div>
                     </div>
                 </div>
@@ -354,7 +358,7 @@
                     <h3 class="banner-title">The Awakened One of Truth</h3>
                     <p class="banner-desc">Cookie Pure Vanilla ผู้ตื่นรู้แห่งความจริง และการเผชิญหน้ากับความเท็จของ Shadow Milk</p>
                     <div class="banner-footer">
-                        <span class="price-tag">🪙 100 <small style="font-size: 0.7rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
+                        <span class="price-tag">🪙 100 <small style="font-size: 0.65rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
                         <div class="pity-info">การันตี EXR ที่ 900 รอบ<br>การันตี SEC ที่ 550 รอบ</div>
                     </div>
                 </div>
@@ -368,7 +372,7 @@
                     <h3 class="banner-title">ตู้รวม</h3>
                     <p class="banner-desc">ตู้รวมการ์ดทุกใบในตู้สู่มทั้งหมด!!</p>
                     <div class="banner-footer">
-                        <span class="price-tag">🪙 100 <small style="font-size: 0.7rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
+                        <span class="price-tag">🪙 100 <small style="font-size: 0.65rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
                         <div class="pity-info">การันตี EXR ที่ 900 รอบ<br>การันตี SEC ที่ 550 รอบ</div>
                     </div>
                 </div>
@@ -382,7 +386,7 @@
                     <h3 class="banner-title">Operation Timeguard</h3>
                     <p class="banner-desc">เส้นเวลาที่ไม่หยุดยิ่งอตีดและอนาคตกำลังรอคุรอยู่!!</p>
                     <div class="banner-footer">
-                        <span class="price-tag">🪙 100 <small style="font-size: 0.7rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
+                        <span class="price-tag">🪙 100 <small style="font-size: 0.65rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
                         <div class="pity-info">การันตี EXR ที่ 900 รอบ<br>การันตี SEC ที่ 550 รอบ</div>
                     </div>
                 </div>
@@ -396,7 +400,7 @@
                     <h3 class="banner-title">Shadows of the Battle</h3>
                     <p class="banner-desc">ร่วมต่อสู้ไปกับ Dark Cacao และสีสันแห่งการนองเลือด ตู้เริ่มต้นสำหรับนักสะสม</p>
                     <div class="banner-footer">
-                        <span class="price-tag">🪙 100 <small style="font-size: 0.7rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
+                        <span class="price-tag">🪙 100 <small style="font-size: 0.65rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
                         <div class="pity-info">การันตี SSR ที่ 100 รอบ<br>เหมาะสำหรับผู้เริ่มต้น</div>
                     </div>
                 </div>
@@ -410,7 +414,7 @@
                     <h3 class="banner-title">Battle of Talingchan</h3>
                     <p class="banner-desc">Battle of Talingchan ศึกประชันใครคือสุดยอดพระเจ้า!!!!!</p>
                     <div class="banner-footer">
-                        <span class="price-tag">🪙 100 <small style="font-size: 0.7rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
+                        <span class="price-tag">🪙 100 <small style="font-size: 0.65rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
                         <div class="pity-info">การันตี USEC ที่ 900 รอบ<br>การันตี SEC ที่ 550 รอบ</div>
                     </div>
                 </div>
@@ -424,7 +428,7 @@
                     <h3 class="banner-title">Battle of Talingchan</h3>
                     <p class="banner-desc">Battle of Talingchan ศึกประชันใครคือสุดยอดพระเจ้า!!!!!</p>
                     <div class="banner-footer">
-                        <span class="price-tag">🪙 100 <small style="font-size: 0.7rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
+                        <span class="price-tag">🪙 100 <small style="font-size: 0.65rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
                         <div class="pity-info">การันตี USEC ที่ 900 รอบ<br>การันตี SEC ที่ 550 รอบ</div>
                     </div>
                 </div>
@@ -438,7 +442,7 @@
                     <h3 class="banner-title">Arena of Glory</h3>
                     <p class="banner-desc">ศึกประชันความกล้าหาญใน Arena of Glory! ค้นหาแชมเปี้ยนที่จะมาเสริมทัพของคุณ</p>
                     <div class="banner-footer">
-                        <span class="price-tag">🪙 100 <small style="font-size: 0.7rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
+                        <span class="price-tag">🪙 100 <small style="font-size: 0.65rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
                         <div class="pity-info">การันตี EXR ที่ 900 รอบ<br>การันตี SEC ที่ 550 รอบ</div>
                     </div>
                 </div>
@@ -451,7 +455,7 @@
                     <h3 class="banner-title">coming soon</h3>
                     <p class="banner-desc">coming soon</p>
                     <div class="banner-footer">
-                        <span class="price-tag">🪙 ??? <small style="font-size: 0.7rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
+                        <span class="price-tag">🪙 ??? <small style="font-size: 0.65rem; color: #888; font-weight: 400;">/ 5 ใบ</small></span>
                         <div class="pity-info">???</div>
                     </div>
                 </div>
@@ -462,22 +466,22 @@
 
     <div id="game-overlay">
         <div class="game-header">
-            <div class="game-status-box" style="color: #ffc831;"><i class="fas fa-hourglass-half"></i> เวลาที่เหลือ: <span id="game-timer">15:00</span></div>
-            <div class="frenzy-badge" id="frenzy-timer-badge">🔥 คลั่งทองกระหน่ำเพชร: 10 วินาที!</div>
-            <div class="item-status-badge" id="slow-badge">⏰ ชะลอเวลาเพชรตกอยู่! (<span id="slow-time">5</span>s)</div>
-            <div class="game-status-box" style="color: #60efff; font-size: 1.4rem;"><i class="fas fa-gem"></i> เพชรที่เก็บได้: <span id="player-score">0</span></div>
-            <button onclick="endGame()" style="background:#ff4757; color:white; border:none; padding:10px 20px; border-radius:12px; font-weight:bold; cursor:pointer;">สรุปผลเลย</button>
+            <div class="game-status-box" style="color: #ffc831;"><i class="fas fa-hourglass-half"></i> <span id="game-timer">15:00</span></div>
+            <div class="frenzy-badge" id="frenzy-timer-badge">🔥 คลั่งทอง: 10s</div>
+            <div class="item-status-badge" id="slow-badge">⏰ ชะลอเวลา (<span id="slow-time">5</span>s)</div>
+            <div class="game-status-box" style="color: #60efff;"><i class="fas fa-gem"></i> <span id="player-score">0</span></div>
+            <button onclick="endGame()" style="background:#ff4757; color:white; border:none; padding:6px 12px; border-radius:10px; font-weight:bold; cursor:pointer; font-size:0.8rem;">สรุปผล</button>
         </div>
         <div class="game-area" id="game-area">
-            <div id="paddle"><i class="fas fa-shield-alt"></i></div>
+            <div id="paddle"><i class="fas fa-shield-alt"></i> รับเพชร</div>
         </div>
     </div>
 
     <div id="result-popup">
-        <h2>🎉 หมดเวลาเก็บเพชร! 🎉</h2>
-        <p>ยินดีด้วย! คุณเก็บเพชรสะสมไปได้ทั้งหมด</p>
-        <p><strong id="final-diamonds" style="color:#60efff; font-size:2.5rem; text-shadow:0 0 15px rgba(96,239,255,0.4);">0</strong> เม็ด</p>
-        <p style="font-size:0.95rem; color:#aaa; line-height:1.5;">ระบบได้ทำการโอนเพชรทั้งหมดแปรเปลี่ยนเป็นเงินแต้มสะสม และบันทึกเข้าสู่บัญชีของคุณเรียบร้อยแล้ว!</p>
+        <h2>🎉 สรุปผลการเก็บเพชร 🎉</h2>
+        <p>คุณเก็บเพชรสะสมไปได้ทั้งหมด</p>
+        <p><strong id="final-diamonds" style="color:#60efff; font-size:2.2rem; text-shadow:0 0 15px rgba(96,239,255,0.4);">0</strong> เม็ด</p>
+        <p style="font-size:0.85rem; color:#aaa; line-height:1.4;">ระบบได้ทำการโอนเพชรทั้งหมดแปรเปลี่ยนเป็นเงินแต้มสะสม และบันทึกเข้าสู่บัญชีของคุณเรียบร้อยแล้ว!</p>
         <button class="result-btn" onclick="closeResultPopup()">ตกลง</button>
     </div>
 
@@ -561,14 +565,24 @@
         let paddleX = window.innerWidth / 2;
         let activeElementsList = []; 
 
+        // 📱 ปรับปรุงระบบควบคุม Mouse และ Touch บนหน้าจอมือถือให้เสถียรและแม่นยำขึ้น
         window.addEventListener("mousemove", (e) => {
             if (gameActive) paddleX = e.clientX;
         });
-        window.addEventListener("touchmove", (e) => {
+
+        const gameAreaElem = document.getElementById("game-area");
+        gameAreaElem.addEventListener("touchmove", (e) => {
+            if (gameActive && e.touches.length > 0) {
+                paddleX = e.touches[0].clientX;
+                e.preventDefault(); // ป้องกันหน้าจอมือถือเลื่อนขึ้นลงขณะกำลังลากรับเพชร
+            }
+        }, { passive: false });
+
+        gameAreaElem.addEventListener("touchstart", (e) => {
             if (gameActive && e.touches.length > 0) {
                 paddleX = e.touches[0].clientX;
             }
-        });
+        }, { passive: true });
 
         function checkEventStatus() {
             const now = new Date();
@@ -586,7 +600,7 @@
             if (isEventActive) {
                 const minLeft = 14 - currentMinute;
                 const secLeft = 59 - currentSecond;
-                txtStatus.innerText = `🔥 พายุฝนเพชรกำลังกระหน่ำเทลงมาแล้ว! (เปิดรอบเข้าฟรีถึงนาทีที่ 15)`;
+                txtStatus.innerText = `🔥 พายุฝนเพชรกำลังตก! (ฟรีถึงนาทีที่ 15)`;
                 txtStatus.style.color = "#00ff87";
                 btnJoin.style.display = "inline-block";
                 btnBuy.style.display = "none"; 
@@ -609,7 +623,7 @@
                 let diffMin = Math.floor(diffMs / 60000);
                 let diffSec = Math.floor((diffMs % 60000) / 1000);
 
-                txtStatus.innerText = `⏳ รอบถัดไปเปิดในอีก: ${diffMin} นาที ${diffSec} วินาที (หากรอไม่ไหวสามารถกดซื้อสิทธิ์เล่นก่อนได้!)`;
+                txtStatus.innerText = `⏳ รอบถัดไป: ${diffMin}น. ${diffSec}วินาที`;
                 txtStatus.style.color = "white";
             }
         }
@@ -623,18 +637,17 @@
             }
 
             if (userCurrentPoints < nextEventCost) {
-                alert(`❌ แต้มสะสมของคุณไม่เพียงพอ! ต้องใช้ ${nextEventCost.toLocaleString()} แต้มเพื่อเปิดก่อนเวลา`);
+                alert(`❌ แต้มของคุณไม่พอ! ต้องใช้ ${nextEventCost.toLocaleString()} แต้ม`);
                 return;
             }
 
-            const confirmBuy = confirm(`คุณต้องการจ่ายแต้มจำนวน ${nextEventCost.toLocaleString()} เพื่อสุ่มเก็บเพชรทันที 15 นาทีใช่หรือไม่?`);
+            const confirmBuy = confirm(`ต้องการจ่ายแต้ม ${nextEventCost.toLocaleString()} เพื่อเปิดเล่นกิจกรรมทันทีใช่หรือไม่?`);
             if (!confirmBuy) return;
 
             try {
                 const userRef = doc(db, "users", currentUser.uid);
                 const updatedPoints = userCurrentPoints - nextEventCost;
                 
-                // คำนวณราคาคูณสอง แต่จำกัดไว้ไม่ให้เกิน 100,000,000 แต้ม
                 let calculatedNextCost = nextEventCost * 2;
                 const MAX_COST = 100000000;
                 let updatedNextCost = calculatedNextCost > MAX_COST ? MAX_COST : calculatedNextCost;
@@ -651,7 +664,7 @@
 
             } catch (error) {
                 console.error("Error updating buy state: ", error);
-                alert("เกิดข้อผิดพลาดทางเทคนิค กรุณาลองใหม่อีกครั้งครับ");
+                alert("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้งครับ");
             }
         };
 
@@ -705,7 +718,7 @@
             if (!gameActive) return;
             
             frenzyTimeLeft = 10; 
-            document.getElementById("frenzy-timer-badge").innerText = `🔥 คลั่งทองกระหน่ำเพชร: ${frenzyTimeLeft} วิ!`;
+            document.getElementById("frenzy-timer-badge").innerText = `🔥 คลั่งทอง: ${frenzyTimeLeft}s`;
             document.getElementById("frenzy-timer-badge").style.display = "block";
             document.getElementById("game-overlay").classList.add("frenzy-active");
 
@@ -719,7 +732,7 @@
                 if (frenzyTimeLeft <= 0) {
                     deactivateFrenzyMode();
                 } else {
-                    document.getElementById("frenzy-timer-badge").innerText = `🔥 คลั่งทองกระหน่ำเพชร: ${frenzyTimeLeft} วิ!`;
+                    document.getElementById("frenzy-timer-badge").innerText = `🔥 คลั่งทอง: ${frenzyTimeLeft}s`;
                 }
             }, 1000);
         }
@@ -733,8 +746,8 @@
         }
 
         function triggerBombEffect() {
-            for (let i = 0; i < 20; i++) {
-                setTimeout(() => { if (gameActive) spawnDiamond(true); }, i * 50);
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => { if (gameActive) spawnDiamond(true); }, i * 40);
             }
         }
 
@@ -789,9 +802,9 @@
             }
             
             diamond.innerText = chosen.icon;
-            diamond.style.left = Math.random() * 90 + "vw"; 
+            diamond.style.left = Math.random() * 85 + "vw"; 
             
-            let fallDuration = isFrenzyMode ? (Math.random() * 2 + 2) : (Math.random() * 3 + 4); 
+            let fallDuration = isFrenzyMode ? (Math.random() * 1.5 + 1.5) : (Math.random() * 2.5 + 3.5); 
             if (isSlowMode) fallDuration *= 1.8;
 
             diamond.style.animationDuration = fallDuration + "s";
@@ -819,15 +832,15 @@
                 }
 
                 document.getElementById("player-score").innerText = score;
-                createClickEffect(e.clientX, e.clientY, chosen.icon);
+                const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : window.innerWidth / 2);
+                const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : window.innerHeight / 2);
+                createClickEffect(clientX, clientY, chosen.icon);
                 
                 removeActiveItem(itemObj);
             };
 
             diamond.addEventListener("mousedown", collectDiamond);
-            diamond.addEventListener("touchstart", (e) => {
-                collectDiamond(e.touches[0]);
-            });
+            diamond.addEventListener("touchstart", collectDiamond);
 
             gameArea.appendChild(diamond);
 
@@ -893,22 +906,21 @@
             fx.style.position = "fixed";
             fx.style.left = x + "px";
             fx.style.top = y + "px";
-            fx.style.fontSize = "2rem";
+            fx.style.fontSize = "1.6rem";
             fx.style.fontWeight = "bold";
             fx.style.color = "#ffc831";
             fx.style.pointerEvents = "none";
-            fx.style.transition = "transform 0.4s, opacity 0.4s";
+            fx.style.transition = "transform 0.3s, opacity 0.3s";
             fx.style.zIndex = "1001";
             document.body.appendChild(fx);
 
             setTimeout(() => {
-                fx.style.transform = "translateY(-50px) scale(1.4)";
+                fx.style.transform = "translateY(-40px) scale(1.3)";
                 fx.style.opacity = "0";
             }, 10);
-            setTimeout(() => fx.remove(), 400);
+            setTimeout(() => fx.remove(), 300);
         }
 
-        // 💎 ฟังก์ชันบันทึกข้อมูลเมื่อจบเกม
         window.endGame = async function() {
             gameActive = false;
             isEarlyAccessMode = false;
@@ -919,7 +931,7 @@
             cancelAnimationFrame(animFrameId);
 
             document.getElementById("game-overlay").style.display = "none";
-            document.getElementById("game-area").innerHTML = '<div id="paddle"><i class="fas fa-shield-alt"></i></div>';
+            document.getElementById("game-area").innerHTML = '<div id="paddle"><i class="fas fa-shield-alt"></i> รับเพชร</div>';
             activeElementsList = [];
 
             document.getElementById("final-diamonds").innerText = score;
@@ -945,14 +957,12 @@
 
                     await updateDoc(userRef, updateData);
                     userPlayCount = updatedPlayCount; 
-                    console.log("บันทึกข้อมูลสำเร็จ (จำนวนการเล่นรอบนี้: " + updatedPlayCount + ")");
                 } catch (e) {
                     console.error("Firebase Sync Error: ", e);
                 }
             }
         };
 
-        // 💎 ฟังก์ชันกดปุ่มตกลงหลังจบเกม ส่งต่อไปยังหน้าโปรไฟล์พร้อม action
         window.closeResultPopup = function() {
             document.getElementById("result-popup").style.display = "none";
 
@@ -963,7 +973,6 @@
             }
         };
 
-        // 💎 ฟังก์ชันกดปุ่มไปหน้าโปรไฟล์เมื่อได้รับยศ
         window.goToProfile = function() {
             window.location.href = "Banner Selection.html?action=play_banner";
         };
