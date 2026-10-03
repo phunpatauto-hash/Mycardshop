@@ -564,6 +564,14 @@
         <div class="modal-content">
             <h2 style="color: #00e5ff;"><i class="fas fa-calendar-star"></i> กิจกรรมประจำสัปดาห์</h2>
             <p style="color: #a0aec0; font-size: 0.85rem; margin-top: -5px;">เลือกเข้าร่วมกิจกรรมพิเศษเพื่อรับรางวัลมากมาย!</p>
+
+            <div class="weekly-event-card" onclick="checkAuthAndNavigate('halloween_event.html')">
+                <div class="weekly-event-info">
+                    <h4> 🎃 Halloween Event  </h4>
+                    <p>มาสนุกกับ🎃 Halloween Event กันเถอะ!!!</p>
+                </div>
+                <i class="fas fa-angle-right" style="color: #00e5ff; font-size: 1.5rem;"></i>
+            </div>
             
             <div class="weekly-event-card" onclick="checkAuthAndNavigate('random gacha.html')">
                 <div class="weekly-event-info">
@@ -772,7 +780,7 @@
             
             <!-- Halloween Event Banner (เปิดให้เข้าเฉพาะ 1 ต.ค. - 31 ต.ค.) -->
             <div class="modern-banner" style="background: linear-gradient(135deg, #ff7518, #2a0845); color: white; grid-column: span 2;" onclick="checkHalloweenEvent()">
-                <h3>🎃 Halloween Event (เปิดให้เข้าวันที่ 10 ตุลาคมนี้!!!)</h3>
+                <h3>🎃 Halloween Event </h3>
                 <p>อีเวนต์สุดพิเศษต้อนรับวันฮาโลวีน ออกไปขอลูกกวาดและสนุกกับเพื่อนกันเถอะ!</p>
                 <i class="fas fa-ghost main-icon"></i>
             </div>
@@ -869,10 +877,10 @@
         const date = now.getDate();     // วันที่ (1-31)
 
         // ตรวจสอบว่าเป็นเดือนตุลาคม (10) และวันที่อยู่ระหว่าง 1 ถึง 31 หรือไม่
-        if (month === 10 && date >= 10 && date <= 31) {
+        if (month === 10 && date >= 3 && date <= 31) {
             window.location.href = "halloween_event.html";
         } else {
-            alert("🎃 กิจกรรม Halloween ยังไม่เปิดให้บริการ! จะเปิดให้ในวันที่ 1 ตุลาคม ถึง 31 ตุลาคม เท่านั้น อดทนรอก่อนน้า!!!");
+            alert("🎃 กิจกรรม Halloween ยังไม่เปิดให้บริการ! จะเปิดให้ในวันที่ 3 ตุลาคม ถึง 31 ตุลาคม เท่านั้น อดทนรอก่อนน้า!!!");
         }
     };
 
