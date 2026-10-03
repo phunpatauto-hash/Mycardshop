@@ -459,12 +459,12 @@
                     cardStocks[win.key] = currentCount + 1;
                     stockUpdates[win.key] = cardStocks[win.key];
                     let prefix = win.rarity.includes("SECRET") ? "SECRET" : "USEC";
-                    sendBroadcast(`🎃 ดวงเฮงสุดๆ! ${currentUserName} สุ่มได้ [${prefix}] ${win.name} (ใบที่ ${cardStocks[win.key].toLocaleString()}/50,000)!`);
+                    sendBroadcast(`🎃 ดวงดีสุดๆคุณ! ${currentUserName} สุ่มได้ [${prefix}] ${win.name} (ใบที่ ${cardStocks[win.key].toLocaleString()}/50,000)!`);
                 } else { 
                     win = activeCards.find(c => c.rarity === "EXR HALLOWEEN") || win; 
                 }
             } else if (win.rarity === "EXR HALLOWEEN") {
-                sendBroadcast(`🔥 ดวงปังมาก! ${currentUserName} สุ่มได้การ์ด [EXR] ${win.name}!`);
+                sendBroadcast(`🔥 ว้าว!คุณ ${currentUserName} สุ่มได้การ์ด [EXR] ${win.name}!`);
             }
 
             results.push({ name: win.name, rarity: win.rarity, img: win.img, obtainedDate: Date.now(), level: 1, status: "HALLOWEEN", source: "Gacha ตู้ HALLOWEEN", tag: "HALLOWEEN EVENT" });
