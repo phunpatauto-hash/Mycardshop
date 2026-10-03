@@ -19,7 +19,7 @@
         /* Navbar */
         .navbar { 
             background-color: rgba(10, 10, 15, 0.9); 
-            padding: 15px 25px; 
+            padding: 12px 15px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
@@ -28,24 +28,27 @@
             top: 0; 
             z-index: 1000; 
             backdrop-filter: blur(20px); 
-            height: 85px; 
+            flex-wrap: wrap;
+            gap: 10px;
         }
-        .user-name-tag { color: #ffc831; font-weight: bold; font-size: 1.1rem; text-transform: uppercase; }
-        .nav-buttons { display: flex; gap: 12px; margin-top: 5px; flex-wrap: wrap; }
-        .btn-nav { background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 12px; text-decoration: none; font-size: 0.9rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .user-info { display: flex; flex-direction: column; gap: 4px; }
+        .user-name-tag { color: #ffc831; font-weight: bold; font-size: 1rem; text-transform: uppercase; }
+        .nav-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn-nav { background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 10px; text-decoration: none; font-size: 0.8rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .btn-nav.primary { background: linear-gradient(45deg, #ffc831, #ff9000); color: #000; border: none; }
-        .wallet-display { display: flex; gap: 15px; }
-        .wallet-box { background: rgba(255, 255, 255, 0.05); padding: 8px 16px; border-radius: 25px; border: 1.5px solid #333; display: flex; align-items: center; gap: 8px; font-weight: bold; }
+        
+        .wallet-display { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+        .wallet-box { background: rgba(255, 255, 255, 0.05); padding: 6px 12px; border-radius: 20px; border: 1.5px solid #333; display: flex; align-items: center; gap: 5px; font-weight: bold; font-size: 0.85rem; }
 
         /* Control Panel */
-        .control-panel { max-width: 1200px; margin: 25px auto 10px; padding: 0 20px; display: flex; flex-direction: column; gap: 15px; }
-        .search-sort-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center; }
-        .search-input { background: rgba(255,255,255,0.05); border: 1px solid #444; padding: 10px 20px; border-radius: 12px; color: white; font-family: 'Kanit'; width: 300px; outline: none; transition: 0.3s; }
+        .control-panel { max-width: 1200px; margin: 20px auto 10px; padding: 0 15px; display: flex; flex-direction: column; gap: 12px; }
+        .search-sort-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; align-items: center; }
+        .search-input { background: rgba(255,255,255,0.05); border: 1px solid #444; padding: 10px 15px; border-radius: 12px; color: white; font-family: 'Kanit'; width: 100%; max-width: 300px; outline: none; transition: 0.3s; font-size: 0.9rem; }
         .search-input:focus { border-color: #ffc831; box-shadow: 0 0 10px rgba(255,200,49,0.2); }
-        .sort-select { background: #222; color: white; border: 1px solid #444; padding: 10px; border-radius: 12px; font-family: 'Kanit'; cursor: pointer; outline: none; }
-        .filter-bar { display: flex; flex-direction: column; gap: 10px; align-items: center; }
-        .filter-group { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
-        .filter-btn { padding: 8px 18px; border-radius: 25px; border: 2px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #aaa; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .sort-select { background: #222; color: white; border: 1px solid #444; padding: 10px; border-radius: 12px; font-family: 'Kanit'; cursor: pointer; outline: none; font-size: 0.9rem; }
+        .filter-bar { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+        .filter-group { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+        .filter-btn { padding: 6px 14px; border-radius: 20px; border: 2px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #aaa; cursor: pointer; font-weight: bold; transition: 0.3s; font-size: 0.8rem; }
         .filter-btn.active { border-color: #ffc831; color: #fff; background: rgba(255,200,49,0.1); }
         .filter-btn.type-btn.active { border-color: #00d4ff; color: #fff; background: rgba(0,212,255,0.15); }
         .filter-btn.halloween-btn.active { border-color: #ff6600; color: #ff9900; background: rgba(255,102,0,0.2); }
@@ -58,13 +61,13 @@
         }
         .card-halloween-badge {
             position: absolute;
-            bottom: 60px;
-            left: 8px;
+            bottom: 55px;
+            left: 6px;
             background: linear-gradient(45deg, #ff3300, #ff9900);
             color: #000;
-            padding: 2px 8px;
-            border-radius: 8px;
-            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 0.6rem;
             font-weight: 800;
             z-index: 6;
             border: 1px solid #fff;
@@ -86,6 +89,7 @@
             text-align: center;
             padding: 10px;
             backdrop-filter: blur(2px);
+            font-size: 0.85rem;
         }
 
         /* Effects */
@@ -127,46 +131,55 @@
         .card-pulse-new { animation: pulse-glow 1.8s infinite ease-in-out; }
 
         /* Grid & Cards */
-        .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
-        .collection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
-        .col-card { background: #111; border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); position: relative; transition: 0.3s; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        .col-card:hover { transform: translateY(-8px); border-color: #ffc831; box-shadow: 0 0 20px rgba(255, 200, 49, 0.3); }
+        .container { max-width: 1200px; margin: 15px auto; padding: 0 15px; }
+        .collection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+        .col-card { background: #111; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); position: relative; transition: 0.3s; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .col-card:hover { transform: translateY(-4px); border-color: #ffc831; box-shadow: 0 0 15px rgba(255, 200, 49, 0.3); }
         .col-card.expired { opacity: 0.6; filter: grayscale(0.8); cursor: not-allowed; }
-        .col-card.expired:hover { transform: none; border-color: rgba(255,255,255,0.1); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        .col-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; transition: 0.3s; }
+        .col-card.expired:hover { transform: none; border-color: rgba(255,255,255,0.1); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .col-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; transition: 0.3s; display: block; }
         
         .star-container { 
-            position: absolute; top: 10px; left: 50%; transform: translateX(-50%); 
-            background: rgba(0, 0, 0, 0.75); padding: 3px 8px; border-radius: 10px; 
-            color: #ffc831; font-size: 0.7rem; z-index: 5; backdrop-filter: blur(5px); 
+            position: absolute; top: 8px; left: 50%; transform: translateX(-50%); 
+            background: rgba(0, 0, 0, 0.75); padding: 2px 6px; border-radius: 8px; 
+            color: #ffc831; font-size: 0.65rem; z-index: 5; backdrop-filter: blur(5px); 
             border: 1px solid rgba(255, 200, 49, 0.3); white-space: nowrap; text-align: center;
         }
 
-        .card-count-badge { position: absolute; top: 8px; right: 8px; background: #ffc831; color: #000; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; font-weight: bold; z-index: 5; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
-        .card-type-badge { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.8); color: #00d4ff; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: bold; z-index: 5; border: 1px solid #00d4ff; }
-        .card-lock-badge { position: absolute; bottom: 75px; right: 8px; background: rgba(0,0,0,0.75); color: #ff4d4d; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; z-index: 5; border: 1px solid #ff4d4d; }
+        .card-count-badge { position: absolute; top: 6px; right: 6px; background: #ffc831; color: #000; padding: 1px 6px; border-radius: 8px; font-size: 0.75rem; font-weight: bold; z-index: 5; box-shadow: 0 0 8px rgba(0,0,0,0.5); }
+        .card-type-badge { position: absolute; top: 6px; left: 6px; background: rgba(0,0,0,0.8); color: #00d4ff; padding: 1px 6px; border-radius: 8px; font-size: 0.65rem; font-weight: bold; z-index: 5; border: 1px solid #00d4ff; }
+        .card-lock-badge { position: absolute; bottom: 55px; right: 6px; background: rgba(0,0,0,0.75); color: #ff4d4d; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; z-index: 5; border: 1px solid #ff4d4d; }
 
         /* Modal */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(10px); }
-        .modal-content { background: #0a0a0f; border-radius: 25px; max-width: 900px; width: 100%; display: flex; overflow: hidden; border: 1px solid #333; box-shadow: 0 0 50px rgba(0,0,0,1); }
-        .modal-left { width: 45%; background: #000; display: flex; align-items: center; justify-content: center; padding: 20px; position: relative; }
-        .modal-right { width: 55%; padding: 35px; display: flex; flex-direction: column; background: linear-gradient(135deg, #0a0a0f 0%, #111 100%); max-height: 90vh; overflow-y: auto; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; padding: 10px; backdrop-filter: blur(10px); overflow-y: auto; }
+        .modal-content { background: #0a0a0f; border-radius: 20px; max-width: 850px; width: 100%; display: flex; overflow: hidden; border: 1px solid #333; box-shadow: 0 0 30px rgba(0,0,0,1); max-height: 90vh; margin: auto; }
+        .modal-left { width: 40%; background: #000; display: flex; align-items: center; justify-content: center; padding: 15px; position: relative; }
+        .modal-right { width: 60%; padding: 20px; display: flex; flex-direction: column; background: linear-gradient(135deg, #0a0a0f 0%, #111 100%); overflow-y: auto; }
 
-        .stat-item { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; border-left: 4px solid #ffc831; margin: 10px 0; }
-        .stat-val { font-size: 1.8rem; font-weight: bold; display: block; color: #ffc831; }
-        .stat-lbl { font-size: 0.75rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
-        .lvl-bar-bg { width: 100%; height: 10px; background: #222; border-radius: 10px; margin: 8px 0; overflow: hidden; }
+        .stat-item { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; border-left: 4px solid #ffc831; margin: 8px 0; }
+        .stat-val { font-size: 1.5rem; font-weight: bold; display: block; color: #ffc831; }
+        .stat-lbl { font-size: 0.7rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+        .lvl-bar-bg { width: 100%; height: 8px; background: #222; border-radius: 8px; margin: 6px 0; overflow: hidden; }
         .lvl-bar-fill { height: 100%; background: linear-gradient(90deg, #00d4ff, #00ff88); width: 0%; transition: 0.5s; }
-        .btn-action { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s; font-size: 1rem; }
+        .btn-action { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; margin-top: 8px; transition: 0.2s; font-size: 0.95rem; }
         .btn-lv { background: #0066ff; color: white; }
         .btn-star { background: #ff9900; color: black; }
         .btn-awaken { background: linear-gradient(45deg, #00d4ff, #ffffff); color: #000; }
-        .btn-sell-single { background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1.5px solid #ff4d4d; padding: 8px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-sell-all { background: #ff4d4d; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        .btn-lock { background: rgba(255, 255, 255, 0.08); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-sell-single { background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1.5px solid #ff4d4d; padding: 6px 10px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 0.85rem; }
+        .btn-sell-all { background: #ff4d4d; color: white; border: none; padding: 10px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
+        .btn-lock { background: rgba(255, 255, 255, 0.08); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 6px 10px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 0.8rem; }
         .btn-lock.locked { background: rgba(255, 77, 77, 0.15); color: #ff4d4d; border-color: #ff4d4d; }
 
-        @media (max-width: 768px) { .modal-content { flex-direction: column; overflow-y: auto; } .modal-left, .modal-right { width: 100%; } .search-input { width: 100%; } }
+        @media (max-width: 768px) { 
+            .modal-content { flex-direction: column; max-height: 92vh; } 
+            .modal-left, .modal-right { width: 100%; } 
+            .modal-left { padding: 10px; max-height: 40vh; }
+            .modal-left img { max-height: 35vh !important; }
+            .modal-right { padding: 15px; max-height: 52vh; }
+            .search-input { max-width: 100%; flex: 1; }
+            .search-sort-row { width: 100%; }
+            .sort-select { flex: 1; }
+        }
     </style>
 </head>
 <body>
@@ -220,16 +233,16 @@
     <div id="cardModal" class="modal" onclick="this.style.display='none'">
         <div class="modal-content" id="modalMainBox" onclick="event.stopPropagation()">
             <div class="modal-left">
-                <img id="modalImg" src="" style="max-width: 100%; max-height: 75vh; border-radius: 15px; object-fit: contain;">
+                <img id="modalImg" src="" style="max-width: 100%; max-height: 70vh; border-radius: 12px; object-fit: contain;">
             </div>
             <div class="modal-right">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                     <div>
-                        <h2 id="modalName" style="margin:0; font-size: 2.2rem;">Name</h2>
-                        <div id="modalRarity" style="font-weight: bold; letter-spacing: 2px; margin-bottom: 5px;">GRADE: -</div>
-                        <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 15px;">
-                            <div id="modalType" style="color: #00d4ff; font-weight: bold;">TYPE: CARD</div>
-                            <div id="modalHalloweenTag" style="display:none; background: linear-gradient(45deg, #ff3300, #ff9900); color: #000; font-size: 0.75rem; font-weight: 800; padding: 2px 8px; border-radius: 6px; border: 1px solid #fff;">🎃 HALLOWEEN</div>
+                        <h2 id="modalName" style="margin:0; font-size: 1.6rem;">Name</h2>
+                        <div id="modalRarity" style="font-weight: bold; letter-spacing: 1px; margin-bottom: 3px; font-size: 0.9rem;">GRADE: -</div>
+                        <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 10px;">
+                            <div id="modalType" style="color: #00d4ff; font-weight: bold; font-size: 0.85rem;">TYPE: CARD</div>
+                            <div id="modalHalloweenTag" style="display:none; background: linear-gradient(45deg, #ff3300, #ff9900); color: #000; font-size: 0.7rem; font-weight: 800; padding: 2px 6px; border-radius: 6px; border: 1px solid #fff;">🎃 HALLOWEEN</div>
                         </div>
                     </div>
                     <button id="btnLockCard" class="btn-lock">🔒 ล็อกการ์ด</button>
@@ -240,43 +253,43 @@
                     <span id="modalPower" class="stat-val">0</span>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                     <div class="stat-item" style="border-left-color: #00ff88; margin: 0;">
                         <span class="stat-lbl">💚 HP (พลังชีวิต)</span>
-                        <span id="modalHp" class="stat-val" style="color: #00ff88; font-size: 1.4rem;">0</span>
+                        <span id="modalHp" class="stat-val" style="color: #00ff88; font-size: 1.2rem;">0</span>
                     </div>
                     <div class="stat-item" style="border-left-color: #00d4ff; margin: 0;">
                         <span class="stat-lbl">🛡️ DEF (พลังป้องกัน)</span>
-                        <span id="modalDef" class="stat-val" style="color: #00d4ff; font-size: 1.4rem;">0</span>
+                        <span id="modalDef" class="stat-val" style="color: #00d4ff; font-size: 1.2rem;">0</span>
                     </div>
                 </div>
 
-                <div id="modalSellPriceBox" style="margin-top: 15px; padding: 15px; background: rgba(0, 255, 136, 0.05); border-radius: 15px; border: 1px solid rgba(0, 255, 136, 0.2); display: flex; justify-content: space-between; align-items: center;">
+                <div id="modalSellPriceBox" style="margin-top: 12px; padding: 12px; background: rgba(0, 255, 136, 0.05); border-radius: 12px; border: 1px solid rgba(0, 255, 136, 0.2); display: flex; justify-content: space-between; align-items: center;">
                     <div>
-                        <div style="color:#00ff88; font-size:0.75rem; font-weight: bold;">💰 ราคาขาย</div>
-                        <div id="modalSellPrice" style="color:#fff; font-weight:bold; font-size:1.6rem;">0 🪙</div>
+                        <div style="color:#00ff88; font-size:0.7rem; font-weight: bold;">💰 ราคาขาย</div>
+                        <div id="modalSellPrice" style="color:#fff; font-weight:bold; font-size:1.3rem;">0 🪙</div>
                     </div>
                     <button id="btnSellCard" class="btn-sell-single">ขายใบนี้</button>
                 </div>
 
-                <div style="margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px;">
-                    <div style="display: flex; justify-content: space-between;">
+                <div style="margin-top: 12px; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 10px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
                         <span id="modalLvlDisplay" style="color:#00d4ff; font-weight: bold;">LV. 1</span>
                         <span style="color:#666;">MAX 80</span>
                     </div>
                     <div class="lvl-bar-bg"><div id="lvlBarFill" class="lvl-bar-fill"></div></div>
-                    <div style="font-size: 0.8rem; color: #aaa;">🎴 จำนวนที่ซ้ำ: <span id="reqQty" style="color:#ffc831;">0</span> ใบ</div>
-                    <div id="modalUpgradeInfo" style="color: #00ff88; font-weight: bold; font-size: 0.85rem; margin-top: 5px;">-</div>
+                    <div style="font-size: 0.75rem; color: #aaa;">🎴 จำนวนที่ซ้ำ: <span id="reqQty" style="color:#ffc831;">0</span> ใบ</div>
+                    <div id="modalUpgradeInfo" style="color: #00ff88; font-weight: bold; font-size: 0.8rem; margin-top: 3px;">-</div>
                 </div>
 
-                <div id="lvUpgradeGroup" style="display: flex; gap: 10px; margin-top: 15px;">
+                <div id="lvUpgradeGroup" style="display: flex; gap: 8px; margin-top: 12px;">
                     <button id="btnUpgradeLV" class="btn-action btn-lv" style="flex:2; margin-top:0;">⚡ เลเวลอัป</button>
                     <button id="btnBulkUpgrade" class="btn-action btn-lv" style="flex:1; background: #00ff88; color: #000; margin-top:0;">MAX</button>
                 </div>
-                <button id="btnUpgradeStar" class="btn-action btn-star" style="display:none; margin-top: 15px;">⭐ อัปดาว (ใช้เพียง 1 ใบ)</button>
-                <button id="btnAwakenCard" class="btn-action btn-awaken" style="display:none; margin-top: 15px;">🔮 ปลุกพลังการ์ด (AWAKEN)</button>
-                <div id="maxLevelMessage" style="display:none; text-align:center; color:#ffc831; font-weight:bold; margin-top:15px;"></div>
-                <button class="btn-nav" style="margin-top:15px; border-color: rgba(255,255,255,0.1);" onclick="document.getElementById('cardModal').style.display='none'">ปิด</button>
+                <button id="btnUpgradeStar" class="btn-action btn-star" style="display:none; margin-top: 12px;">⭐ อัปดาว (ใช้เพียง 1 ใบ)</button>
+                <button id="btnAwakenCard" class="btn-action btn-awaken" style="display:none; margin-top: 12px;">🔮 ปลุกพลังการ์ด (AWAKEN)</button>
+                <div id="maxLevelMessage" style="display:none; text-align:center; color:#ffc831; font-weight:bold; font-size:0.85rem; margin-top:10px;"></div>
+                <button class="btn-nav" style="margin-top:12px; border-color: rgba(255,255,255,0.1); width: 100%; padding: 10px;" onclick="document.getElementById('cardModal').style.display='none'">ปิด</button>
             </div>
         </div>
     </div>
@@ -556,7 +569,7 @@
             }
 
             const halloweenTagHTML = isHCard ? `<div class="card-halloween-badge">🎃 HALLOWEEN</div>` : '';
-            const expiredOverlay = isExpired ? `<div class="card-expired-overlay"><span>⌛ หมดเขตกิจกรรม</span><span style="font-size:0.6rem; color:#aaa;">ไม่สามารถใช้งานได้แล้ว \nเจอกันใหม่ปีหน้า!!</span></div>` : '';
+            const expiredOverlay = isExpired ? `<div class="card-expired-overlay"><span>⌛ หมดเขตกิจกรรม</span></div>` : '';
 
             div.innerHTML = `
                 ${starContent}
@@ -566,10 +579,10 @@
                 ${card.count > 1 && !isExpired ? `<div class="card-count-badge">x${card.count}</div>` : ''}
                 ${card.isLocked && !isExpired ? `<div class="card-lock-badge">🔒</div>` : ''}
                 <img src="${card.img || card.image || ''}">
-                <div style="padding:10px; background: rgba(0,0,0,0.8);">
-                    <div style="color:${isExpired ? '#777' : ((card.awakening || 0) > 0 ? '#00f3ff' : (rarityColors[r] || '#fff'))}; font-size:0.75rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${card.name} ${(card.awakening || 0) > 0 && !isExpired ? '✨🔮' : ''}</div>
-                    <div style="color:${isExpired ? '#777' : '#ffc831'}; font-size:0.8rem; font-weight:bold;">⚡ ${isExpired ? '0 (หมดอายุ)' : getArenaPower(card).toLocaleString()}</div>
-                    <div style="color:#aaa; font-size:0.65rem;">LV. ${card.level || 1}</div>
+                <div style="padding:8px; background: rgba(0,0,0,0.8);">
+                    <div style="color:${isExpired ? '#777' : ((card.awakening || 0) > 0 ? '#00f3ff' : (rarityColors[r] || '#fff'))}; font-size:0.7rem; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${card.name} ${(card.awakening || 0) > 0 && !isExpired ? '✨🔮' : ''}</div>
+                    <div style="color:${isExpired ? '#777' : '#ffc831'}; font-size:0.75rem; font-weight:bold;">⚡ ${isExpired ? '0 (หมดอายุ)' : getArenaPower(card).toLocaleString()}</div>
+                    <div style="color:#aaa; font-size:0.6rem;">LV. ${card.level || 1}</div>
                 </div>`;
             grid.appendChild(div);
         });
@@ -647,7 +660,7 @@
                     const awakenCost = nextAwkLevel * 200;
                     awakenBtn.innerText = `🔮 ปลุกพลังดาวที่ ${nextAwkLevel} (ใช้ ⭐ ${awakenCost.toLocaleString()})`;
                     awakenBtn.onclick = () => handleAwaken(card, awakenCost);
-                    maxMsg.innerText = `⚡ การ์ดเงื่อนไขถึงกำหนด พร้อมปลุกพลัง! (ดาวปัจจุบัน: ${currentAwakening}/5)`;
+                    maxMsg.innerText = `⚡ พร้อมปลุกพลัง! (ดาวปัจจุบัน: ${currentAwakening}/5)`;
                 } else {
                     awakenBtn.style.display = "none";
                     maxMsg.innerText = "🌈 ปลุกพลังเต็มขั้นสูงสุดสมบูรณ์แบบ! (Awakening Max) 🌈";
@@ -762,7 +775,7 @@
     }
 
     async function handleSingleSell(card) {
-        if (card.isLocked) return alert("❌ ไม่สามารถขายได้เนื่องจากเปิดระบบล็อกการ์ดไว้ ปลดล็อกก่อนทำการขาย!");
+        if (card.isLocked) return alert("❌ ไม่สามารถขายได้เนื่องจากเปิดระบบล็อกการ์ดไว้!");
         if(!confirm(`ขายการ์ด ${card.name} หรือไม่?`)) return;
         let updated = [...userCards];
         const idx = updated.findIndex(c => c.name === card.name && (c.rarity || '').toUpperCase() === (card.rarity || '').toUpperCase() && c.level === card.level && c.stars === card.stars && (c.awakening || 0) === (card.awakening || 0) && isHalloweenCard(c) === isHalloweenCard(card));
