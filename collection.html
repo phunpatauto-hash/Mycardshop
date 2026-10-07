@@ -868,7 +868,7 @@
 
     const fCon = document.getElementById("filterContainer");
     if (fCon) {
-        ['ALL','ADMIN','P','SECRET','USEC','EXR','CBR','SEC','SUR','PR','UR','SSR','SR','R','U','C'].forEach(r => {
+        ['ALL','P','SECRET','USEC','EXR','CBR','SEC','SUR','PR','UR','SSR','SR','R','U','C'].forEach(r => {
             const btn = document.createElement("button");
             btn.className = `filter-btn ${r === 'ALL' ? 'active' : ''}`;
             btn.innerText = r;
