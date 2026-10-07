@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>มินิเกม</title>
+    <title>รวมมินิเกมสนุกๆ - ฮาโลวีนอารีน่า</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -12,7 +12,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc, increment, collection, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, updateDoc, increment, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
@@ -30,16 +30,26 @@
         let currentUserId = null;
         let currentUserDisplayName = "ผู้เล่นเกม";
 
+        // ฟังก์ชันย่อตัวเลขเหรียญ (เช่น 1,500 -> 1.5K, 1,000,000 -> 1M, 20,000,000,000 -> 20B)
         function formatCompactNumber(number) {
             if (!number || isNaN(number)) return "0";
             const num = Number(number);
-            if (num >= 1e12) return (num / 1e12).toFixed(1).replace(/\.0$/, '') + 'T';
-            if (num >= 1e9) return (num / 1e9).toFixed(1).replace(/\.0$/, '') + 'B';
-            if (num >= 1e6) return (num / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
-            if (num >= 1e3) return (num / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
+            if (num >= 1e12) {
+                return (num / 1e12).toFixed(1).replace(/\.0$/, '') + 'T';
+            }
+            if (num >= 1e9) {
+                return (num / 1e9).toFixed(1).replace(/\.0$/, '') + 'B';
+            }
+            if (num >= 1e6) {
+                return (num / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+            }
+            if (num >= 1e3) {
+                return (num / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
+            }
             return num.toString();
         }
 
+        // ตรวจสอบสถานะการล็อกอินและดึงข้อมูลบัญชีจริงจาก Firestore
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUserId = user.uid;
@@ -52,6 +62,7 @@
                         currentUserDisplayName = userData.username || user.email || "ผู้เล่นเกม";
                         document.getElementById("profile-name").innerText = currentUserDisplayName;
                         
+                        // ดึงข้อมูล HALLOWEEN Coin จาก Firestore
                         const userHalloweenCoins = userData.halloween_coins ?? userData.halloweenCoins ?? userData.halloweenCoin ?? userData.coins ?? 0;
                         document.getElementById("user-halloween-coins").innerText = formatCompactNumber(userHalloweenCoins);
 
@@ -63,10 +74,6 @@
                         document.getElementById("profile-name").innerText = currentUserDisplayName;
                         document.getElementById("user-halloween-coins").innerText = "0";
                     }
-
-                    // ตรวจสอบและจัดการรีเซ็ตกระดานผู้นำทันทีที่ล็อกอินเข้าหน้ามินิเกมสำเร็จ
-                    await checkAndProcessLeaderboardReset();
-
                 } catch (error) {
                     console.error("Error loading user profile:", error);
                     document.getElementById("profile-name").innerText = "เกิดข้อผิดพลาดในการโหลดชื่อ";
@@ -78,6 +85,7 @@
             }
         });
 
+        // ฟังก์ชันตรวจสอบและหักค่าเข้าเล่นเกม (10,000 Coin, จำกัด 15 ครั้ง/วัน, รีเซ็ตเที่ยงวัน)
         window.tryEnterGame = async function(gameUrl) {
             if (!currentUserId) {
                 alert("⚠️ กรุณาเข้าสู่ระบบก่อนเข้าเล่นเกม");
@@ -96,12 +104,14 @@
                 const userData = userSnap.data();
                 const currentCoins = userData.halloween_coins ?? userData.halloweenCoins ?? userData.halloweenCoin ?? userData.coins ?? 0;
                 
+                // ตรวจสอบว่าเหรียญพอไหม (10,000 Coin)
                 const entryFee = 10000;
                 if (currentCoins < entryFee) {
                     alert("❌ HALLOWEEN Coin ของคุณไม่พอ! ต้องการ 10,000 Coin เพื่อเข้าเล่น");
                     return;
                 }
 
+                // ระบบเช็คโควตา 15 ครั้งต่อวัน และรีเซ็ตตอนเที่ยง (12:00 น.)
                 const now = new Date();
                 let resetTargetTime = new Date();
                 resetTargetTime.setHours(12, 0, 0, 0);
@@ -137,6 +147,7 @@
             }
         }
 
+        // ฟังก์ชันตรวจสอบและจำกัดการเข้าวงล้อนำโชค 2 ครั้งต่อวัน (รีเซ็ตเที่ยงวัน 12:00 น.)
         window.tryEnterWheel = async function(wheelUrl) {
             if (!currentUserId) {
                 alert("⚠️ กรุณาเข้าสู่ระบบก่อนเข้าวงล้อนำโชค");
@@ -153,6 +164,7 @@
                 }
 
                 const userData = userSnap.data();
+
                 const now = new Date();
                 let resetTargetTime = new Date();
                 resetTargetTime.setHours(12, 0, 0, 0);
@@ -181,108 +193,6 @@
             } catch (error) {
                 console.error("Error entering wheel: ", error);
                 alert("เกิดข้อผิดพลาดในการตรวจสอบสิทธิ์วงล้อ กรุณาลองใหม่อีกครั้ง");
-            }
-        }
-
-        // ระบบตรวจสอบเวลาและจัดการรีเซ็ตกระดานผู้นำทุกๆ 1 วัน (24 ชั่วโมง)
-        async function checkAndProcessLeaderboardReset() {
-            try {
-                const settingsRef = doc(db, "systemSettings", "leaderboardReset");
-                const settingsSnap = await getDoc(settingsRef);
-                
-                const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-                const now = Date.now();
-
-                let nextResetTime;
-
-                if (!settingsSnap.exists()) {
-                    // กำหนดเวลาเริ่มนับถอยหลังรอบแรก (24 ชม. จากตอนนี้)
-                    nextResetTime = now + ONE_DAY_MS;
-                    await setDoc(settingsRef, { nextResetTimestamp: nextResetTime });
-                    return;
-                }
-
-                const data = settingsSnap.data();
-                nextResetTime = data.nextResetTimestamp;
-
-                // หากเวลาปัจจุบันเลยกำหนดรีเซ็ตแล้ว
-                if (now >= nextResetTime) {
-                    console.log("Leaderboard reset time reached. Processing rewards & resetting scores...");
-
-                    // 1. ดึงคะแนนปัจจุบันมาสรุปอันดับ
-                    const querySnapshot = await getDocs(collection(db, "candyHuntScores"));
-                    const playerScores = {};
-                    const allScoreDocs = [];
-
-                    querySnapshot.forEach((docSnap) => {
-                        const item = docSnap.data();
-                        allScoreDocs.push({ id: docSnap.id, ...item });
-                        const key = item.uid || item.name || 'ไม่ระบุชื่อ';
-                        
-                        if (!playerScores[key]) {
-                            playerScores[key] = {
-                                name: item.name || 'ไม่ระบุชื่อ',
-                                score: 0,
-                                uid: item.uid || ''
-                            };
-                        }
-                        playerScores.score += Number(item.score) || 0;
-                    });
-
-                    const sortedPlayers = Object.values(playerScores).sort((a, b) => b.score - a.score);
-                    const topThree = sortedPlayers.slice(0, 3);
-
-                    // 2. แจกรางวัลให้ผู้ที่ติดอันดับ 1-3 อัตโนมัติ (ไม่ว่าเจ้าตัวจะออนไลน์อยู่หรือไม่)
-                    for (let i = 0; i < topThree.length; i++) {
-                        const player = topThree[i];
-                        if (player.uid) {
-                            let rewardCoins = 0;
-                            if (i === 0) rewardCoins = 1000000000; // อันดับ 1: 1B
-                            else if (i === 1) rewardCoins = 500000000;  // อันดับ 2: 500M
-                            else if (i === 2) rewardCoins = 100000000;  // อันดับ 3: 100M
-
-                            if (rewardCoins > 0) {
-                                const winnerRef = doc(db, "users", player.uid);
-                                await updateDoc(winnerRef, {
-                                    halloween_coins: increment(rewardCoins)
-                                });
-                            }
-                        }
-                    }
-
-                    // 3. รีเซ็ตคะแนนในฐานข้อมูล (ลบประวัติคะแนนเก่าเพื่อเริ่มรอบใหม่)
-                    // หมายเหตุ: เพื่อความปลอดภัยสามารถเคลียร์ Collection candyHuntScores หรือทำเครื่องหมายได้
-                    for (const scoreDoc of allScoreDocs) {
-                        // ทำการลบเอกสารคะแนนเก่าออกเพื่อให้คะแนนเริ่มต้นใหม่เป็นศูนย์
-                        const { deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
-                        await deleteDoc(doc(db, "candyHuntScores", scoreDoc.id));
-                    }
-
-                    // 4. ตั้งเวลารีเซ็ตครั้งถัดไปอีก 24 ชั่วโมงข้างหน้า
-                    const newResetTime = now + ONE_DAY_MS;
-                    await updateDoc(settingsRef, { nextResetTimestamp: newResetTime });
-
-                    // 5. ค้นหาอันดับของผู้ใช้งานปัจจุบันเพื่อแสดง Popup แจ้งเตือน
-                    let userRankText = "ไม่ติดอันดับรางวัลในรอบที่ผ่านมา";
-                    if (currentUserId) {
-                        const myIndex = sortedPlayers.findIndex(p => p.uid === currentUserId || p.name === currentUserDisplayName);
-                        if (myIndex !== -1) {
-                            userRankText = `คุณจบการแข่งขันในอันดับที่ ${myIndex + 1} !`;
-                        }
-                    }
-
-                    Swal.fire({
-                        title: '🏆 สรุปผลกระดานผู้นำประจำวัน',
-                        text: `การแข่งขันรอบก่อนหน้าสิ้นสุดและรีเซ็ตคะแนนเรียบร้อยแล้ว!\n${userRankText}\nระบบได้ทำการแจกรางวัลให้ผู้ชนะเรียบร้อยแล้ว เริ่มสะสมคะแนนรอบใหม่กันเลย!`,
-                        icon: 'success',
-                        background: '#1a1a2e',
-                        color: '#fff',
-                        confirmButtonText: 'ลุยเลย!',
-                        confirmButtonColor: '#4ecdc4'
-                    });
-                }
-            } catch (e) {
-                console.error("Error processing leaderboard reset: ", e);
             }
         }
 
@@ -366,46 +276,50 @@
             startNewGamesCountdown();
         };
 
-        // ฟังก์ชันแสดงเวลานับถอยหลังรีเซ็ตจริงอิงจาก Firebase
-        async function startResetCountdown() {
-            const timerElement = document.getElementById("reset-timer");
+        // ฟังก์ชันแสดง Popup แจ้งอันดับเมื่อเวลารีเซ็ตหมดลง
+        async function checkAndShowResetPopup() {
+            const sortedPlayers = await loadLeaderboard();
+            let userRank = "ไม่ติดอันดับ";
             
-            try {
-                const settingsRef = doc(db, "systemSettings", "leaderboardReset");
-                const settingsSnap = await getDoc(settingsRef);
-                
-                let nextResetTime;
-                const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+            if (currentUserId) {
+                const foundIndex = sortedPlayers.findIndex(p => p.uid === currentUserId || p.name === currentUserDisplayName);
+                if (foundIndex !== -1) {
+                    userRank = `อันดับที่ ${foundIndex + 1}`;
+                }
+            }
 
-                if (!settingsSnap.exists()) {
-                    nextResetTime = Date.now() + ONE_DAY_MS;
-                    await setDoc(settingsRef, { nextResetTimestamp: nextResetTime });
-                } else {
-                    nextResetTime = settingsSnap.data().nextResetTimestamp;
+            Swal.fire({
+                title: '🏆 สรุปผลกระดานผู้นำประจำวัน',
+                text: `การแข่งขันรอบนี้รีเซ็ตแล้ว! คุณได้รับ: ${userRank}`,
+                icon: 'info',
+                background: '#1a1a2e',
+                color: '#fff',
+                confirmButtonText: 'ตกลง',
+                confirmButtonColor: '#4ecdc4'
+            });
+        }
+
+        function startResetCountdown() {
+            // เปลี่ยนจาก 4 วัน เป็น 1 วัน (24 ชั่วโมง)
+            const countDownDate = new Date().getTime() + (1 * 24 * 60 * 60 * 1000);
+            
+            const timerInterval = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = countDownDate - now;
+
+                if (distance < 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById("reset-timer").innerText = "รีเซ็ตแล้ว";
+                    checkAndShowResetPopup();
+                    return;
                 }
 
-                const timerInterval = setInterval(() => {
-                    const now = new Date().getTime();
-                    const distance = nextResetTime - now;
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-                    if (distance < 0) {
-                        clearInterval(timerInterval);
-                        timerElement.innerText = "กำลังรีเซ็ต...";
-                        setTimeout(() => location.reload(), 2000); // รีโหลดหน้าเพื่อประมวลผลรางวัลและรีเซ็ตคะแนนทันที
-                        return;
-                    }
-
-                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                    timerElement.innerText = `${hours}ชม. ${minutes}นาที ${seconds}วิ`;
-                }, 1000);
-
-            } catch (e) {
-                console.error("Error starting countdown: ", e);
-                timerElement.innerText = "24ชม. 0นาที";
-            }
+                document.getElementById("reset-timer").innerText = `${hours}ชม. ${minutes}นาที ${seconds}วิ`;
+            }, 1000);
         }
 
         function startNewGamesCountdown() {
@@ -768,8 +682,8 @@
     </div>
 
     <div class="hub-container">
-        <h1>🎃 Arcade game 🕹️</h1>
-        <p class="subtitle">เล่นมินิเกมสะสมคะแนนรับเหรียญหรือหมุนวงล้อเพื่อลุ้นรับรางวัล HALLOWEEN Coin!!!</p>
+        <h1>🎃 Arcade Hub & Lucky Wheel 🕹️</h1>
+        <p class="subtitle">เล่นมินิเกมสะสมคะแนน หรือหมุนวงล้อนำโชคเพื่อลุ้นรับรางวัล HALLOWEEN Coin สุดอลังการ</p>
 
         <div class="games-grid">
             <div class="game-card" onclick="tryEnterGame('Candy Hunt.html')">
