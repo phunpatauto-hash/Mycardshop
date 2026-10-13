@@ -467,6 +467,22 @@
         .banner-diamond-shop:hover { border-color: #00e5ff; box-shadow: 0 0 25px rgba(0, 229, 255, 0.4); }
         .banner-diamond-shop .shop-glow-icon { color: #00e5ff; text-shadow: 0 0 15px rgba(0, 229, 255, 0.8); }
 
+        /* --- ✨ เอฟเฟกต์สีรุ้งเคลื่อนไหวพิเศษสำหรับยศ ปาร์ตี้ราชันย์ภูตผี👻 --- */
+        .profile-link.ghost-king-party-bg {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(270deg, #a855f7, #ff6b00, #00d4ff, #a855f7);
+            background-size: 400% 400%;
+            animation: ghostKingRainbowBg 6s ease infinite;
+            border: 1px solid #ff6b00;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.6), 0 0 10px rgba(255, 107, 0, 0.5);
+        }
+        @keyframes ghostKingRainbowBg {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         /* --- ✨ Halloween Metallic/Glossy Shimmer Effect for Profile Link --- */
         .profile-link.halloween-glossy-bg {
             position: relative;
@@ -533,7 +549,7 @@
             <li><a href="javascript:void(0)" onclick="checkAuthAndNavigate('redeem.html')" style="color: #ffc831;"><i class="fas fa-gift"></i> แลกโค้ด</a></li>
             <li><a href="javascript:void(0)" onclick="checkAuthAndNavigate('Cookie city.html')"><i class="fas fa-city"></i> Cookie city</a></li>
             <li><a href="javascript:void(0)" onclick="checkAuthAndNavigate('Banner Selection.html')"><i class="fas fa-magic"></i> สุ่มการ์ดนำโชค</a></li>
-            <li><a href="javascript:void(0)" onclick="checkAuthAndNavigate('Grand Arena.html')" style="color: #e63946;"><i class="fas fa-fist-raised"></i> Grand Arena</a></li>
+            <li><a href="javascript:void(0)" onclick="checkAuthAndNavigate('Battle.html')" style="color: #e63946;"><i class="fas fa-fist-raised"></i> Battle Arena</a></li>
             <li id="sidebar-logout-item" style="display: none; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
                 <button id="sidebar-logout-btn" style="color: #ff4d4d;"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</button>
             </li>
@@ -564,14 +580,6 @@
         <div class="modal-content">
             <h2 style="color: #00e5ff;"><i class="fas fa-calendar-star"></i> กิจกรรมประจำสัปดาห์</h2>
             <p style="color: #a0aec0; font-size: 0.85rem; margin-top: -5px;">เลือกเข้าร่วมกิจกรรมพิเศษเพื่อรับรางวัลมากมาย!</p>
-
-            <div class="weekly-event-card" onclick="checkAuthAndNavigate('halloween_event.html')">
-                <div class="weekly-event-info">
-                    <h4> 🎃 Halloween Event  </h4>
-                    <p>มาสนุกกับ🎃 Halloween Event กันเถอะ!!!</p>
-                </div>
-                <i class="fas fa-angle-right" style="color: #00e5ff; font-size: 1.5rem;"></i>
-            </div>
             
             <div class="weekly-event-card" onclick="checkAuthAndNavigate('random gacha.html')">
                 <div class="weekly-event-info">
@@ -780,7 +788,7 @@
             
             <!-- Halloween Event Banner (เปิดให้เข้าเฉพาะ 1 ต.ค. - 31 ต.ค.) -->
             <div class="modern-banner" style="background: linear-gradient(135deg, #ff7518, #2a0845); color: white; grid-column: span 2;" onclick="checkHalloweenEvent()">
-                <h3>🎃 Halloween Event </h3>
+                <h3>🎃 Halloween Event (เปิดให้เข้าวันที่ 1 ตุลาคมนี้!!!)</h3>
                 <p>อีเวนต์สุดพิเศษต้อนรับวันฮาโลวีน ออกไปขอลูกกวาดและสนุกกับเพื่อนกันเถอะ!</p>
                 <i class="fas fa-ghost main-icon"></i>
             </div>
@@ -793,7 +801,7 @@
 
             <!-- Battle Pass -->
             <div class="modern-banner" style="background: linear-gradient(135deg, #ffc831, #ff8c00); color: #000; grid-column: span 2;" onclick="checkAuthAndNavigate('Pass (Battle Pass).html')">
-                <h3>🏆 BATTLE PASS SS7: คืนแห่งการไถ่บาป Halloween part 1</h3>
+                <h3>🏆 Battle Pass SS5 : เรื่องวุ้นๆของสัตว์ตัวน้อย</h3>
                 <p>ทำภารกิจเพื่อรับการ์ดระดับพรีเมียมประจำซีซั่น!</p>
                 <i class="fas fa-trophy main-icon"></i>
             </div>
@@ -877,10 +885,10 @@
         const date = now.getDate();     // วันที่ (1-31)
 
         // ตรวจสอบว่าเป็นเดือนตุลาคม (10) และวันที่อยู่ระหว่าง 1 ถึง 31 หรือไม่
-        if (month === 10 && date >= 3 && date <= 31) {
+        if (month === 10 && date >= 1 && date <= 31) {
             window.location.href = "halloween_event.html";
         } else {
-            alert("🎃 กิจกรรม Halloween ยังไม่เปิดให้บริการ! จะเปิดให้ในวันที่ 3 ตุลาคม ถึง 31 ตุลาคม เท่านั้น อดทนรอก่อนน้า!!!");
+            alert("🎃 กิจกรรม Halloween ยังไม่เปิดให้บริการ! จะเปิดให้ในวันที่ 1 ตุลาคม ถึง 31 ตุลาคม เท่านั้น อดทนรอก่อนน้า!!!");
         }
     };
 
@@ -1272,11 +1280,16 @@
                         }
                     }
 
-                    // --- ✨ ตรวจสอบเงื่อนไขยศพิเศษ Halloween เพื่อเปิดใช้งานพื้นหลังสีมันเงา ---
+                    // --- ✨ ตรวจสอบเงื่อนไขยศพิเศษ ปาร์ตี้ราชันย์ภูตผี👻 เพื่อเปิดใช้งานพื้นหลังสีรุ้ง และยศฮาโลวีนเดิม ---
                     if (profileLinkBox) {
-                        if (data.currentTitle === "Halloween is Time 🎃" || data.currentTitle === "happy HALLOWEEN 🎃") {
+                        if (data.currentTitle === "ปาร์ตี้ราชันย์ภูตผี👻") {
+                            profileLinkBox.classList.add("ghost-king-party-bg");
+                            profileLinkBox.classList.remove("halloween-glossy-bg");
+                        } else if (data.currentTitle === "Halloween is Time 🎃" || data.currentTitle === "happy HALLOWEEN 🎃") {
                             profileLinkBox.classList.add("halloween-glossy-bg");
+                            profileLinkBox.classList.remove("ghost-king-party-bg");
                         } else {
+                            profileLinkBox.classList.remove("ghost-king-party-bg");
                             profileLinkBox.classList.remove("halloween-glossy-bg");
                         }
                     }
