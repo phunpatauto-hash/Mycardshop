@@ -1182,7 +1182,7 @@
                     </div>
                     <div class="filter-group">
             `;
-            ['ALL','P','SECRET','UR','SSR','SR','R','U','C'].forEach(r => {
+            ['ALL','P','SECRET','USEC','EXR','CBR','SEC','SUR','PR','UR','SSR','SR','R','U','C'].forEach(r => {
                 htmlContent += `<button class="filter-btn ${modalRarityFilter === r ? 'active' : ''}" onclick="setModalRarity('${r}')">${r}</button>`;
             });
             htmlContent += `</div></div><div class="modal-card-grid">`;
