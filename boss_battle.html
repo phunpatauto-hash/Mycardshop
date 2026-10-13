@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>สนามต่อสู้บอสผี - ฮาโลวีนอารีน่า</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
+        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: #0d0714; color: white; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        
+        .battle-header {
+            background: rgba(18, 10, 26, 0.9);
+            border-bottom: 1px solid rgba(255, 107, 0, 0.3);
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            gap: 10px;
+        }
+        .boss-info-mini { display: flex; flex-direction: column; gap: 4px; width: 100%; max-width: 250px; }
+        .boss-hp-bar-container { width: 100%; background: rgba(255,255,255,0.1); height: 16px; border-radius: 10px; overflow: hidden; position: relative; border: 1px solid rgba(255,107,0,0.4); }
+        .boss-hp-bar-fill { height: 100%; background: linear-gradient(90deg, #ff4757, #ff6b81); width: 100%; transition: width 0.2s; }
+        .boss-hp-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: bold; text-shadow: 0 1px 2px #000; }
+
+        .battle-timer {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #ff6b00;
+            background: rgba(0,0,0,0.5);
+            padding: 4px 15px;
+            border-radius: 20px;
+            border: 2px solid rgba(255, 107, 0, 0.4);
+            box-shadow: 0 0 15px rgba(255, 107, 0, 0.3);
+            white-space: nowrap;
+        }
+
+        .battle-arena {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 10px;
+            touch-action: manipulation;
+        }
+
+        .boss-stage-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .boss-stage-center:active { transform: scale(0.95); }
+
+        .boss-avatar-battle {
+            font-size: 7.5rem;
+            animation: floatBossBattle 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 35px rgba(168, 85, 247, 0.8));
+            user-select: none;
+        }
+
+        @keyframes floatBossBattle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .boss-name-tag {
+            background: linear-gradient(135deg, #ff4757, #ff6b00);
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+            margin-top: 8px;
+        }
+
+        .active-combos-display {
+            margin-top: 6px;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .battle-combo-badge {
+            background: linear-gradient(135deg, #00d4ff, #a855f7);
+            color: #000;
+            font-weight: bold;
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            box-shadow: 0 0 8px rgba(0, 212, 255, 0.6);
+        }
+
+        .damage-popup {
+            position: absolute;
+            font-weight: 900;
+            font-size: 1.5rem;
+            color: #ffcc00;
+            text-shadow: 0 0 10px #ff3300, 0 0 20px #ff0000;
+            pointer-events: none;
+            animation: floatUpDamage 0.8s ease-out forwards;
+            z-index: 50;
+        }
+
+        @keyframes floatUpDamage {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-80px) scale(1.3); }
+        }
+
+        .battle-deck-container {
+            background: rgba(18, 10, 26, 0.95);
+            border-top: 2px solid rgba(255, 107, 0, 0.4);
+            padding: 10px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .deck-title { font-size: 0.8rem; color: #ff6b00; font-weight: bold; text-align: center; }
+
+        .battle-cards-grid {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            max-width: 100%;
+            padding-bottom: 4px;
+        }
+
+        .battle-card-slot {
+            width: 70px;
+            height: 95px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(255, 107, 0, 0.4);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3px;
+            position: relative;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .battle-card-slot img {
+            width: 36px;
+            height: 46px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 2px;
+        }
+
+        .battle-card-slot .card-name {
+            font-size: 0.5rem;
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            text-align: center;
+        }
+
+        .battle-card-slot .card-atk-val {
+            font-size: 0.5rem;
+            color: #00d4ff;
+        }
+
+        .countdown-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(13, 7, 20, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .countdown-number {
+            font-size: 7rem;
+            font-weight: 900;
+            color: #ff6b00;
+            text-shadow: 0 0 30px rgba(255, 107, 0, 0.8);
+            animation: pulseCount 1s infinite alternate;
+        }
+
+        @keyframes pulseCount {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.15); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="countdownOverlay" class="countdown-overlay">
+        <div class="countdown-number" id="countdownTxt">3</div>
+    </div>
+
+    <header class="battle-header">
+        <div class="boss-info-mini">
+            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: bold;">
+                <span id="boss-level-display">ราชันย์ภูตผี (LV. 1)</span>
+                <span id="boss-hp-num-display" style="color: #ff6b00;">10,000</span>
+            </div>
+            <div class="boss-hp-bar-container">
+                <div class="boss-hp-bar-fill" id="bossHpBarFill"></div>
+                <div class="boss-hp-text">HP BOSS</div>
+            </div>
+        </div>
+
+        <div class="battle-timer" id="battleTimerTxt">02:00</div>
+
+        <div>
+            <button onclick="window.location.href='boss_lobby.html'" style="background: rgba(255,71,87,0.2); border: 1px solid #ff4757; color: #ff4757; padding: 6px 12px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 0.75rem;">
+                <i class="fas fa-sign-out-alt"></i> ออก
+            </button>
+        </div>
+    </header>
+
+    <main class="battle-arena" id="battleArena" onclick="handleAttackBoss(event)" ontouchstart="handleTouchAttack(event)">
+        <div class="boss-stage-center" id="bossStageCenter">
+            <div class="boss-avatar-battle">👻</div>
+            <div class="boss-name-tag" id="bossNameTag">ราชันย์ภูตผี LV.1</div>
+            <div class="active-combos-display" id="activeCombosDisplay"></div>
+            <div style="font-size: 0.75rem; color: #a855f7; margin-top: 6px; text-align: center;">(แตะรัวๆ ที่บอสเพื่อโจมตีด่วน!)</div>
+        </div>
+    </main>
+
+    <section class="battle-deck-container">
+        <div class="deck-title"><i class="fas fa-id-card"></i> เด็คการ์ด (<span id="deckCountTxt">0</span> ใบ) | DPS: <span id="totalDpsTxt" style="color: #00d4ff;">0</span></div>
+        <div class="battle-cards-grid" id="battleDeckGrid"></div>
+    </section>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
+            authDomain: "sign-up-73f99.firebaseapp.com",
+            projectId: "sign-up-73f99",
+            storageBucket: "sign-up-73f99.appspot.com",
+            messagingSenderId: "916335559099",
+            appId: "1:916335559099:web:3a8ed896ba26e38991849e"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUserId = null;
+        let userName = "ผู้เล่น";
+        let bossLevel = 1;
+        let maxBossHp = 10000;
+        let currentBossHp = 10000;
+        let deckCards = [];
+        let activeCombos = [];
+        let totalDamageDealt = 0;
+        let totalDps = 0;
+        let attackIntervalMs = 200;
+        let battleActive = false;
+        let timeLeft = 120;
+        let battleTimerInterval = null;
+        let autoAttackInterval = null;
+        let userUpgrades = { click: 0, speed: 0, card: 0 };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUserId = user.uid;
+                await fetchUserData(user.uid);
+                await initBossBattleData();
+                startCountdown();
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        async function fetchUserData(uid) {
+            try {
+                const userSnap = await getDoc(doc(db, "users", uid));
+                if (userSnap.exists()) {
+                    userName = userSnap.data().username || userSnap.data().name || "ผู้เล่น";
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function initBossBattleData() {
+            try {
+                const bossSnap = await getDoc(doc(db, "users", currentUserId, "bossProgress", "data"));
+                if (bossSnap.exists()) bossLevel = bossSnap.data().bossLevel || 1;
+            } catch (e) { console.error(e); }
+
+            try {
+                const upSnap = await getDoc(doc(db, "users", currentUserId, "bossUpgrades", "data"));
+                if (upSnap.exists()) {
+                    userUpgrades = upSnap.data();
+                } else {
+                    const localUp = JSON.parse(localStorage.getItem(`bossUpgrades_${currentUserId}`));
+                    if (localUp) userUpgrades = localUp;
+                }
+            } catch (e) { console.error(e); }
+
+            maxBossHp = 10000 + ((bossLevel - 1) * 5000);
+            currentBossHp = maxBossHp;
+
+            document.getElementById("boss-level-display").innerText = `ราชันย์ภูตผี (LV. ${bossLevel})`;
+            document.getElementById("bossNameTag").innerText = `ราชันย์ภูตผี LV.${bossLevel}`;
+            updateBossHpUI();
+
+            deckCards = JSON.parse(localStorage.getItem(`selectedBossDeck_${currentUserId}`)) || [];
+            if (deckCards.length === 0) {
+                alert("ยังไม่ได้เลือกการ์ดเข้าเด็ค กรุณาเลือกก่อน!");
+                window.location.href = "boss_lobby.html";
+                return;
+            }
+
+            activeCombos = JSON.parse(localStorage.getItem(`activeCardCombos_${currentUserId}`)) || [];
+            renderActiveCombosUI();
+            renderBattleDeck();
+            calculateTotalDpsAndBuffs();
+        }
+
+        function renderActiveCombosUI() {
+            const container = document.getElementById("activeCombosDisplay");
+            container.innerHTML = activeCombos.map(cb => `<span class="battle-combo-badge">${cb.name}</span>`).join('');
+        }
+
+        function calculateTotalDpsAndBuffs() {
+            let baseDps = 0;
+            deckCards.forEach(card => {
+                let atk = Number(card.atk || card.power || 100);
+                baseDps += atk;
+            });
+
+            let cardUpgradeBonus = 1 + (userUpgrades.card * 0.20);
+            baseDps = Math.floor(baseDps * cardUpgradeBonus);
+
+            let atkMultiplier = 1.0;
+            let speedMultiplier = 1.0;
+
+            activeCombos.forEach(cb => {
+                if (cb.bonusType === 'atk_percent') atkMultiplier += cb.value;
+                else if (cb.bonusType === 'attack_speed') speedMultiplier += cb.value;
+            });
+
+            let speedUpgradeBonus = 1 + (userUpgrades.speed * 0.05);
+            speedMultiplier *= speedUpgradeBonus;
+
+            totalDps = Math.floor(baseDps * atkMultiplier);
+            attackIntervalMs = Math.max(30, Math.floor(200 / speedMultiplier));
+
+            document.getElementById("totalDpsTxt").innerText = totalDps.toLocaleString();
+        }
+
+        function renderBattleDeck() {
+            document.getElementById("deckCountTxt").innerText = deckCards.length;
+            document.getElementById("battleDeckGrid").innerHTML = deckCards.map(c => `
+                <div class="battle-card-slot">
+                    <img src="${c.img || c.image || 'https://via.placeholder.com/50'}">
+                    <span class="card-name">${escapeHtml(c.name || 'การ์ด')}</span>
+                    <span class="card-atk-val">ATK ${c.atk || c.power || 100}</span>
+                </div>
+            `).join('');
+        }
+
+        function startCountdown() {
+            let count = 3;
+            const countTxt = document.getElementById("countdownTxt");
+            const overlay = document.getElementById("countdownOverlay");
+            const timer = setInterval(() => {
+                count--;
+                if (count > 0) countTxt.innerText = count;
+                else if (count === 0) countTxt.innerText = "FIGHT! ⚔️";
+                else { clearInterval(timer); overlay.style.display = "none"; beginBattle(); }
+            }, 1000);
+        }
+
+        function beginBattle() {
+            battleActive = true;
+            battleTimerInterval = setInterval(() => {
+                timeLeft--;
+                let min = Math.floor(timeLeft / 60), sec = timeLeft % 60;
+                document.getElementById("battleTimerTxt").innerText = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+                if (timeLeft <= 0) endBattle(false);
+            }, 1000);
+
+            autoAttackInterval = setInterval(() => {
+                if (!battleActive) return;
+                applyDamage(Math.floor(totalDps / 5)); 
+            }, attackIntervalMs);
+        }
+
+        window.handleAttackBoss = function(event) {
+            if (!battleActive) return;
+            triggerClickDamage(event.clientX, event.clientY);
+        }
+
+        window.handleTouchAttack = function(event) {
+            if (!battleActive) return;
+            if (event.touches && event.touches.length > 0) {
+                const touch = event.touches[0];
+                triggerClickDamage(touch.clientX, touch.clientY);
+            }
+        }
+
+        function triggerClickDamage(x, y) {
+            let baseClickDmg = Math.max(50, Math.floor(totalDps * 0.1));
+            let clickUpgradeBonus = 1 + (userUpgrades.click * 0.10);
+            let clickDmg = Math.floor(baseClickDmg * clickUpgradeBonus);
+            applyDamage(clickDmg, x, y);
+        }
+
+        function applyDamage(amount, clientX = null, clientY = null) {
+            if (!battleActive) return;
+            currentBossHp -= amount;
+            totalDamageDealt += amount;
+
+            if (currentBossHp <= 0) {
+                currentBossHp = 0;
+                updateBossHpUI();
+                endBattle(true);
+                return;
+            }
+            updateBossHpUI();
+
+            if (clientX === null || clientY === null) {
+                const rect = document.getElementById("bossStageCenter").getBoundingClientRect();
+                clientX = rect.left + rect.width / 2 + (Math.random() * 40 - 20);
+                clientY = rect.top + (Math.random() * 30 - 15);
+            }
+            showDamagePopup(amount, clientX, clientY);
+        }
+
+        function showDamagePopup(dmg, x, y) {
+            const popup = document.createElement("div");
+            popup.className = "damage-popup";
+            popup.innerText = `-${dmg.toLocaleString()}`;
+            popup.style.left = `${x}px`;
+            popup.style.top = `${y}px`;
+            document.body.appendChild(popup);
+            setTimeout(() => popup.remove(), 600);
+        }
+
+        function updateBossHpUI() {
+            document.getElementById("boss-hp-num-display").innerText = `${currentBossHp.toLocaleString()} / ${maxBossHp.toLocaleString()}`;
+            document.getElementById("bossHpBarFill").style.width = `${Math.max(0, (currentBossHp / maxBossHp) * 100)}%`;
+        }
+
+        async function endBattle(isVictory) {
+            if (!battleActive) return;
+            battleActive = false;
+            clearInterval(battleTimerInterval);
+            clearInterval(autoAttackInterval);
+
+            try {
+                await setDoc(doc(db, "bossScores", currentUserId), {
+                    name: userName,
+                    bossLevel: bossLevel,
+                    totalDamage: increment(totalDamageDealt),
+                    updatedAt: new Date().toISOString()
+                }, { merge: true });
+
+                if (isVictory) {
+                    await setDoc(doc(db, "users", currentUserId, "bossProgress", "data"), { bossLevel: increment(1) }, { merge: true });
+                }
+            } catch (e) { console.error(e); }
+
+            Swal.fire({
+                title: isVictory ? '🎉 ปราบราชันย์ภูตผีสำเร็จ!' : '⏰ หมดเวลาการต่อสู้!',
+                html: `
+                    <div style="text-align: left; font-size: 0.95rem; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-top: 10px;">
+                        <p style="margin: 5px 0;">🎯 <b>สถานะ:</b> <span style="color: ${isVictory ? '#33ffad' : '#ff4d4d'};">${isVictory ? 'ชนะบอส' : 'แพ้ (หมดเวลา)'}</span></p>
+                        <p style="margin: 5px 0;">⚔️ <b>ดาเมจรวม:</b> <span style="color: #ff6b00; font-weight: bold;">${totalDamageDealt.toLocaleString()}</span></p>
+                    </div>
+                `,
+                icon: isVictory ? 'success' : 'info',
+                background: '#120a1a', color: '#fff',
+                confirmButtonText: 'กลับสู่ล็อบบี้บอส', confirmButtonColor: '#ff6b00',
+                allowOutsideClick: false
+            }).then(() => { window.location.href = "boss_lobby.html"; });
+        }
+
+        function escapeHtml(text) {
+            return (text || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+    </script>
+</body>
+</html>

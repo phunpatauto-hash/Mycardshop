@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ล็อบบี้ตีบอสผี - ฮาโลวีนอารีน่า</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: #0d0714; color: white; line-height: 1.6; }
+        
+        /* --- Navbar --- */
+        .navbar { 
+            background: rgba(18, 10, 26, 0.85); backdrop-filter: blur(15px);
+            padding: 0 15px; display: flex; justify-content: space-between; align-items: center; 
+            position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid rgba(255, 107, 0, 0.3); height: 70px; 
+        }
+        .nav-left { display: flex; align-items: center; gap: 10px; }
+        .navbar .logo { font-size: 1.1rem; font-weight: 700; color: #ff6b00; text-transform: uppercase; text-shadow: 0 0 10px rgba(255, 107, 0, 0.5); }
+        .nav-links { list-style: none; display: flex; gap: 10px; margin: 0; align-items: center; padding: 0; }
+        .nav-links a { color: rgba(255,255,255,0.8); text-decoration: none; transition: 0.3s; font-size: 0.85rem; cursor: pointer; }
+        .nav-links a:hover { color: #ff6b00; }
+
+        .profile-info-block { display: flex; flex-direction: column; gap: 2px; }
+        .profile-meta-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .profile-link { 
+            text-decoration: none; display: flex; align-items: center; gap: 10px;
+            padding: 6px 12px; border-radius: 20px; background: rgba(255, 255, 255, 0.05); 
+            border: 1px solid rgba(255, 107, 0, 0.3); cursor: pointer; 
+            transition: transform 0.2s, background 0.2s; user-select: none;
+        }
+        .nav-avatar { width: 36px; height: 36px; border-radius: 50%; border: 2px solid #ff6b00; background: #222; object-fit: cover; }
+        
+        .currency-display { display: flex; gap: 10px; font-size: 0.75rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2px; margin-top: 2px; }
+        .diamond-text { color: #00e5ff; font-weight: bold; }
+        .halloween-coin-text { color: #ff6b00; font-weight: bold; text-shadow: 0 0 5px rgba(255, 107, 0, 0.6); }
+
+        .btn-purple { 
+            background: linear-gradient(135deg, #a855f7, #6b21a8); 
+            padding: 8px 16px; border-radius: 10px; font-weight: 600; cursor: pointer; border: none; color: white; text-decoration: none; font-size: 0.85rem;
+        }
+
+        /* --- Container & Layout --- */
+        .container { max-width: 1140px; margin: 0 auto; padding: 20px 15px; display: flex; flex-direction: column; gap: 20px; }
+        
+        .main-lobby-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        @media(min-width: 900px) {
+            .main-lobby-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Boss Section */
+        .boss-section {
+            background: linear-gradient(135deg, #1f102e 0%, #0d0714 100%);
+            border: 2px solid rgba(255, 107, 0, 0.4);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(255, 107, 0, 0.15);
+        }
+
+        .boss-level-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: linear-gradient(135deg, #ff4757, #ff6b81);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            box-shadow: 0 4px 10px rgba(255, 71, 87, 0.4);
+        }
+
+        .boss-avatar-container {
+            font-size: 5.5rem;
+            margin: 15px 0;
+            animation: floatBoss 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 25px rgba(168, 85, 247, 0.8));
+        }
+
+        @keyframes floatBoss {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .hp-container {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            height: 24px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 107, 0, 0.3);
+            margin-top: 8px;
+        }
+
+        .hp-bar {
+            background: linear-gradient(90deg, #ff4757, #ff6b81);
+            height: 100%;
+            width: 100%;
+            border-radius: 20px;
+            transition: width 0.3s ease;
+        }
+
+        .hp-text {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+        }
+
+        /* Right Section */
+        .right-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Upgrade Box Style */
+        .upgrade-box {
+            background: linear-gradient(135deg, #1f102e 0%, #0d0714 100%);
+            border: 2px solid rgba(168, 85, 247, 0.4);
+            border-radius: 20px;
+            padding: 15px 20px;
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.15);
+        }
+        .upgrade-item {
+            background: rgba(0,0,0,0.4);
+            padding: 10px 12px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255,107,0,0.2);
+            margin-top: 8px;
+            gap: 10px;
+        }
+        .btn-upgrade-action {
+            background: linear-gradient(135deg, #ff6b00, #a855f7);
+            border: none; color: white; padding: 6px 12px;
+            border-radius: 10px; font-weight: bold; cursor: pointer;
+            font-size: 0.75rem; font-family: 'Kanit', sans-serif;
+            transition: 0.2s; white-space: nowrap;
+        }
+        .btn-upgrade-action:hover { transform: scale(1.05); }
+
+        .leaderboard-box {
+            background: linear-gradient(135deg, #1f102e 0%, #0d0714 100%);
+            border: 2px solid rgba(255, 107, 0, 0.4);
+            border-radius: 20px;
+            padding: 20px;
+            flex-grow: 1;
+            box-shadow: 0 10px 30px rgba(255, 107, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .leaderboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .leaderboard-title {
+            color: #ff6b00;
+            font-size: 1rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-shadow: 0 0 10px rgba(255, 107, 0, 0.3);
+        }
+
+        /* Toggle Button Group */
+        .lb-switch-group {
+            display: flex;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 3px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 107, 0, 0.3);
+        }
+
+        .lb-switch-btn {
+            background: none;
+            border: none;
+            color: #aaa;
+            padding: 5px 10px;
+            border-radius: 9px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Kanit', sans-serif;
+        }
+
+        .lb-switch-btn.active {
+            background: linear-gradient(135deg, #ff6b00, #a855f7);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(255, 107, 0, 0.4);
+        }
+
+        .boss-lb-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        .boss-lb-table th {
+            color: #a855f7;
+            text-align: left;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .boss-lb-table td {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* Rank Badge Style */
+        .my-rank-banner {
+            background: rgba(168, 85, 247, 0.15);
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            border-radius: 12px;
+            padding: 10px 12px;
+            margin-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .season-timer-row {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .season-timer-tag {
+            font-size: 0.7rem;
+            color: #ffcc00;
+            background: rgba(255, 204, 0, 0.1);
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 204, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0;
+        }
+
+        .btn-fight {
+            background: linear-gradient(135deg, #ff6b00, #a855f7);
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(255, 107, 0, 0.4);
+            transition: 0.3s;
+            font-family: 'Kanit', sans-serif;
+            width: 100%;
+        }
+
+        .btn-fight:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(168, 85, 247, 0.6);
+        }
+
+        /* Bottom Deck Section */
+        .bottom-card-section {
+            background: linear-gradient(135deg, #1f102e 0%, #0d0714 100%);
+            border: 2px dashed rgba(255, 107, 0, 0.5);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 10px 30px rgba(255, 107, 0, 0.15);
+        }
+
+        .card-slot-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #ff6b00;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-weight: bold;
+        }
+
+        .btn-open-collection {
+            background: linear-gradient(135deg, #a855f7, #6b21a8);
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+            font-family: 'Kanit', sans-serif;
+            transition: 0.2s;
+        }
+        .btn-open-collection:hover { transform: scale(1.05); }
+
+        .combo-active-box {
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            border-radius: 12px;
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .combo-title {
+            color: #00d4ff;
+            font-size: 0.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .combo-tags-container {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .combo-badge {
+            background: linear-gradient(135deg, #00d4ff, #a855f7);
+            color: #000;
+            font-weight: bold;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            box-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
+        }
+
+        .deck-slots-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        @media(min-width: 768px) {
+            .deck-slots-grid {
+                grid-template-columns: repeat(10, 1fr);
+            }
+        }
+
+        .card-slot {
+            height: 100px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            padding: 3px;
+            transition: 0.2s;
+        }
+
+        .card-slot.empty:hover { border-color: #ff6b00; color: #ff6b00; }
+        .card-slot.active {
+            border: 2px solid #ff6b00;
+            background: linear-gradient(135deg, #2c1a40, #120a1a);
+            box-shadow: 0 0 10px rgba(255, 107, 0, 0.4);
+        }
+
+        .card-slot .card-img {
+            width: 38px;
+            height: 38px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 2px;
+        }
+
+        .card-slot .card-name {
+            font-size: 0.6rem;
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            text-align: center;
+        }
+
+        .card-slot .card-atk { font-size: 0.55rem; color: #ff6b00; }
+
+        .remove-overlay {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: rgba(255, 71, 87, 0.9);
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.55rem;
+            color: #fff;
+            opacity: 0;
+            transition: 0.2s;
+        }
+        .card-slot.active:hover .remove-overlay { opacity: 1; }
+
+        .modal-filter-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .filter-group {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .filter-btn {
+            padding: 3px 8px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            color: #aaa;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.7rem;
+            transition: 0.2s;
+        }
+        .filter-btn.active {
+            border-color: #ff6b00;
+            color: #fff;
+            background: rgba(255, 107, 0, 0.2);
+        }
+
+        .modal-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 8px;
+            max-height: 320px;
+            overflow-y: auto;
+            padding: 4px;
+        }
+
+        .modal-card-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        .modal-card-item:hover { border-color: #ff6b00; transform: translateY(-2px); }
+        .modal-card-item.selected {
+            border-color: #ff6b00;
+            background: rgba(255, 107, 0, 0.15);
+            box-shadow: 0 0 8px rgba(255, 107, 0, 0.4);
+        }
+
+        .check-icon {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            color: #ff6b00;
+            font-size: 1rem;
+            background: #120a1a;
+            border-radius: 50%;
+            z-index: 6;
+        }
+
+        .modal-card-img-wrap {
+            position: relative;
+            width: 55px;
+            height: 75px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 3px;
+        }
+        .modal-card-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+
+        .card-rarity-tag {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            padding: 1px 3px;
+            border-radius: 3px;
+            font-size: 0.5rem;
+            font-weight: bold;
+            color: #000;
+            z-index: 5;
+        }
+
+        .modal-card-name {
+            font-size: 0.65rem;
+            font-weight: bold;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 80px;
+            text-align: center;
+        }
+        .card-count-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: #ffc831;
+            color: #000;
+            padding: 1px 4px;
+            border-radius: 4px;
+            font-size: 0.55rem;
+            font-weight: bold;
+            z-index: 5;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-left">
+            <div class="logo">HALLOWEEN 🎃</div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">หน้าแรก</a></li>
+            <li><a href="collection.html">สมุดสะสม</a></li>
+            <li><a href="bag.html">กระเป๋า</a></li>
+            <li>
+                <div class="profile-link" id="profile-container" style="display: none;" onclick="window.location.href='profile.html'">
+                    <img src="" id="nav-avatar-img" class="nav-avatar">
+                    <div class="profile-info-block">
+                        <div class="profile-meta-row">
+                            <span id="user-display" style="color: #fff; font-weight: 700; font-size: 0.85rem;"></span>
+                        </div>
+                        <div class="currency-display">
+                            <span class="diamond-text">💎 <span id="user-diamonds">0</span></span>
+                            <span class="halloween-coin-text">🎃 <span id="user-halloween-coins">0</span></span>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li><a href="login.html" id="auth-btn" class="btn-purple">เข้าสู่ระบบ</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        <div class="main-lobby-grid">
+            <div class="boss-section">
+                <div class="boss-level-badge" id="boss-level-text">LV. 1</div>
+                <div class="boss-avatar-container">👻</div>
+                <h3 style="margin: 5px 0 12px 0; color: #ff6b00; font-size: 1.2rem; text-align: center;">ราชันย์ภูตผี (Halloween Boss)</h3>
+                
+                <div style="width: 100%;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 4px;">
+                        <span>พลังชีวิต (HP)</span>
+                        <span id="boss-hp-text" style="color: #ff6b00; font-weight: bold;">10,000 / 10,000</span>
+                    </div>
+                    <div class="hp-container">
+                        <div class="hp-bar" id="boss-hp-bar"></div>
+                        <div class="hp-text">พลังชีวิตบอส</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-section">
+                <div class="upgrade-box">
+                    <div style="color: #a855f7; font-size: 0.95rem; font-weight: bold; display: flex; align-items: center; gap: 6px;">
+                        <i class="fas fa-arrow-alt-circle-up"></i> ⚡ อัปเกรดความสามารถ (สูงสุด 100)
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 8px;">
+                        <div class="upgrade-item">
+                            <div>
+                                <div style="font-weight: bold; font-size: 0.8rem; color: #ff6b00;">👆 พลังคลิก (+10%)</div>
+                                <div style="font-size: 0.65rem; color: #aaa;" id="upClickInfo">เลเวล: 0/100 | 1,000 🎃</div>
+                            </div>
+                            <button class="btn-upgrade-action" onclick="upgradeSkill('click')">อัปเกรด</button>
+                        </div>
+                        <div class="upgrade-item">
+                            <div>
+                                <div style="font-weight: bold; font-size: 0.8rem; color: #00d4ff;">⚡ ความไว (+5%)</div>
+                                <div style="font-size: 0.65rem; color: #aaa;" id="upSpeedInfo">เลเวล: 0/100 | 1,500 🎃</div>
+                            </div>
+                            <button class="btn-upgrade-action" onclick="upgradeSkill('speed')">อัปเกรด</button>
+                        </div>
+                        <div class="upgrade-item">
+                            <div>
+                                <div style="font-weight: bold; font-size: 0.8rem; color: #ff4757;">⚔️ พลังการ์ด (+20%)</div>
+                                <div style="font-size: 0.65rem; color: #aaa;" id="upCardInfo">เลเวล: 0/100 | 2,000 🎃</div>
+                            </div>
+                            <button class="btn-upgrade-action" onclick="upgradeSkill('card')">อัปเกรด</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="leaderboard-box">
+                    <div class="season-timer-row">
+                        <div class="season-timer-tag">
+                            <i class="fas fa-clock"></i> รีซีซั่นใน: <span id="seasonCountdownTxt" style="font-weight: bold;">กำลังคำวณ...</span>
+                        </div>
+                    </div>
+
+                    <div class="leaderboard-header">
+                        <div class="leaderboard-title" id="lb-header-title">
+                            <i class="fas fa-trophy" style="color: #ff6b00;"></i> 📊 จัดอันดับตีบอส
+                        </div>
+                        <div class="lb-switch-group">
+                            <button class="lb-switch-btn active" id="btnTabLeaderboard" onclick="switchLbTab('RANK')">📊 อันดับ</button>
+                            <button class="lb-switch-btn" id="btnTabRewards" onclick="switchLbTab('REWARDS')">🎁 รางวัล</button>
+                        </div>
+                    </div>
+
+                    <div id="viewLeaderboard">
+                        <table class="boss-lb-table">
+                            <thead>
+                                <tr>
+                                    <th>ชื่อผู้ใช้</th>
+                                    <th style="text-align: center;">เลเวล</th>
+                                    <th style="text-align: right;">ดาเมจรวม</th>
+                                </tr>
+                            </thead>
+                            <tbody id="boss-leaderboard-body">
+                                <tr><td colspan="3" style="text-align: center; color: #888; padding: 10px;">กำลังโหลด...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="viewRewards" style="display: none;">
+                        <table class="boss-lb-table">
+                            <thead>
+                                <tr>
+                                    <th>อันดับ</th>
+                                    <th>รางวัล</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="color: #ffc831; font-weight: bold;">🥇 1 - 20</td>
+                                    <td>
+                                        <div>🎃 <b style="color: #ff6b00;">990M</b> Coin</div>
+                                        <div style="font-size: 0.7rem; color: #a855f7;">ยศ: <b>ราชันย์ภูตผี👻</b></div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="color: #00d4ff; font-weight: bold;">🥈 21 - 100</td>
+                                    <td>
+                                        <div>🎃 <b style="color: #ff6b00;">80M</b> Coin</div>
+                                        <div style="font-size: 0.7rem; color: #a855f7;">ยศ: <b>ราชันย์ภูตผี👻</b></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="my-rank-banner">
+                        <div>
+                            <span style="color: #aaa;">อันดับของคุณ:</span>
+                            <span id="myRankTxt" style="color: #ffcc00; font-weight: bold; margin-left: 4px;">กำลังคำวณ...</span>
+                        </div>
+                        <div id="claimPendingBtnContainer" style="display: none;">
+                            <button onclick="claimPendingReward()" style="background: linear-gradient(135deg, #00d4ff, #a855f7); border: none; color: #000; font-weight: bold; padding: 4px 10px; border-radius: 10px; cursor: pointer; font-size: 0.7rem;">
+                                🎁 รับรางวัลซีซั่น
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-fight" onclick="enterBossBattle()">
+                    <i class="fas fa-fire"></i> เข้าสู่สนามต่อสู้กับบอส!
+                </button>
+            </div>
+        </div>
+
+        <div class="bottom-card-section">
+            <div class="card-slot-header">
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <span><i class="fas fa-id-card"></i> จัดการ์ดต่อสู้:</span>
+                    <button class="btn-open-collection" onclick="openSelectCardModal()">
+                        <i class="fas fa-box-open"></i> เลือกการ์ด
+                    </button>
+                </div>
+                <span style="color: #ff6b00; font-weight: bold; font-size: 1rem;" id="card-count-text">0/10</span>
+            </div>
+
+            <div class="combo-active-box" id="combo-active-box" style="display: none;">
+                <div class="combo-title"><i class="fas fa-magic"></i> คอมโบที่เปิดใช้งาน:</div>
+                <div class="combo-tags-container" id="combo-tags-list"></div>
+            </div>
+
+            <div class="deck-slots-grid" id="deck-slots-container"></div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, getDocs, setDoc, updateDoc, increment, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
+            authDomain: "sign-up-73f99.firebaseapp.com",
+            projectId: "sign-up-73f99",
+            storageBucket: "sign-up-73f99.appspot.com",
+            messagingSenderId: "916335559099",
+            appId: "1:916335559099:web:3a8ed896ba26e38991849e"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const rarityColors = { 'ADMIN': '#ff0055', 'SECRET': '#D8BFD8', 'P': '#ff00ff', 'USEC': '#ff00ff', 'EXR': '#ff4d4d', 'CBR': '#ff4d4d', 'SEC': '#ffac33', 'SUR': '#33ffad', 'SSR': '#ffc831', 'PR': '#ffc831', 'UR': '#bf40bf', 'SR': '#33aaff', 'R': '#33ff57', 'U': '#ffffff', 'C': '#ffffff' };
+
+        let currentUserId = null;
+        let selectedBossCards = []; 
+        let userUniqueCards = []; 
+        let modalCategoryFilter = 'ALL';
+        let modalRarityFilter = 'ALL';
+        let myCurrentRank = 0;
+        let pendingRewardData = null;
+        let userUpgrades = { click: 0, speed: 0, card: 0 };
+
+        function isHalloweenCard(card) {
+            const rarityStr = (card && card.rarity ? card.rarity : '').toString().trim().toUpperCase();
+            return rarityStr.endsWith("HALLOWEEN");
+        }
+
+        function formatCompactNumber(number) {
+            if (!number || isNaN(number)) return "0";
+            const num = Number(number);
+            if (num >= 1e12) return (num / 1e12).toFixed(1).replace(/\.0$/, '') + 'T';
+            if (num >= 1e9) return (num / 1e9).toFixed(1).replace(/\.0$/, '') + 'B';
+            if (num >= 1e6) return (num / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+            if (num >= 1e3) return (num / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
+            return num.toString();
+        }
+
+        window.switchLbTab = function(tab) {
+            const btnRank = document.getElementById("btnTabLeaderboard");
+            const btnRewards = document.getElementById("btnTabRewards");
+            const viewLb = document.getElementById("viewLeaderboard");
+            const viewRew = document.getElementById("viewRewards");
+            const titleHeader = document.getElementById("lb-header-title");
+
+            if (tab === 'RANK') {
+                btnRank.classList.add("active");
+                btnRewards.classList.remove("active");
+                viewLb.style.display = "block";
+                viewRew.style.display = "none";
+                titleHeader.innerHTML = `<i class="fas fa-trophy" style="color: #ff6b00;"></i> 📊 จัดอันดับตีบอส`;
+            } else {
+                btnRewards.classList.add("active");
+                btnRank.classList.remove("active");
+                viewLb.style.display = "none";
+                viewRew.style.display = "block";
+                titleHeader.innerHTML = `<i class="fas fa-gift" style="color: #a855f7;"></i> 🎁 รายการของรางวัล`;
+            }
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUserId = user.uid;
+                await loadUserProfile(user);
+                await loadPlayerBossStatus();
+                await loadUserUpgrades();
+                await loadUserCollectionCards();
+                await checkAndProcessSeasonReset();
+                await loadBossLeaderboard();
+                await checkPendingReward();
+            } else {
+                alert("⚠️ กรุณาเข้าสู่ระบบก่อนเข้าสู่ล็อบบี้บอส");
+                window.location.href = "login.html";
+            }
+        });
+
+        async function loadUserProfile(user) {
+            try {
+                const userDocRef = doc(db, "users", user.uid);
+                const userDocSnap = await getDoc(userDocRef);
+
+                let displayName = user.email || "ผู้เล่นเกม";
+                let diamonds = 0;
+                let halloweenCoins = 0;
+                let userPhoto = `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.uid}`;
+
+                if (userDocSnap.exists()) {
+                    const data = userDocSnap.data();
+                    displayName = data.username || data.name || user.email || "ผู้เล่นเกม";
+                    diamonds = data.diamonds ?? data.diamond ?? 0;
+                    halloweenCoins = data.halloween_coins ?? data.halloweenCoins ?? data.halloweenCoin ?? 0;
+                    userPhoto = data.userPhoto || userPhoto;
+                }
+
+                document.getElementById("profile-container").style.display = "flex";
+                document.getElementById("user-display").innerText = displayName;
+                document.getElementById("user-diamonds").innerText = formatCompactNumber(diamonds);
+                document.getElementById("user-halloween-coins").innerText = formatCompactNumber(halloweenCoins);
+                document.getElementById("nav-avatar-img").src = userPhoto;
+
+                document.getElementById("auth-btn").innerText = "ออกจากระบบ";
+                document.getElementById("auth-btn").onclick = () => signOut(auth).then(() => location.reload());
+            } catch (error) { console.error(error); }
+        }
+
+        async function loadUserUpgrades() {
+            try {
+                const ref = doc(db, "users", currentUserId, "bossUpgrades", "data");
+                const snap = await getDoc(ref);
+                if (snap.exists()) {
+                    userUpgrades = snap.data();
+                } else {
+                    await setDoc(ref, { click: 0, speed: 0, card: 0 });
+                }
+                updateUpgradeUI();
+            } catch (e) { console.error(e); }
+        }
+
+        function updateUpgradeUI() {
+            const costClick = 1000 * (userUpgrades.click + 1);
+            const costSpeed = 1500 * (userUpgrades.speed + 1);
+            const costCard = 2000 * (userUpgrades.card + 1);
+
+            document.getElementById("upClickInfo").innerText = `เลเวล: ${userUpgrades.click}/100 | ${userUpgrades.click >= 100 ? 'MAX' : costClick.toLocaleString() + ' 🎃'}`;
+            document.getElementById("upSpeedInfo").innerText = `เลเวล: ${userUpgrades.speed}/100 | ${userUpgrades.speed >= 100 ? 'MAX' : costSpeed.toLocaleString() + ' 🎃'}`;
+            document.getElementById("upCardInfo").innerText = `เลเวล: ${userUpgrades.card}/100 | ${userUpgrades.card >= 100 ? 'MAX' : costCard.toLocaleString() + ' 🎃'}`;
+            
+            localStorage.setItem(`bossUpgrades_${currentUserId}`, JSON.stringify(userUpgrades));
+        }
+
+        window.upgradeSkill = async function(type) {
+            if (!currentUserId) return;
+            if (userUpgrades[type] >= 100) {
+                Swal.fire({ icon: 'info', title: 'อัปเกรดถึงเลเวลสูงสุด 100 แล้ว!', background: '#120a1a', color: '#fff', confirmButtonColor: '#ff6b00' });
+                return;
+            }
+
+            let cost = (type === 'click' ? 1000 : type === 'speed' ? 1500 : 2000) * (userUpgrades[type] + 1);
+
+            try {
+                const userRef = doc(db, "users", currentUserId);
+                const userSnap = await getDoc(userRef);
+                if (!userSnap.exists()) return;
+
+                let currentCoins = userSnap.data().halloween_coins || 0;
+                if (currentCoins < cost) {
+                    Swal.fire({ icon: 'warning', title: 'เหรียญฮาโลวีนไม่พอ!', background: '#120a1a', color: '#fff', confirmButtonColor: '#ff6b00' });
+                    return;
+                }
+
+                await updateDoc(userRef, { halloween_coins: increment(-cost) });
+                userUpgrades[type] += 1;
+
+                const upRef = doc(db, "users", currentUserId, "bossUpgrades", "data");
+                await setDoc(upRef, userUpgrades, { merge: true });
+
+                await loadUserProfile(auth.currentUser);
+                updateUpgradeUI();
+            } catch (e) { console.error(e); }
+        };
+
+        async function loadPlayerBossStatus() {
+            try {
+                const bossRef = doc(db, "users", currentUserId, "bossProgress", "data");
+                const bossSnap = await getDoc(bossRef);
+                
+                let bossLevel = 1;
+                if (bossSnap.exists()) {
+                    bossLevel = bossSnap.data().bossLevel || 1;
+                } else {
+                    await setDoc(bossRef, { bossLevel: 1, totalDamage: 0 }, { merge: true });
+                }
+
+                const baseHp = 10000;
+                const bossMaxHp = baseHp + ((bossLevel - 1) * 5000);
+                const currentHp = bossMaxHp;
+
+                document.getElementById("boss-level-text").innerText = `LV. ${bossLevel}`;
+                document.getElementById("boss-hp-text").innerText = `${currentHp.toLocaleString()} / ${bossMaxHp.toLocaleString()}`;
+                document.getElementById("boss-hp-bar").style.width = `100%`;
+            } catch (e) { console.error(e); }
+        }
+
+        async function checkAndProcessSeasonReset() {
+            try {
+                const seasonRef = doc(db, "seasonMeta", "bossSeason");
+                const seasonSnap = await getDoc(seasonRef);
+                const now = Date.now();
+                const resetInterval = 2 * 24 * 60 * 60 * 1000;
+
+                let nextResetTime = now + resetInterval;
+
+                if (seasonSnap.exists()) {
+                    const sData = seasonSnap.data();
+                    nextResetTime = sData.nextResetTime || nextResetTime;
+
+                    if (now >= nextResetTime) {
+                        await performSeasonReset();
+                        nextResetTime = now + resetInterval;
+                        await setDoc(seasonRef, { nextResetTime: nextResetTime, lastResetTime: now }, { merge: true });
+                    }
+                } else {
+                    await setDoc(seasonRef, { nextResetTime: nextResetTime, lastResetTime: now }, { merge: true });
+                }
+
+                startSeasonTimer(nextResetTime);
+            } catch (e) { console.error(e); }
+        }
+
+        function startSeasonTimer(nextResetTime) {
+            setInterval(() => {
+                const diff = nextResetTime - Date.now();
+                if (diff <= 0) {
+                    document.getElementById("seasonCountdownTxt").innerText = "กำลังรีซีซั่น...";
+                    location.reload();
+                    return;
+                }
+                const hrs = Math.floor(diff / (1000 * 60 * 60));
+                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const secs = Math.floor((diff % (1000 * 60)) / 1000);
+                document.getElementById("seasonCountdownTxt").innerText = `${hrs}ชม. ${mins}น. ${secs}วิ`;
+            }, 1000);
+        }
+
+        async function performSeasonReset() {
+            try {
+                const q = query(collection(db, "bossScores"), orderBy("totalDamage", "desc"));
+                const querySnapshot = await getDocs(q);
+
+                let rank = 1;
+                querySnapshot.forEach(async (docSnap) => {
+                    const userId = docSnap.id;
+                    const data = docSnap.data();
+                    const bossLevel = data.bossLevel || 1;
+
+                    if (rank <= 100) {
+                        let rewardCoins = (rank >= 1 && rank <= 20) ? 990000000 : 80000000;
+                        let titleReward = "ปาร์ตี้ราชันย์ภูตผี👻";
+
+                        const pendingRef = doc(db, "users", userId, "pendingRewards", "bossSeason");
+                        await setDoc(pendingRef, {
+                            rank: rank, bossLevel: bossLevel, coins: rewardCoins, title: titleReward, claimed: false, createdAt: new Date().toISOString()
+                        });
+                    }
+                    await setDoc(doc(db, "bossScores", docSnap.id), { totalDamage: 0, bossLevel: 1 }, { merge: true });
+                    rank++;
+                });
+            } catch (e) { console.error(e); }
+        }
+
+        async function checkPendingReward() {
+            if (!currentUserId) return;
+            try {
+                const pendingRef = doc(db, "users", currentUserId, "pendingRewards", "bossSeason");
+                const snap = await getDoc(pendingRef);
+
+                if (snap.exists() && !snap.data().claimed) {
+                    pendingRewardData = snap.data();
+                    document.getElementById("claimPendingBtnContainer").style.display = "block";
+                    showSeasonRewardPopup(pendingRewardData);
+                } else {
+                    document.getElementById("claimPendingBtnContainer").style.display = "none";
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function showSeasonRewardPopup(reward) {
+            Swal.fire({
+                title: '🎉 สรุปผลงานจบซีซั่นตีบอส!',
+                html: `
+                    <div style="text-align: left; font-size: 0.9rem; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-top: 10px; display: flex; flex-direction: column; gap: 6px;">
+                        <div style="display: flex; justify-content: space-between;"><span style="color: #aaa;">🏆 อันดับ:</span><b style="color: #ffcc00;">#${reward.rank || '-'}</b></div>
+                        <div style="display: flex; justify-content: space-between;"><span style="color: #aaa;">👻 เลเวลบอส:</span><b style="color: #a855f7;">LV. ${reward.bossLevel || 1}</b></div>
+                        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 2px 0;">
+                        <div style="display: flex; justify-content: space-between;"><span style="color: #aaa;">🎃 เหรียญ:</span><b style="color: #ff6b00;">+${(reward.coins || 0).toLocaleString()}</b></div>
+                    </div>
+                `,
+                icon: 'success', background: '#120a1a', color: '#fff',
+                confirmButtonText: '🎁 รับรางวัล', confirmButtonColor: '#ff6b00', allowOutsideClick: false
+            }).then(async () => { await claimPendingReward(); });
+        }
+
+        window.claimPendingReward = async function() {
+            if (!currentUserId || !pendingRewardData) return;
+            try {
+                const userDocRef = doc(db, "users", currentUserId);
+                const userSnap = await getDoc(userDocRef);
+                let currentTitles = [];
+                if (userSnap.exists() && Array.isArray(userSnap.data().titles)) {
+                    currentTitles = userSnap.data().titles;
+                }
+                if (pendingRewardData.title && !currentTitles.includes(pendingRewardData.title)) {
+                    currentTitles.push(pendingRewardData.title);
+                }
+
+                await updateDoc(userDocRef, {
+                    halloween_coins: increment(pendingRewardData.coins || 0),
+                    titles: currentTitles,
+                    currentTitle: pendingRewardData.title || ''
+                });
+
+                await updateDoc(doc(db, "users", currentUserId, "pendingRewards", "bossSeason"), { claimed: true });
+
+                Swal.fire({ icon: 'success', title: 'รับรางวัลสำเร็จ!', background: '#120a1a', color: '#fff', confirmButtonColor: '#ff6b00' }).then(() => location.reload());
+            } catch (e) { console.error(e); }
+        };
+
+        async function loadUserCollectionCards() {
+            userUniqueCards = [];
+            let rawCards = [];
+            
+            if (currentUserId) {
+                try {
+                    const userSnap = await getDoc(doc(db, "users", currentUserId));
+                    if (userSnap.exists() && Array.isArray(userSnap.data().collection)) {
+                        rawCards = userSnap.data().collection.filter(item => item && !(item.source === "ตู้สุ่มสัตว์เลี้ยง" || (item.id != null && String(item.id).startsWith("p")) || item.type === "pet"));
+                    }
+                } catch (e) { console.error(e); }
+            }
+
+            if (rawCards.length === 0) {
+                for (let key of ["userCardCollection", "collectionCards", "myCards", "cards", "inventory"]) {
+                    const data = JSON.parse(localStorage.getItem(key));
+                    if (Array.isArray(data) && data.length > 0) { rawCards = data; break; }
+                }
+            }
+
+            const grouped = {};
+            rawCards.forEach(card => {
+                if (!card || !card.name) return;
+                const key = `${card.name}_${(card.rarity || 'C').toUpperCase()}_${(card.type || 'CARD').toUpperCase()}_${isHalloweenCard(card) ? 'HW' : 'NORMAL'}`;
+                if (!grouped[key]) grouped[key] = [];
+                grouped[key].push({ ...card, level: card.level || 1, stars: card.stars || 0, awakening: card.awakening || 0, type: (card.type || 'CARD').toUpperCase() });
+            });
+
+            for (const key in grouped) {
+                const copies = grouped[key];
+                copies.sort((a, b) => ((b.awakening || 0) * 1000 + (b.stars || 0) * 100 + (b.level || 1)) - ((a.awakening || 0) * 1000 + (a.stars || 0) * 100 + (a.level || 1)));
+                userUniqueCards.push({ ...copies[0], count: copies.length });
+            }
+
+            const userDeckKey = `selectedBossDeck_${currentUserId}`;
+            const savedDeck = JSON.parse(localStorage.getItem(userDeckKey)) || [];
+            selectedBossCards = savedDeck.filter(savedCard => userUniqueCards.some(uCard => (uCard.id && uCard.id === savedCard.id) || uCard.name === savedCard.name)).slice(0, 10);
+            localStorage.setItem(userDeckKey, JSON.stringify(selectedBossCards));
+
+            renderSelectedDeck();
+        }
+
+        function checkCardCombos() {
+            let activeCombos = [];
+            if (selectedBossCards.filter(c => isHalloweenCard(c)).length >= 3) {
+                activeCombos.push({ id: 'hw_trio', name: '🎃 Halloween Trio (+20% ATK)', bonusType: 'atk_percent', value: 0.20 });
+            }
+            if (selectedBossCards.some(c => (c.rarity || '').toUpperCase().includes('ADMIN') || (c.rarity || '').toUpperCase().includes('SECRET'))) {
+                activeCombos.push({ id: 'god_resonance', name: '✨ God Resonance (+Damage)', bonusType: 'damage_flat', value: 5000 });
+            }
+
+            localStorage.setItem(`activeCardCombos_${currentUserId}`, JSON.stringify(activeCombos));
+
+            const comboBox = document.getElementById("combo-active-box");
+            const comboList = document.getElementById("combo-tags-list");
+            if (activeCombos.length > 0) {
+                comboBox.style.display = "flex";
+                comboList.innerHTML = activeCombos.map(cb => `<span class="combo-badge">${cb.name}</span>`).join('');
+            } else {
+                comboBox.style.display = "none";
+                comboList.innerHTML = '';
+            }
+        }
+
+        function renderSelectedDeck() {
+            const slotContainer = document.getElementById("deck-slots-container");
+            document.getElementById("card-count-text").innerText = `${selectedBossCards.length}/10`;
+            
+            let html = "";
+            for (let i = 0; i < 10; i++) {
+                const card = selectedBossCards[i];
+                if (card) {
+                    let r = (card.rarity || 'C').toUpperCase();
+                    if (r.endsWith("HALLOWEEN")) r = r.replace("HALLOWEEN", "").trim();
+                    const tagBg = rarityColors[r] || '#fff';
+
+                    html += `
+                        <div class="card-slot active" onclick="removeCardFromDeck(${i})">
+                            <span class="rarity-badge" style="background: ${tagBg}; color: #000; position: absolute; top:2px; left:2px; font-size:0.5rem; padding:1px 3px; border-radius:3px;">${card.rarity || 'C'}</span>
+                            <img src="${card.img || card.image || 'https://via.placeholder.com/50'}" class="card-img">
+                            <span class="card-name">${escapeHtml(card.name || 'การ์ด')}</span>
+                            <span class="card-atk">ATK ${card.atk || card.power || 100}</span>
+                            <div class="remove-overlay"><i class="fas fa-times"></i></div>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="card-slot empty" onclick="openSelectCardModal()">
+                            <i class="fas fa-plus"></i>
+                            <span style="font-size:0.6rem;">เลือกการ์ด</span>
+                        </div>
+                    `;
+                }
+            }
+            slotContainer.innerHTML = html;
+            checkCardCombos();
+        }
+
+        window.openSelectCardModal = async function() {
+            await loadUserCollectionCards();
+            if (userUniqueCards.length === 0) {
+                Swal.fire({ icon: 'warning', title: 'ไม่พบการ์ดในคอลเลกชัน', background: '#120a1a', color: '#fff', confirmButtonColor: '#ff6b00' });
+                return;
+            }
+            modalCategoryFilter = 'ALL';
+            modalRarityFilter = 'ALL';
+            renderCardSelectionModalContent();
+        }
+
+        function renderCardSelectionModalContent() {
+            let filteredCards = userUniqueCards;
+            if (modalCategoryFilter === 'HALLOWEEN') filteredCards = filteredCards.filter(c => isHalloweenCard(c));
+            else if (modalCategoryFilter !== 'ALL') filteredCards = filteredCards.filter(c => (c.type || 'CARD').toUpperCase() === modalCategoryFilter);
+
+            if (modalRarityFilter !== 'ALL') {
+                filteredCards = filteredCards.filter(c => {
+                    let r = (c.rarity || 'C').toUpperCase();
+                    if (r.endsWith("HALLOWEEN")) r = r.replace("HALLOWEEN", "").trim();
+                    return r === modalRarityFilter;
+                });
+            }
+
+            let htmlContent = `
+                <div class="modal-filter-bar">
+                    <div class="filter-group">
+                        <button class="filter-btn ${modalCategoryFilter === 'ALL' ? 'active' : ''}" onclick="setModalCategory('ALL')">🌐 ทั้งหมด</button>
+                        <button class="filter-btn ${modalCategoryFilter === 'CARD' ? 'active' : ''}" onclick="setModalCategory('CARD')">🎴 การ์ด</button>
+                        <button class="filter-btn ${modalCategoryFilter === 'HALLOWEEN' ? 'active' : ''}" onclick="setModalCategory('HALLOWEEN')">🎃 ฮาโลวีน</button>
+                    </div>
+                    <div class="filter-group">
+            `;
+            ['ALL','P','SECRET','UR','SSR','SR','R','U','C'].forEach(r => {
+                htmlContent += `<button class="filter-btn ${modalRarityFilter === r ? 'active' : ''}" onclick="setModalRarity('${r}')">${r}</button>`;
+            });
+            htmlContent += `</div></div><div class="modal-card-grid">`;
+
+            if (filteredCards.length === 0) {
+                htmlContent += `<div style="grid-column: 1 / -1; text-align: center; color: #888; padding: 20px;">ไม่พบการ์ด</div>`;
+            } else {
+                filteredCards.forEach((card) => {
+                    const originalIdx = userUniqueCards.indexOf(card);
+                    const isSelected = selectedBossCards.some(c => (c.id && c.id === card.id) || c.name === card.name);
+                    let r = (card.rarity || 'C').toUpperCase();
+                    if (r.endsWith("HALLOWEEN")) r = r.replace("HALLOWEEN", "").trim();
+                    
+                    htmlContent += `
+                        <div class="modal-card-item ${isSelected ? 'selected' : ''}" onclick="toggleSelectCard(${originalIdx})">
+                            <div class="modal-card-img-wrap">
+                                <span class="card-rarity-tag" style="background: ${rarityColors[r] || '#fff'};">${card.rarity || 'C'}</span>
+                                ${card.count > 1 ? `<div class="card-count-badge">x${card.count}</div>` : ''}
+                                <img src="${card.img || card.image || 'https://via.placeholder.com/50'}">
+                            </div>
+                            <div class="modal-card-name">${escapeHtml(card.name || 'การ์ด')}</div>
+                            ${isSelected ? '<div class="check-icon"><i class="fas fa-check-circle"></i></div>' : ''}
+                        </div>
+                    `;
+                });
+            }
+            htmlContent += `</div>`;
+
+            if (Swal.getPopup()) {
+                Swal.getHtmlContainer().innerHTML = htmlContent;
+            } else {
+                Swal.fire({ title: '🎴 เลือกการ์ดเข้าเด็ค (สูงสุด 10 ใบ)', html: htmlContent, confirmButtonText: 'เสร็จสิ้น', confirmButtonColor: '#ff6b00', background: '#120a1a', color: '#fff', width: '90%' }).then(() => renderSelectedDeck());
+            }
+        }
+
+        window.setModalCategory = (cat) => { modalCategoryFilter = cat; renderCardSelectionModalContent(); };
+        window.setModalRarity = (rarity) => { modalRarityFilter = rarity; renderCardSelectionModalContent(); };
+
+        window.toggleSelectCard = function(cardIndex) {
+            const card = userUniqueCards[cardIndex];
+            const existingIndex = selectedBossCards.findIndex(c => (c.id && c.id === card.id) || c.name === card.name);
+            if (existingIndex !== -1) {
+                selectedBossCards.splice(existingIndex, 1);
+            } else {
+                if (selectedBossCards.length >= 10) { Swal.showValidationMessage('เลือกได้สูงสุด 10 ใบ!'); return; }
+                selectedBossCards.push(card);
+            }
+            if (currentUserId) localStorage.setItem(`selectedBossDeck_${currentUserId}`, JSON.stringify(selectedBossCards));
+            renderCardSelectionModalContent();
+        }
+
+        window.removeCardFromDeck = function(slotIndex) {
+            selectedBossCards.splice(slotIndex, 1);
+            if (currentUserId) localStorage.setItem(`selectedBossDeck_${currentUserId}`, JSON.stringify(selectedBossCards));
+            renderSelectedDeck();
+        }
+
+        async function loadBossLeaderboard() {
+            const tbody = document.getElementById("boss-leaderboard-body");
+            try {
+                const q = query(collection(db, "bossScores"), orderBy("totalDamage", "desc"));
+                const querySnapshot = await getDocs(q);
+                if (querySnapshot.empty) {
+                    tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #888; padding: 10px;">ยังไม่มีประวัติ</td></tr>`;
+                    document.getElementById("myRankTxt").innerText = "ยังไม่มีอันดับ";
+                    return;
+                }
+                let html = "", index = 1, userRankFound = false;
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    if (docSnap.id === currentUserId) { myCurrentRank = index; userRankFound = true; }
+                    if (index <= 5) {
+                        html += `<tr><td style="padding: 6px 0;">#${index} ${escapeHtml(data.name || 'ผู้เล่น')}</td><td style="text-align: center; color: #a855f7;">LV. ${data.bossLevel || 1}</td><td style="text-align: right; color: #ff6b00; font-weight: bold;">${Number(data.totalDamage || 0).toLocaleString()}</td></tr>`;
+                    }
+                    index++;
+                });
+                tbody.innerHTML = html;
+                document.getElementById("myRankTxt").innerText = userRankFound ? `อันดับ #${myCurrentRank}` : "ยังไม่มีอันดับ";
+            } catch (e) { console.error(e); }
+        }
+
+        function escapeHtml(text) { return (text || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+        window.enterBossBattle = function() {
+            if (selectedBossCards.length === 0) {
+                Swal.fire({ icon: 'warning', title: '⚠️ ยังไม่ได้เลือกการ์ด!', text: 'กรุณาเลือกการ์ดอย่างน้อย 1 ใบบนมือถือก่อนลุย', background: '#120a1a', color: '#fff', confirmButtonColor: '#ff6b00' });
+                return;
+            }
+            window.location.href = "boss_battle.html";
+        }
+    </script>
+</body>
+</html>
