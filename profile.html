@@ -153,6 +153,15 @@
             animation: titlePulse 1.5s infinite alternate;
         }
 
+        /* 👻 เพิ่มสไตล์เฉพาะสำหรับยศ ปาร์ตี้ราชันย์ภูตผี👻 */
+        .whale-title-banner.rank-ghost-king-party {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.5) 0%, rgba(255, 107, 0, 0.5) 50%, rgba(13, 7, 20, 0.8) 100%);
+            border: 2px solid #ff6b00; color: #00d4ff; font-weight: 900;
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.9), 0 0 15px rgba(255, 107, 0, 0.8);
+            text-shadow: 0 0 10px #ff6b00, 0 0 18px #a855f7;
+            animation: titlePulse 1.2s infinite alternate;
+        }
+
         @keyframes rainbowAnimation {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -822,24 +831,35 @@
             const isHappyHalloween = unlockedTitles.includes("happy HALLOWEEN 🎃") || 
                 (userData.happyHalloweenUnlocked === true);
 
+            // เงื่อนไขปลดล็อกยศ ปาร์ตี้ราชันย์ภูตผี👻 (ตรวจสอบจาก titles, ฟิลด์เฉพาะ หรือรับรางวัลจบซีซั่นตบอส)
+            const isGhostKingParty = unlockedTitles.includes("ปาร์ตี้ราชันย์ภูตผี👻") || 
+                (userData.currentTitle === "ปาร์ตี้ราชันย์ภูตผี👻");
+
             const categories = [
                 {
                     catName: "🎃 หมวดกิจกรรม & พิเศษ (Event & Special)",
                     titles: [
                         { id: 'none', name: '❌ ไม่แสดงฉายา', isUnlocked: true, desc: 'ปิดการแสดงผลฉายาบนหน้าโปรไฟล์ของคุณ' },
                         { 
+                            id: 'ปาร์ตี้ราชันย์ภูตผี👻', 
+                            name: 'ปาร์ตี้ราชันย์ภูตผี👻', 
+                            isUnlocked: isGhostKingParty, 
+                            desc: 'รับได้จากรางวัลอันดับตีบอสราชันย์ภูตผีในกิจกรรม halloween event',
+                            previewImg: 'https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/%E0%B8%9B%E0%B8%B2%E0%B8%A3%E0%B9%8C%E0%B8%95%E0%B8%B5%E0%B9%89.png' 
+                        },
+                        { 
                             id: 'happy HALLOWEEN 🎃', 
                             name: 'happy HALLOWEEN 🎃', 
                             isUnlocked: isHappyHalloween, 
                             desc: 'รับได้จากหน้าอีเว้นท์ halloween_event ในวันที่ 31 ตุลาคม เท่านั้น!',
-                            previewImg: 'https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/%E0%B8%A2%E0%B8%A8%E0%B8%9E%E0%B8%B4%E0%B9%80%E0%B8%A9%E0%B8%A8.png' // เปลี่ยนเป็น URL รูปภาพตัวอย่างจริงของคุณได้ที่นี่
+                            previewImg: 'https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/%E0%B8%A2%E0%B8%A8%E0%B8%9E%E0%B8%B4%E0%B9%80%E0%B8%A8%E0%B8%A8.png' 
                         },
                         { 
                             id: 'Halloween is Time 🎃', 
                             name: 'Halloween is Time 🎃', 
                             isUnlocked: isHalloweenTime, 
                             desc: 'สามารถรับได้จาก halloween_event ในราคา 20B HALLOWEEN Coin',
-                            previewImg: 'https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/%E0%B8%A2%E0%B8%A8.png' // เปลี่ยนเป็น URL รูปภาพตัวอย่างจริงของคุณได้ที่นี่
+                            previewImg: 'https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/%E0%B8%A2%E0%B8%A8.png' 
                         },
                         { id: 'DIAMONDS', name: 'DIAMONDS', isUnlocked: isPartyDiamonds, desc: `เล่นกิจกรรมฝนเพชรหน้า Banner Selection ครบ 5 ครั้ง (ปัจจุบัน: ${diamondRainPlaysCount}/5 ครั้ง)` },
                         { id: 'ผู้ใหญ่ใจบุญ', name: 'ผู้ใหญ่ใจบุญ', isUnlocked: isWhale || unlockedTitles.includes("ผู้ใหญ่ใจบุญ"), desc: 'ปลดล็อกจากแพ็กเกจผู้ใหญ่ใจบุญ' }
@@ -919,7 +939,6 @@
                     const clickAction = t.isUnlocked && t.id !== 'none' ? `onclick="selectAndEquipTitle('${t.id}')"` : (t.id === 'none' ? `onclick="selectAndEquipTitle('none')"` : `onclick="Swal.fire('ยังไม่ได้ปลดล็อก', 'ยศนี้ยังไม่ผ่านเงื่อนไขการปลดล็อก', 'warning')"`);
                     const hoverStyle = t.isUnlocked || t.id === 'none' ? `cursor: pointer;` : `opacity: 0.6; cursor: not-allowed;`;
 
-                    // ปุ่มตัว i สำหรับพรีวิวรูปภาพ (ถ้ามียศไหนมี previewImg)
                     let previewBtnHTML = "";
                     if (t.previewImg) {
                         previewBtnHTML = `
@@ -976,11 +995,10 @@
         }
     };
 
-    // ฟังก์ชันสำหรับเปิด Popup รูปภาพพรีวิวความพิเศษของยศ
     window.showTitlePreview = (titleName, imgSrc) => {
         Swal.fire({
             title: `✨ พรีวิวยศ: ${titleName}`,
-            text: 'มีเอฟเฟกต์มัเงาและสีเพฉาะของยศนี้',
+            text: 'มีเอฟเฟกต์มิติเงาและสีเฉพาะของยศนี้',
             imageUrl: imgSrc,
             imageWidth: '100%',
             imageHeight: 'auto',
@@ -1007,12 +1025,20 @@
         const isAuctionGod = unlockedTitles.includes("นักประมูลผู้ชนะตลอดกาล") || auctionWinsCount >= 20;
         const isHalloweenTime = unlockedTitles.includes("Halloween is Time 🎃") || (globalUserData.halloweenTitleUnlocked === true);
         const isHappyHalloween = unlockedTitles.includes("happy HALLOWEEN 🎃") || (globalUserData.happyHalloweenUnlocked === true);
+        const isGhostKingParty = unlockedTitles.includes("ปาร์ตี้ราชันย์ภูตผี👻") || (globalUserData.currentTitle === "ปาร์ตี้ราชันย์ภูตผี👻");
 
         const categories = [
             {
                 catName: "🎃 หมวดกิจกรรม & พิเศษ (Event & Special)",
                 titles: [
                     { id: 'none', name: '❌ ไม่แสดงฉายา', isUnlocked: true, desc: 'ปิดการแสดงผลฉายาบนหน้าโปรไฟล์ของคุณ' },
+                    { 
+                        id: 'ปาร์ตี้ราชันย์ภูตผี👻', 
+                        name: 'ปาร์ตี้ราชันย์ภูตผี👻', 
+                        isUnlocked: isGhostKingParty, 
+                        desc: 'รับได้จากรางวัลอันดับตบอสราชันย์ภูตผีซีซั่น หรือผ่านระบบแจกรางวัลบอส',
+                        previewImg: 'https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/%E0%B8%A2%E0%B8%A8.png' 
+                    },
                     { 
                         id: 'happy HALLOWEEN 🎃', 
                         name: 'happy HALLOWEEN 🎃', 
@@ -1106,9 +1132,11 @@
             document.getElementById("whale-title-text").innerText = data.currentTitle;
             titleContainer.style.display = "block";
             
-            titleBanner.classList.remove("rank-pro", "rank-master", "rank-level-traveler", "rank-supreme-guardian", "rank-party-diamonds", "rank-rainbow-ultimate", "rank-auction-starter", "rank-auction-pro", "rank-auction-god", "rank-halloween-time", "rank-happy-halloween");
+            titleBanner.classList.remove("rank-pro", "rank-master", "rank-level-traveler", "rank-supreme-guardian", "rank-party-diamonds", "rank-rainbow-ultimate", "rank-auction-starter", "rank-auction-pro", "rank-auction-god", "rank-halloween-time", "rank-happy-halloween", "rank-ghost-king-party");
             
-            if (data.currentTitle === "happy HALLOWEEN 🎃") {
+            if (data.currentTitle === "ปาร์ตี้ราชันย์ภูตผี👻") {
+                titleBanner.classList.add("rank-ghost-king-party");
+            } else if (data.currentTitle === "happy HALLOWEEN 🎃") {
                 titleBanner.classList.add("rank-happy-halloween");
             } else if (data.currentTitle === "Halloween is Time 🎃") {
                 titleBanner.classList.add("rank-halloween-time");
