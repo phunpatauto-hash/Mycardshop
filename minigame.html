@@ -29,6 +29,7 @@
 
         let currentUserId = null;
         let currentUserDisplayName = "ผู้เล่นเกม";
+        let isBossOpen = false; // ตัวแปรเช็คสถานะเวลาเปิด
 
         function formatCompactNumber(number) {
             if (!number || isNaN(number)) return "0";
@@ -181,6 +182,15 @@
             }
         }
 
+        // ฟังก์ชันจัดการคลิกการ์ด Coming Soon / บอส
+        window.handleBossCardClick = function() {
+            if (isBossOpen) {
+                window.location.href = 'boss_lobby.html';
+            } else {
+                alert('เกมนี้จะเปิดให้เล่นในวันพรุ่งนี้ เวลา 8:00 น. รอติดตามความสนุกได้เลย!');
+            }
+        };
+
         window.onload = () => {
             startNewGamesCountdown();
         };
@@ -194,6 +204,9 @@
             targetDate.setHours(8, 0, 0, 0);
 
             const timerElement = document.getElementById("new-games-timer");
+            const badgeElement = document.getElementById("badge-coming");
+            const btnElement = document.getElementById("btn-boss-action");
+            const cardElement = document.getElementById("boss-game-card");
 
             const updateCountdown = () => {
                 const currentTime = new Date().getTime();
@@ -202,7 +215,21 @@
                 if (!timerElement) return;
 
                 if (distance <= 0) {
+                    isBossOpen = true;
                     timerElement.innerText = "เปิดให้บริการแล้ว!";
+                    if (badgeElement) {
+                        badgeElement.innerText = "เปิดแล้ว!";
+                        badgeElement.style.background = "linear-gradient(135deg, #33ffad, #20bf6b)";
+                    }
+                    if (btnElement) {
+                        btnElement.innerText = "เข้าสู่สนามบอส";
+                        btnElement.className = "btn-play";
+                        btnElement.style.background = "linear-gradient(135deg, #33ffad, #20bf6b)";
+                        btnElement.style.color = "#000";
+                    }
+                    if (cardElement) {
+                        cardElement.classList.remove("coming-soon");
+                    }
                     return;
                 }
 
@@ -517,13 +544,13 @@
                 <button class="btn-play" style="background: linear-gradient(135deg, #ff007f, #ff9f43); color: #fff;">หมุนวงล้อ (ฟรี)</button>
             </div>
 
-            <div class="game-card coming-soon" onclick="alert('เกมนี้จะเปิดให้เล่นในวันพรุ่งนี้ เวลา 8:00 น. รอติดตามความสนุกได้เลย!')">
-                <div class="badge-coming">เปิดพรุ่งนี้ 8:00 น.</div>
+            <div class="game-card coming-soon" id="boss-game-card" onclick="handleBossCardClick()">
+                <div class="badge-coming" id="badge-coming">เปิดพรุ่งนี้ 8:00 น.</div>
                 <div class="game-icon">👻</div>
-                <div class="game-title">ปราบราชันย์ภูตผี</div>
+                <div class="game-title">Boss Arena</div>
                 <div class="countdown-text" id="new-games-timer">เปิดใน: กำลังคำนวณ...</div>
                 <div class="game-desc">Coming Soon</div>
-                <button class="btn-play btn-disabled">ยังไม่เปิด</button>
+                <button class="btn-play btn-disabled" id="btn-boss-action">ยังไม่เปิด</button>
             </div>
         </div>
     </div>
