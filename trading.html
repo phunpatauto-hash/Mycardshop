@@ -241,12 +241,13 @@
             inset-x: 0;
             background: linear-gradient(to top, rgba(0,0,0,0.95) 40%, transparent);
             padding: 8px;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             display: flex;
             flex-direction: column;
         }
         .slot-card-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
         .slot-card-meta { display: flex; justify-content: space-between; margin-top: 2px; color: var(--gold); font-weight: bold; }
+        .slot-card-val { color: #00ff88; font-weight: 700; margin-top: 1px; font-size: 0.6rem; }
         .slot-card-count {
             position: absolute;
             top: 6px;
@@ -285,13 +286,38 @@
             padding: 25px;
             box-shadow: 0 15px 40px rgba(0,0,0,0.4);
         }
-        .inventory-search-row {
+        
+        /* Collection Filter & Search Elements in Trading */
+        .control-panel-inv {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .search-sort-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            gap: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
         }
+        .filter-bar { display: flex; flex-direction: column; gap: 8px; }
+        .filter-group { display: flex; gap: 6px; flex-wrap: wrap; }
+        .filter-btn { 
+            padding: 5px 12px; 
+            border-radius: 20px; 
+            border: 2px solid rgba(255,255,255,0.1); 
+            background: rgba(255,255,255,0.05); 
+            color: #aaa; 
+            cursor: pointer; 
+            font-weight: bold; 
+            transition: 0.3s; 
+            font-size: 0.75rem; 
+        }
+        .filter-btn.active { border-color: var(--gold); color: #fff; background: rgba(255,200,49,0.1); }
+        .filter-btn.type-btn.active { border-color: var(--blue); color: #fff; background: rgba(0,212,255,0.15); }
+        .filter-btn.halloween-btn.active { border-color: #ff6600; color: #ff9900; background: rgba(255,102,0,0.2); }
+
         .inventory-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
@@ -320,9 +346,8 @@
             padding: 8px;
         }
         .inv-card-name { font-size: 0.75rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+        .inv-card-val { font-size: 0.65rem; color: #00ff88; font-weight: bold; margin-top: 1px; }
         .inv-card-badge { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.75); color: #fff; border: 1px solid rgba(255,255,255,0.2); font-size: 0.7rem; font-weight: 600; padding: 2px 6px; border-radius: 6px; }
-        
-        /* Badge for Level inside Inventory */
         .inv-card-lv { position: absolute; top: 6px; left: 6px; background: linear-gradient(135deg, var(--gold), #ff9000); color: #000; font-size: 0.65rem; font-weight: 900; padding: 2px 6px; border-radius: 5px; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
 
         /* Chat Window styling inside Sidebar */
@@ -450,8 +475,7 @@
                         </div>
                     </div>
 
-                    <div class="slots-grid" id="mySlotsGrid">
-                        </div>
+                    <div class="slots-grid" id="mySlotsGrid"></div>
                 </div>
 
                 <div class="player-zone peer-side">
@@ -477,8 +501,7 @@
                         </div>
                     </div>
 
-                    <div class="slots-grid" id="peerSlotsGrid">
-                        </div>
+                    <div class="slots-grid" id="peerSlotsGrid"></div>
                 </div>
             </div>
 
@@ -491,13 +514,21 @@
                 </div>
             </div>
 
+            <!-- Inventory Bottom Drawer with Categories & Filter (Same as Collection) -->
             <div class="inventory-drawer">
-                <div class="inventory-search-row">
-                    <h3 class="section-title" style="margin:0;"><i class="fa-solid fa-box-open"></i> คลังการ์ดในตัวของคุณ (เลือกการ์ดขึ้นกระดานเทรด)</h3>
-                    <input type="text" id="invSearchInput" class="styled-input" style="width: 250px; padding: 8px 15px; font-size: 0.85rem;" placeholder="🔍 ค้นชื่อการ์ด...">
-                </div>
-                <div class="inventory-grid" id="myInventoryGrid">
+                <div class="control-panel-inv">
+                    <div class="search-sort-row">
+                        <h3 class="section-title" style="margin:0;"><i class="fa-solid fa-box-open"></i> คลังการ์ด (เลือกการ์ดขึ้นกระดานเทรด)</h3>
+                        <input type="text" id="invSearchInput" class="styled-input" style="width: 250px; padding: 8px 15px; font-size: 0.85rem;" placeholder="🔍 ค้นหาชื่อการ์ด...">
                     </div>
+                    
+                    <div class="filter-bar">
+                        <div id="categoryFilterContainer" class="filter-group"></div>
+                        <div id="filterContainer" class="filter-group"></div>
+                    </div>
+                </div>
+
+                <div class="inventory-grid" id="myInventoryGrid"></div>
             </div>
 
         </section>
@@ -544,13 +575,44 @@
     let isCreator = false; 
     let currentActiveCurrencyType = 'gold'; 
 
+    let currentFilter = 'ALL';
+    let currentCategoryFilter = 'ALL';
+
     let myOfferFinal = { gold: 0, diamonds: 0, cards: [], ready: false, username: "" };
     let peerOfferFinal = { gold: 0, diamonds: 0, cards: [], ready: false, username: "" };
 
-    const rarityColors = { 'ADMIN': '#ff3333', 'SECRET': '#ff00ff', 'P': '#ff00ff', 'USEC': '#ff00ff', 'EXR': '#ff4d4d', 'CBR': '#ff4d4d', 'SEC': '#ffac33', 'SUR': '#33ffad', 'SSR': '#ffc831', 'PR': '#ffc831', 'UR': '#bf40bf', 'SR': '#33aaff', 'R': '#33ff57', 'U': '#ffffff', 'C': '#ffffff' };
+    const rarityOrder = { 'ADMIN': 15, 'SECRET': 14, 'P': 13, 'USEC': 12, 'EXR': 11, 'CBR': 10, 'SEC': 9, 'SUR': 8, 'SSR': 7, 'PR': 6, 'UR': 5, 'SR': 4, 'R': 3, 'U': 2, 'C': 1 };
+    const rarityColors = { 'ADMIN': '#ff0055', 'SECRET': '#D8BFD8', 'P': '#ff00ff', 'USEC': '#ff00ff', 'EXR': '#ff4d4d', 'CBR': '#ff4d4d', 'SEC': '#ffac33', 'SUR': '#33ffad', 'SSR': '#ffc831', 'PR': '#ffc831', 'UR': '#bf40bf', 'SR': '#33aaff', 'R': '#33ff57', 'U': '#ffffff', 'C': '#ffffff' };
+    
+    const sellValuesBase = { 'ADMIN': 500000000, 'SECRET': 99000, 'P': 10000, 'USEC': 90000, 'EXR': 55000, 'CBR': 50000, 'SEC': 25000, 'SUR': 15000, 'SSR': 15000, 'PR': 10000, 'UR': 1200, 'SR': 1000, 'R': 500, 'U': 200, 'C': 100 };
+
+    function isHalloweenCard(card) {
+        const rarityStr = (card && card.rarity ? card.rarity : '').toString().trim().toUpperCase();
+        return rarityStr.endsWith("HALLOWEEN");
+    }
+
+    function isHalloweenExpired() {
+        const now = new Date();
+        const currentMonth = now.getMonth() + 1;
+        const currentDay = now.getDate();
+        if (currentMonth !== 10 || currentDay < 1 || currentDay > 31) return true;
+        return false;
+    }
+
+    function getDynamicSellValue(card) {
+        if (!card) return 100;
+        let r = (card.rarity || 'C').toString().trim().toUpperCase();
+        if (r.endsWith("HALLOWEEN")) {
+            r = r.replace("HALLOWEEN", "").trim();
+        }
+        const base = sellValuesBase[r] || 100;
+        const halloweenBonus = isHalloweenCard(card) ? 1.20 : 1.0;
+        return Math.floor(base * (1 + ((card.level || card.lv || 1) - 1) * 0.1) * halloweenBonus);
+    }
 
     window.addEventListener("DOMContentLoaded", () => {
         initSlotsGrid();
+        initCollectionFilters();
         
         document.getElementById("btnCreateRoom").addEventListener("click", createTradeRoom);
         document.getElementById("btnJoinRoom").addEventListener("click", joinTradeRoom);
@@ -583,6 +645,46 @@
             window.location.href = "index.html";
         }
     });
+
+    function initCollectionFilters() {
+        const catCon = document.getElementById("categoryFilterContainer");
+        if (catCon) {
+            catCon.innerHTML = "";
+            [
+                { id: 'ALL', label: '🌐 ทั้งหมด' },
+                { id: 'CARD', label: '🎴 การ์ด (CARD)' },
+                { id: 'HALLOWEEN', label: '🎃 HALLOWEEN', isSpecial: true }
+            ].forEach(cat => {
+                const btn = document.createElement("button");
+                btn.className = `filter-btn type-btn ${cat.isSpecial ? 'halloween-btn' : ''} ${cat.id === 'ALL' ? 'active' : ''}`;
+                btn.innerText = cat.label;
+                btn.onclick = () => {
+                    currentCategoryFilter = cat.id;
+                    document.querySelectorAll('#categoryFilterContainer .filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    renderUserInventoryGrid();
+                };
+                catCon.appendChild(btn);
+            });
+        }
+
+        const fCon = document.getElementById("filterContainer");
+        if (fCon) {
+            fCon.innerHTML = "";
+            ['ALL','P','SECRET','USEC','EXR','CBR','SEC','SUR','PR','UR','SSR','SR','R','U','C'].forEach(r => {
+                const btn = document.createElement("button");
+                btn.className = `filter-btn ${r === 'ALL' ? 'active' : ''}`;
+                btn.innerText = r;
+                btn.onclick = () => {
+                    currentFilter = r;
+                    document.querySelectorAll('#filterContainer .filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    renderUserInventoryGrid();
+                };
+                fCon.appendChild(btn);
+            });
+        }
+    }
 
     function initSlotsGrid() {
         const myGrid = document.getElementById("mySlotsGrid");
@@ -617,37 +719,60 @@
 
         const aggregated = {};
         userDataStore.collection.forEach(card => {
-            if (card.isLocked) return; 
+            if (!card || card.isLocked) return; 
             
-            // เช็คเงื่อนไข: ห้ามการ์ดระดับ Admin (ไม่ว่าจะตัวพิมพ์เล็กหรือใหญ่) และการ์ดที่มีแท็ก Halloween
-            const r = (card.rarity || card.tier || 'C').toUpperCase();
-            const tags = Array.isArray(card.tags) ? card.tags.map(t => t.toLowerCase()) : (card.tag ? [card.tag.toLowerCase()] : []);
-            const isHalloween = tags.includes('halloween') || (card.name && card.name.toLowerCase().includes('halloween'));
-            if (r === 'ADMIN' || isHalloween) return;
+            if (isHalloweenCard(card) && isHalloweenExpired()) return;
 
             const level = Number(card.level || card.lv || 1);
-            const key = `${card.name}_${r}_${level}`;
+            const key = `${card.name}_${(card.rarity||'C').toUpperCase()}_${level}_${isHalloweenCard(card)?'HW':'NOR'}`;
             
             if (!aggregated[key]) { 
-                aggregated[key] = { ...card, rarity: r, level, count: 0 }; 
+                aggregated[key] = { ...card, level, count: 0, type: (card.type || 'CARD').toUpperCase() }; 
             }
             aggregated[key].count++;
         });
 
         myOfferFinal.cards.forEach(cOut => {
-            const key = `${cOut.name}_${cOut.rarity.toUpperCase()}_${cOut.level}`;
+            const key = `${cOut.name}_${cOut.rarity.toUpperCase()}_${cOut.level}_${cOut.isHalloween?'HW':'NOR'}`;
             if (aggregated[key]) { aggregated[key].count -= cOut.count; }
         });
 
-        Object.values(aggregated).forEach(card => {
-            if (card.count <= 0) return;
-            if (search && !card.name.toLowerCase().includes(search)) return;
+        let displayList = Object.values(aggregated).filter(card => card.count > 0);
 
+        if (currentCategoryFilter === 'HALLOWEEN') {
+            displayList = displayList.filter(c => isHalloweenCard(c));
+        } else if (currentCategoryFilter !== 'ALL') {
+            displayList = displayList.filter(c => c.type === currentCategoryFilter);
+        }
+
+        if (currentFilter !== 'ALL') {
+            displayList = displayList.filter(c => {
+                let r = (c.rarity || 'C').toUpperCase();
+                if (r.endsWith("HALLOWEEN")) r = r.replace("HALLOWEEN", "").trim();
+                return r === currentFilter;
+            });
+        }
+
+        if (search) {
+            displayList = displayList.filter(c => c.name && c.name.toLowerCase().includes(search));
+        }
+
+        displayList.sort((a, b) => {
+            let rA = (a.rarity || 'C').toUpperCase(); if (rA.endsWith("HALLOWEEN")) rA = rA.replace("HALLOWEEN", "").trim();
+            let rB = (b.rarity || 'C').toUpperCase(); if (rB.endsWith("HALLOWEEN")) rB = rB.replace("HALLOWEEN", "").trim();
+            return (rarityOrder[rB] || 0) - (rarityOrder[rA] || 0);
+        });
+
+        displayList.forEach(card => {
             const div = document.createElement("div");
             div.className = "inv-card";
-            const r = card.rarity;
+            let r = (card.rarity || 'C').toUpperCase();
+            if (r.endsWith("HALLOWEEN")) r = r.replace("HALLOWEEN", "").trim();
+            
             div.style.border = `1px solid ${rarityColors[r] || '#fff'}44`;
             div.onclick = () => addCardToOfferBoard(card);
+
+            const cardVal = getDynamicSellValue(card);
 
             div.innerHTML = `
                 <div class="inv-card-lv">Lv.${card.level}</div>
@@ -655,6 +780,7 @@
                 <img src="${card.img || card.image || 'https://via.placeholder.com/150'}">
                 <div class="inv-card-info">
                     <div class="inv-card-name">${card.name}</div>
+                    <div class="inv-card-val">💰 ${cardVal.toLocaleString()} 🪙</div>
                 </div>
             `;
             grid.appendChild(div);
@@ -664,22 +790,17 @@
     async function addCardToOfferBoard(card) {
         if (!currentRoomID) return alert("โปรดเชื่อมต่อห้องแลกเปลี่ยนก่อน!");
         if (myOfferFinal.ready) return alert("ปลดสถานะ 'พร้อมเทรด' ก่อนแก้ไขข้อเสนอ!");
-
-        const r = (card.rarity || card.tier || 'C').toUpperCase();
-        const tags = Array.isArray(card.tags) ? card.tags.map(t => t.toLowerCase()) : (card.tag ? [card.tag.toLowerCase()] : []);
-        const isHalloween = tags.includes('halloween') || (card.name && card.name.toLowerCase().includes('halloween'));
         
-        // ป้องกันความปลอดภัยระดับฟังก์ชันเพิ่มการ์ด
-        if (r === 'ADMIN' || isHalloween) {
-            return alert("❌ ไม่สามารถนำการ์ดระดับ Admin หรือการ์ดที่มีแท็ก Halloween ไปแลกเปลี่ยนได้!");
+        if (myOfferFinal.cards.length >= 8 && !myOfferFinal.cards.some(c => c.name === card.name && c.rarity === (card.rarity||'C').toUpperCase() && c.level === Number(card.level||1) && c.isHalloween === isHalloweenCard(card))) {
+            return alert("ช่องกระดานแลกเปลี่ยนเต็มแล้ว! บรรจุการ์ดได้สูงสุด 8 ชนิด");
         }
 
-        if (myOfferFinal.cards.reduce((sum, c) => sum + c.count, 0) >= 8) {
-            return alert("ช่องกระดานแลกเปลี่ยนเต็มแล้ว! บรรจุได้สูงสุด 8 ใบ");
-        }
-
+        const r = (card.rarity || 'C').toUpperCase();
         const level = Number(card.level || card.lv || 1);
-        const existingIdx = myOfferFinal.cards.findIndex(c => c.name === card.name && c.rarity === r && c.level === level);
+        const isHW = isHalloweenCard(card);
+        const cardVal = getDynamicSellValue(card);
+
+        const existingIdx = myOfferFinal.cards.findIndex(c => c.name === card.name && c.rarity === r && c.level === level && c.isHalloween === isHW);
         
         if (existingIdx > -1) {
             myOfferFinal.cards[existingIdx].count++;
@@ -689,7 +810,9 @@
                 rarity: r,
                 level: level,
                 img: card.img || card.image || '',
-                count: 1
+                count: 1,
+                isHalloween: isHW,
+                sellValue: cardVal
             });
         }
         await syncOfferToFirebase();
@@ -698,25 +821,14 @@
 
     async function removeCardFromOffer(index) {
         if (myOfferFinal.ready) return alert("ปลดสถานะ 'พร้อมเทรด' ก่อนแก้ไขข้อเสนอ!");
-        
-        let flatCards = [];
-        myOfferFinal.cards.forEach(c => {
-            for (let i = 0; i < c.count; i++) {
-                flatCards.push({ ...c, count: 1 });
-            }
-        });
+        if (!myOfferFinal.cards[index]) return;
 
-        if (!flatCards[index]) return; 
-        flatCards.splice(index, 1);
+        if (myOfferFinal.cards[index].count > 1) {
+            myOfferFinal.cards[index].count--;
+        } else {
+            myOfferFinal.cards.splice(index, 1);
+        }
 
-        const repack = [];
-        flatCards.forEach(fc => {
-            const idx = repack.findIndex(r => r.name === fc.name && r.rarity === fc.rarity && r.level === fc.level);
-            if (idx > -1) repack[idx].count++;
-            else repack.push(fc);
-        });
-
-        myOfferFinal.cards = repack;
         await syncOfferToFirebase();
         renderUserInventoryGrid();
     }
@@ -879,18 +991,13 @@
     }
 
     function drawSlotsSideCards(cardsList, isMySide) {
-        let flatList = [];
-        cardsList.forEach(c => {
-            for (let i = 0; i < c.count; i++) {
-                flatList.push(c);
-            }
-        });
-
         for (let i = 0; i < 8; i++) {
             const slot = document.getElementById(isMySide ? `mySlot_${i}` : `peerSlot_${i}`);
-            if (flatList[i]) {
-                const card = flatList[i];
+            if (cardsList && cardsList[i]) {
+                const card = cardsList[i];
                 const countBadgeHtml = card.count > 1 ? `<div class="slot-card-count">x${card.count}</div>` : '';
+                const cardVal = card.sellValue ? (card.sellValue * card.count) : getDynamicSellValue(card) * card.count;
+                
                 slot.innerHTML = `
                     ${countBadgeHtml}
                     <img class="slot-card-img" src="${card.img || 'https://via.placeholder.com/150'}">
@@ -900,6 +1007,7 @@
                             <span>${card.rarity}</span>
                             <span>LV.${card.level}</span>
                         </div>
+                        <div class="slot-card-val">💰 ${cardVal.toLocaleString()} 🪙</div>
                     </div>
                 `;
                 slot.style.borderStyle = "solid";
@@ -942,7 +1050,7 @@
             myOfferFinal.cards.forEach(cOut => {
                 let countToDeduct = cOut.count;
                 while (countToDeduct > 0) {
-                    const idx = myColl.findIndex(c => c.name === cOut.name && (c.rarity||c.tier||'C').toUpperCase() === cOut.rarity && Number(c.level||c.lv||1) === cOut.level && !c.isLocked);
+                    const idx = myColl.findIndex(c => c.name === cOut.name && (c.rarity||'C').toUpperCase() === cOut.rarity && Number(c.level||c.lv||1) === cOut.level && !c.isLocked);
                     if (idx > -1) {
                         myColl.splice(idx, 1);
                     }
