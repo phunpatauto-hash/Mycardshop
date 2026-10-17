@@ -337,6 +337,16 @@
             aspect-ratio: 2/3;
         }
         .inv-card:hover { transform: translateY(-5px); border-color: var(--gold); box-shadow: 0 5px 15px rgba(255,200,49,0.15); }
+        .inv-card.admin-card {
+            opacity: 0.4;
+            filter: grayscale(1);
+            cursor: not-allowed;
+        }
+        .inv-card.admin-card:hover {
+            transform: none;
+            border-color: rgba(255,255,255,0.06);
+            box-shadow: none;
+        }
         .inv-card img { width: 100%; height: 100%; object-fit: cover; }
         .inv-card-info {
             position: absolute;
@@ -765,12 +775,20 @@
 
         displayList.forEach(card => {
             const div = document.createElement("div");
-            div.className = "inv-card";
             let r = (card.rarity || 'C').toUpperCase();
             if (r.endsWith("HALLOWEEN")) r = r.replace("HALLOWEEN", "").trim();
+
+            const isAdminCard = (r === 'ADMIN');
+            div.className = `inv-card ${isAdminCard ? 'admin-card' : ''}`;
             
             div.style.border = `1px solid ${rarityColors[r] || '#fff'}44`;
-            div.onclick = () => addCardToOfferBoard(card);
+            div.onclick = () => {
+                if (isAdminCard) {
+                    alert("❌ ไม่สามารถแลกเปลี่ยนการ์ดระดับ ADMIN ได้!");
+                    return;
+                }
+                addCardToOfferBoard(card);
+            };
 
             const cardVal = getDynamicSellValue(card);
 
@@ -790,12 +808,16 @@
     async function addCardToOfferBoard(card) {
         if (!currentRoomID) return alert("โปรดเชื่อมต่อห้องแลกเปลี่ยนก่อน!");
         if (myOfferFinal.ready) return alert("ปลดสถานะ 'พร้อมเทรด' ก่อนแก้ไขข้อเสนอ!");
+
+        const r = (card.rarity || 'C').toUpperCase();
+        if (r === 'ADMIN') {
+            return alert("❌ ไม่สามารถแลกเปลี่ยนการ์ดระดับ ADMIN ได้!");
+        }
         
-        if (myOfferFinal.cards.length >= 8 && !myOfferFinal.cards.some(c => c.name === card.name && c.rarity === (card.rarity||'C').toUpperCase() && c.level === Number(card.level||1) && c.isHalloween === isHalloweenCard(card))) {
+        if (myOfferFinal.cards.length >= 8 && !myOfferFinal.cards.some(c => c.name === card.name && c.rarity === r && c.level === Number(card.level||1) && c.isHalloween === isHalloweenCard(card))) {
             return alert("ช่องกระดานแลกเปลี่ยนเต็มแล้ว! บรรจุการ์ดได้สูงสุด 8 ชนิด");
         }
 
-        const r = (card.rarity || 'C').toUpperCase();
         const level = Number(card.level || card.lv || 1);
         const isHW = isHalloweenCard(card);
         const cardVal = getDynamicSellValue(card);
