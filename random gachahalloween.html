@@ -92,6 +92,7 @@
         .rate-label { font-weight: bold; }
 
         /* --- Colors & Glows --- */
+        .color-admin { color: #ff0055; background: linear-gradient(135deg, #ff0000 0%, #ff00ff 50%, #ffff00 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 12px rgba(255, 0, 85, 0.8); font-weight: 900; }
         .color-exr { color: #00d4ff; text-shadow: 0 0 5px #00d4ff; }
         .color-secret { color: #ffffff; background: linear-gradient(135deg, #ff7700 0%, #ff0055 50%, #a020f0 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 10px rgba(255, 119, 0, 0.6); font-weight: 900; }
         .color-usec { color: #ff9900; background: linear-gradient(135deg, #ffff00 0%, #ff7700 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 8px rgba(255, 153, 0, 0.5); font-weight: 900; }
@@ -180,7 +181,7 @@
             <div class="broadcast-sidebar">
                 <div class="broadcast-header">📢 ประกาศผู้โชคดี Halloween</div>
                 <div id="broadcast-feed" class="broadcast-feed">
-                    <div class="broadcast-item">🎃 ยินดีต้อนรับสู่ตู้สุ่ม Halloween! ลุ้นรับการ์ด SECRET และ USEC ที่จำกัดจำนวนเพียง 50,000 ใบเท่านั้น!</div>
+                    <div class="broadcast-item">🎃 ยินดีต้อนรับสู่ตู้สุ่ม Halloween! ลุ้นรับการ์ดระดับ ADMIN ที่จำกัดจำนวนเพียง 500 ใบเท่านั้น!</div>
                 </div>
             </div>
             
@@ -190,6 +191,7 @@
                 
                 <div class="quick-rate-table">
                     <div style="font-size: 0.7rem; color: #aaa; margin-bottom: 8px;">RATE BY RARITY</div>
+                    <div class="rate-row"><span class="rate-label color-admin">ADMIN HALLOWEEN</span><span>0.001%</span></div>
                     <div class="rate-row"><span class="rate-label color-secret">SECRET HALLOWEEN</span><span>0.05%</span></div>
                     <div class="rate-row"><span class="rate-label color-usec">USEC HALLOWEEN</span><span>0.02%</span></div>
                     <div class="rate-row"><span class="rate-label color-exr">EXR HALLOWEEN</span><span>0.1% </span></div>
@@ -197,7 +199,7 @@
                     <div class="rate-row"><span class="rate-label color-sur">SUR HALLOWEEN</span><span>1.75%</span></div> 
                     <div class="rate-row"><span class="rate-label color-ur">UR HALLOWEEN</span><span>2.3%</span></div> 
                     <div class="rate-row"><span class="rate-label color-ssr">SSR HALLOWEEN</span><span>2.0%</span></div>
-                    <div class="rate-row"><span class="rate-label color-sr">SR HALLOWEEN</span><span>6.25%</span></div>
+                    <div class="rate-row"><span class="rate-label color-sr">SR HALLOWEEN</span><span>6.24%</span></div>
                     <div class="rate-row"><span class="rate-label color-r">R HALLOWEEN</span><span>10.0%</span></div>
                     <div class="rate-row"><span class="rate-label color-uc">U / C HALLOWEEN</span><span>25.0-35.85%</span></div>
                 </div>
@@ -227,6 +229,7 @@
     function formatCompactNumber(number) {
         if (!number || isNaN(number)) return "0";
         const num = Number(number);
+        if (num >= 1e12) return (num / 1e12).toFixed(1).replace(/\.0$/, '') + 'T';
         if (num >= 1e9) return (num / 1e9).toFixed(1).replace(/\.0$/, '') + 'B';
         if (num >= 1e6) return (num / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
         if (num >= 1e3) return (num / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
@@ -241,8 +244,10 @@
     // เก็บสต็อกแยกแต่ละใบการ์ด
     let cardStocks = {};
 
-    // --- Card Database (Halloween Theme) เพิ่ม SECRET และ USEC พร้อม key สำหรับแยกสต็อก ---
+    // --- Card Database (Halloween Theme) เพิ่ม ADMIN (จำกัด 500 ใบ) และอื่นๆ ---
     const allCards = [
+        { key: "admin_halloween", id: 9990, rarity: "ADMIN HALLOWEEN", name: "Bon", rate: 0.001, img: "https://i.pinimg.com/736x/4d/01/be/4d01beb0c0e657cfad968ae30c04daa9.jpg", limitedMax: 500 },
+
         { key: "bon_secret", id: 9991, rarity: "SECRET HALLOWEEN", name: "Bon (SECRET)", rate: 0.05, img: "https://i.pinimg.com/736x/4d/01/be/4d01beb0c0e657cfad968ae30c04daa9.jpg", limitedMax: 50000 },
         { key: "pitaya_secret", id: 9991, rarity: "SECRET HALLOWEEN", name: "Pitaya Dragon Cookie (SECRET)", rate: 0.05, img: "https://cookierunbraverse.com/data/en_storage/iykwTAbVji2fS4tmoaVM4A.webp", limitedMax: 50000 },
         { key: "longan_secret", id: 9991, rarity: "SECRET HALLOWEEN", name: "Longan Dragon Cookie (SECRET)", rate: 0.05, img: "https://cookierunbraverse.com/data/en_storage/rErWzADzVUUbYuZFW3vPFw.webp", limitedMax: 50000 },
@@ -284,12 +289,12 @@
         { key: "blue_lily_ssr", id: 10, rarity: "SSR HALLOWEEN", name: "Blue Lily Cookie", rate: 2.0, img: "https://cookierunbraverse.com/data/en_storage/YPuZtYkXzdUE5YeQ9tiFTQ.webp" },
         { key: "charcoal_ssr", id: 10, rarity: "SSR HALLOWEEN", name: "Charcoal Cookie", rate: 2.0, img: "https://cookierunbraverse.com/data/en_storage/lEXzjsm0fJZcG4pHXd5IpQ.webp" },
 
-        { key: "white_pearl_sr", id: 11, rarity: "SR HALLOWEEN", name: "White Pearl Cookie (SR)", rate: 6.25, img: "https://cookierunbraverse.com/data/en_storage/sIVtglS9neromqDgFxfIcg.webp" },
-        { key: "blue_lily_sr", id: 12, rarity: "SR HALLOWEEN", name: "Blue Lily Cookie (SR)", rate: 6.25, img: "https://cookierunbraverse.com/data/en_storage/ZVT8KspDtDG7p2K25EP2Uw.webp" },
-        { key: "charcoal_sr", id: 13, rarity: "SR HALLOWEEN", name: "Charcoal Cookie (SR)", rate: 6.25, img: "https://cookierunbraverse.com/data/en_storage/QoO_bNC01aDqueXh7ofKGA.webp" },
-        { key: "dracula_sr", id: 14, rarity: "SR HALLOWEEN", name: "แดรกคูลา (SR)", rate: 6.25, img: "https://cdn.bottcg.com/cards/CC02-034.png" },
-        { key: "may_vampire_sr", id: 14, rarity: "SR HALLOWEEN", name: "เมย์ แวมไพร์โกธิค (SR)", rate: 6.25, img: "https://cdn.bottcg.com/cards/BT09-010.png" },
-        { key: "otakula_sr", id: 14, rarity: "SR HALLOWEEN", name: "โอตะคูลา (SR)", rate: 6.25, img: "https://cdn.bottcg.com/cards/KD03-002.png" },
+        { key: "white_pearl_sr", id: 11, rarity: "SR HALLOWEEN", name: "White Pearl Cookie (SR)", rate: 6.24, img: "https://cookierunbraverse.com/data/en_storage/sIVtglS9neromqDgFxfIcg.webp" },
+        { key: "blue_lily_sr", id: 12, rarity: "SR HALLOWEEN", name: "Blue Lily Cookie (SR)", rate: 6.24, img: "https://cookierunbraverse.com/data/en_storage/ZVT8KspDtDG7p2K25EP2Uw.webp" },
+        { key: "charcoal_sr", id: 13, rarity: "SR HALLOWEEN", name: "Charcoal Cookie (SR)", rate: 6.24, img: "https://cookierunbraverse.com/data/en_storage/QoO_bNC01aDqueXh7ofKGA.webp" },
+        { key: "dracula_sr", id: 14, rarity: "SR HALLOWEEN", name: "แดรกคูลา (SR)", rate: 6.24, img: "https://cdn.bottcg.com/cards/CC02-034.png" },
+        { key: "may_vampire_sr", id: 14, rarity: "SR HALLOWEEN", name: "เมย์ แวมไพร์โกธิค (SR)", rate: 6.24, img: "https://cdn.bottcg.com/cards/BT09-010.png" },
+        { key: "otakula_sr", id: 14, rarity: "SR HALLOWEEN", name: "โอตะคูลา (SR)", rate: 6.24, img: "https://cdn.bottcg.com/cards/KD03-002.png" },
 
         { key: "truffle_r", id: 20, rarity: "R HALLOWEEN", name: "Truffle Cookie", rate: 10.0, img: "https://cookierunbraverse.com/data/en_storage/0-xFW-vdD9s4gIZWGMp-aA.webp" },
         { key: "dark_choco_r", id: 20, rarity: "R HALLOWEEN", name: "Dark Choco Cookie", rate: 10.0, img: "https://cookierunbraverse.com/data/en_storage/D1opuim62ALtOvnlZ-zh2w.webp" },
@@ -352,7 +357,7 @@
     function initStockListeners() {
         // ใช้ snapshot ฟังข้อมูลสต็อกแยกรายใบจากคอลเลกชัน server_stats ของแต่ละ card.key
         allCards.forEach(c => {
-            if (c.rarity === "SECRET HALLOWEEN" || c.rarity === "USEC HALLOWEEN") {
+            if (c.rarity === "ADMIN HALLOWEEN" || c.rarity === "SECRET HALLOWEEN" || c.rarity === "USEC HALLOWEEN") {
                 const stockRef = doc(db, "server_stats", `halloween_stock_${c.key}`);
                 onSnapshot(stockRef, async (docSnap) => {
                     if (docSnap.exists()) {
@@ -419,10 +424,10 @@
         const results = [];
         let ps = userData.pitySEC || 0, pe = userData.pityEXR || 0;
 
-        // ดึงข้อมูลสต็อกปัจจุบันของ SECRET และ USEC ทุกตัวมาก่อนเริ่มสุ่ม
+        // ดึงข้อมูลสต็อกปัจจุบันของ ADMIN, SECRET และ USEC ทุกตัวมาก่อนเริ่มสุ่ม
         let stockUpdates = {};
         for (const c of allCards) {
-            if (c.rarity === "SECRET HALLOWEEN" || c.rarity === "USEC HALLOWEEN") {
+            if (c.rarity === "ADMIN HALLOWEEN" || c.rarity === "SECRET HALLOWEEN" || c.rarity === "USEC HALLOWEEN") {
                 const stockRef = doc(db, "server_stats", `halloween_stock_${c.key}`);
                 const snap = await getDoc(stockRef);
                 cardStocks[c.key] = snap.exists() ? (snap.data().count || 0) : 0;
@@ -431,7 +436,9 @@
 
         const activeCards = allCards.map(c => {
             let modRate = c.rate;
-            if ((c.rarity === "SECRET HALLOWEEN" || c.rarity === "USEC HALLOWEEN") && (cardStocks[c.key] || 0) >= 50000) {
+            if (c.rarity === "ADMIN HALLOWEEN" && (cardStocks[c.key] || 0) >= 500) {
+                modRate = 0;
+            } else if ((c.rarity === "SECRET HALLOWEEN" || c.rarity === "USEC HALLOWEEN") && (cardStocks[c.key] || 0) >= 50000) {
                 modRate = 0;
             }
             return { ...c, currentRate: modRate };
@@ -453,13 +460,25 @@
             if (win.rarity === "SEC HALLOWEEN") ps = 0;
             if (win.rarity === "EXR HALLOWEEN") { pe = 0; ps = 0; }
 
+            if (win.rarity === "ADMIN HALLOWEEN") {
+                let currentCount = cardStocks[win.key] || 0;
+                if (currentCount < 500) {
+                    cardStocks[win.key] = currentCount + 1;
+                    stockUpdates[win.key] = cardStocks[win.key];
+                    sendBroadcast(`🚨 [GODLIKE] ผู้เล่น ${currentUserName} สุ่มได้การ์ดระดับ [ADMIN] ${win.name} เป็นใบที่ ${cardStocks[win.key].toLocaleString()}/500 ของเซิร์ฟเวอร์! 🎉`);
+                } else {
+                    win = activeCards.find(c => c.rarity === "SECRET HALLOWEEN") || win;
+                }
+            }
+
             if (win.rarity === "SECRET HALLOWEEN" || win.rarity === "USEC HALLOWEEN") {
                 let currentCount = cardStocks[win.key] || 0;
-                if (currentCount < 50000) {
+                let maxLimit = 50000;
+                if (currentCount < maxLimit) {
                     cardStocks[win.key] = currentCount + 1;
                     stockUpdates[win.key] = cardStocks[win.key];
                     let prefix = win.rarity.includes("SECRET") ? "SECRET" : "USEC";
-                    sendBroadcast(`🎃 ดวงดีสุดๆคุณ! ${currentUserName} สุ่มได้ [${prefix}] ${win.name} (ใบที่ ${cardStocks[win.key].toLocaleString()}/50,000)!`);
+                    sendBroadcast(`🎃 ดวงดีสุดๆคุณ! ${currentUserName} สุ่มได้ [${prefix}] ${win.name} (ใบที่ ${cardStocks[win.key].toLocaleString()}/${maxLimit.toLocaleString()})!`);
                 } else { 
                     win = activeCards.find(c => c.rarity === "EXR HALLOWEEN") || win; 
                 }
@@ -475,7 +494,7 @@
             display.appendChild(cardEl);
             setTimeout(() => cardEl.classList.add("revealed"), i * 150);
 
-            if (["EXR HALLOWEEN", "SECRET HALLOWEEN", "USEC HALLOWEEN"].includes(win.rarity)) await playEXRCutscene();
+            if (["ADMIN HALLOWEEN", "EXR HALLOWEEN", "SECRET HALLOWEEN", "USEC HALLOWEEN"].includes(win.rarity)) await playEXRCutscene();
             else if (["SEC HALLOWEEN", "SUR HALLOWEEN", "SSR HALLOWEEN", "UR HALLOWEEN"].includes(win.rarity)) triggerShake();
         }
 
@@ -540,7 +559,12 @@
         const body = document.getElementById("rate-list-body");
         body.innerHTML = allCards.map(c => {
             let stockInfo = "";
-            if (c.rarity === "SECRET HALLOWEEN" || c.rarity === "USEC HALLOWEEN") {
+            if (c.rarity === "ADMIN HALLOWEEN") {
+                let current = cardStocks[c.key] || 0;
+                let remaining = 500 - current;
+                if (remaining < 0) remaining = 0;
+                stockInfo = `<div style="font-size:0.75rem; color:#ff0055; font-weight:bold;">เหลืออยู่: ${remaining.toLocaleString()} / 500 ใบ</div>`;
+            } else if (c.rarity === "SECRET HALLOWEEN" || c.rarity === "USEC HALLOWEEN") {
                 let current = cardStocks[c.key] || 0;
                 let remaining = 50000 - current;
                 if (remaining < 0) remaining = 0;
@@ -566,6 +590,7 @@
     window.closeModal = () => document.getElementById("rateModal").style.display = "none";
 
     function getRarityColor(rarity) {
+        if (rarity.includes("ADMIN")) return '#ff0055';
         if (rarity.includes("SECRET")) return '#ffffff';
         if (rarity.includes("USEC")) return '#ff9900';
         if (rarity.includes("EXR")) return '#00d4ff';
@@ -579,7 +604,7 @@
     }
 
     const track = document.getElementById("v-track");
-    const rares = allCards.filter(c => ["SECRET HALLOWEEN", "USEC HALLOWEEN", "EXR HALLOWEEN", "SEC HALLOWEEN", "SUR HALLOWEEN", "UR HALLOWEEN", "SSR HALLOWEEN", "R HALLOWEEN"].includes(c.rarity));
+    const rares = allCards.filter(c => ["ADMIN HALLOWEEN", "SECRET HALLOWEEN", "USEC HALLOWEEN", "EXR HALLOWEEN", "SEC HALLOWEEN", "SUR HALLOWEEN", "UR HALLOWEEN", "SSR HALLOWEEN", "R HALLOWEEN"].includes(c.rarity));
     track.innerHTML = [...rares, ...rares].map(c => `<div class="preview-card-item"><img src="${c.img}"></div>`).join('');
 </script>
 </body>
