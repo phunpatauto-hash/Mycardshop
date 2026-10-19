@@ -57,6 +57,51 @@
             }
         }
 
+        /* Boss Mode Selector Header Tabs */
+        .boss-mode-tabs {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 5px;
+        }
+
+        .boss-tab-btn {
+            flex: 1;
+            padding: 10px 15px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            color: #aaa;
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            font-family: 'Kanit', sans-serif;
+        }
+
+        .boss-tab-btn:hover {
+            border-color: rgba(255, 107, 0, 0.5);
+            color: #fff;
+        }
+
+        .boss-tab-btn.active-ghost {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(107, 33, 168, 0.25));
+            border-color: #a855f7;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+        }
+
+        .boss-tab-btn.active-pumpkin {
+            background: linear-gradient(135deg, rgba(255, 107, 0, 0.25), rgba(255, 165, 0, 0.25));
+            border-color: #ff6b00;
+            color: #ffc831;
+            box-shadow: 0 0 15px rgba(255, 107, 0, 0.3);
+        }
+
         /* Boss Section */
         .boss-section {
             background: linear-gradient(135deg, #1f102e 0%, #0d0714 100%);
@@ -69,6 +114,7 @@
             justify-content: center;
             position: relative;
             box-shadow: 0 10px 30px rgba(255, 107, 0, 0.15);
+            transition: all 0.3s ease;
         }
 
         .boss-level-badge {
@@ -89,6 +135,7 @@
             margin: 15px 0;
             animation: floatBoss 3s ease-in-out infinite;
             filter: drop-shadow(0 0 25px rgba(168, 85, 247, 0.8));
+            transition: all 0.3s ease;
         }
 
         @keyframes floatBoss {
@@ -112,7 +159,7 @@
             height: 100%;
             width: 100%;
             border-radius: 20px;
-            transition: width 0.3s ease;
+            transition: width 0.3s ease, background 0.3s ease;
         }
 
         .hp-text {
@@ -163,6 +210,7 @@
             transition: 0.2s; white-space: nowrap;
         }
         .btn-upgrade-action:hover { transform: scale(1.05); }
+        .btn-upgrade-action:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
         .leaderboard-box {
             background: linear-gradient(135deg, #1f102e 0%, #0d0714 100%);
@@ -208,7 +256,7 @@
             border: none;
             color: #aaa;
             padding: 5px 10px;
-            border-radius: 9px;
+            border-radius: 99px;
             font-size: 0.75rem;
             font-weight: bold;
             cursor: pointer;
@@ -570,7 +618,7 @@
             <div class="logo">HALLOWEEN 🎃</div>
         </div>
         <ul class="nav-links">
-            <li><a href="minigame.html">หน้ามินเกม</a></li>
+            <li><a href="minigamen.html">กลับหน้ามินิเกม</a></li>
             <li>
                 <div class="profile-link" id="profile-container" style="display: none;" onclick="window.location.href='profile.html'">
                     <img src="" id="nav-avatar-img" class="nav-avatar">
@@ -591,27 +639,40 @@
 
     <main class="container">
         <div class="main-lobby-grid">
-            <div class="boss-section">
-                <div class="boss-level-badge" id="boss-level-text">LV. 1</div>
-                <div class="boss-avatar-container">👻</div>
-                <h3 style="margin: 5px 0 12px 0; color: #ff6b00; font-size: 1.2rem; text-align: center;">ราชันย์ภูตผี (Halloween Boss)</h3>
-                
-                <div style="width: 100%;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 4px;">
-                        <span>พลังชีวิต (HP)</span>
-                        <span id="boss-hp-text" style="color: #ff6b00; font-weight: bold;">10,000 / 10,000</span>
-                    </div>
-                    <div class="hp-container">
-                        <div class="hp-bar" id="boss-hp-bar"></div>
-                        <div class="hp-text">พลังชีวิตบอส</div>
+            <!-- Left Side: Boss Card View & Mode Selector -->
+            <div>
+                <div class="boss-mode-tabs">
+                    <button class="boss-tab-btn active-ghost" id="tab-ghost" onclick="switchBossMode('ghost')">
+                        👻 ราชันย์ภูตผี
+                    </button>
+                    <button class="boss-tab-btn" id="tab-pumpkin" onclick="switchBossMode('pumpkin')">
+                        🎃 ปาร์ตี้ Coin
+                    </button>
+                </div>
+
+                <div class="boss-section" id="boss-display-card">
+                    <div class="boss-level-badge" id="boss-level-text">LV. 1</div>
+                    <div class="boss-avatar-container" id="boss-avatar-emoji">👻</div>
+                    <h3 id="boss-title-name" style="margin: 5px 0 12px 0; color: #ff6b00; font-size: 1.2rem; text-align: center;">ราชันย์ภูตผี (Halloween Boss)</h3>
+                    
+                    <div style="width: 100%;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 4px;">
+                            <span>พลังชีวิต (HP)</span>
+                            <span id="boss-hp-text" style="color: #ff6b00; font-weight: bold;">10,000 / 10,000</span>
+                        </div>
+                        <div class="hp-container">
+                            <div class="hp-bar" id="boss-hp-bar"></div>
+                            <div class="hp-text" id="boss-hp-label">พลังชีวิตบอส</div>
+                        </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Right Side: Upgrades, Leaderboard, Battle Button -->
             <div class="right-section">
                 <div class="upgrade-box">
                     <div style="color: #a855f7; font-size: 0.95rem; font-weight: bold; display: flex; align-items: center; gap: 6px;">
-                        <i class="fas fa-arrow-alt-circle-up"></i> ⚡ อัปเกรดความสามารถ (สูงสุด 100)
+                        <i class="fas fa-arrow-alt-circle-up"></i> ⚡ อัปเกรดความสามารถ
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 8px;">
                         <div class="upgrade-item">
@@ -619,21 +680,21 @@
                                 <div style="font-weight: bold; font-size: 0.8rem; color: #ff6b00;">👆 พลังคลิก (+10%)</div>
                                 <div style="font-size: 0.65rem; color: #aaa;" id="upClickInfo">เลเวล: 0/100 | 1,000 🎃</div>
                             </div>
-                            <button class="btn-upgrade-action" onclick="upgradeSkill('click')">อัปเกรด</button>
+                            <button class="btn-upgrade-action" id="btn-up-click" onclick="upgradeSkill('click')">อัปเกรด</button>
                         </div>
                         <div class="upgrade-item">
                             <div>
                                 <div style="font-weight: bold; font-size: 0.8rem; color: #00d4ff;">⚡ ความไว (+5%)</div>
                                 <div style="font-size: 0.65rem; color: #aaa;" id="upSpeedInfo">เลเวล: 0/100 | 1,500 🎃</div>
                             </div>
-                            <button class="btn-upgrade-action" onclick="upgradeSkill('speed')">อัปเกรด</button>
+                            <button class="btn-upgrade-action" id="btn-up-speed" onclick="upgradeSkill('speed')">อัปเกรด</button>
                         </div>
                         <div class="upgrade-item">
                             <div>
                                 <div style="font-weight: bold; font-size: 0.8rem; color: #ff4757;">⚔️ พลังการ์ด (+20%)</div>
                                 <div style="font-size: 0.65rem; color: #aaa;" id="upCardInfo">เลเวล: 0/100 | 2,000 🎃</div>
                             </div>
-                            <button class="btn-upgrade-action" onclick="upgradeSkill('card')">อัปเกรด</button>
+                            <button class="btn-upgrade-action" id="btn-up-card" onclick="upgradeSkill('card')">อัปเกรด</button>
                         </div>
                     </div>
                 </div>
@@ -641,7 +702,7 @@
                 <div class="leaderboard-box">
                     <div class="season-timer-row">
                         <div class="season-timer-tag">
-                            <i class="fas fa-clock"></i> รีซีซั่นใน: <span id="seasonCountdownTxt" style="font-weight: bold;">กำลังคำวณ...</span>
+                            <i class="fas fa-clock"></i> รีซีซั่นใน: <span id="seasonCountdownTxt" style="font-weight: bold;">กำลังคำนวณ...</span>
                         </div>
                     </div>
 
@@ -657,7 +718,7 @@
 
                     <div id="viewLeaderboard">
                         <table class="boss-lb-table">
-                            <thead>
+                            <thead id="boss-lb-thead">
                                 <tr>
                                     <th>ชื่อผู้ใช้</th>
                                     <th style="text-align: center;">เลเวล</th>
@@ -678,7 +739,7 @@
                                     <th>รางวัล</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="reward-table-body">
                                 <tr>
                                     <td style="color: #ffc831; font-weight: bold;">🥇 1 - 20</td>
                                     <td>
@@ -710,7 +771,7 @@
                     </div>
                 </div>
 
-                <button class="btn-fight" onclick="enterBossBattle()">
+                <button class="btn-fight" id="btn-fight-action" onclick="enterBossBattle()">
                     <i class="fas fa-fire"></i> เข้าสู่สนามต่อสู้กับบอส!
                 </button>
             </div>
@@ -762,8 +823,9 @@
         let modalCategoryFilter = 'ALL';
         let modalRarityFilter = 'ALL';
         let myCurrentRank = 0;
-        let pendingRewardData = null;
+        let pendingRewardsList = []; 
         let userUpgrades = { click: 0, speed: 0, card: 0 };
+        let currentBossMode = 'ghost';
 
         function isHalloweenCard(card) {
             const rarityStr = (card && card.rarity ? card.rarity : '').toString().trim().toUpperCase();
@@ -778,6 +840,102 @@
             if (num >= 1e6) return (num / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
             if (num >= 1e3) return (num / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
             return num.toString();
+        }
+
+        window.switchBossMode = function(mode) {
+            currentBossMode = mode;
+            const tabGhost = document.getElementById("tab-ghost");
+            const tabPumpkin = document.getElementById("tab-pumpkin");
+            const bossDisplayCard = document.getElementById("boss-display-card");
+            const bossLevelBadge = document.getElementById("boss-level-text");
+            const bossAvatar = document.getElementById("boss-avatar-emoji");
+            const bossTitle = document.getElementById("boss-title-name");
+            const bossHpText = document.getElementById("boss-hp-text");
+            const bossHpBar = document.getElementById("boss-hp-bar");
+            const bossHpLabel = document.getElementById("boss-hp-label");
+            const btnFight = document.getElementById("btn-fight-action");
+
+            if (mode === 'ghost') {
+                tabGhost.className = "boss-tab-btn active-ghost";
+                tabPumpkin.className = "boss-tab-btn";
+                
+                bossDisplayCard.style.borderColor = "rgba(168, 85, 247, 0.4)";
+                bossDisplayCard.style.boxShadow = "0 10px 30px rgba(168, 85, 247, 0.15)";
+                bossAvatar.innerText = "👻";
+                bossAvatar.style.filter = "drop-shadow(0 0 25px rgba(168, 85, 247, 0.8))";
+                bossTitle.innerText = "ราชันย์ภูตผี (Halloween Boss)";
+                bossTitle.style.color = "#ff6b00";
+
+                bossHpLabel.innerText = "พลังชีวิตบอส";
+                bossHpBar.style.background = "linear-gradient(90deg, #ff4757, #ff6b81)";
+                
+                btnFight.style.background = "linear-gradient(135deg, #ff6b00, #a855f7)";
+                btnFight.innerHTML = `<i class="fas fa-fire"></i> เข้าต่อสู้กับบอส!`;
+
+                loadPlayerBossStatus();
+            } else if (mode === 'pumpkin') {
+                tabPumpkin.className = "boss-tab-btn active-pumpkin";
+                tabGhost.className = "boss-tab-btn";
+                
+                bossDisplayCard.style.borderColor = "rgba(255, 107, 0, 0.6)";
+                bossDisplayCard.style.boxShadow = "0 10px 30px rgba(255, 107, 0, 0.25)";
+                bossAvatar.innerText = "🎃";
+                bossAvatar.style.filter = "drop-shadow(0 0 25px rgba(255, 165, 0, 0.9))";
+                bossTitle.innerText = "ปาร์ตี้ Coin (Pumpkin Boss)";
+                bossTitle.style.color = "#ffc831";
+
+                bossLevelBadge.innerText = "∞";
+                bossLevelBadge.style.background = "linear-gradient(135deg, #ff9f43, #ff5252)";
+                bossHpText.innerText = "∞ / ∞";
+                bossHpBar.style.width = "100%";
+                bossHpBar.style.background = "linear-gradient(90deg, #ff9f43, #ffc831)";
+                bossHpLabel.innerText = "เลือดไม่จำกัด";
+
+                btnFight.style.background = "linear-gradient(135deg, #ff9f43, #ff5252)";
+                btnFight.innerHTML = `<i class="fas fa-coins"></i> ลุยปาร์ตี้ Coin!`;
+            }
+
+            loadBossLeaderboard();
+            renderRewardTable();
+        };
+
+        function renderRewardTable() {
+            const rewardBody = document.getElementById("reward-table-body");
+            if (currentBossMode === 'ghost') {
+                rewardBody.innerHTML = `
+                    <tr>
+                        <td style="color: #ffc831; font-weight: bold;">🥇 1 - 20</td>
+                        <td>
+                            <div>🎃 <b style="color: #ff6b00;">990M</b> Coin</div>
+                            <div style="font-size: 0.7rem; color: #a855f7;">ยศ: <b>ราชันย์ภูตผี👻</b></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="color: #00d4ff; font-weight: bold;">🥈 21 - 100</td>
+                        <td>
+                            <div>🎃 <b style="color: #ff6b00;">80M</b> Coin</div>
+                            <div style="font-size: 0.7rem; color: #a855f7;">ยศ: <b>ราชันย์ภูตผี👻</b></div>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                rewardBody.innerHTML = `
+                    <tr>
+                        <td style="color: #ffc831; font-weight: bold;">🥇 1 - 20</td>
+                        <td>
+                            <div>🎃 <b style="color: #ff6b00;">500M</b> Coin</div>
+                            <div style="font-size: 0.7rem; color: #ff9f43;">ยศ: <b>เศรษฐีฟักทอง🎃</b></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="color: #00d4ff; font-weight: bold;">🥈 21 - 100</td>
+                        <td>
+                            <div>🎃 <b style="color: #ff6b00;">50M</b> Coin</div>
+                            <div style="font-size: 0.7rem; color: #ff9f43;">ยศ: <b>นักเก็บฟักทอง🎃</b></div>
+                        </td>
+                    </tr>
+                `;
+            }
         }
 
         window.switchLbTab = function(tab) {
@@ -848,62 +1006,96 @@
         }
 
         async function loadUserUpgrades() {
+            if (!currentUserId) return;
             try {
                 const ref = doc(db, "users", currentUserId, "bossUpgrades", "data");
                 const snap = await getDoc(ref);
                 if (snap.exists()) {
                     userUpgrades = snap.data();
                 } else {
-                    await setDoc(ref, { click: 0, speed: 0, card: 0 });
+                    userUpgrades = { click: 0, speed: 0, card: 0 };
+                    await setDoc(ref, userUpgrades);
                 }
                 updateUpgradeUI();
-            } catch (e) { console.error(e); }
+            } catch (e) { 
+                console.error("Error loading upgrades:", e);
+                const localData = localStorage.getItem(`bossUpgrades_${currentUserId}`);
+                if (localData) {
+                    try { userUpgrades = JSON.parse(localData); } catch(err) {}
+                }
+                updateUpgradeUI();
+            }
         }
 
         function updateUpgradeUI() {
-            const costClick = 1000 * (userUpgrades.click + 1);
-            const costSpeed = 1500 * (userUpgrades.speed + 1);
-            const costCard = 2000 * (userUpgrades.card + 1);
+            const clickLvl = userUpgrades.click || 0;
+            const speedLvl = userUpgrades.speed || 0;
+            const cardLvl = userUpgrades.card || 0;
 
-            document.getElementById("upClickInfo").innerText = `เลเวล: ${userUpgrades.click}/100 | ${userUpgrades.click >= 100 ? 'MAX' : costClick.toLocaleString() + ' 🎃'}`;
-            document.getElementById("upSpeedInfo").innerText = `เลเวล: ${userUpgrades.speed}/100 | ${userUpgrades.speed >= 100 ? 'MAX' : costSpeed.toLocaleString() + ' 🎃'}`;
-            document.getElementById("upCardInfo").innerText = `เลเวล: ${userUpgrades.card}/100 | ${userUpgrades.card >= 100 ? 'MAX' : costCard.toLocaleString() + ' 🎃'}`;
+            const costClick = 1000 * (clickLvl + 1);
+            const costSpeed = 1500 * (speedLvl + 1);
+            const costCard = 2000 * (cardLvl + 1);
+
+            document.getElementById("upClickInfo").innerText = `เลเวล: ${clickLvl}/100 | ${clickLvl >= 100 ? 'MAX' : costClick.toLocaleString() + ' 🎃'}`;
+            document.getElementById("upSpeedInfo").innerText = `เลเวล: ${speedLvl}/100 | ${speedLvl >= 100 ? 'MAX' : costSpeed.toLocaleString() + ' 🎃'}`;
+            document.getElementById("upCardInfo").innerText = `เลเวล: ${cardLvl}/100 | ${cardLvl >= 100 ? 'MAX' : costCard.toLocaleString() + ' 🎃'}`;
             
-            localStorage.setItem(`bossUpgrades_${currentUserId}`, JSON.stringify(userUpgrades));
+            document.getElementById("btn-up-click").disabled = clickLvl >= 100;
+            document.getElementById("btn-up-speed").disabled = speedLvl >= 100;
+            document.getElementById("btn-up-card").disabled = cardLvl >= 100;
+
+            if (currentUserId) {
+                localStorage.setItem(`bossUpgrades_${currentUserId}`, JSON.stringify(userUpgrades));
+            }
         }
 
         window.upgradeSkill = async function(type) {
             if (!currentUserId) return;
-            if (userUpgrades[type] >= 100) {
-                Swal.fire({ icon: 'info', title: 'อัปเกรดถึงเลเวลสูงสุด 100 แล้ว!', background: '#120a1a', color: '#fff', confirmButtonColor: '#ff6b00' });
-                return;
-            }
+            
+            let currentLvl = userUpgrades[type] || 0;
+            if (currentLvl >= 100) return;
 
-            let cost = (type === 'click' ? 1000 : type === 'speed' ? 1500 : 2000) * (userUpgrades[type] + 1);
+            let cost = (type === 'click' ? 1000 : type === 'speed' ? 1500 : 2000) * (currentLvl + 1);
+            const btnElement = document.getElementById(`btn-up-${type}`);
+            if (btnElement) btnElement.disabled = true;
 
             try {
                 const userRef = doc(db, "users", currentUserId);
                 const userSnap = await getDoc(userRef);
-                if (!userSnap.exists()) return;
-
-                let currentCoins = userSnap.data().halloween_coins || 0;
-                if (currentCoins < cost) {
-                    Swal.fire({ icon: 'warning', title: 'เหรียญฮาโลวีนไม่พอ!', background: '#120a1a', color: '#fff', confirmButtonColor: '#ff6b00' });
+                if (!userSnap.exists()) {
+                    if (btnElement) btnElement.disabled = false;
                     return;
                 }
 
-                await updateDoc(userRef, { halloween_coins: increment(-cost) });
-                userUpgrades[type] += 1;
+                let currentCoins = userSnap.data().halloween_coins ?? userSnap.data().halloweenCoins ?? 0;
+                if (currentCoins < cost) {
+                    Swal.fire({ icon: 'warning', title: 'เหรียญฮาโลวีนไม่พอ!', background: '#120a1a', color: '#fff', confirmButtonColor: '#ff6b00' });
+                    if (btnElement) btnElement.disabled = false;
+                    return;
+                }
 
+                // ตัดเหรียญและอัปเดตเลเวลทันทีโดยไม่มีป๊อบอัปสำเร็จ
+                await updateDoc(userRef, { halloween_coins: increment(-cost) });
+                
+                userUpgrades[type] = currentLvl + 1;
                 const upRef = doc(db, "users", currentUserId, "bossUpgrades", "data");
                 await setDoc(upRef, userUpgrades, { merge: true });
 
                 await loadUserProfile(auth.currentUser);
                 updateUpgradeUI();
-            } catch (e) { console.error(e); }
+
+            } catch (e) { 
+                console.error("Upgrade error:", e);
+            } finally {
+                if (btnElement && userUpgrades[type] < 100) {
+                    btnElement.disabled = false;
+                }
+            }
         };
 
         async function loadPlayerBossStatus() {
+            if (currentBossMode === 'pumpkin') return;
+
             try {
                 const bossRef = doc(db, "users", currentUserId, "bossProgress", "data");
                 const bossSnap = await getDoc(bossRef);
@@ -968,26 +1160,41 @@
 
         async function performSeasonReset() {
             try {
-                const q = query(collection(db, "bossScores"), orderBy("totalDamage", "desc"));
-                const querySnapshot = await getDocs(q);
-
-                let rank = 1;
-                querySnapshot.forEach(async (docSnap) => {
+                const qGhost = query(collection(db, "bossScores"), orderBy("totalDamage", "desc"));
+                const snapGhost = await getDocs(qGhost);
+                let rankGhost = 1;
+                snapGhost.forEach(async (docSnap) => {
                     const userId = docSnap.id;
                     const data = docSnap.data();
                     const bossLevel = data.bossLevel || 1;
-
-                    if (rank <= 100) {
-                        let rewardCoins = (rank >= 1 && rank <= 20) ? 990000000 : 80000000;
-                        let titleReward = "ปาร์ตี้ราชันย์ภูตผี👻";
-
+                    if (rankGhost <= 100) {
+                        let rewardCoins = (rankGhost >= 1 && rankGhost <= 20) ? 990000000 : 80000000;
+                        let titleReward = "ราชันย์ภูตผี👻";
                         const pendingRef = doc(db, "users", userId, "pendingRewards", "bossSeason");
                         await setDoc(pendingRef, {
-                            rank: rank, bossLevel: bossLevel, coins: rewardCoins, title: titleReward, claimed: false, createdAt: new Date().toISOString()
+                            key: "bossSeason", rank: rankGhost, bossLevel: bossLevel, coins: rewardCoins, title: titleReward, claimed: false, createdAt: new Date().toISOString()
                         });
                     }
                     await setDoc(doc(db, "bossScores", docSnap.id), { totalDamage: 0, bossLevel: 1 }, { merge: true });
-                    rank++;
+                    rankGhost++;
+                });
+
+                const qPump = query(collection(db, "pumpkinBossScores"), orderBy("totalCoinsEarned", "desc"));
+                const snapPump = await getDocs(qPump);
+                let rankPump = 1;
+                snapPump.forEach(async (docSnap) => {
+                    const userId = docSnap.id;
+                    const data = docSnap.data();
+                    if (rankPump <= 100) {
+                        let rewardCoins = (rankPump >= 1 && rankPump <= 20) ? 500000000 : 50000000;
+                        let titleReward = "เศรษฐีฟักทอง🎃";
+                        const pendingRef = doc(db, "users", userId, "pendingRewards", "pumpkinSeason");
+                        await setDoc(pendingRef, {
+                            key: "pumpkinSeason", rank: rankPump, bossLevel: '∞', coins: rewardCoins, title: titleReward, claimed: false, createdAt: new Date().toISOString()
+                        });
+                    }
+                    await setDoc(doc(db, "pumpkinBossScores", docSnap.id), { totalCoinsEarned: 0 }, { merge: true });
+                    rankPump++;
                 });
             } catch (e) { console.error(e); }
         }
@@ -995,37 +1202,67 @@
         async function checkPendingReward() {
             if (!currentUserId) return;
             try {
-                const pendingRef = doc(db, "users", currentUserId, "pendingRewards", "bossSeason");
-                const snap = await getDoc(pendingRef);
+                pendingRewardsList = [];
+                const keys = ["bossSeason", "pumpkinSeason"];
+                
+                for (let k of keys) {
+                    const pendingRef = doc(db, "users", currentUserId, "pendingRewards", k);
+                    const snap = await getDoc(pendingRef);
+                    if (snap.exists() && !snap.data().claimed) {
+                        pendingRewardsList.push(snap.data());
+                    }
+                }
 
-                if (snap.exists() && !snap.data().claimed) {
-                    pendingRewardData = snap.data();
+                if (pendingRewardsList.length > 0) {
                     document.getElementById("claimPendingBtnContainer").style.display = "block";
-                    showSeasonRewardPopup(pendingRewardData);
+                    showSeasonRewardPopup(pendingRewardsList);
                 } else {
                     document.getElementById("claimPendingBtnContainer").style.display = "none";
                 }
             } catch (e) { console.error(e); }
         }
 
-        function showSeasonRewardPopup(reward) {
+        function showSeasonRewardPopup(rewards) {
+            let rewardsHtml = '';
+            let totalCoinsSum = 0;
+
+            rewards.forEach(reward => {
+                totalCoinsSum += (reward.coins || 0);
+                const bossTitleName = reward.key === 'pumpkinSeason' ? '🎃 ปาร์ตี้ Coin (ฟักทอง)' : '👻 ราชันย์ภูตผี';
+                rewardsHtml += `
+                    <div style="background: rgba(0, 0, 0, 0.4); padding: 12px; border-radius: 12px; margin-bottom: 8px; border: 1px solid rgba(255,107,0,0.2);">
+                        <div style="color: #ff6b00; font-weight: bold; font-size: 0.85rem; margin-bottom: 4px;">${bossTitleName}</div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                            <span style="color: #aaa;">🏆 อันดับ:</span> <b style="color: #ffc831;">#${reward.rank || '-'}</b>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                            <span style="color: #aaa;">🎃 เหรียญที่ได้รับ:</span> <b style="color: #ff6b00;">+${(reward.coins || 0).toLocaleString()}</b>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                            <span style="color: #aaa;">👑 ยศ:</span> <b style="color: #33ffad;">${reward.title || '-'}</b>
+                        </div>
+                    </div>
+                `;
+            });
+
             Swal.fire({
-                title: '🎉 สรุปผลงานจบซีซั่นตีบอส!',
+                title: '🎉 สรุปผลงานจบซีซั่น!',
                 html: `
-                    <div style="text-align: left; font-size: 0.9rem; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-top: 10px; display: flex; flex-direction: column; gap: 6px;">
-                        <div style="display: flex; justify-content: space-between;"><span style="color: #aaa;">🏆 อันดับ:</span><b style="color: #ffcc00;">#${reward.rank || '-'}</b></div>
-                        <div style="display: flex; justify-content: space-between;"><span style="color: #aaa;">👻 เลเวลบอส:</span><b style="color: #a855f7;">LV. ${reward.bossLevel || 1}</b></div>
-                        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 2px 0;">
-                        <div style="display: flex; justify-content: space-between;"><span style="color: #aaa;">🎃 เหรียญ:</span><b style="color: #ff6b00;">+${(reward.coins || 0).toLocaleString()}</b></div>
+                    <div style="text-align: left; max-height: 280px; overflow-y: auto; margin-top: 5px;">
+                        ${rewardsHtml}
                     </div>
                 `,
-                icon: 'success', background: '#120a1a', color: '#fff',
-                confirmButtonText: '🎁 รับรางวัล', confirmButtonColor: '#ff6b00', allowOutsideClick: false
+                icon: 'success', 
+                background: '#120a1a', 
+                color: '#fff',
+                confirmButtonText: `🎁 รับรางวัลทั้งหมด (+${totalCoinsSum.toLocaleString()} 🎃)`, 
+                confirmButtonColor: '#ff6b00', 
+                allowOutsideClick: false
             }).then(async () => { await claimPendingReward(); });
         }
 
         window.claimPendingReward = async function() {
-            if (!currentUserId || !pendingRewardData) return;
+            if (!currentUserId || pendingRewardsList.length === 0) return;
             try {
                 const userDocRef = doc(db, "users", currentUserId);
                 const userSnap = await getDoc(userDocRef);
@@ -1033,19 +1270,30 @@
                 if (userSnap.exists() && Array.isArray(userSnap.data().titles)) {
                     currentTitles = userSnap.data().titles;
                 }
-                if (pendingRewardData.title && !currentTitles.includes(pendingRewardData.title)) {
-                    currentTitles.push(pendingRewardData.title);
+
+                let totalCoinsToAdd = 0;
+                for (let reward of pendingRewardsList) {
+                    totalCoinsToAdd += (reward.coins || 0);
+                    const rewardTitle = reward.title;
+                    if (rewardTitle && !currentTitles.includes(rewardTitle)) {
+                        currentTitles.push(rewardTitle);
+                    }
                 }
 
+                let latestTitle = pendingRewardsList[pendingRewardsList.length - 1].title;
+
                 await updateDoc(userDocRef, {
-                    halloween_coins: increment(pendingRewardData.coins || 0),
+                    halloween_coins: increment(totalCoinsToAdd),
                     titles: currentTitles,
-                    currentTitle: pendingRewardData.title || ''
+                    currentTitle: latestTitle || userSnap.data().currentTitle
                 });
 
-                await updateDoc(doc(db, "users", currentUserId, "pendingRewards", "bossSeason"), { claimed: true });
+                for (let reward of pendingRewardsList) {
+                    const docKey = reward.key || "bossSeason";
+                    await updateDoc(doc(db, "users", currentUserId, "pendingRewards", docKey), { claimed: true });
+                }
 
-                Swal.fire({ icon: 'success', title: 'รับรางวัลสำเร็จ!', background: '#120a1a', color: '#fff', confirmButtonColor: '#ff6b00' }).then(() => location.reload());
+                Swal.fire({ icon: 'success', title: 'รับรางวัลทั้งหมดสำเร็จ!', background: '#120a1a', color: '#fff', confirmButtonColor: '#ff6b00' }).then(() => location.reload());
             } catch (e) { console.error(e); }
         };
 
@@ -1240,20 +1488,50 @@
 
         async function loadBossLeaderboard() {
             const tbody = document.getElementById("boss-leaderboard-body");
+            const thead = document.getElementById("boss-lb-thead");
+            
+            if (currentBossMode === 'ghost') {
+                thead.innerHTML = `
+                    <tr>
+                        <th>ชื่อผู้ใช้</th>
+                        <th style="text-align: center;">เลเวล</th>
+                        <th style="text-align: right;">ดาเมจรวม</th>
+                    </tr>
+                `;
+            } else {
+                thead.innerHTML = `
+                    <tr>
+                        <th>ชื่อผู้ใช้</th>
+                        <th style="text-align: center;">โหมด</th>
+                        <th style="text-align: right;">Coin ที่ได้รับ</th>
+                    </tr>
+                `;
+            }
+
             try {
-                const q = query(collection(db, "bossScores"), orderBy("totalDamage", "desc"));
+                const targetCollection = currentBossMode === 'ghost' ? "bossScores" : "pumpkinBossScores";
+                const targetField = currentBossMode === 'ghost' ? "totalDamage" : "totalCoinsEarned";
+
+                const q = query(collection(db, targetCollection), orderBy(targetField, "desc"));
                 const querySnapshot = await getDocs(q);
+                
                 if (querySnapshot.empty) {
                     tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #888; padding: 10px;">ยังไม่มีประวัติ</td></tr>`;
                     document.getElementById("myRankTxt").innerText = "ยังไม่มีอันดับ";
                     return;
                 }
+
                 let html = "", index = 1, userRankFound = false;
                 querySnapshot.forEach((docSnap) => {
                     const data = docSnap.data();
                     if (docSnap.id === currentUserId) { myCurrentRank = index; userRankFound = true; }
+                    
                     if (index <= 5) {
-                        html += `<tr><td style="padding: 6px 0;">#${index} ${escapeHtml(data.name || 'ผู้เล่น')}</td><td style="text-align: center; color: #a855f7;">LV. ${data.bossLevel || 1}</td><td style="text-align: right; color: #ff6b00; font-weight: bold;">${Number(data.totalDamage || 0).toLocaleString()}</td></tr>`;
+                        if (currentBossMode === 'ghost') {
+                            html += `<tr><td style="padding: 6px 0;">#${index} ${escapeHtml(data.name || 'ผู้เล่น')}</td><td style="text-align: center; color: #a855f7;">LV. ${data.bossLevel || 1}</td><td style="text-align: right; color: #ff6b00; font-weight: bold;">${Number(data.totalDamage || 0).toLocaleString()}</td></tr>`;
+                        } else {
+                            html += `<tr><td style="padding: 6px 0;">#${index} ${escapeHtml(data.name || 'ผู้เล่น')}</td><td style="text-align: center; color: #ff9f43;">Coin 🎃</td><td style="text-align: right; color: #ffc831; font-weight: bold;">${Number(data.totalCoinsEarned || 0).toLocaleString()}</td></tr>`;
+                        }
                     }
                     index++;
                 });
@@ -1269,7 +1547,12 @@
                 Swal.fire({ icon: 'warning', title: '⚠️ ยังไม่ได้เลือกการ์ด!', text: 'กรุณาเลือกการ์ดอย่างน้อย 1 ใบบนมือถือก่อนลุย', background: '#120a1a', color: '#fff', confirmButtonColor: '#ff6b00' });
                 return;
             }
-            window.location.href = "boss_battle.html";
+
+            if (currentBossMode === 'pumpkin') {
+                window.location.href = "pumpkin_battle.html";
+            } else {
+                window.location.href = "boss_battle.html";
+            }
         }
     </script>
 </body>
