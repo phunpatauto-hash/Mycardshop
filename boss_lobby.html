@@ -191,6 +191,49 @@
             padding: 15px 20px;
             box-shadow: 0 10px 30px rgba(168, 85, 247, 0.15);
         }
+        
+        .upgrade-controls-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .batch-control-group {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 107, 0, 0.3);
+            border-radius: 10px;
+            padding: 2px 6px;
+            gap: 6px;
+        }
+        .batch-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #fff;
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            transition: 0.2s;
+        }
+        .batch-btn:hover { background: #ff6b00; }
+        .batch-value-display {
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #ffc831;
+            min-width: 35px;
+            text-align: center;
+        }
+
         .upgrade-item {
             background: rgba(0,0,0,0.4);
             padding: 10px 12px;
@@ -618,7 +661,7 @@
             <div class="logo">HALLOWEEN 🎃</div>
         </div>
         <ul class="nav-links">
-            <li><a href="minigame.html">กลับหน้ามินิเกม</a></li>
+            <li><a href="minigamen.html">กลับหน้ามินิเกม</a></li>
             <li>
                 <div class="profile-link" id="profile-container" style="display: none;" onclick="window.location.href='profile.html'">
                     <img src="" id="nav-avatar-img" class="nav-avatar">
@@ -671,28 +714,40 @@
             <!-- Right Side: Upgrades, Leaderboard, Battle Button -->
             <div class="right-section">
                 <div class="upgrade-box">
-                    <div style="color: #a855f7; font-size: 0.95rem; font-weight: bold; display: flex; align-items: center; gap: 6px;">
-                        <i class="fas fa-arrow-alt-circle-up"></i> ⚡ อัปเกรดความสามารถ
+                    <div class="upgrade-controls-header">
+                        <div style="color: #a855f7; font-size: 0.95rem; font-weight: bold; display: flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-arrow-alt-circle-up"></i> ⚡ อัปเกรดความสามารถ (Max 300)
+                        </div>
+                        <div class="batch-control-group">
+                            <span style="font-size: 0.75rem; color: #aaa;">จำนวน:</span>
+                            <button class="batch-btn" onclick="changeBatchAmount(-10)">-10</button>
+                            <button class="batch-btn" onclick="changeBatchAmount(-1)">-1</button>
+                            <span class="batch-value-display" id="batchAmountDisplay">+1</span>
+                            <button class="batch-btn" onclick="changeBatchAmount(1)">+1</button>
+                            <button class="batch-btn" onclick="changeBatchAmount(10)">+10</button>
+                            <button class="batch-btn" onclick="setBatchMax()" title="อัปสูงสุด">MAX</button>
+                        </div>
                     </div>
+
                     <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 8px;">
                         <div class="upgrade-item">
                             <div>
                                 <div style="font-weight: bold; font-size: 0.8rem; color: #ff6b00;">👆 พลังคลิก (+10%)</div>
-                                <div style="font-size: 0.65rem; color: #aaa;" id="upClickInfo">เลเวล: 0/100 | 1,000 🎃</div>
+                                <div style="font-size: 0.65rem; color: #aaa;" id="upClickInfo">เลเวล: 0/300 | 1,000 🎃</div>
                             </div>
                             <button class="btn-upgrade-action" id="btn-up-click" onclick="upgradeSkill('click')">อัปเกรด</button>
                         </div>
                         <div class="upgrade-item">
                             <div>
                                 <div style="font-weight: bold; font-size: 0.8rem; color: #00d4ff;">⚡ ความไว (+5%)</div>
-                                <div style="font-size: 0.65rem; color: #aaa;" id="upSpeedInfo">เลเวล: 0/100 | 1,500 🎃</div>
+                                <div style="font-size: 0.65rem; color: #aaa;" id="upSpeedInfo">เลเวล: 0/300 | 1,500 🎃</div>
                             </div>
                             <button class="btn-upgrade-action" id="btn-up-speed" onclick="upgradeSkill('speed')">อัปเกรด</button>
                         </div>
                         <div class="upgrade-item">
                             <div>
                                 <div style="font-weight: bold; font-size: 0.8rem; color: #ff4757;">⚔️ พลังการ์ด (+20%)</div>
-                                <div style="font-size: 0.65rem; color: #aaa;" id="upCardInfo">เลเวล: 0/100 | 2,000 🎃</div>
+                                <div style="font-size: 0.65rem; color: #aaa;" id="upCardInfo">เลเวล: 0/300 | 2,000 🎃</div>
                             </div>
                             <button class="btn-upgrade-action" id="btn-up-card" onclick="upgradeSkill('card')">อัปเกรด</button>
                         </div>
@@ -713,6 +768,7 @@
                         <div class="lb-switch-group">
                             <button class="lb-switch-btn active" id="btnTabLeaderboard" onclick="switchLbTab('RANK')">📊 อันดับ</button>
                             <button class="lb-switch-btn" id="btnTabRewards" onclick="switchLbTab('REWARDS')">🎁 รางวัล</button>
+                            <button class="lb-switch-btn" id="btnTabChallenge" onclick="switchLbTab('CHALLENGE')">🎯 ชาเล้น</button>
                         </div>
                     </div>
 
@@ -756,6 +812,31 @@
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+
+                    <div id="viewChallenge" style="display: none;">
+                        <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 107, 0, 0.3); border-radius: 12px; padding: 12px; margin-top: 5px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <div>
+                                    <div style="color: #ff6b00; font-weight: bold; font-size: 0.9rem;">🎯 พิชิตราชันย์ภูตผี LV. 500</div>
+                                    <div style="color: #aaa; font-size: 0.75rem;">ต่อสู้กับบอสราชันย์ภูตผีให้ถึงเลเวล 500 เพื่อรับยศพิเศษ</div>
+                                </div>
+                                <div style="font-size: 0.8rem; font-weight: bold; color: #a855f7;" id="challengeLevelTxt">
+                                    0 / 500
+                                </div>
+                            </div>
+                            
+                            <div style="background: rgba(255, 255, 255, 0.1); height: 10px; border-radius: 10px; overflow: hidden; margin-bottom: 10px;">
+                                <div id="challengeProgressBar" style="background: linear-gradient(90deg, #ff6b00, #a855f7); width: 0%; height: 100%; transition: width 0.3s ease;"></div>
+                            </div>
+
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-size: 0.75rem; color: #ffc831;">🏷️ ยศที่จะได้รับ: <b style="color: #33ffad;">[500 Lv พี่ยังไหว]</b></span>
+                                <button id="btnClaimChallengeTitle" onclick="claimChallengeTitle()" style="background: linear-gradient(135deg, #ff6b00, #a855f7); border: none; color: white; padding: 5px 12px; border-radius: 10px; font-weight: bold; font-size: 0.75rem; cursor: pointer; transition: 0.2s;" disabled>
+                                    🔒 เลเวลยังไม่ถึง
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="my-rank-banner">
@@ -825,7 +906,9 @@
         let myCurrentRank = 0;
         let pendingRewardsList = []; 
         let userUpgrades = { click: 0, speed: 0, card: 0 };
+        let currentUpgradeBatch = 1; // จำนวนเลเวลที่เลือกอัปเกรดในแต่ละครั้ง (+1, +10, ฯลฯ)
         let currentBossMode = 'ghost';
+        let userBossLevel = 1;
 
         function isHalloweenCard(card) {
             const rarityStr = (card && card.rarity ? card.rarity : '').toString().trim().toUpperCase();
@@ -841,6 +924,18 @@
             if (num >= 1e3) return (num / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
             return num.toString();
         }
+
+        window.changeBatchAmount = function(amount) {
+            currentUpgradeBatch += amount;
+            if (currentUpgradeBatch < 1) currentUpgradeBatch = 1;
+            if (currentUpgradeBatch > 300) currentUpgradeBatch = 300;
+            document.getElementById("batchAmountDisplay").innerText = `+${currentUpgradeBatch}`;
+        };
+
+        window.setBatchMax = function() {
+            currentUpgradeBatch = 300;
+            document.getElementById("batchAmountDisplay").innerText = `MAX`;
+        };
 
         window.switchBossMode = function(mode) {
             currentBossMode = mode;
@@ -897,6 +992,7 @@
 
             loadBossLeaderboard();
             renderRewardTable();
+            updateChallengeUI();
         };
 
         function renderRewardTable() {
@@ -941,22 +1037,106 @@
         window.switchLbTab = function(tab) {
             const btnRank = document.getElementById("btnTabLeaderboard");
             const btnRewards = document.getElementById("btnTabRewards");
+            const btnChallenge = document.getElementById("btnTabChallenge");
+            
             const viewLb = document.getElementById("viewLeaderboard");
             const viewRew = document.getElementById("viewRewards");
+            const viewChal = document.getElementById("viewChallenge");
             const titleHeader = document.getElementById("lb-header-title");
+
+            [btnRank, btnRewards, btnChallenge].forEach(btn => btn?.classList.remove("active"));
+            [viewLb, viewRew, viewChal].forEach(view => view ? view.style.display = "none" : null);
 
             if (tab === 'RANK') {
                 btnRank.classList.add("active");
-                btnRewards.classList.remove("active");
                 viewLb.style.display = "block";
-                viewRew.style.display = "none";
                 titleHeader.innerHTML = `<i class="fas fa-trophy" style="color: #ff6b00;"></i> 📊 จัดอันดับตีบอส`;
-            } else {
+            } else if (tab === 'REWARDS') {
                 btnRewards.classList.add("active");
-                btnRank.classList.remove("active");
-                viewLb.style.display = "none";
                 viewRew.style.display = "block";
                 titleHeader.innerHTML = `<i class="fas fa-gift" style="color: #a855f7;"></i> 🎁 รายการของรางวัล`;
+            } else if (tab === 'CHALLENGE') {
+                btnChallenge.classList.add("active");
+                viewChal.style.display = "block";
+                titleHeader.innerHTML = `<i class="fas fa-bullseye" style="color: #ff6b00;"></i> 🎯 ชาเล้นพิเศษ`;
+                updateChallengeUI();
+            }
+        };
+
+        async function updateChallengeUI() {
+            const lvlTxt = document.getElementById("challengeLevelTxt");
+            const bar = document.getElementById("challengeProgressBar");
+            const claimBtn = document.getElementById("btnClaimChallengeTitle");
+
+            if (!lvlTxt || !bar || !claimBtn) return;
+
+            lvlTxt.innerText = `${userBossLevel} / 500`;
+            const progressPercent = Math.min(100, (userBossLevel / 500) * 100);
+            bar.style.width = `${progressPercent}%`;
+
+            if (!currentUserId) return;
+
+            try {
+                const userDocRef = doc(db, "users", currentUserId);
+                const userSnap = await getDoc(userDocRef);
+                let titles = [];
+                if (userSnap.exists() && Array.isArray(userSnap.data().titles)) {
+                    titles = userSnap.data().titles;
+                }
+
+                const titleTarget = "500 Lv พี่ยังไหว";
+
+                if (titles.includes(titleTarget)) {
+                    claimBtn.disabled = true;
+                    claimBtn.innerText = "✅ รับยศแล้ว";
+                    claimBtn.style.background = "#444";
+                } else if (userBossLevel >= 500) {
+                    claimBtn.disabled = false;
+                    claimBtn.innerText = "🎁 กดรับยศ";
+                    claimBtn.style.background = "linear-gradient(135deg, #00d4ff, #a855f7)";
+                } else {
+                    claimBtn.disabled = true;
+                    claimBtn.innerText = "🔒 เลเวลยังไม่ถึง";
+                    claimBtn.style.background = "linear-gradient(135deg, #ff6b00, #a855f7)";
+                }
+            } catch (e) { console.error("Error updating challenge UI:", e); }
+        }
+
+        window.claimChallengeTitle = async function() {
+            if (!currentUserId || userBossLevel < 500) return;
+
+            try {
+                const userDocRef = doc(db, "users", currentUserId);
+                const userSnap = await getDoc(userDocRef);
+
+                let titles = [];
+                if (userSnap.exists() && Array.isArray(userSnap.data().titles)) {
+                    titles = userSnap.data().titles;
+                }
+
+                const titleTarget = "500 Lv พี่ยังไหว";
+
+                if (!titles.includes(titleTarget)) {
+                    titles.push(titleTarget);
+
+                    await updateDoc(userDocRef, {
+                        titles: titles,
+                        currentTitle: titleTarget
+                    });
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: '🎉 รับยศสำเร็จ!',
+                        text: `คุณได้รับยศ [${titleTarget}] เรียบร้อยแล้ว สามารถดูและใช้งานยศได้ที่หน้า profile.html`,
+                        background: '#120a1a',
+                        color: '#fff',
+                        confirmButtonColor: '#ff6b00'
+                    });
+
+                    updateChallengeUI();
+                }
+            } catch (e) {
+                console.error("Error claiming challenge title:", e);
             }
         };
 
@@ -1032,17 +1212,26 @@
             const speedLvl = userUpgrades.speed || 0;
             const cardLvl = userUpgrades.card || 0;
 
-            const costClick = 1000 * (clickLvl + 1);
-            const costSpeed = 1500 * (speedLvl + 1);
-            const costCard = 2000 * (cardLvl + 1);
+            let nextCostClick = 0;
+            for(let i=0; i<Math.min(currentUpgradeBatch, 300 - clickLvl); i++) {
+                nextCostClick += 1000 * (clickLvl + 1 + i);
+            }
+            let nextCostSpeed = 0;
+            for(let i=0; i<Math.min(currentUpgradeBatch, 300 - speedLvl); i++) {
+                nextCostSpeed += 1500 * (speedLvl + 1 + i);
+            }
+            let nextCostCard = 0;
+            for(let i=0; i<Math.min(currentUpgradeBatch, 300 - cardLvl); i++) {
+                nextCostCard += 2000 * (cardLvl + 1 + i);
+            }
 
-            document.getElementById("upClickInfo").innerText = `เลเวล: ${clickLvl}/100 | ${clickLvl >= 100 ? 'MAX' : costClick.toLocaleString() + ' 🎃'}`;
-            document.getElementById("upSpeedInfo").innerText = `เลเวล: ${speedLvl}/100 | ${speedLvl >= 100 ? 'MAX' : costSpeed.toLocaleString() + ' 🎃'}`;
-            document.getElementById("upCardInfo").innerText = `เลเวล: ${cardLvl}/100 | ${cardLvl >= 100 ? 'MAX' : costCard.toLocaleString() + ' 🎃'}`;
+            document.getElementById("upClickInfo").innerText = `เลเวล: ${clickLvl}/300 | ${clickLvl >= 300 ? 'MAX' : nextCostClick.toLocaleString() + ' 🎃'}`;
+            document.getElementById("upSpeedInfo").innerText = `เลเวล: ${speedLvl}/300 | ${speedLvl >= 300 ? 'MAX' : nextCostSpeed.toLocaleString() + ' 🎃'}`;
+            document.getElementById("upCardInfo").innerText = `เลเวล: ${cardLvl}/300 | ${cardLvl >= 300 ? 'MAX' : nextCostCard.toLocaleString() + ' 🎃'}`;
             
-            document.getElementById("btn-up-click").disabled = clickLvl >= 100;
-            document.getElementById("btn-up-speed").disabled = speedLvl >= 100;
-            document.getElementById("btn-up-card").disabled = cardLvl >= 100;
+            document.getElementById("btn-up-click").disabled = clickLvl >= 300;
+            document.getElementById("btn-up-speed").disabled = speedLvl >= 300;
+            document.getElementById("btn-up-card").disabled = cardLvl >= 300;
 
             if (currentUserId) {
                 localStorage.setItem(`bossUpgrades_${currentUserId}`, JSON.stringify(userUpgrades));
@@ -1053,9 +1242,20 @@
             if (!currentUserId) return;
             
             let currentLvl = userUpgrades[type] || 0;
-            if (currentLvl >= 100) return;
+            if (currentLvl >= 300) return;
 
-            let cost = (type === 'click' ? 1000 : type === 'speed' ? 1500 : 2000) * (currentLvl + 1);
+            let targetLevelsToAdd = currentUpgradeBatch;
+            if (currentLvl + targetLevelsToAdd > 300) {
+                targetLevelsToAdd = 300 - currentLvl;
+            }
+            if (targetLevelsToAdd <= 0) return;
+
+            let totalCost = 0;
+            let baseMultiplier = (type === 'click' ? 1000 : type === 'speed' ? 1500 : 2000);
+            for (let i = 0; i < targetLevelsToAdd; i++) {
+                totalCost += baseMultiplier * (currentLvl + 1 + i);
+            }
+
             const btnElement = document.getElementById(`btn-up-${type}`);
             if (btnElement) btnElement.disabled = true;
 
@@ -1068,16 +1268,15 @@
                 }
 
                 let currentCoins = userSnap.data().halloween_coins ?? userSnap.data().halloweenCoins ?? 0;
-                if (currentCoins < cost) {
+                if (currentCoins < totalCost) {
                     Swal.fire({ icon: 'warning', title: 'เหรียญฮาโลวีนไม่พอ!', background: '#120a1a', color: '#fff', confirmButtonColor: '#ff6b00' });
                     if (btnElement) btnElement.disabled = false;
                     return;
                 }
 
-                // ตัดเหรียญและอัปเดตเลเวลทันทีโดยไม่มีป๊อบอัปสำเร็จ
-                await updateDoc(userRef, { halloween_coins: increment(-cost) });
+                await updateDoc(userRef, { halloween_coins: increment(-totalCost) });
                 
-                userUpgrades[type] = currentLvl + 1;
+                userUpgrades[type] = currentLvl + targetLevelsToAdd;
                 const upRef = doc(db, "users", currentUserId, "bossUpgrades", "data");
                 await setDoc(upRef, userUpgrades, { merge: true });
 
@@ -1087,7 +1286,7 @@
             } catch (e) { 
                 console.error("Upgrade error:", e);
             } finally {
-                if (btnElement && userUpgrades[type] < 100) {
+                if (btnElement && userUpgrades[type] < 300) {
                     btnElement.disabled = false;
                 }
             }
@@ -1100,20 +1299,22 @@
                 const bossRef = doc(db, "users", currentUserId, "bossProgress", "data");
                 const bossSnap = await getDoc(bossRef);
                 
-                let bossLevel = 1;
                 if (bossSnap.exists()) {
-                    bossLevel = bossSnap.data().bossLevel || 1;
+                    userBossLevel = bossSnap.data().bossLevel || 1;
                 } else {
+                    userBossLevel = 1;
                     await setDoc(bossRef, { bossLevel: 1, totalDamage: 0 }, { merge: true });
                 }
 
                 const baseHp = 10000;
-                const bossMaxHp = baseHp + ((bossLevel - 1) * 5000);
+                const bossMaxHp = baseHp + ((userBossLevel - 1) * 5000);
                 const currentHp = bossMaxHp;
 
-                document.getElementById("boss-level-text").innerText = `LV. ${bossLevel}`;
+                document.getElementById("boss-level-text").innerText = `LV. ${userBossLevel}`;
                 document.getElementById("boss-hp-text").innerText = `${currentHp.toLocaleString()} / ${bossMaxHp.toLocaleString()}`;
                 document.getElementById("boss-hp-bar").style.width = `100%`;
+
+                updateChallengeUI();
             } catch (e) { console.error(e); }
         }
 
