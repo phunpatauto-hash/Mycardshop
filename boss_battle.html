@@ -486,9 +486,19 @@
                 `,
                 icon: isVictory ? 'success' : 'info',
                 background: '#120a1a', color: '#fff',
-                confirmButtonText: 'กลับสู่ล็อบบี้บอส', confirmButtonColor: '#ff6b00',
+                showDenyButton: true,
+                confirmButtonText: '⚔️ สู้บอส LV. ถัดไป',
+                confirmButtonColor: '#ff6b00',
+                denyButtonText: '🏠 กลับหน้าล็อบบี้',
+                denyButtonColor: '#4a306d',
                 allowOutsideClick: false
-            }).then(() => { window.location.href = "boss_lobby.html"; });
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    location.reload(); // รีเฟรชหน้าเพื่อเริ่มสู้บอสเลเวลถัดไปทันที
+                } else {
+                    window.location.href = "boss_lobby.html";
+                }
+            });
         }
 
         function escapeHtml(text) {
