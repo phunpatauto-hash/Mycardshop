@@ -161,13 +161,22 @@
             animation: titlePulse 1.2s infinite alternate;
         }
 
-        /* 🎃 เพิ่มสไตล์เฉพาะสำหรับยศ เศรษฐีฟักทอง🎃 */
         .whale-title-banner.rank-pumpkin-king-rich {
             background: linear-gradient(135deg, rgba(255, 159, 67, 0.5) 0%, rgba(255, 87, 34, 0.6) 50%, rgba(44, 26, 64, 0.9) 100%);
             border: 2px solid #ffc831; color: #ffeb3b; font-weight: 900;
             box-shadow: 0 0 30px rgba(255, 159, 67, 0.95), 0 0 15px rgba(255, 87, 34, 0.8);
             text-shadow: 0 0 10px #ff9f43, 0 0 18px #ff5722;
             animation: titlePulse 1.2s infinite alternate;
+        }
+
+        /* 🎃 สไตล์เอฟเฟกต์เฉพาะตัวสำหรับยศ "500 Lv พี่ยังไหว" */
+        .whale-title-banner.rank-boss-lvl-500 {
+            background: linear-gradient(270deg, #ff0055, #ff6b00, #a855f7, #00e5ff, #ff0055);
+            background-size: 400% 400%;
+            border: 2px solid #fff; color: #ffffff; font-weight: 900;
+            box-shadow: 0 0 35px rgba(255, 107, 0, 0.9), 0 0 20px rgba(168, 85, 247, 0.8);
+            text-shadow: 0 0 10px #000, 0 0 20px #ff6b00;
+            animation: rainbowAnimation 4s ease infinite, titlePulse 1s infinite alternate;
         }
 
         @keyframes rainbowAnimation {
@@ -842,15 +851,24 @@
             const isGhostKingParty = unlockedTitles.includes("ปาร์ตี้ราชันย์ภูตผี👻") || 
                 (userData.currentTitle === "ปาร์ตี้ราชันย์ภูตผี👻");
 
-            // เงื่อนไขปลดล็อกยศ เศรษฐีฟักทอง🎃 (ตรวจสอบจาก titles หรือฟิลด์ currentTitle)
             const isPumpkinKingRich = unlockedTitles.includes("เศรษฐีฟักทอง🎃") || 
                 (userData.currentTitle === "เศรษฐีฟักทอง🎃");
+
+            // เงื่อนไขปลดล็อกยศ "500 Lv พี่ยังไหว" (ตรวจสอบจาก titles หรือผ่านเลเวลบอสถึง 500)
+            const isBossLv500 = unlockedTitles.includes("500 Lv พี่ยังไหว") || (userData.currentTitle === "500 Lv พี่ยังไหว");
 
             const categories = [
                 {
                     catName: "🎃 หมวดกิจกรรม & พิเศษ (Event & Special)",
                     titles: [
                         { id: 'none', name: '❌ ไม่แสดงฉายา', isUnlocked: true, desc: 'ปิดการแสดงผลฉายาบนหน้าโปรไฟล์ของคุณ' },
+                        { 
+                            id: '500 Lv พี่ยังไหว', 
+                            name: '500 Lv พี่ยังไหว', 
+                            isUnlocked: isBossLv500, 
+                            desc: 'ต่อสู้กับบอส ราชันย์ภูตผี (Halloween Boss) ให้ถึง LV 500',
+                            previewImg: 'https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/%E0%B8%9B%E0%B8%B2%E0%B8%A3%E0%B9%8C%E0%B8%95%E0%B8%B5%E0%B9%89.png' 
+                        },
                         { 
                             id: 'เศรษฐีฟักทอง🎃', 
                             name: 'เศรษฐีฟักทอง🎃', 
@@ -1045,12 +1063,20 @@
         const isHappyHalloween = unlockedTitles.includes("happy HALLOWEEN 🎃") || (globalUserData.happyHalloweenUnlocked === true);
         const isGhostKingParty = unlockedTitles.includes("ปาร์ตี้ราชันย์ภูตผี👻") || (globalUserData.currentTitle === "ปาร์ตี้ราชันย์ภูตผี👻");
         const isPumpkinKingRich = unlockedTitles.includes("เศรษฐีฟักทอง🎃") || (globalUserData.currentTitle === "เศรษฐีฟักทอง🎃");
+        const isBossLv500 = unlockedTitles.includes("500 Lv พี่ยังไหว") || (globalUserData.currentTitle === "500 Lv พี่ยังไหว");
 
         const categories = [
             {
                 catName: "🎃 หมวดกิจกรรม & พิเศษ (Event & Special)",
                 titles: [
                     { id: 'none', name: '❌ ไม่แสดงฉายา', isUnlocked: true, desc: 'ปิดการแสดงผลฉายาบนหน้าโปรไฟล์ของคุณ' },
+                    { 
+                        id: '500 Lv พี่ยังไหว', 
+                        name: '500 Lv พี่ยังไหว', 
+                        isUnlocked: isBossLv500, 
+                        desc: 'ต่อสู้กับบอส ราชันย์ภูตผี (Halloween Boss) ให้ถึง LV 500',
+                        previewImg: 'https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/%E0%B8%9B%E0%B8%B2%E0%B8%A3%E0%B9%8C%E0%B8%95%E0%B8%B5%E0%B9%89.png' 
+                    },
                     { 
                         id: 'เศรษฐีฟักทอง🎃', 
                         name: 'เศรษฐีฟักทอง🎃', 
@@ -1158,9 +1184,11 @@
             document.getElementById("whale-title-text").innerText = data.currentTitle;
             titleContainer.style.display = "block";
             
-            titleBanner.classList.remove("rank-pro", "rank-master", "rank-level-traveler", "rank-supreme-guardian", "rank-party-diamonds", "rank-rainbow-ultimate", "rank-auction-starter", "rank-auction-pro", "rank-auction-god", "rank-halloween-time", "rank-happy-halloween", "rank-ghost-king-party", "rank-pumpkin-king-rich");
+            titleBanner.classList.remove("rank-pro", "rank-master", "rank-level-traveler", "rank-supreme-guardian", "rank-party-diamonds", "rank-rainbow-ultimate", "rank-auction-starter", "rank-auction-pro", "rank-auction-god", "rank-halloween-time", "rank-happy-halloween", "rank-ghost-king-party", "rank-pumpkin-king-rich", "rank-boss-lvl-500");
             
-            if (data.currentTitle === "เศรษฐีฟักทอง🎃") {
+            if (data.currentTitle === "500 Lv พี่ยังไหว") {
+                titleBanner.classList.add("rank-boss-lvl-500");
+            } else if (data.currentTitle === "เศรษฐีฟักทอง🎃") {
                 titleBanner.classList.add("rank-pumpkin-king-rich");
             } else if (data.currentTitle === "ปาร์ตี้ราชันย์ภูตผี👻") {
                 titleBanner.classList.add("rank-ghost-king-party");
@@ -1182,7 +1210,7 @@
                 titleBanner.classList.add("rank-supreme-guardian");
             } else if (data.currentTitle === "นักสู้ผู้ไม่ย่อท้อ") {
                 titleBanner.classList.add("rank-pro");
-            } else if (data.currentTitle === "ผู้พิชิตศึกสงคราม") {
+            } else if (data.currentTitle === "ผู้พิพิชศึกสงคราม") {
                 titleBanner.classList.add("rank-master");
             } else if (data.currentTitle === "ผู้เดินทางเลเวลชำนาน" || data.currentTitle === "นักเดินทางเลเวล") {
                 titleBanner.classList.add("rank-level-traveler");
