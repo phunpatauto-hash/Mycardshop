@@ -12,7 +12,6 @@
         * { box-sizing: border-box; }
         body { font-family: 'Kanit', sans-serif; margin: 0; background-color: #0d0714; color: white; line-height: 1.6; }
         
-        /* --- Navbar --- */
         .navbar { 
             background: rgba(18, 10, 26, 0.85); backdrop-filter: blur(15px);
             padding: 0 15px; display: flex; justify-content: space-between; align-items: center; 
@@ -43,7 +42,6 @@
             padding: 8px 16px; border-radius: 10px; font-weight: 600; cursor: pointer; border: none; color: white; text-decoration: none; font-size: 0.85rem;
         }
 
-        /* --- Container & Layout --- */
         .container { max-width: 1140px; margin: 0 auto; padding: 20px 15px; display: flex; flex-direction: column; gap: 20px; }
         
         .main-lobby-grid {
@@ -57,7 +55,6 @@
             }
         }
 
-        /* Boss Mode Selector Header Tabs */
         .boss-mode-tabs {
             display: flex;
             gap: 10px;
@@ -102,7 +99,6 @@
             box-shadow: 0 0 15px rgba(255, 107, 0, 0.3);
         }
 
-        /* Boss Section */
         .boss-section {
             background: linear-gradient(135deg, #1f102e 0%, #0d0714 100%);
             border: 2px solid rgba(255, 107, 0, 0.4);
@@ -176,14 +172,12 @@
             text-shadow: 0 1px 3px rgba(0,0,0,0.8);
         }
 
-        /* Right Section */
         .right-section {
             display: flex;
             flex-direction: column;
             gap: 15px;
         }
 
-        /* Upgrade Box Style */
         .upgrade-box {
             background: linear-gradient(135deg, #1f102e 0%, #0d0714 100%);
             border: 2px solid rgba(168, 85, 247, 0.4);
@@ -285,7 +279,6 @@
             text-shadow: 0 0 10px rgba(255, 107, 0, 0.3);
         }
 
-        /* Toggle Button Group */
         .lb-switch-group {
             display: flex;
             background: rgba(0, 0, 0, 0.5);
@@ -331,7 +324,6 @@
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
-        /* Rank Badge Style */
         .my-rank-banner {
             background: rgba(168, 85, 247, 0.15);
             border: 1px solid rgba(168, 85, 247, 0.4);
@@ -392,7 +384,6 @@
             box-shadow: 0 8px 25px rgba(168, 85, 247, 0.6);
         }
 
-        /* Bottom Deck Section */
         .bottom-card-section {
             background: linear-gradient(135deg, #1f102e 0%, #0d0714 100%);
             border: 2px dashed rgba(255, 107, 0, 0.5);
@@ -661,7 +652,7 @@
             <div class="logo">HALLOWEEN 🎃</div>
         </div>
         <ul class="nav-links">
-            <li><a href="minigame.html">กลับหน้ามินิเกม</a></li>
+            <li><a href="minigamen.html">กลับหน้ามินิเกม</a></li>
             <li>
                 <div class="profile-link" id="profile-container" style="display: none;" onclick="window.location.href='profile.html'">
                     <img src="" id="nav-avatar-img" class="nav-avatar">
@@ -682,7 +673,6 @@
 
     <main class="container">
         <div class="main-lobby-grid">
-            <!-- Left Side: Boss Card View & Mode Selector -->
             <div>
                 <div class="boss-mode-tabs">
                     <button class="boss-tab-btn active-ghost" id="tab-ghost" onclick="switchBossMode('ghost')">
@@ -711,7 +701,6 @@
                 </div>
             </div>
 
-            <!-- Right Side: Upgrades, Leaderboard, Battle Button -->
             <div class="right-section">
                 <div class="upgrade-box">
                     <div class="upgrade-controls-header">
@@ -906,7 +895,7 @@
         let myCurrentRank = 0;
         let pendingRewardsList = []; 
         let userUpgrades = { click: 0, speed: 0, card: 0 };
-        let currentUpgradeBatch = 1; // จำนวนเลเวลที่เลือกอัปเกรดในแต่ละครั้ง (+1, +10, ฯลฯ)
+        let currentUpgradeBatch = 1; 
         let currentBossMode = 'ghost';
         let userBossLevel = 1;
 
@@ -1462,6 +1451,7 @@
             }).then(async () => { await claimPendingReward(); });
         }
 
+        /* --- ✨ ฟังก์ชันรับรางวัลจบซีซั่น (ปรับปรุงให้รองรับยศ ราชันย์ภูตผี👻) --- */
         window.claimPendingReward = async function() {
             if (!currentUserId || pendingRewardsList.length === 0) return;
             try {
@@ -1475,18 +1465,18 @@
                 let totalCoinsToAdd = 0;
                 for (let reward of pendingRewardsList) {
                     totalCoinsToAdd += (reward.coins || 0);
-                    const rewardTitle = reward.title;
+                    const rewardTitle = reward.title || "ราชันย์ภูตผี👻";
                     if (rewardTitle && !currentTitles.includes(rewardTitle)) {
                         currentTitles.push(rewardTitle);
                     }
                 }
 
-                let latestTitle = pendingRewardsList[pendingRewardsList.length - 1].title;
+                let latestTitle = pendingRewardsList[pendingRewardsList.length - 1].title || "ราชันย์ภูตผี👻";
 
                 await updateDoc(userDocRef, {
                     halloween_coins: increment(totalCoinsToAdd),
                     titles: currentTitles,
-                    currentTitle: latestTitle || userSnap.data().currentTitle
+                    currentTitle: latestTitle
                 });
 
                 for (let reward of pendingRewardsList) {
@@ -1494,7 +1484,14 @@
                     await updateDoc(doc(db, "users", currentUserId, "pendingRewards", docKey), { claimed: true });
                 }
 
-                Swal.fire({ icon: 'success', title: 'รับรางวัลทั้งหมดสำเร็จ!', background: '#120a1a', color: '#fff', confirmButtonColor: '#ff6b00' }).then(() => location.reload());
+                Swal.fire({ 
+                    icon: 'success', 
+                    title: 'รับรางวัลทั้งหมดสำเร็จ!', 
+                    text: `ได้รับยศ [${latestTitle}] และสวมใส่ให้อัตโนมัติเรียบร้อยแล้ว!`,
+                    background: '#120a1a', 
+                    color: '#fff', 
+                    confirmButtonColor: '#ff6b00' 
+                }).then(() => location.reload());
             } catch (e) { console.error(e); }
         };
 
