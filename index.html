@@ -10,7 +10,6 @@
         * { box-sizing: border-box; }
         body { font-family: 'Kanit', sans-serif; margin: 0; background-color: #0f0f0f; color: white; line-height: 1.6; }
         
-        /* --- Navbar --- */
         .navbar { 
             background: rgba(30, 30, 30, 0.8); backdrop-filter: blur(15px);
             padding: 0 30px; display: flex; justify-content: space-between; align-items: center; 
@@ -24,7 +23,6 @@
         .nav-links a { color: rgba(255,255,255,0.8); text-decoration: none; transition: 0.3s; font-size: 0.95rem; cursor: pointer; }
         .nav-links a:hover { color: #ffc831; }
 
-        /* --- Mailbox Nav Button & Badge --- */
         .btn-mailbox {
             position: relative;
             background: rgba(255, 200, 49, 0.1);
@@ -59,7 +57,6 @@
             box-shadow: 0 0 8px rgba(230, 57, 70, 0.8);
         }
         
-        /* --- Sidebar Menu Custom --- */
         .sidebar {
             position: fixed; top: 0; left: -320px; width: 320px; height: 100%;
             background: #111115; border-right: 1px solid rgba(255, 200, 49, 0.2);
@@ -134,7 +131,6 @@
             padding: 10px 22px; border-radius: 12px; font-weight: 600; cursor: pointer; border: none; color: white; text-decoration: none;
         }
 
-        /* --- Global Modal Style --- */
         .admin-modal, .profile-popup-modal, .mailbox-modal, .news-modal, .weekly-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
@@ -154,7 +150,6 @@
         .btn-confirm { flex: 2; background: #ffc831; color: #000; border: none; padding: 10px; border-radius: 10px; font-weight: 700; cursor: pointer; }
         .btn-cancel { flex: 1; background: #333; color: white; border: none; padding: 10px; border-radius: 10px; cursor: pointer; }
 
-        /* --- Weekly Event Modal Style --- */
         .weekly-modal .modal-content { max-width: 500px; border-color: #00e5ff; box-shadow: 0 0 30px rgba(0, 229, 255, 0.3); }
         .weekly-event-card {
             background: linear-gradient(135deg, rgba(0, 229, 255, 0.1), rgba(0, 85, 255, 0.2));
@@ -169,13 +164,11 @@
         .weekly-event-info h4 { margin: 0; color: #00e5ff; font-size: 1.1rem; }
         .weekly-event-info p { margin: 5px 0 0 0; font-size: 0.85rem; color: #ccc; }
 
-        /* --- News Detail Modal Custom Style --- */
         .news-modal .modal-content { max-width: 550px; text-align: left; border-color: #ffc831; }
         .news-modal-date { color: #ffc831; font-size: 0.9rem; font-weight: bold; margin-bottom: 8px; }
         .news-modal-title { color: #fff; font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; line-height: 1.4; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
         .news-modal-body { color: #ccc; font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px; white-space: pre-line; }
 
-        /* --- Mailbox Custom Popup Style --- */
         .mailbox-modal .modal-content {
             max-width: 560px;
             border-color: #00e5ff;
@@ -346,7 +339,6 @@
             box-shadow: none;
         }
 
-        /* --- User Profile Popup Custom Style --- */
         .popup-header-info { display: flex; align-items: center; gap: 15px; text-align: left; margin-bottom: 20px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); }
         .popup-avatar { width: 75px; height: 75px; border-radius: 50%; border: 3px solid #ffc831; object-fit: cover; background: #222; }
         .popup-username { font-size: 1.3rem; font-weight: 700; color: #fff; margin: 0; }
@@ -364,7 +356,6 @@
         .popup-card-name { font-weight: bold; color: #fff; font-size: 1rem; margin: 0; }
         .popup-card-stat { font-size: 0.8rem; color: #ff477e; font-weight: bold; margin-top: 4px; }
 
-        /* --- Hero --- */
         .hero { 
             height: 400px; display: flex; flex-direction: column; justify-content: center; align-items: center; 
             text-align: center; position: relative; overflow: hidden; background-size: cover;
@@ -407,7 +398,6 @@
         .modern-banner .main-icon { position: absolute; right: 20px; bottom: 10px; font-size: 4.5rem; opacity: 0.15; transform: rotate(-10deg); transition: 0.4s; }
         .modern-banner:hover .main-icon { opacity: 0.3; transform: rotate(0deg) scale(1.1); }
 
-        /* --- LEADERBOARD CUSTOM STYLES --- */
         .leaderboard-section { background: linear-gradient(135deg, #16161a 0%, #1e1e24 100%); border-radius: 24px; padding: 30px; margin-bottom: 40px; border: 1px solid rgba(255, 200, 49, 0.15); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .leaderboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
         .leaderboard-title { font-size: 1.6rem; color: #ffc831; font-weight: bold; margin: 0; display: flex; align-items: center; gap: 10px; }
@@ -467,7 +457,6 @@
         .banner-diamond-shop:hover { border-color: #00e5ff; box-shadow: 0 0 25px rgba(0, 229, 255, 0.4); }
         .banner-diamond-shop .shop-glow-icon { color: #00e5ff; text-shadow: 0 0 15px rgba(0, 229, 255, 0.8); }
 
-        /* --- ✨ เอฟเฟกต์สีรุ้งเคลื่อนไหวพิเศษสำหรับยศ 500 Lv พี่ยังไหว --- */
         .profile-link.rainbow-500lvl-bg {
             position: relative;
             overflow: hidden;
@@ -483,7 +472,6 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* --- ✨ เอฟเฟกต์สีส้มตัดส้มอ่อน (Orange Shimmer Effect) สำหรับยศ เศรษฐีฟักทอง🎃 --- */
         .profile-link.pumpkin-rich-bg {
             position: relative;
             overflow: hidden;
@@ -516,7 +504,7 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* --- ✨ เอฟเฟกต์สีรุ้งเคลื่อนไหวพิเศษสำหรับยศ ปาร์ตี้ราชันย์ภูตผี👻 --- */
+        /* --- ✨ เอฟเฟกต์สีรุ้งเคลื่อนไหวพิเศษสำหรับยศ ราชันย์ภูตผี👻 --- */
         .profile-link.ghost-king-party-bg {
             position: relative;
             overflow: hidden;
@@ -532,7 +520,6 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* --- ✨ Halloween Metallic/Glossy Shimmer Effect for Profile Link --- */
         .profile-link.halloween-glossy-bg {
             position: relative;
             overflow: hidden;
@@ -542,7 +529,6 @@
             border: 1px solid rgba(255, 117, 24, 0.8);
             box-shadow: 0 0 15px rgba(255, 117, 24, 0.4);
         }
-        /* ชั้นเงาแสงกวาดผ่าน (Glossy Reflection Bar) */
         .profile-link.halloween-glossy-bg::after {
             content: '';
             position: absolute;
@@ -574,7 +560,6 @@
 </head>
 <body>
 
-    <!-- 📁 SIDEBAR SLIDER MENU -->
     <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
     <div id="sidebarMenu" class="sidebar">
         <div class="sidebar-header">
@@ -612,7 +597,6 @@
         </div>
     </div>
 
-    <!-- 🔐 ADMIN MODAL -->
     <div id="adminModal" class="admin-modal">
         <div class="modal-content">
             <h2><i class="fas fa-lock"></i> Admin Access</h2>
@@ -624,7 +608,6 @@
         </div>
     </div>
 
-    <!-- 🗓️ WEEKLY EVENT POPUP MODAL -->
     <div id="weeklyModal" class="weekly-modal">
         <div class="modal-content">
             <h2 style="color: #00e5ff;"><i class="fas fa-calendar-star"></i> กิจกรรมประจำสัปดาห์</h2>
@@ -642,7 +625,6 @@
         </div>
     </div>
 
-    <!-- 📰 NEWS DETAIL POPUP MODAL -->
     <div id="newsModal" class="news-modal">
         <div class="modal-content">
             <div class="news-modal-date" id="news-modal-date">--/--/----</div>
@@ -652,13 +634,11 @@
         </div>
     </div>
 
-    <!-- 📬 MAILBOX POPUP MODAL -->
     <div id="mailboxModal" class="mailbox-modal">
         <div class="modal-content">
             <h2 style="color: #00e5ff; margin-bottom: 5px;"><i class="fas fa-envelope-open-text"></i> กล่องข้อความ & แจกของรางวัล</h2>
             <p style="color: #a0aec0; font-size: 0.85rem; margin-top: 0;">ข่าวสารล่าสุดและของขวัญพิเศษสำหรับคุณ</p>
 
-            <!-- แถบจัดการจดหมายแบบด่วน -->
             <div class="mailbox-header-actions">
                 <div class="mailbox-status-text">
                     <span id="unclaimed-count-text">มีข้อความคงเหลือ: 0</span>
@@ -668,7 +648,6 @@
                 </button>
             </div>
 
-            <!-- รายการจดหมาย -->
             <div class="mailbox-list" id="mailbox-list-container">
                 <div style="text-align:center; padding:20px; color:#a0aec0;">📡 กำลังโหลดข้อความ...</div>
             </div>
@@ -677,7 +656,6 @@
         </div>
     </div>
 
-    <!-- 👤 PROFILE POPUP MODAL -->
     <div id="profileModal" class="profile-popup-modal">
         <div class="modal-content">
             <h2><i class="fas fa-id-card"></i> ข้อมูลโปรไฟล์ผู้เล่น</h2>
@@ -729,14 +707,12 @@
         </div>
     </div>
 
-  <!-- 🌐 NAVBAR -->
     <nav class="navbar">
         <div class="nav-left">
             <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
             <div class="logo">Mycard</div>
         </div>
 
-        <!-- ย้ายส่วนปุ่มจดหมายและโปรไฟล์ให้อยู่นอก .nav-links เพื่อให้แสดงบนมือถือได้ -->
         <div style="display: flex; align-items: center; gap: 10px;">
             <div id="mailbox-nav-item" style="display: none;">
                 <button class="btn-mailbox" onclick="openMailboxModal()">
@@ -778,64 +754,54 @@
         </div>
 
         <div class="banner-grid">
-            <!-- ==================== 1. BATTLE & GAME MODES ==================== -->
             <div class="category-title">
                 <i class="fas fa-swords"></i> อารีน่า
             </div>
 
-            <!-- Battle Arena -->
             <div class="modern-banner" style="background: linear-gradient(135deg, #e63946, #780000); color: white; grid-column: span 2;" onclick="checkAuthAndNavigate('Grand Arena.html')">
                 <h3>NEW!!⚔️ Grand Arena</h3>
                 <p>อารีน่าแบบใหม่เปิดให้เล่นแล้ว!!</p>
                 <i class="fas fa-fist-raised main-icon"></i>
             </div>
 
-            <!-- ==================== 2. GACHA & MARKET ==================== -->
             <div class="category-title">
                 <i class="fas fa-store"></i> ระบบสุ่มการ์ด & ร้านค้าและการแลกเปลี่ยน
             </div>
 
-            <!-- สุ่มการ์ดนำโชค -->
             <div class="modern-banner" style="background: linear-gradient(135deg, #ff007f, #7928ca); color: white; grid-column: span 2;" onclick="checkAuthAndNavigate('Banner Selection.html')">
                 <h3>🎰 เลือกตู้สู่มการ์ด</h3>
                 <p>ใช้พอยท์สะสมเพื่อออกตามหาการ์สุดแรร์และการ์ดสุดพิเศษอีกมากมาย!</p>
                 <i class="fas fa-magic main-icon"></i>
             </div>
 
-            <!-- Diamond Shop -->
             <div class="modern-banner banner-diamond-shop" onclick="checkAuthAndNavigate('DIAMOND SHOP.html')">
                 <h3><i class="fas fa-shopping-basket"></i> DIAMOND SHOP</h3>
                 <p>ร้านค้าเพชรและไอเทมสุดพิเศษ!</p>
                 <i class="fas fa-gem main-icon shop-glow-icon"></i>
             </div>
 
-            <!-- Arena Auction -->
             <div class="modern-banner" style="background: linear-gradient(135deg, #1a1a1a, #333); color: #ffc831; border: 1px solid #ffc831;" onclick="checkAuthAndNavigate('auction.html')">
                 <h3>🔨 Arena Auction</h3>
                 <p>ร่วมประมูลการ์ดกับผู้ใช้คนอื่นเพื่อชิงรางวัลการ์ดที่มีแค่ที่นี่!</p>
                 <i class="fas fa-gavel main-icon"></i>
             </div>
 
-            <!-- แลกเปลี่ยนการ์ด -->
             <div class="modern-banner" style="background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white;" onclick="checkAuthAndNavigate('trading.html')">
                 <h3>🤝 แลกเปลี่ยนการ์ด</h3>
                 <p>สร้างห้องแลกเปลี่ยนการ์ดกับผู้ใช้คนอื่นแบบ Real-time</p>
                 <i class="fas fa-handshake main-icon"></i>
             </div>
 
-            <!-- แลกเปลี่ยนเพชร -->
             <div class="modern-banner" style="background: linear-gradient(135deg, #00d4ff, #0055ff); color: white;" onclick="checkAuthAndNavigate('Exchange.html')">
                 <h3>💎 แลกเปลี่ยนเพชร</h3>
                 <p>แปลงทองสะสมของคุณให้กลายเป็นเพชรล้ำค่า</p>
                 <i class="fas fa-gem main-icon"></i>
             </div>
 
-            <!-- ==================== 3. PASS & ACTIVITIES ==================== -->
             <div class="category-title">
                 <i class="fas fa-trophy"></i> กิจกรรมประจำสัปดาห์ & Pass
             </div>
             
-            <!-- Halloween Event Banner (เปิดให้เข้าเฉพาะ 1 ต.ค. - 31 ต.ค.) -->
             <div class="modern-banner" style="background: linear-gradient(135deg, #ff7518, #2a0845); color: white; grid-column: span 2;" onclick="checkHalloweenEvent()">
                 <h3>🎃 Halloween Event</h3>
                 <p>อีเวนต์สุดพิเศษต้อนรับวันฮาโลวีน ออกไปขอลูกกวาดและสนุกกับเพื่อนกันเถอะ!</p>
@@ -848,26 +814,22 @@
                 <i class="fas fa-calendar-star main-icon"></i>
             </div>
 
-            <!-- Battle Pass -->
             <div class="modern-banner" style="background: linear-gradient(135deg, #ffc831, #ff8c00); color: #000; grid-column: span 2;" onclick="checkAuthAndNavigate('Pass (Battle Pass).html')">
                 <h3>🏆 Battle Pass SS5 : เรื่องวุ้นๆของสัตว์ตัวน้อย</h3>
                 <p>ทำภารกิจเพื่อรับการ์ดระดับพรีเมียมประจำซีซั่น!</p>
                 <i class="fas fa-trophy main-icon"></i>
             </div>
 
-            <!-- ==================== 4. WORLD & COMMUNITY ==================== -->
             <div class="category-title">
                 <i class="fas fa-globe"></i> เมืองของเล่าการ์ด
             </div>
 
-            <!-- Cookie City -->
             <div class="modern-banner" style="background: linear-gradient(135deg, #11998e, #38ef7d); color: #000;" onclick="checkAuthAndNavigate('Cookie city.html')">
                 <h3>🏙️ Cookie City</h3>
                 <p>สำรวจเมืองคุกกี้และร่วมกิจกรรมพิเศษ</p>
                 <i class="fas fa-city main-icon"></i>
             </div>
 
-            <!-- Coming Soon -->
             <div class="modern-banner" style="background: rgba(255, 255, 255, 0.05); color: #888; border: 1px dashed rgba(255,255,255,0.2);" onclick="alert('ระบบใหม่กำลังอยู่ในการพัฒนา!')">
                 <h3>🚀 Coming Soon</h3>
                 <p>ฟีเจอร์ใหม่กำลังอยู่ระหว่างการพัฒนา โปรดติดตาม!</p>
@@ -908,10 +870,8 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // ตัวแปรเช็คสถานะการล็อกอินสำหรับฟังก์ชันตรวจสอบผู้ใช้ใหม่
     window.isUserLoggedIn = false;
 
-    // ฟังก์ชันตรวจสอบสิทธิ์ก่อนเข้าสู่หมวดหมู่ต่างๆ
     window.checkAuthAndNavigate = (url) => {
         if (!window.isUserLoggedIn) {
             alert("⚠️ คุณยังไม่มีบัญชีนะ สมัครสมาชิกก่อนดีไหม??");
@@ -921,7 +881,6 @@
         }
     };
 
-    // ฟังก์ชันตรวจสอบสิทธิ์และวันที่สำหรับเข้าอีเวนต์ Halloween (เปิด 1 ตุลาคม ถึง 31 ตุลาคม เท่านั้น)
     window.checkHalloweenEvent = () => {
         if (!window.isUserLoggedIn) {
             alert("⚠️ คุณยังไม่มีบัญชีนะ สมัครสมาชิกก่อนดีไหม??");
@@ -930,10 +889,9 @@
         }
 
         const now = new Date();
-        const month = now.getMonth() + 1; // เดือน (มกราคม = 1, ตุลาคม = 10)
-        const date = now.getDate();     // วันที่ (1-31)
+        const month = now.getMonth() + 1;
+        const date = now.getDate();
 
-        // ตรวจสอบว่าเป็นเดือนตุลาคม (10) และวันที่อยู่ระหว่าง 1 ถึง 31 หรือไม่
         if (month === 10 && date >= 1 && date <= 31) {
             window.location.href = "halloween_event.html";
         } else {
@@ -941,7 +899,6 @@
         }
     };
 
-    // ฟังก์ชันย่อตัวเลข (K, M, B, T)
     function formatCompactNumber(number) {
         if (!number || isNaN(number)) return "0";
         return new Intl.NumberFormat('en-US', {
@@ -975,7 +932,6 @@
         profileModal.style.display = "none";
     };
 
-    /* --- Weekly Event Modal Functions --- */
     window.openWeeklyModal = () => {
         weeklyModal.style.display = "flex";
     };
@@ -984,7 +940,6 @@
         weeklyModal.style.display = "none";
     };
 
-    /* --- News Modal Functions --- */
     window.openNewsModal = (newsData) => {
         document.getElementById("news-modal-date").innerText = newsData.date || '';
         document.getElementById("news-modal-title").innerText = newsData.title || 'ไม่มีหัวข้อ';
@@ -996,7 +951,6 @@
         newsModal.style.display = "none";
     };
 
-    /* --- Mailbox Modal Functions --- */
     window.openMailboxModal = () => {
         mailboxModal.style.display = "flex";
         renderMailboxItems();
@@ -1329,7 +1283,7 @@
                         }
                     }
 
-                    // --- ✨ ตรวจสอบเงื่อนไขยศพิเศษ (500 Lv พี่ยังไหว และ เศรษฐีฟักทอง🎃) ---
+                    /* --- ✨ ตรวจสอบเงื่อนไขยศพิเศษ (รองรับยศ ราชันย์ภูตผี👻) --- */
                     if (profileLinkBox) {
                         profileLinkBox.classList.remove("rainbow-500lvl-bg", "pumpkin-rich-bg", "ghost-king-party-bg", "halloween-glossy-bg");
 
@@ -1337,7 +1291,7 @@
                             profileLinkBox.classList.add("rainbow-500lvl-bg");
                         } else if (data.currentTitle === "เศรษฐีฟักทอง🎃") {
                             profileLinkBox.classList.add("pumpkin-rich-bg");
-                        } else if (data.currentTitle === "ปาร์ตี้ราชันย์ภูตผี👻") {
+                        } else if (data.currentTitle === "ราชันย์ภูตผี👻" || data.currentTitle === "ปาร์ตี้ราชันย์ภูตผี👻") {
                             profileLinkBox.classList.add("ghost-king-party-bg");
                         } else if (data.currentTitle === "Halloween is Time 🎃" || data.currentTitle === "happy HALLOWEEN 🎃") {
                             profileLinkBox.classList.add("halloween-glossy-bg");
