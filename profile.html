@@ -848,7 +848,9 @@
             const isHappyHalloween = unlockedTitles.includes("happy HALLOWEEN 🎃") || 
                 (userData.happyHalloweenUnlocked === true);
 
-            const isGhostKingParty = unlockedTitles.includes("ปาร์ตี้ราชันย์ภูตผี👻") || 
+            const isGhostKingParty = unlockedTitles.includes("ราชันย์ภูตผี👻") || 
+                unlockedTitles.includes("ปาร์ตี้ราชันย์ภูตผี👻") || 
+                (userData.currentTitle === "ราชันย์ภูตผี👻") || 
                 (userData.currentTitle === "ปาร์ตี้ราชันย์ภูตผี👻");
 
             const isPumpkinKingRich = unlockedTitles.includes("เศรษฐีฟักทอง🎃") || 
@@ -877,8 +879,8 @@
                             previewImg: 'https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/%E0%B8%9B%E0%B8%B2%E0%B8%A3%E0%B9%8C%E0%B8%95%E0%B8%B5%E0%B9%89.png' 
                         },
                         { 
-                            id: 'ปาร์ตี้ราชันย์ภูตผี👻', 
-                            name: 'ปาร์ตี้ราชันย์ภูตผี👻', 
+                            id: 'ราชันย์ภูตผี👻', 
+                            name: 'ราชันย์ภูตผี👻', 
                             isUnlocked: isGhostKingParty, 
                             desc: 'รับได้จากรางวัลอันดับตีบอสราชันย์ภูตผีในกิจกรรม halloween event',
                             previewImg: 'https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/%E0%B8%9B%E0%B8%B2%E0%B8%A3%E0%B9%8C%E0%B8%95%E0%B8%B5%E0%B9%89.png' 
@@ -1061,7 +1063,7 @@
         const isAuctionGod = unlockedTitles.includes("นักประมูลผู้ชนะตลอดกาล") || auctionWinsCount >= 20;
         const isHalloweenTime = unlockedTitles.includes("Halloween is Time 🎃") || (globalUserData.halloweenTitleUnlocked === true);
         const isHappyHalloween = unlockedTitles.includes("happy HALLOWEEN 🎃") || (globalUserData.happyHalloweenUnlocked === true);
-        const isGhostKingParty = unlockedTitles.includes("ปาร์ตี้ราชันย์ภูตผี👻") || (globalUserData.currentTitle === "ปาร์ตี้ราชันย์ภูตผี👻");
+        const isGhostKingParty = unlockedTitles.includes("ราชันย์ภูตผี👻") || unlockedTitles.includes("ปาร์ตี้ราชันย์ภูตผี👻") || (globalUserData.currentTitle === "ราชันย์ภูตผี👻") || (globalUserData.currentTitle === "ปาร์ตี้ราชันย์ภูตผี👻");
         const isPumpkinKingRich = unlockedTitles.includes("เศรษฐีฟักทอง🎃") || (globalUserData.currentTitle === "เศรษฐีฟักทอง🎃");
         const isBossLv500 = unlockedTitles.includes("500 Lv พี่ยังไหว") || (globalUserData.currentTitle === "500 Lv พี่ยังไหว");
 
@@ -1085,11 +1087,11 @@
                         previewImg: 'https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/%E0%B8%9B%E0%B8%B2%E0%B8%A3%E0%B9%8C%E0%B8%95%E0%B8%B5%E0%B9%89.png' 
                     },
                     { 
-                        id: 'ปาร์ตี้ราชันย์ภูตผี👻', 
-                        name: 'ปาร์ตี้ราชันย์ภูตผี👻', 
+                        id: 'ราชันย์ภูตผี👻', 
+                        name: 'ราชันย์ภูตผี👻', 
                         isUnlocked: isGhostKingParty, 
-                        desc: 'รับได้จากรางวัลอันดับตบอสราชันย์ภูตผีซีซั่น หรือผ่านระบบแจกรางวัลบอส',
-                        previewImg: 'https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/%E0%B8%A2%E0%B8%A8.png' 
+                        desc: 'รับได้จากรางวัลอันดับตีบอสราชันย์ภูตผีในกิจกรรม halloween event',
+                        previewImg: 'https://raw.githubusercontent.com/phunpatauto-hash/Mycardshop/refs/heads/main/%E0%B8%9B%E0%B8%B2%E0%B8%A3%E0%B9%8C%E0%B8%95%E0%B8%B5%E0%B9%89.png' 
                     },
                     { 
                         id: 'happy HALLOWEEN 🎃', 
@@ -1190,7 +1192,7 @@
                 titleBanner.classList.add("rank-boss-lvl-500");
             } else if (data.currentTitle === "เศรษฐีฟักทอง🎃") {
                 titleBanner.classList.add("rank-pumpkin-king-rich");
-            } else if (data.currentTitle === "ปาร์ตี้ราชันย์ภูตผี👻") {
+            } else if (data.currentTitle === "ราชันย์ภูตผี👻" || data.currentTitle === "ปาร์ตี้ราชันย์ภูตผี👻") {
                 titleBanner.classList.add("rank-ghost-king-party");
             } else if (data.currentTitle === "happy HALLOWEEN 🎃") {
                 titleBanner.classList.add("rank-happy-halloween");
