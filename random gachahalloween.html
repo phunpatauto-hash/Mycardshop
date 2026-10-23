@@ -309,7 +309,7 @@
         <!-- แบนเนอร์แสดงบัฟโชคดี -->
         <div id="luck-buff-container" style="display:none;">
             <div class="luck-buff-banner">
-                🍀 <span>บัฟโชคดีทำงาน! (เพิ่มเรท x2) ถึง 31 ต.ค. 23:59</span>
+                🍀 <span>บัฟโชคดีทำงาน! (เพิ่มเรทการ์ดหายาก x10) ถึง 31 ต.ค. 23:59</span>
                 <span id="luck-timer" style="color:#fff; margin-left: 3px;">(--:--:--)</span>
             </div>
         </div>
@@ -345,7 +345,7 @@
                 <div class="scroll-window"><div class="slide-track-v" id="v-track"></div></div>
                 
                 <div class="quick-rate-table">
-                    <div style="font-size: 0.68rem; color: #aaa; margin-bottom: 6px;">RATE BY RARITY <span id="rate-buff-tag" style="color:#00ff80; display:none;">(x2 BUFF!)</span></div>
+                    <div style="font-size: 0.68rem; color: #aaa; margin-bottom: 6px;">RATE BY RARITY <span id="rate-buff-tag" style="color:#00ff80; display:none;">(x10 BUFF!)</span></div>
                     <div class="rate-row"><span class="rate-label color-admin">ADMIN</span><span id="rate-admin">0.015%</span></div>
                     <div class="rate-row"><span class="rate-label color-secret">SECRET</span><span id="rate-secret">0.01%</span></div>
                     <div class="rate-row"><span class="rate-label color-usec">USEC</span><span id="rate-usec">0.01%</span></div>
@@ -420,11 +420,11 @@
             timeStr += `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
             document.getElementById("luck-timer").innerText = `(${timeStr})`;
 
-            document.getElementById("rate-admin").innerText = "0.03%";
-            document.getElementById("rate-secret").innerText = "0.02%";
-            document.getElementById("rate-usec").innerText = "0.02%";
-            document.getElementById("rate-exr").innerText = "0.2%";
-            document.getElementById("rate-sec").innerText = "2.0%";
+            document.getElementById("rate-admin").innerText = "0.15%";
+            document.getElementById("rate-secret").innerText = "0.1%";
+            document.getElementById("rate-usec").innerText = "0.1%";
+            document.getElementById("rate-exr").innerText = "1.0%";
+            document.getElementById("rate-sec").innerText = "10.0%";
         } else {
             document.getElementById("luck-buff-container").style.display = "none";
             document.getElementById("rate-buff-tag").style.display = "none";
@@ -637,8 +637,9 @@
 
         const activeCards = allCards.map(c => {
             let modRate = c.rate;
+            // ปรับจาก x2 เป็น x10 สำหรับการ์ดระดับสูง
             if (hasLuckBuff && ["ADMIN HALLOWEEN", "SECRET HALLOWEEN", "USEC HALLOWEEN", "EXR HALLOWEEN", "SEC HALLOWEEN"].includes(c.rarity)) {
-                modRate = modRate * 2;
+                modRate = modRate * 10;
             }
 
             if (c.rarity === "ADMIN HALLOWEEN" && (cardStocks[c.key] || 0) >= 500) {
@@ -670,7 +671,7 @@
                 if (currentCount < 500) {
                     cardStocks[win.key] = currentCount + 1;
                     stockUpdates[win.key] = cardStocks[win.key];
-                    sendBroadcast(`👑 <span class="rainbow-text">NO No WAY!!!</span> คุณ <span class="rainbow-text">${currentUserName}</span> สุ่มได้การ์ดระดับ [ADMIN] ${win.name} ใบที่ ${cardStocks[win.key].toLocaleString()}/500! 🌈✨`, true);
+                    sendBroadcast(`👑 <span class="rainbow-text">NO WAY!!!</span> คุณ <span class="rainbow-text">${currentUserName}</span> สุ่มได้การ์ดระดับ [ADMIN] ${win.name} ใบที่ ${cardStocks[win.key].toLocaleString()}/500! 🌈✨`, true);
                 } else {
                     win = activeCards.find(c => c.rarity === "SECRET HALLOWEEN") || win;
                 }
@@ -841,7 +842,7 @@
             let displayRate = c.rate;
 
             if (hasLuckBuff && ["ADMIN HALLOWEEN", "SECRET HALLOWEEN", "USEC HALLOWEEN", "EXR HALLOWEEN", "SEC HALLOWEEN"].includes(c.rarity)) {
-                displayRate = c.rate * 2;
+                displayRate = c.rate * 10;
             }
 
             if (c.rarity === "ADMIN HALLOWEEN") {
