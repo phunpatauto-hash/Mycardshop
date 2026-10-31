@@ -355,6 +355,24 @@
                 </div>
                 <button class="btn-buy" id="btn-buy-premium" onclick="event.stopPropagation(); buyPremiumTicketCustom()">ซื้อไอเทม</button>
             </div>
+            
+            <!-- ไอเทมใหม่: XP 100 (เพิ่มปุ่ม + - จำนวนชิ้น) -->
+            <div class="shop-item" data-type="premium" id="item-xp-box">
+                <div class="sold-out-overlay" id="sold-xp"><div class="sold-out-text">SOLD OUT</div></div>
+                <span style="position:absolute; top:15px; right:15px; background:linear-gradient(135deg,#00d4ff,#a855f7); color:#fff; padding:4px 10px; border-radius:8px; font-size:0.7rem; font-weight:700;">BATTLE PASS</span>
+                <div class="item-icon-wrapper"><i class="fas fa-bolt" style="font-size: 3.8rem; color: #00d4ff; filter: drop-shadow(0 0 12px rgba(0,212,255,0.4));"></i></div>
+                <h3 class="item-title" style="color: #00d4ff;">XP 100 (แบทเทิลพาส)</h3>
+                <p class="item-desc">เพิ่ม XP 100 หน่วยเข้าสู่หน้า Battle Pass ทันทีเพื่ออัปเลเวลรับรางวัลพิเศษ (รีเซ็ตโควตาทุก 1 เดือน)</p>
+                <div class="item-stock">คงเหลือ (รายเดือน): <span id="stock-xp-text">50</span>/50 ชิ้น</div>
+                <div class="price-box" id="xp-total-price">💎 500</div>
+
+                <div class="quantity-selector" onclick="event.stopPropagation()">
+                    <button class="quantity-btn" onclick="changeXpQuantity(-1)">-</button>
+                    <input type="number" class="quantity-input" id="xp-qty-input" value="1" min="1" oninput="validateXpQtyInput()">
+                    <button class="quantity-btn" onclick="changeXpQuantity(1)">+</button>
+                </div>
+                <button class="btn-buy" id="btn-buy-xp" onclick="event.stopPropagation(); buyXpItemCustom()">ซื้อ XP 100</button>
+            </div>
         </div>
 
         <!-- ==================== SECTION NEW: สินค้าซองการ์ดสุ่ม ==================== -->
@@ -627,6 +645,7 @@
         const DEFAULT_STOCK = { 
             normal: 50, 
             premium: 20, 
+            xp_item: 50,
             pack_normal_10: 5, 
             pack_combo: 3,
             pack_super: 3,
@@ -637,13 +656,14 @@
 
         const BASE_NORMAL_PRICE = 1200;
         const BASE_PREMIUM_PRICE = 3500;
+        const XP_ITEM_PRICE = 500;
         const DADDY_PACK_PRICE = 1500000;
         const MATERIAL_PACK_PRICE = 2990000; 
 
         function formatCurrency(num) {
             if (num >= 100000000000) {
                 return (num / 1000000000).toFixed(num % 1000000000 === 0 ? 0 : 1) + 'B';
-            } else if (num >= 100000000000) {
+            } else if (num >= 1000000000) {
                 return (num / 1000000).toFixed(num % 1000000 === 0 ? 0 : 1) + 'M';
             } else if (num >= 1000) {
                 return (num / 1000).toFixed(num % 1000 === 0 ? 0 : 1) + 'K';
@@ -718,6 +738,9 @@
                             shiningStarTier = 1;
                         }
 
+                        // ตรวจสอบระบบรีเซ็ต XP 100 ทุกๆ 1 เดือน
+                        checkMonthlyXpReset(data);
+
                         updateUI();
                     }
                 });
@@ -727,8 +750,31 @@
             }
         });
 
+        // ฟังก์ชันตรวจสอบและรีเซ็ตโควตา XP 100 ทุก 1 เดือน
+        async function checkMonthlyXpReset(userData) {
+            const now = Date.now();
+            const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000;
+            const lastReset = userData.lastXpMonthlyReset || 0;
+
+            if (now - lastReset > ONE_MONTH_MS) {
+                try {
+                    const userRef = doc(db, "users", currentUser.uid);
+                    await updateDoc(userRef, {
+                        xp_monthly_purchased: 0,
+                        lastXpMonthlyReset: now
+                    });
+                } catch (e) {
+                    console.error("Monthly XP Reset Error:", e);
+                }
+            } else {
+                const purchasedCount = userData.xp_monthly_purchased || 0;
+                currentStock.xp_item = Math.max(0, 50 - purchasedCount);
+                updateUI();
+            }
+        }
+
         const RESTOCK_TIME_KEY = "gacha_shop_restock_target";
-        const STOCK_KEY = "gacha_shop_current_stock_v3";
+        const STOCK_KEY = "gacha_shop_current_stock_v4";
 
         function initShopSystem() {
             const savedStock = localStorage.getItem(STOCK_KEY);
@@ -747,6 +793,7 @@
             updateUI();
             updateNormalPriceUI();
             updatePremiumPriceUI();
+            updateXpPriceUI();
             updateCardPackPriceUI();
             
             setInterval(() => {
@@ -767,17 +814,26 @@
         }
 
         function restockProducts() {
-            currentStock = { ...DEFAULT_STOCK };
+            currentStock.normal = DEFAULT_STOCK.normal;
+            currentStock.premium = DEFAULT_STOCK.premium;
+            currentStock.pack_normal_10 = DEFAULT_STOCK.pack_normal_10;
+            currentStock.pack_combo = DEFAULT_STOCK.pack_combo;
+            currentStock.pack_super = DEFAULT_STOCK.pack_super;
+            currentStock.pack_mega = DEFAULT_STOCK.pack_mega;
+            currentStock.pack_special_select = DEFAULT_STOCK.pack_special_select;
+
             localStorage.setItem(STOCK_KEY, JSON.stringify(currentStock));
             const newTarget = Date.now() + (1 * 24 * 60 * 60 * 1000);
             localStorage.setItem(RESTOCK_TIME_KEY, newTarget);
 
             document.getElementById("custom-qty-input").value = 1;
             document.getElementById("premium-qty-input").value = 1;
+            document.getElementById("xp-qty-input").value = 1;
 
             updateUI();
             updateNormalPriceUI();
             updatePremiumPriceUI();
+            updateXpPriceUI();
             
             if (!hasNotifiedRestock) {
                 hasNotifiedRestock = true;
@@ -787,11 +843,16 @@
 
         function updateUI() {
             document.getElementById("stock-normal-text").innerText = currentStock.normal;
-            document.getElementById("stock-premium-text").innerText = currentStock.premium;
             document.getElementById("sold-normal").style.display = currentStock.normal <= 0 ? "flex" : "none";
             document.getElementById("btn-buy-normal").disabled = currentStock.normal <= 0;
+
+            document.getElementById("stock-premium-text").innerText = currentStock.premium;
             document.getElementById("sold-premium").style.display = currentStock.premium <= 0 ? "flex" : "none";
             document.getElementById("btn-buy-premium").disabled = currentStock.premium <= 0;
+
+            document.getElementById("stock-xp-text").innerText = currentStock.xp_item;
+            document.getElementById("sold-xp").style.display = currentStock.xp_item <= 0 ? "flex" : "none";
+            document.getElementById("btn-buy-xp").disabled = currentStock.xp_item <= 0;
 
             document.getElementById("stock-pack-normal-text").innerText = currentStock.pack_normal_10;
             document.getElementById("stock-pack-combo-text").innerText = currentStock.pack_combo;
@@ -848,6 +909,61 @@
                 shiningTitleDisplay.innerText = `✨ แพ็คดวงที่ส่องแสง (MAX)`;
                 document.getElementById("stock-pack-shining-star-text").innerText = "หมดแล้ว";
                 document.getElementById("stock-pack-shining-star-text").style.color = "#ff3366";
+            }
+        }
+
+        // ฟังก์ชันจัดการจำนวนและซื้อ XP 100 แบบหลายชิ้น
+        window.changeXpQuantity = function(amount) {
+            const qtyInput = document.getElementById("xp-qty-input");
+            let currentVal = parseInt(qtyInput.value) || 1;
+            let newVal = currentVal + amount;
+            if(newVal < 1) newVal = 1;
+            if(newVal > currentStock.xp_item) newVal = currentStock.xp_item;
+            qtyInput.value = newVal;
+            updateXpPriceUI();
+        }
+
+        window.validateXpQtyInput = function() {
+            const qtyInput = document.getElementById("xp-qty-input");
+            let val = parseInt(qtyInput.value);
+            if (isNaN(val) || val < 1) { qtyInput.value = 1; } 
+            else if (val > currentStock.xp_item) { qtyInput.value = currentStock.xp_item; }
+            updateXpPriceUI();
+        }
+
+        function updateXpPriceUI() {
+            const qty = parseInt(document.getElementById("xp-qty-input").value) || 1;
+            const totalPrice = XP_ITEM_PRICE * qty;
+            document.getElementById("xp-total-price").innerText = `💎 ${totalPrice.toLocaleString()}`;
+        }
+
+        window.buyXpItemCustom = async function() {
+            if (!currentUser) { alert("❌ กรุณาเข้าสู่ระบบก่อนทำการสั่งซื้อ"); return; }
+            const qtyInput = document.getElementById("xp-qty-input");
+            const qtyToBuy = parseInt(qtyInput.value) || 1;
+            const totalPrice = XP_ITEM_PRICE * qtyToBuy;
+
+            if (currentStock.xp_item <= 0) { alert("❌ สินค้าหมดโควตารายเดือนแล้ว กรุณารอรีเซ็ตในเดือนถัดไป!"); return; }
+            if (qtyToBuy > currentStock.xp_item) { alert("❌ จำนวนชิ้นเกินโควตารายเดือนที่เหลือ!"); return; }
+            if (userDiamonds < totalPrice) { alert("❌ เพชรของคุณไม่เพียงพอสำหรับการซื้อจำนวนนี้!"); return; }
+
+            if (confirm(`คุณต้องการซื้อ "XP 100" จำนวน ${qtyToBuy} ชิ้น ในราคา 💎 ${totalPrice.toLocaleString()} เพชร ใช่หรือไม่?`)) {
+                try {
+                    const userRef = doc(db, "users", currentUser.uid);
+                    await updateDoc(userRef, {
+                        [diamondFieldKey]: increment(-totalPrice),
+                        passExp: increment(100 * qtyToBuy),
+                        xp_monthly_purchased: increment(qtyToBuy)
+                    });
+
+                    currentStock.xp_item -= qtyToBuy;
+                    qtyInput.value = currentStock.xp_item > 0 ? 1 : 0;
+                    updateUI();
+                    updateXpPriceUI();
+                    alert(`🎉 ซื้อสำเร็จ! ระบบได้เพิ่ม XP ${100 * qtyToBuy} หน่วยเข้าสู่หน้า Battle Pass ของคุณเรียบร้อยแล้ว`);
+                } catch (error) {
+                    alert("เกิดข้อผิดพลาดในการซื้อ XP กรุณาลองใหม่อีกครั้ง");
+                }
             }
         }
 
