@@ -86,6 +86,34 @@
         }
         .hero-halloween p { font-size: 1.2rem; color: #e2e8f0; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); margin-top: 10px; }
 
+        /* --- Countdown Notice Banner --- */
+        .event-countdown-banner {
+            background: linear-gradient(135deg, rgba(153, 27, 27, 0.9), rgba(91, 33, 182, 0.9));
+            border: 2px solid #ff6b00;
+            color: #fff;
+            padding: 15px 20px;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 20px rgba(255, 107, 0, 0.3);
+            animation: pulse-border 2s infinite alternate;
+        }
+        @keyframes pulse-border {
+            0% { border-color: #ff6b00; box-shadow: 0 5px 15px rgba(255, 107, 0, 0.3); }
+            100% { border-color: #a855f7; box-shadow: 0 5px 25px rgba(168, 85, 247, 0.6); }
+        }
+        .event-countdown-banner h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.2rem;
+            color: #ffaa00;
+        }
+        #countdown-timer {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #00ffcc;
+            text-shadow: 0 0 10px rgba(0,255,204,0.5);
+        }
+
         .container { max-width: 1140px; margin: 0 auto; padding: 40px 20px; }
         
         .category-title {
@@ -213,10 +241,17 @@
     <!-- 🎃 HERO HEADER -->
     <header class="hero-halloween">
         <h1>HALLOWEEN EVENT</h1>
-        <p>ต้อนรับสุ้อีเว้น มาสะสมเหรียญเพื่อไปสู่มลุ้นรับการ์ดลิมิเต็ดกัน!</p>
+        <p>ต้อนรับคืนวันปล่อยผี สะสมเหรียญฟักทองเพื่อลุ้นรับการ์ดลิมิเต็ดกัน!</p>
     </header>
 
     <main class="container">
+
+        <!-- ⏰ กล่องประกาศนับถอยหลังหมดเวลาอีเว้นท์ -->
+        <div class="event-countdown-banner">
+            <h3><i class="fas fa-clock"></i> ประกาศเวลาปิดกิจกรรม HALLOWEEN EVENT</h3>
+            <p style="margin: 2px 0 8px 0; font-size: 0.9rem; color: #ffd699;">กิจกรรมใกล้สินสุดแล้วเราจะได้พบกันอีกในปีหน้านะทุกคนหน้านี้จะตอนวันที่ 1 พฤศจิกายน เวลา 01:00 น.</p>
+            <div id="countdown-timer">กำลังโหลดเวลา...</div>
+        </div>
 
         <!-- ==================== 1. ยศ Halloween is Time (สำหรับซื้อด้วย 20B Coins) ==================== -->
         <div class="category-title" style="margin-top: 0;">
@@ -225,7 +260,7 @@
 
         <div class="daily-reward" id="title-section" style="border-color: #ff8c00; margin-bottom: 30px;">
             <h3 style="margin-top:0; color: #ff8c00; font-size: 1.6rem;">🎃 Halloween is Time</h3>
-            <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px;">ยศสุดพิเษศ <span style="color: #ff8c00; font-weight: bold; text-shadow: 0 0 8px rgba(255,140,0,0.8);">Halloween is Time 🎃</span> (เงื่อนไข: ต้องมี HALLOWEEN Coin 🎃 20B )</p>
+            <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px;">ซื้อยศสุดเท่ <span style="color: #ff8c00; font-weight: bold; text-shadow: 0 0 8px rgba(255,140,0,0.8);">Halloween is Time 🎃</span> (เงื่อนไข: ต้องมี 🎃 20B HALLOWEEN Coin)</p>
             <button id="buy-title-btn" class="btn-spin" style="background: linear-gradient(135deg, #ff8c00, #ff4500);">ซื้อยศ (ใช้ 20B Coins)</button>
         </div>
 
@@ -237,7 +272,7 @@
         <div class="daily-reward" id="daily-section">
             <h3 style="margin-top:0; color: #ff6b00; font-size: 1.8rem;">🎁 เช็คอินรับเหรียญ HALLOWEEN EVENT</h3>
             <p style="color: rgba(255,255,255,0.8); margin-bottom: 25px;">เข้าเช็คอินทุกวันเพื่อรับ 🎃 5,000 HALLOWEEN Coin ฟรี!</p>
-            <button id="spin-btn" class="btn-spin">กดรับเหรียญของวันนี้</button>
+            <button id="spin-btn" class="btn-spin">กดรับเหรียญวันนี้</button>
         </div>
 
         <!-- ยศ happy HALLOWEEN (รับฟรีเฉพาะ 31 ตุลาคม) -->
@@ -338,12 +373,54 @@
             </div>
         </div>
 
+        <div class="pack-card" style="margin-top: 20px;">
+            <div class="pack-icon">🎃</div>
+            <div class="pack-title">Spooky Pack HALLOWEEN Coin(โครตจะคุ้มสุด!!)</div>
+            <div class="pack-coin">1 Coins</div>
+            <button class="btn-buy-pack" onclick="buyCoinPack(20000000000000000, 1000000000000000000)">
+                <span>ใช้ 💎 100,000,000,000,000,000,000</span>
+            </button>
+        </div>
+
     </main>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, onSnapshot, updateDoc, increment, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // --- ระบบตรวจสอบเวลาหมดเขตอีเว้นท์และนับถอยหลัง (หลังตี 1 ของวันที่ 1 พ.ย.) ---
+    const currentYear = new Date().getFullYear();
+    const expireTime = new Date(currentYear, 10, 1, 1, 0, 0).getTime(); // วันที่ 1 พ.ย. เวลา 01:00:00 น.
+
+    function updateCountdown() {
+        const now = new Date().getTime();
+        const distance = expireTime - now;
+
+        const timerElem = document.getElementById("countdown-timer");
+        if (!timerElem) return;
+
+        if (distance <= 0) {
+            timerElem.innerText = "กิจกรรมสิ้นสุดลงแล้ว!";
+            alert("⏰ กิจกรรม HALLOWEEN EVENT สิ้นสุดลงแล้ว! กำลังพากลับสู่หน้าแรก");
+            window.location.replace("index.html");
+            return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        let timeString = "";
+        if (days > 0) timeString += `${days} วัน `;
+        timeString += `${String(hours).padStart(2, '0')} ชั่วโมง ${String(minutes).padStart(2, '0')} นาที ${String(seconds).padStart(2, '0')} วินาที`;
+        
+        timerElem.innerText = timeString;
+    }
+
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
 
     const firebaseConfig = {
         apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM",
