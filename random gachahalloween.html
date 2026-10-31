@@ -309,7 +309,7 @@
         <!-- แบนเนอร์แสดงบัฟโชคดี -->
         <div id="luck-buff-container" style="display:none;">
             <div class="luck-buff-banner">
-                🍀 <span>บัฟโชคดีทำงาน! (เพิ่มเรทการ์ดหายาก x10) ถึง 31 ต.ค. 23:59</span>
+                🍀 <span>บัฟโชคดีทำงาน! (เพิ่มเรทการ์ดหายาก x50) ถึง 31 ต.ค. 23:59</span>
                 <span id="luck-timer" style="color:#fff; margin-left: 3px;">(--:--:--)</span>
             </div>
         </div>
@@ -327,7 +327,7 @@
                 
                 <div class="btn-group">
                     <button id="pull-5" class="btn-pull" onclick="pull(5)">สุ่ม 5 (100🎃)</button>
-                    <button id="pull-10" class="btn-pull" style="background: #a020f0; color: white;" onclick="pull(10)">สุ่ม 10 (500🎃)</button>
+                    <button id="pull-10" class="btn-pull" style="background: #a020f0; color: white;" onclick="pull(10)">สุ่ม 50 (500🎃)</button>
                     <button id="pull-50" class="btn-pull" style="background: #ff0055; color: white;" onclick="pull(50)">สุ่ม 50 (1K🎃)</button>
                 </div>
             </div>
@@ -345,7 +345,7 @@
                 <div class="scroll-window"><div class="slide-track-v" id="v-track"></div></div>
                 
                 <div class="quick-rate-table">
-                    <div style="font-size: 0.68rem; color: #aaa; margin-bottom: 6px;">RATE BY RARITY <span id="rate-buff-tag" style="color:#00ff80; display:none;">(x10 BUFF!)</span></div>
+                    <div style="font-size: 0.68rem; color: #aaa; margin-bottom: 6px;">RATE BY RARITY <span id="rate-buff-tag" style="color:#00ff80; display:none;">(x50 BUFF!)</span></div>
                     <div class="rate-row"><span class="rate-label color-admin">ADMIN</span><span id="rate-admin">0.015%</span></div>
                     <div class="rate-row"><span class="rate-label color-secret">SECRET</span><span id="rate-secret">0.01%</span></div>
                     <div class="rate-row"><span class="rate-label color-usec">USEC</span><span id="rate-usec">0.01%</span></div>
@@ -420,11 +420,12 @@
             timeStr += `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
             document.getElementById("luck-timer").innerText = `(${timeStr})`;
 
-            document.getElementById("rate-admin").innerText = "0.15%";
-            document.getElementById("rate-secret").innerText = "0.1%";
-            document.getElementById("rate-usec").innerText = "0.1%";
-            document.getElementById("rate-exr").innerText = "1.0%";
-            document.getElementById("rate-sec").innerText = "10.0%";
+            // ปรับเรทที่แสดงผลบน Quick Rate Table เมื่อเปิด Buff x50
+            document.getElementById("rate-admin").innerText = (0.015 * 50).toFixed(3) + "%";
+            document.getElementById("rate-secret").innerText = (0.01 * 50).toFixed(2) + "%";
+            document.getElementById("rate-usec").innerText = (0.01 * 50).toFixed(2) + "%";
+            document.getElementById("rate-exr").innerText = (0.1 * 50).toFixed(1) + "%";
+            document.getElementById("rate-sec").innerText = (1 * 50) + "%";
         } else {
             document.getElementById("luck-buff-container").style.display = "none";
             document.getElementById("rate-buff-tag").style.display = "none";
@@ -637,9 +638,9 @@
 
         const activeCards = allCards.map(c => {
             let modRate = c.rate;
-            // ปรับจาก x2 เป็น x10 สำหรับการ์ดระดับสูง
+            // ปรับตัวคูณบัฟโชคดีเป็น x50 สำหรับการ์ดระดับสูง
             if (hasLuckBuff && ["ADMIN HALLOWEEN", "SECRET HALLOWEEN", "USEC HALLOWEEN", "EXR HALLOWEEN", "SEC HALLOWEEN"].includes(c.rarity)) {
-                modRate = modRate * 10;
+                modRate = modRate * 50;
             }
 
             if (c.rarity === "ADMIN HALLOWEEN" && (cardStocks[c.key] || 0) >= 500) {
@@ -842,7 +843,7 @@
             let displayRate = c.rate;
 
             if (hasLuckBuff && ["ADMIN HALLOWEEN", "SECRET HALLOWEEN", "USEC HALLOWEEN", "EXR HALLOWEEN", "SEC HALLOWEEN"].includes(c.rarity)) {
-                displayRate = c.rate * 10;
+                displayRate = c.rate * 50;
             }
 
             if (c.rarity === "ADMIN HALLOWEEN") {
