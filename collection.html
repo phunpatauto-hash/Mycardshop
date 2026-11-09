@@ -53,7 +53,7 @@
         .filter-btn.type-btn.active { border-color: #00d4ff; color: #fff; background: rgba(0,212,255,0.15); }
         .filter-btn.halloween-btn.active { border-color: #ff6600; color: #ff9900; background: rgba(255,102,0,0.2); }
 
-        /* Halloween Special Tag & Animation */
+        /* Halloween & Pass Special Badges */
         @keyframes halloween-glow {
             0% { box-shadow: 0 0 5px #ff6600, inset 0 0 5px #ff6600; }
             50% { box-shadow: 0 0 15px #ff9900, inset 0 0 10px #ff3300; }
@@ -73,6 +73,21 @@
             border: 1px solid #fff;
             text-transform: uppercase;
             animation: halloween-glow 1.5s infinite ease-in-out;
+        }
+
+        .card-pass-badge {
+            position: absolute;
+            bottom: 55px;
+            left: 6px;
+            background: linear-gradient(45deg, #ff00ff, #00d4ff);
+            color: #000;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 0.55rem;
+            font-weight: 800;
+            z-index: 6;
+            border: 1px solid #fff;
+            text-transform: uppercase;
         }
         
         .card-expired-overlay {
@@ -240,9 +255,10 @@
                     <div>
                         <h2 id="modalName" style="margin:0; font-size: 1.6rem;">Name</h2>
                         <div id="modalRarity" style="font-weight: bold; letter-spacing: 1px; margin-bottom: 3px; font-size: 0.9rem;">GRADE: -</div>
-                        <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 10px;">
+                        <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 10px; flex-wrap: wrap;">
                             <div id="modalType" style="color: #00d4ff; font-weight: bold; font-size: 0.85rem;">TYPE: CARD</div>
                             <div id="modalHalloweenTag" style="display:none; background: linear-gradient(45deg, #ff3300, #ff9900); color: #000; font-size: 0.7rem; font-weight: 800; padding: 2px 6px; border-radius: 6px; border: 1px solid #fff;">🎃 HALLOWEEN</div>
+                            <div id="modalPassTag" style="display:none; background: linear-gradient(45deg, #ff00ff, #00d4ff); color: #000; font-size: 0.7rem; font-weight: 800; padding: 2px 6px; border-radius: 6px; border: 1px solid #fff;">🎁 BATTLE PASS</div>
                         </div>
                     </div>
                     <button id="btnLockCard" class="btn-lock">🔒 ล็อกการ์ด</button>
@@ -343,6 +359,11 @@
         return rarityStr.endsWith("HALLOWEEN");
     }
 
+    function isPassCard(card) {
+        const sourceStr = (card && card.source ? card.source : '').toString().trim().toLowerCase();
+        return sourceStr.includes("battle pass") || sourceStr.includes("pass");
+    }
+
     function isHalloweenExpired() {
         const now = new Date();
         const currentMonth = now.getMonth() + 1;
@@ -426,7 +447,8 @@
                             img: c.img || c.image || '',
                             type: (c.type || 'CARD').toUpperCase(),
                             source: c.source || '',
-                            isHalloween: isHalloweenCard(c)
+                            isHalloween: isHalloweenCard(c),
+                            isPass: isPassCard(c)
                         }));
                     
                     globalPoints = data.points || 0;
@@ -452,7 +474,7 @@
         const grouped = {};
         userCards.forEach(card => {
             if (!card || !card.name) return;
-            const key = `${card.name}_${(card.rarity || 'C').toUpperCase()}_${card.type || 'CARD'}_${isHalloweenCard(card) ? 'HW' : 'NORMAL'}`;
+            const key = `${card.name}_${(card.rarity || 'C').toUpperCase()}_${card.type || 'CARD'}_${isHalloweenCard(card) ? 'HW' : 'NORMAL'}_${isPassCard(card) ? 'PASS' : 'NORMAL'}`;
             if (!grouped[key]) grouped[key] = [];
             grouped[key].push(card);
         });
@@ -535,6 +557,7 @@
             if (r.endsWith("HALLOWEEN")) r = r.replace("HALLOWEEN", "").trim();
             
             const isHCard = isHalloweenCard(card);
+            const isPCard = isPassCard(card);
             const isExpired = isHCard && isHalloweenExpired();
 
             const isRecentNew = card.obtainedAt && (now - card.obtainedAt < FIVE_MINUTES);
@@ -569,12 +592,14 @@
             }
 
             const halloweenTagHTML = isHCard ? `<div class="card-halloween-badge">🎃 HALLOWEEN</div>` : '';
+            const passTagHTML = isPCard ? `<div class="card-pass-badge">🎁 BATTLE PASS</div>` : '';
             const expiredOverlay = isExpired ? `<div class="card-expired-overlay"><span>⌛ หมดเขตกิจกรรม</span></div>` : '';
 
             div.innerHTML = `
                 ${starContent}
                 <div class="card-type-badge">${card.type || 'CARD'}</div>
                 ${halloweenTagHTML}
+                ${passTagHTML}
                 ${expiredOverlay}
                 ${card.count > 1 && !isExpired ? `<div class="card-count-badge">x${card.count}</div>` : ''}
                 ${card.isLocked && !isExpired ? `<div class="card-lock-badge">🔒</div>` : ''}
@@ -599,7 +624,7 @@
         let displayR = r;
         if (r.endsWith("HALLOWEEN")) r = r.replace("HALLOWEEN", "").trim();
 
-        const sameCards = userCards.filter(c => c.name === card.name && (c.rarity || 'C').toUpperCase() === (card.rarity || 'C').toUpperCase() && isHalloweenCard(c) === isHalloweenCard(card));
+        const sameCards = userCards.filter(c => c.name === card.name && (c.rarity || 'C').toUpperCase() === (card.rarity || 'C').toUpperCase() && isHalloweenCard(c) === isHalloweenCard(card) && isPassCard(c) === isPassCard(card));
         
         document.getElementById("modalImg").src = card.img || card.image || '';
         document.getElementById("modalName").innerText = card.name || 'Unknown';
@@ -614,6 +639,13 @@
             hwTag.style.display = "none";
         }
 
+        const passTag = document.getElementById("modalPassTag");
+        if (isPassCard(card)) {
+            passTag.style.display = "inline-block";
+        } else {
+            passTag.style.display = "none";
+        }
+
         document.getElementById("modalPower").innerText = getArenaPower(card).toLocaleString();
         document.getElementById("modalHp").innerText = getCardHp(card).toLocaleString();
         document.getElementById("modalDef").innerText = getCardDef(card).toLocaleString();
@@ -621,18 +653,6 @@
         document.getElementById("lvlBarFill").style.width = ((card.level || 1) / MAX_LV * 100) + "%";
         document.getElementById("reqQty").innerText = sameCards.length;
         document.getElementById("modalSellPrice").innerText = getDynamicSellValue(card).toLocaleString() + " 🪙";
-
-        // ตรวจสอบการ์ดระดับ ADMIN ไม่ให้ขายได้
-        const sellPriceBox = document.getElementById("modalSellPriceBox");
-        const btnSellCard = document.getElementById("btnSellCard");
-        if (r === 'ADMIN') {
-            sellPriceBox.style.display = "none";
-            btnSellCard.style.display = "none";
-        } else {
-            sellPriceBox.style.display = "flex";
-            btnSellCard.style.display = "block";
-            btnSellCard.onclick = () => handleSingleSell(card);
-        }
 
         const lockBtn = document.getElementById("btnLockCard");
         if (card.isLocked) {
@@ -679,6 +699,7 @@
                 }
             }
         }
+        document.getElementById("btnSellCard").onclick = () => handleSingleSell(card);
         document.getElementById("cardModal").style.display = "flex";
     };
 
@@ -689,7 +710,7 @@
 
     async function handleToggleLock(card) {
         let updated = [...userCards];
-        const idx = updated.findIndex(c => c.name === card.name && (c.rarity || '').toUpperCase() === (card.rarity || '').toUpperCase() && c.level === card.level && c.stars === card.stars && (c.awakening || 0) === (card.awakening || 0) && isHalloweenCard(c) === isHalloweenCard(card));
+        const idx = updated.findIndex(c => c.name === card.name && (c.rarity || '').toUpperCase() === (card.rarity || '').toUpperCase() && c.level === card.level && c.stars === card.stars && (c.awakening || 0) === (card.awakening || 0) && isHalloweenCard(c) === isHalloweenCard(card) && isPassCard(c) === isPassCard(card));
         if (idx > -1) {
             updated[idx].isLocked = !updated[idx].isLocked;
             await saveStateToFirebase(updated);
@@ -701,7 +722,7 @@
         if (globalStars < costStars) return alert(`❌ หน่วยเงิน ⭐ (Star) ของคุณไม่พอสำหรับการปลุกพลังนี้ (ต้องการ ${costStars.toLocaleString()} ⭐)`);
 
         let updated = [...userCards];
-        const idx = updated.findIndex(c => c.name === card.name && (c.rarity || '').toUpperCase() === (card.rarity || '').toUpperCase() && c.level === card.level && c.stars === card.stars && (c.awakening || 0) === (card.awakening || 0) && isHalloweenCard(c) === isHalloweenCard(card));
+        const idx = updated.findIndex(c => c.name === card.name && (c.rarity || '').toUpperCase() === (card.rarity || '').toUpperCase() && c.level === card.level && c.stars === card.stars && (c.awakening || 0) === (card.awakening || 0) && isHalloweenCard(c) === isHalloweenCard(card) && isPassCard(c) === isPassCard(card));
         if (idx === -1) return alert("ไม่พบการ์ดที่ต้องการปลุกพลัง");
 
         updated[idx].awakening = (updated[idx].awakening || 0) + 1;
@@ -722,7 +743,7 @@
         let currentDiamonds = data.diamonds || 0;
 
         let localCollection = [...userCards];
-        let mainIdx = localCollection.findIndex(c => c.name === card.name && (c.rarity || '').toUpperCase() === (card.rarity || '').toUpperCase() && (c.level || 1) === card.level && (c.stars || 0) === card.stars && (c.awakening || 0) === (card.awakening || 0) && isHalloweenCard(c) === isHalloweenCard(card));
+        let mainIdx = localCollection.findIndex(c => c.name === card.name && (c.rarity || '').toUpperCase() === (card.rarity || '').toUpperCase() && (c.level || 1) === card.level && (c.stars || 0) === card.stars && (c.awakening || 0) === (card.awakening || 0) && isHalloweenCard(c) === isHalloweenCard(card) && isPassCard(c) === isPassCard(card));
         if (mainIdx === -1) return alert("ไม่พบการ์ดหลัก");
 
         let totalCostPoints = 0;
@@ -734,7 +755,7 @@
                 const req = getUpgradeRequirements(localCollection[mainIdx]);
                 let materialIndices = [];
                 for (let i = 0; i < localCollection.length; i++) {
-                    if (i !== mainIdx && localCollection[i].name === card.name && (localCollection[i].rarity || '').toUpperCase() === (card.rarity || '').toUpperCase() && !localCollection[i].isLocked && isHalloweenCard(localCollection[i]) === isHalloweenCard(card)) {
+                    if (i !== mainIdx && localCollection[i].name === card.name && (localCollection[i].rarity || '').toUpperCase() === (localCollection[i].rarity || '').toUpperCase() && !localCollection[i].isLocked && isHalloweenCard(localCollection[i]) === isHalloweenCard(card) && isPassCard(localCollection[i]) === isPassCard(card)) {
                         materialIndices.push(i);
                         if (materialIndices.length >= req.reqQty) break;
                     }
@@ -759,7 +780,7 @@
             let reqQty = 1;
             let materialIndices = [];
             for (let i = 0; i < localCollection.length; i++) {
-                if (i !== mainIdx && localCollection[i].name === card.name && (localCollection[i].rarity || '').toUpperCase() === (card.rarity || '').toUpperCase() && !localCollection[i].isLocked && isHalloweenCard(localCollection[i]) === isHalloweenCard(card)) {
+                if (i !== mainIdx && localCollection[i].name === card.name && (localCollection[i].rarity || '').toUpperCase() === (card.rarity || '').toUpperCase() && !localCollection[i].isLocked && isHalloweenCard(localCollection[i]) === isHalloweenCard(card) && isPassCard(localCollection[i]) === isPassCard(card)) {
                     materialIndices.push(i);
                     if (materialIndices.length >= reqQty) break;
                 }
@@ -786,14 +807,10 @@
     }
 
     async function handleSingleSell(card) {
-        let r = (card.rarity || 'C').toUpperCase();
-        if (r.endsWith("HALLOWEEN")) r = r.replace("HALLOWEEN", "").trim();
-        if (r === 'ADMIN') return alert("❌ การ์ดระดับ Admin ไม่สามารถนำไปแลกเปลี่ยนหรือขายได้!");
-        
         if (card.isLocked) return alert("❌ ไม่สามารถขายได้เนื่องจากเปิดระบบล็อกการ์ดไว้!");
         if(!confirm(`ขายการ์ด ${card.name} หรือไม่?`)) return;
         let updated = [...userCards];
-        const idx = updated.findIndex(c => c.name === card.name && (c.rarity || '').toUpperCase() === (card.rarity || '').toUpperCase() && c.level === card.level && c.stars === card.stars && (c.awakening || 0) === (card.awakening || 0) && isHalloweenCard(c) === isHalloweenCard(card));
+        const idx = updated.findIndex(c => c.name === card.name && (c.rarity || '').toUpperCase() === (card.rarity || '').toUpperCase() && c.level === card.level && c.stars === card.stars && (c.awakening || 0) === (card.awakening || 0) && isHalloweenCard(c) === isHalloweenCard(card) && isPassCard(c) === isPassCard(card));
         if(idx > -1) {
             const gain = getDynamicSellValue(card);
             updated.splice(idx, 1);
@@ -806,11 +823,11 @@
     const btnSellAllEl = document.getElementById("btnSellAll");
     if (btnSellAllEl) {
         btnSellAllEl.onclick = async () => {
-            if (!confirm("ระบบจะเก็บการ์ดที่เลเวลและดาวสูงสุดไว้ 1 ใบ และขายใบซ้ำอื่นที่ไม่ได้ล็อกทิ้งทั้งหมด (ยกเว้นระดับ Admin) ยืนยันหรือไม่?")) return;
+            if (!confirm("ระบบจะเก็บการ์ดที่เลเวลและดาวสูงสุดไว้ 1 ใบ และขายใบซ้ำอื่นที่ไม่ได้ล็อกทิ้งทั้งหมด ยืนยันหรือไม่?")) return;
             const grouped = {};
             userCards.forEach(card => {
                 if (!card || !card.name) return;
-                const key = `${card.name}_${(card.rarity || 'C').toUpperCase()}_${isHalloweenCard(card) ? 'HW' : 'NORMAL'}`;
+                const key = `${card.name}_${(card.rarity || 'C').toUpperCase()}_${isHalloweenCard(card) ? 'HW' : 'NORMAL'}_${isPassCard(card) ? 'PASS' : 'NORMAL'}`;
                 if (!grouped[key]) grouped[key] = [];
                 grouped[key].push(card);
             });
@@ -820,11 +837,7 @@
                 copies.sort((a, b) => ((b.awakening || 0) * 1000 + (b.stars || 0) * 100 + (b.level || 1)) - ((a.awakening || 0) * 1000 + (a.stars || 0) * 100 + (a.level || 1)));
                 newCollection.push(copies[0]); 
                 for (let i = 1; i < copies.length; i++) {
-                    let r = (copies[i].rarity || 'C').toUpperCase();
-                    if (r.endsWith("HALLOWEEN")) r = r.replace("HALLOWEEN", "").trim();
-                    
-                    // ป้องกันไม่ให้ขายการ์ดระดับ Admin ผ่านปุ่มขายซ้ำทั้งหมด
-                    if (copies[i].isLocked || r === 'ADMIN') {
+                    if (copies[i].isLocked) {
                         newCollection.push(copies[i]); 
                     } else {
                         totalGain += getDynamicSellValue(copies[i]);
