@@ -236,7 +236,7 @@
 
     <div class="container">
         <div class="header-info" style="text-align: center; margin-bottom: 25px;">
-            <h1 style="font-size: 2.3rem; font-weight: 900; color: #ffc831; margin: 0; letter-spacing: 1px;">BATTLE PASS SS8 คืนแห่งการไถ่บาป Halloween part 2</h1>
+            <h1 style="font-size: 2.3rem; font-weight: 900; color: #ffc831; margin: 0; letter-spacing: 1px;">BATTLE PASS SS9 เส้นเวลาที่ไม่หยุดนิ่ง</h1>
             <div class="timer-container">
                 <i class="fas fa-clock"></i> ซีซั่นจะรีเซ็ตใน: <span id="reset-timer">-- วัน -- ชม. -- นาที -- วิ</span>
             </div>
@@ -348,25 +348,25 @@
         normalTicket: "🎫",
         premiumTicket: "🎟️",
         star: "⭐",
-        cardR: "https://cookierunbraverse.com/data/en_storage/O0rvY1l3l-5KUrK6rSctNg.webp",
-        cardSR: "https://cookierunbraverse.com/data/en_storage/RGsbysbwkONTFB2DJxUoEA.webp",
-        cardSSR: "https://cookierunbraverse.com/data/en_storage/QJ7lbJo6hEu4yliWbc4gjA.webp",
-        cardEXR: "https://cookierunbraverse.com/data/en_storage/CMHoSF_U6LUYwYSH_9obrQ.webp",
-        cardUltimate: "https://cookierunbraverse.com/data/en_storage/HIi-p2c23fh3emDZ5dwwQg.webp"
+        cardR: "https://cookierunbraverse.com/data/en_storage/BItTYfwxfuWTncj3VYKGMA.webp",
+        cardSR: "https://cookierunbraverse.com/data/en_storage/1PyBBp_jG-6x-13qzT1ixA.webp",
+        cardSSR: "https://cookierunbraverse.com/data/en_storage/uy0evUoJmqw2TgyxA21LnQ.webp",
+        cardEXR: "https://cookierunbraverse.com/data/en_storage/04Ahr1eXIerfTtIvinvqqA.webp",
+        cardUltimate: "https://cookierunbraverse.com/data/en_storage/B4zYAOpgr0SycdDljZo8pg.webp"
     };
 
-    // 🎴 กำหนดระบบสร้างรางวัล Battle Pass (1 - 50) ตามเงื่อนไขใหม่ที่คุณกำหนด
+    // 🎴 กำหนดระบบสร้างรางวัล Battle Pass (1 - 50) ตามเงื่อนไขที่คุณกำหนด
     const passData = [];
     for(let i = 1; i <= 50; i++) {
         let freeReward, premiumReward, superReward;
 
         // 🟢 FREE TRACK: การ์ด R (เลเวล 5 - 20), การ์ด SR (เลเวล 25 - 40), การ์ด SSR (เลเวล 45 - 50)
         if (i % 5 === 0 && i <= 20) {
-            freeReward = { id: `free_card_${i}`, name: 'Black Raisin Cookie (R)', rarity: 'R', amount: 1, icon: imgAssets.cardR, isImage: true, isCard: true };
+            freeReward = { id: `free_card_${i}`, name: 'Coffee Candy Cookie (R)', rarity: 'R', amount: 1, icon: imgAssets.cardR, isImage: true, isCard: true };
         } else if (i % 5 === 0 && i >= 25 && i <= 40) {
-            freeReward = { id: `free_card_${i}`, name: 'Salt Cellar Cookie (SR)', rarity: 'SR', amount: 1, icon: imgAssets.cardSR, isImage: true, isCard: true };
+            freeReward = { id: `free_card_${i}`, name: 'Roguefort Cookie (SR)', rarity: 'SR', amount: 1, icon: imgAssets.cardSR, isImage: true, isCard: true };
         } else if (i % 5 === 0 && i >= 45) {
-            freeReward = { id: `free_card_${i}`, name: 'Salt Cellar Cookie (SSR)', rarity: 'SSR', amount: 1, icon: imgAssets.cardSSR, isImage: true, isCard: true };
+            freeReward = { id: `free_card_${i}`, name: 'Roguefort Cookie (SSR)', rarity: 'SSR', amount: 1, icon: imgAssets.cardSSR, isImage: true, isCard: true };
         } else if (i % 2 === 0) {
             freeReward = { id: `free_dia_${i}`, name: 'Diamonds', amount: 300, icon: imgAssets.diamond, isImage: false };
         } else {
@@ -375,11 +375,11 @@
 
         // 🟡 PREMIUM TRACK: การ์ด SR (เลเวล 5 - 20), การ์ด SSR (เลเวล 25 - 40), การ์ด SEC (เลเวล 45 - 50)
         if (i % 5 === 0 && i <= 20) {
-            premiumReward = { id: `prem_card_${i}`, name: 'Salt Cellar Cookie (SR)', rarity: 'SR', amount: 1, icon: imgAssets.cardSR, isImage: true, isCard: true };
+            premiumReward = { id: `prem_card_${i}`, name: 'Roguefort Cookie (SR)', rarity: 'SR', amount: 1, icon: imgAssets.cardSR, isImage: true, isCard: true };
         } else if (i % 5 === 0 && i >= 25 && i <= 40) {
-            premiumReward = { id: `prem_card_${i}`, name: 'Salt Cellar Cookie (SSR)', rarity: 'SSR', amount: 1, icon: imgAssets.cardSSR, isImage: true, isCard: true };
+            premiumReward = { id: `prem_card_${i}`, name: 'Roguefort Cookie (SSR)', rarity: 'SSR', amount: 1, icon: imgAssets.cardSSR, isImage: true, isCard: true };
         } else if (i % 5 === 0 && i >= 45) {
-            premiumReward = { id: `prem_card_${i}`, name: 'Black Raisin Cookie (SEC)', rarity: 'SEC', amount: 1, icon: imgAssets.cardUltimate, isImage: true, isCard: true };
+            premiumReward = { id: `prem_card_${i}`, name: 'Coffee Candy Cookie (SEC)', rarity: 'SEC', amount: 1, icon: imgAssets.cardUltimate, isImage: true, isCard: true };
         } else if (i % 2 === 0) {
             premiumReward = { id: `prem_gold_${i}`, name: 'Gold', amount: i * 2500, icon: imgAssets.coin, isImage: false };
         } else {
@@ -388,13 +388,13 @@
 
         // 👑 SUPER+ TRACK: ช่องแรก (LV.1) แจก SEC, เลเวล 5-15 เป็น SR, เลเวล 20-40 เป็น SEC, เลเวล 45 และ 50 เป็น EXR
         if (i === 1) {
-            superReward = { id: `super_card_${i}`, name: 'Salt Cellar Cookie (SEC)', rarity: 'SEC', amount: 1, icon: imgAssets.cardUltimate, isImage: true, isCard: true };
+            superReward = { id: `super_card_${i}`, name: 'Coffee Candy Cookie (SEC)', rarity: 'SEC', amount: 1, icon: imgAssets.cardUltimate, isImage: true, isCard: true };
         } else if (i >= 5 && i <= 15 && i % 5 === 0) {
-            superReward = { id: `super_card_${i}`, name: 'Salt Cellar Cookie (SR)', rarity: 'SR', amount: 1, icon: imgAssets.cardSR, isImage: true, isCard: true };
+            superReward = { id: `super_card_${i}`, name: 'Roguefort Cookie (SR)', rarity: 'SR', amount: 1, icon: imgAssets.cardSR, isImage: true, isCard: true };
         } else if (i >= 20 && i <= 40 && i % 5 === 0) {
-            superReward = { id: `super_card_${i}`, name: 'Black Raisin Cookie (SEC)', rarity: 'SEC', amount: 1, icon: imgAssets.cardUltimate, isImage: true, isCard: true };
+            superReward = { id: `super_card_${i}`, name: 'Coffee Candy Cookie (SEC)', rarity: 'SEC', amount: 1, icon: imgAssets.cardUltimate, isImage: true, isCard: true };
         } else if (i === 45 || i === 50) {
-            superReward = { id: `super_card_${i}`, name: 'Dark Cacao Cookie (EXR)', rarity: 'EXR', amount: 1, icon: imgAssets.cardEXR, isImage: true, isCard: true };
+            superReward = { id: `super_card_${i}`, name: 'Timekeeper Cookie (EXR)', rarity: 'EXR', amount: 1, icon: imgAssets.cardEXR, isImage: true, isCard: true };
         } else if (i % 2 === 0) {
             superReward = { id: `super_gold_${i}`, name: 'Gold', amount: i * 4000, icon: imgAssets.coin, isImage: false };
         } else {
@@ -500,6 +500,7 @@
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
+            // ใช้ onSnapshot แบบระบุเฉพาะ Document ของ User คนนั้นๆ เพื่อความแม่นยำและเสถียรสูงสุด
             onSnapshot(doc(db, "users", user.uid), async (snapshot) => { 
                 if (snapshot.exists()) {
                     const data = snapshot.data();
