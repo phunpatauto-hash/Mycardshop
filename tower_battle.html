@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สนามประลอง: หอคอยแห่งการต่อสู้ - My Card Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Kanit', sans-serif; 
+            margin: 0; 
+            background: #050508; 
+            color: #fff; 
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* Arena Stage Viewport */
+        .battle-stage {
+            width: 100vw;
+            height: 100vh;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(255, 59, 92, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at center, #1a1d33 0%, #070810 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Grid Background Effect */
+        .grid-bg {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background-image: 
+                linear-gradient(rgba(255, 200, 49, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 200, 49, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            transform: perspective(500px) rotateX(45deg);
+            pointer-events: none;
+        }
+
+        /* Top HUD Layout */
+        .top-hud {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            z-index: 10;
+            background: rgba(11, 13, 24, 0.88);
+            padding: 14px 26px;
+            border-radius: 28px;
+            border: 1.5px solid rgba(255, 200, 49, 0.42);
+            backdrop-filter: blur(12px);
+            min-width: 640px;
+            max-width: 95vw;
+            justify-content: space-between;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+        }
+
+        .player-info { 
+            text-align: left; 
+            flex: 1; 
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .enemy-info { 
+            text-align: right; 
+            flex: 1; 
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        /* Team HP Bar Styles */
+        .team-hp-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            display: flex;
+        }
+
+        .team-hp-fill { height: 100%; transition: width 0.2s ease; }
+        .player-hp-fill { background: linear-gradient(90deg, #00ff88, #10b981); width: 100%; }
+        .enemy-hp-fill { background: linear-gradient(90deg, #ef4444, #f87171); width: 100%; }
+
+        .center-hud-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0 8px;
+        }
+
+        .vs-badge { 
+            font-size: 1.45rem; 
+            font-weight: 900; 
+            color: #ef4444; 
+            text-shadow: 0 0 12px #ef4444; 
+            line-height: 1;
+        }
+
+        .floor-indicator {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #ffc831;
+            background: rgba(0, 0, 0, 0.55);
+            padding: 3px 11px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 200, 49, 0.35);
+            margin-top: 5px;
+            font-family: monospace;
+        }
+
+        .mode-hud-pill {
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 9px;
+            border-radius: 999px;
+            margin-top: 4px;
+            background: rgba(255, 200, 49, 0.16);
+            color: #ffc831;
+            border: 1px solid rgba(255, 200, 49, 0.4);
+        }
+
+        .xmas-hud-pill {
+            font-size: 0.7rem;
+            color: #ffe8a3;
+            background: rgba(255, 59, 92, 0.18);
+            border: 1px solid rgba(255, 209, 102, 0.45);
+            padding: 2px 9px;
+            border-radius: 999px;
+            margin-top: 4px;
+            white-space: nowrap;
+        }
+
+        /* Left Team Switcher Dock */
+        .left-team-dock {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 25;
+            width: 192px;
+            background: rgba(11, 14, 26, 0.9);
+            border: 1.5px solid rgba(255, 200, 49, 0.38);
+            border-radius: 20px;
+            padding: 12px;
+            backdrop-filter: blur(14px);
+            box-shadow: 0 14px 32px rgba(0, 0, 0, 0.65);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .dock-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.84rem;
+            font-weight: 700;
+            color: #ffc831;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding-bottom: 6px;
+        }
+
+        .dock-cooldown-banner {
+            background: rgba(255, 200, 49, 0.1);
+            border: 1px solid rgba(255, 200, 49, 0.28);
+            border-radius: 12px;
+            padding: 7px 10px;
+            font-size: 0.76rem;
+            text-align: center;
+            color: #e2e8f0;
+            line-height: 1.35;
+        }
+
+        .dock-cooldown-banner.active-cd {
+            background: rgba(239, 68, 68, 0.16);
+            border-color: rgba(239, 68, 68, 0.5);
+            color: #fca5a5;
+            font-weight: 700;
+        }
+
+        .team-switch-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: 0.2s;
+        }
+
+        .team-switch-card.active-wave {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.08);
+            box-shadow: 0 0 16px rgba(0, 255, 136, 0.2);
+        }
+
+        .team-switch-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.76rem;
+            font-weight: 700;
+        }
+
+        .team-mini-thumbs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
+        }
+
+        .team-mini-thumb {
+            width: 100%;
+            aspect-ratio: 2/3;
+            border-radius: 6px;
+            object-fit: cover;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: #141826;
+        }
+
+        .team-mini-thumb.empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            color: #64748b;
+            border-style: dashed;
+        }
+
+        .team-mini-thumb.dead {
+            filter: grayscale(1) brightness(0.45);
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+
+        .btn-switch-team {
+            width: 100%;
+            border: none;
+            border-radius: 9px;
+            padding: 6px 8px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            background: linear-gradient(135deg, #ffc831, #ff9000);
+            color: #090b12;
+            transition: 0.2s;
+        }
+
+        .btn-switch-team:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 200, 49, 0.45);
+        }
+
+        .btn-switch-team:disabled {
+            background: rgba(255, 255, 255, 0.08);
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .top-hud {
+                min-width: unset;
+                width: calc(100vw - 24px);
+                top: 10px;
+                padding: 10px 14px;
+                gap: 8px;
+            }
+            .left-team-dock {
+                top: auto;
+                bottom: 12px;
+                left: 12px;
+                transform: none;
+                width: calc(100vw - 24px);
+                flex-direction: row;
+                align-items: center;
+                padding: 8px 10px;
+                gap: 8px;
+            }
+            .dock-header, .dock-cooldown-banner {
+                display: none;
+            }
+            .team-switch-card {
+                flex: 1;
+                padding: 6px;
+            }
+        }
+
+        /* Countdown Overlay */
+        .overlay-screen {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .countdown-text {
+            font-size: 5rem;
+            font-weight: 900;
+            color: #ffc831;
+            text-shadow: 0 0 30px rgba(255, 200, 49, 0.8);
+            animation: pulseText 0.8s infinite alternate;
+            text-align: center;
+        }
+
+        @keyframes pulseText {
+            from { transform: scale(1); }
+            to { transform: scale(1.15); }
+        }
+
+        /* Field for 2D Cards */
+        .field { position: absolute; width: 100%; height: 100%; top: 0; left: 0; }
+
+        /* Card Unit Styles */
+        .battle-unit {
+            width: 86px;
+            height: 124px;
+            background: #111;
+            border-radius: 12px;
+            position: absolute;
+            border: 2px solid #ffc831;
+            box-shadow: 0 0 15px rgba(255, 200, 49, 0.4);
+            transition: transform 0.1s ease, border-color 0.3s, box-shadow 0.3s, opacity 0.5s;
+            overflow: visible;
+        }
+
+        .battle-unit.boss-unit {
+            border-color: #ef4444;
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.7);
+            width: 108px;
+            height: 154px;
+        }
+
+        .battle-unit img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+
+        .battle-unit .unit-lv {
+            position: absolute;
+            top: -10px;
+            right: -6px;
+            background: #ffc831;
+            color: #000;
+            font-weight: 900;
+            font-size: 0.65rem;
+            padding: 2px 5px;
+            border-radius: 4px;
+            z-index: 5;
+        }
+        .battle-unit.boss-unit .unit-lv { background: #ef4444; color: #fff; }
+
+        /* Health Bar Unit */
+        .unit-hp-bar-container {
+            position: absolute;
+            top: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 8px;
+            background: rgba(0,0,0,0.8);
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+        }
+
+        .unit-hp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #10b981);
+            width: 100%;
+            transition: width 0.2s ease;
+        }
+
+        .battle-unit.boss-unit .unit-hp-fill {
+            background: linear-gradient(90deg, #ef4444, #f87171);
+        }
+
+        /* Floating Damage Text */
+        .damage-pop {
+            position: absolute;
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: #ff3333;
+            text-shadow: 0 0 6px #000;
+            pointer-events: none;
+            animation: floatUp 0.6s ease-out forwards;
+            z-index: 50;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1.2); }
+            100% { opacity: 0; transform: translateY(-30px) scale(0.8); }
+        }
+
+        /* Result Panel */
+        .result-panel {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(5, 5, 10, 0.92);
+            z-index: 200;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            padding: 20px;
+        }
+
+        .result-card {
+            background: rgba(18, 22, 38, 0.94);
+            border: 2px solid rgba(255, 200, 49, 0.35);
+            border-radius: 26px;
+            padding: 32px 38px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.85);
+            min-width: 360px;
+            max-width: 540px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .result-title {
+            font-size: 3.2rem;
+            font-weight: 900;
+            margin: 0;
+            line-height: 1;
+        }
+
+        .win { color: #00ff88; text-shadow: 0 0 25px rgba(0, 255, 136, 0.6); }
+        .lose { color: #ef4444; text-shadow: 0 0 25px rgba(239, 68, 68, 0.6); }
+
+        .reward-info-box {
+            margin: 22px 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .result-reward-row {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 200, 49, 0.25);
+            border-radius: 14px;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .result-reward-row.xmas {
+            background: linear-gradient(90deg, rgba(255, 59, 92, 0.16), rgba(255, 209, 102, 0.16));
+            border-color: rgba(255, 209, 102, 0.55);
+            color: #ffe8a3;
+        }
+
+        .result-reward-row.no-repeat {
+            opacity: 0.6;
+            border-style: dashed;
+            border-color: rgba(148, 163, 184, 0.4);
+            color: #cbd5e1;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .btn-next-floor {
+            padding: 13px 28px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            font-family: 'Kanit', sans-serif;
+            background: linear-gradient(135deg, #00ff88, #10b981);
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            color: #06130d;
+            box-shadow: 0 0 22px rgba(0, 255, 136, 0.42);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-next-floor:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.72);
+        }
+
+        .btn-return {
+            padding: 13px 28px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            font-family: 'Kanit', sans-serif;
+            background: linear-gradient(135deg, #ffc831, #ff9000);
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            color: #000;
+            box-shadow: 0 0 20px rgba(255, 200, 49, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-return:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 200, 49, 0.7);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="battle-stage">
+        <div class="grid-bg"></div>
+
+        <!-- Left Team Switcher Panel -->
+        <aside class="left-team-dock" id="left-team-dock">
+            <div class="dock-header">
+                <span><i class="fas fa-exchange-alt"></i> สลับทีม</span>
+                <span style="font-size: 0.72rem; color: #94a3b8;">10วิ / กลับ 15วิ</span>
+            </div>
+
+            <div class="dock-cooldown-banner" id="dock-cooldown-banner">
+                พร้อมสลับทีม
+            </div>
+
+            <div class="team-switch-card active-wave" id="switch-card-1">
+                <div class="team-switch-top">
+                    <span style="color: #00e5ff;">🛡️ ทีม 1</span>
+                    <span id="switch-status-1" style="color: #00ff88; font-size: 0.7rem;">กำลังรบ</span>
+                </div>
+                <div class="team-mini-thumbs" id="mini-thumbs-1"></div>
+                <button class="btn-switch-team" id="btn-switch-1" onclick="requestSwitchTeam(1)">ใช้งานทีม 1</button>
+            </div>
+
+            <div class="team-switch-card" id="switch-card-2">
+                <div class="team-switch-top">
+                    <span style="color: #ffc831;">⚔️ ทีม 2</span>
+                    <span id="switch-status-2" style="color: #94a3b8; font-size: 0.7rem;">สแตนด์บาย</span>
+                </div>
+                <div class="team-mini-thumbs" id="mini-thumbs-2"></div>
+                <button class="btn-switch-team" id="btn-switch-2" onclick="requestSwitchTeam(2)">สลับทีม </button>
+            </div>
+        </aside>
+
+        <!-- Top HUD -->
+        <div class="top-hud">
+            <!-- ทีมผู้เล่น (ทีม 1 หรือทีม 2 ที่กำลังสู้ สูงสุดทีมละ 4 ใบ) -->
+            <div class="player-info">
+                <div style="font-weight: bold; color: #ffc831;" id="active-team-label">ทีมผู้เล่น</div>
+                <div style="font-size: 0.8rem; color: #a0aec0;" id="player-status-sub">กำลังรบในแนวหน้า</div>
+                <div class="team-hp-bar">
+                    <div class="team-hp-fill player-hp-fill" id="player-team-hp-bar"></div>
+                </div>
+            </div>
+
+            <div class="center-hud-box">
+                <div class="vs-badge">VS</div>
+                <div class="floor-indicator" id="floor-title-badge">ชั้นที่ 1</div>
+                <div class="mode-hud-pill" id="mode-hud-pill">NORMAL</div>
+                <div class="xmas-hud-pill" id="xmas-hud-pill">🍪 CHRISTMAS EVENT</div>
+            </div>
+
+            <!-- ฝ่ายบอส -->
+            <div class="enemy-info">
+                <div style="font-weight: bold; color: #ef4444;" id="boss-hud-name">บอสประจำชั้น</div>
+                <div style="font-size: 0.8rem; color: #a0aec0;" id="boss-behavior-tag">พฤติกรรม: ปกติ</div>
+                <div class="team-hp-bar">
+                    <div class="team-hp-fill enemy-hp-fill" id="boss-team-hp-bar"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Field for 2D Cards -->
+        <div class="field" id="battle-field"></div>
+
+        <!-- Overlay Countdown Screen -->
+        <div class="overlay-screen" id="countdown-screen">
+            <div class="countdown-text" id="countdown-num">กำลังโหลด...</div>
+        </div>
+
+        <!-- Match Result Modal -->
+        <div class="result-panel" id="result-screen">
+            <div class="result-card">
+                <div class="result-title" id="result-title">VICTORY!</div>
+                <div class="reward-info-box" id="reward-details-text">รับรางวัลสำเร็จ!</div>
+                <div class="result-actions">
+                    <button class="btn-next-floor" id="btn-next-floor" style="display: none;" onclick="goToNextFloor()">
+                        <i class="fas fa-forward"></i> ไปด่านถัดไป (<span id="next-floor-label">ชั้นที่ 2</span>)
+                    </button>
+                    <button class="btn-return" onclick="window.location.href='tower.html'">
+                        <i class="fas fa-chess-rook"></i> กลับสู่หอคอย
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc, increment, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const db = getFirestore(initializeApp({ 
+        apiKey: "AIzaSyCLgMyUiSZcIdBXnefK3SHQiVpSaBm8xoM", authDomain: "sign-up-73f99.firebaseapp.com", 
+        projectId: "sign-up-73f99", storageBucket: "sign-up-73f99.appspot.com", 
+        messagingSenderId: "916335559099", appId: "1:916335559099:web:3a8ed896ba26e38991849e" 
+    }));
+    const auth = getAuth();
+
+    const XMAS_COOKIE_DEADLINE = new Date("2027-01-10T23:59:59").getTime();
+    // อัตราของรางวัล (เหรียญ & เพชร) เมื่อเล่นชั้นที่เคยเคลียร์แล้วซ้ำ (35% ของรางวัลครั้งแรก)
+    const REPEAT_REWARD_RATIO = 0.35;
+
+    const MODE_CONFIG = {
+        NORMAL: {
+            key: 'NORMAL',
+            label: 'Normal',
+            maxFloors: 50,
+            lvPerFloor: 10,
+            baseScale: 1.0,
+            maxScaleBonus: 4.5,
+            rewardMult: 1.0,
+            cookieMult: 1.0,
+            bonusCoinsPerFloor: 0,
+            bonusDiamondsPerFloor: 0,
+            bonusCookiesPerFloor: 0,
+            bossAtkMult: 1.0,
+            playerDmgMult: 1.0
+        },
+        HARDCORE: {
+            key: 'HARDCORE',
+            label: 'Hardcore',
+            maxFloors: 30,
+            lvPerFloor: 15,
+            baseScale: 2.35,
+            maxScaleBonus: 5.2,
+            rewardMult: 2.4,
+            cookieMult: 2.2,
+            bonusCoinsPerFloor: 1200,
+            bonusDiamondsPerFloor: 40,
+            bonusCookiesPerFloor: 150,
+            bossAtkMult: 1.25,
+            playerDmgMult: 0.95
+        },
+        CHALLENGE: {
+            key: 'CHALLENGE',
+            label: 'Challenge',
+            maxFloors: 20,
+            lvPerFloor: 20,
+            baseScale: 3.4,
+            maxScaleBonus: 6.5,
+            rewardMult: 3.5,
+            cookieMult: 3.2,
+            bonusCoinsPerFloor: 2500,
+            bonusDiamondsPerFloor: 90,
+            bonusCookiesPerFloor: 300,
+            bossAtkMult: 1.4,
+            playerDmgMult: 0.85
+        }
+    };
+
+    const rawMode = (sessionStorage.getItem("tower_battle_mode") || "NORMAL").toUpperCase();
+    const currentMode = MODE_CONFIG[rawMode] ? rawMode : "NORMAL";
+    const modeCfg = MODE_CONFIG[currentMode];
+
+    function isXmasCookieEventActive() {
+        return Date.now() <= XMAS_COOKIE_DEADLINE;
+    }
+
+    function calculateModeFloorRewards(floorNum, modeKey = currentMode) {
+        const cfg = MODE_CONFIG[modeKey] || MODE_CONFIG.NORMAL;
+        const isMilestone5 = floorNum % 5 === 0;
+        const milestoneBonusMult = isMilestone5 ? 1.5 : 1.0;
+
+        return {
+            coins: Math.floor(((floorNum * 1500) + cfg.bonusCoinsPerFloor) * cfg.rewardMult * milestoneBonusMult),
+            diamonds: Math.floor(((floorNum * 50) + cfg.bonusDiamondsPerFloor) * cfg.rewardMult * milestoneBonusMult),
+            cookies: Math.floor(((floorNum * 250) + cfg.bonusCookiesPerFloor) * cfg.cookieMult * milestoneBonusMult)
+        };
+    }
+
+    function getRepeatFloorRewards(baseCoins, baseDiamonds) {
+        return {
+            coins: Math.max(100, Math.floor(baseCoins * REPEAT_REWARD_RATIO)),
+            diamonds: Math.max(5, Math.floor(baseDiamonds * REPEAT_REWARD_RATIO)),
+            cookies: 0 // หน่วยเงินอีเว้นไม่สามารถรับซ้ำได้อีก
+        };
+    }
+
+    function isFloorAlreadyClearedInMode(uData, floorNum, modeKey) {
+        if (!uData) return false;
+        if (modeKey === "NORMAL") {
+            const maxF = Math.min(50, Math.max(1, Number(uData.tower_floor || uData.tower_modes?.NORMAL?.maxFloor || 1)));
+            const claimedList = Array.isArray(uData.tower_claimed_floors)
+                ? uData.tower_claimed_floors
+                : (Array.isArray(uData.tower_modes?.NORMAL?.claimedFloors) ? uData.tower_modes.NORMAL.claimedFloors : []);
+            return floorNum < maxF || claimedList.includes(floorNum);
+        }
+        if (modeKey === "HARDCORE") {
+            const maxF = Math.min(30, Math.max(1, Number(uData.tower_modes?.HARDCORE?.maxFloor ?? uData.tower_hardcore_floor ?? 1)));
+            const claimedList = Array.isArray(uData.tower_modes?.HARDCORE?.claimedFloors)
+                ? uData.tower_modes.HARDCORE.claimedFloors
+                : (Array.isArray(uData.tower_hardcore_claimed_floors) ? uData.tower_hardcore_claimed_floors : []);
+            return floorNum < maxF || claimedList.includes(floorNum);
+        }
+        if (modeKey === "CHALLENGE") {
+            const maxF = Math.min(20, Math.max(1, Number(uData.tower_modes?.CHALLENGE?.maxFloor ?? uData.tower_challenge_floor ?? 1)));
+            const claimedList = Array.isArray(uData.tower_modes?.CHALLENGE?.claimedFloors)
+                ? uData.tower_modes.CHALLENGE.claimedFloors
+                : (Array.isArray(uData.tower_challenge_claimed_floors) ? uData.tower_challenge_claimed_floors : []);
+            return floorNum < maxF || claimedList.includes(floorNum);
+        }
+        return false;
+    }
+
+    let currentFloor = Math.min(modeCfg.maxFloors, Math.max(1, Number(sessionStorage.getItem("tower_battle_floor")) || 1));
+    const rawTeam1 = (JSON.parse(sessionStorage.getItem("tower_team_1")) || []).slice(0, 4);
+    const rawTeam2 = (JSON.parse(sessionStorage.getItem("tower_team_2")) || []).slice(0, 4);
+
+    let currentUserUid = null;
+    const field = document.getElementById('battle-field');
+    let battleActive = false;
+    let countdownTimerId = null;
+
+    // ระบบคูลดาวน์สลับทีม: เปลี่ยนไปทีมอื่น = 10 วิ, กลับไปทีมเดิม = 15 วิ
+    const SWITCH_TO_OTHER_CD_SEC = 10;
+    const RETURN_TO_PREV_CD_SEC = 15;
+    let cooldownRemainingSec = 0;
+    let lastSwitchedAwayTeam = null;
+    let cooldownIntervalId = null;
+
+    const bossPool = [
+        { name: "Strawberry Mochi Cookie", baseHp: 5000, baseAtk: 400, img: "https://cookierunbraverse.com/data/en_storage/Il_rWV5TYuqxPZp0ay7nHQ.webp" },
+        { name: "Kouign-Amann Cookie", baseHp: 6500, baseAtk: 500, img: "https://cookierunbraverse.com/data/en_storage/JxV8tyZYxtNMn3SpFORykw.webp" },
+        { name: "Mint Choco Cookie", baseHp: 9000, baseAtk: 750, img: "https://cookierunbraverse.com/data/en_storage/cfYD8PCfmUt0STqcoFxHNA.webp" },
+        { name: "DJ Miya", baseHp: 11000, baseAtk: 900, img: "https://cookierunbraverse.com/data/en_storage/xfOWxLcUUMOn_SIZEM2CPA.webp" },
+        { name: "Pure Vanilla Cookie", baseHp: 18000, baseAtk: 1400, img: "https://cookierunbraverse.com/data/en_storage/v3sriD5Yu_o7COb4ttgqTw.webp" },
+        { name: "White Lily Cookie", baseHp: 22000, baseAtk: 1800, img: "https://cookierunbraverse.com/data/en_storage/d13fpF4FiA0yxYJ5qr6yig.webp" },
+        { name: "Poison Mushroom Cookie", baseHp: 45000, baseAtk: 3500, img: "https://cookierunbraverse.com/data/en_storage/4JZ692x-o-ukC_4jSm_ItA.webp" }
+    ];
+
+    let boss = null;
+    let team1Units = [];
+    let team2Units = [];
+    
+    let currentActiveTeamWave = 1;
+    let activeUnits = [];
+
+    function createBossForFloor(floorNum, modeKey = currentMode) {
+        const cfg = MODE_CONFIG[modeKey] || MODE_CONFIG.NORMAL;
+        const bossTemplate = bossPool[(floorNum - 1) % bossPool.length];
+        const bossLv = Math.min(150, floorNum * cfg.lvPerFloor);
+        const levelProgress = (bossLv - 1) / 149;
+        const scaleFactor = cfg.baseScale + (levelProgress * cfg.maxScaleBonus);
+
+        return {
+            id: `boss_unit`,
+            name: bossTemplate.name,
+            level: bossLv,
+            hp: Math.floor(bossTemplate.baseHp * scaleFactor),
+            maxHp: Math.floor(bossTemplate.baseHp * scaleFactor),
+            atk: Math.floor(bossTemplate.baseAtk * scaleFactor * cfg.bossAtkMult),
+            speed: modeKey === "CHALLENGE" ? 3.2 : (modeKey === "HARDCORE" ? 2.9 : 2.5),
+            x: 0,
+            y: 0,
+            img: bossTemplate.img,
+            isBoss: true
+        };
+    }
+
+    function updateFloorHUD() {
+        document.getElementById('floor-title-badge').innerText = `ชั้นที่ ${currentFloor}`;
+        const modePill = document.getElementById('mode-hud-pill');
+        if (modePill) {
+            modePill.innerText = `${modeCfg.label.toUpperCase()} (${modeCfg.maxFloors} ชั้น)`;
+            if (currentMode === "HARDCORE") {
+                modePill.style.background = "rgba(255, 77, 77, 0.2)";
+                modePill.style.color = "#ff8a8a";
+                modePill.style.borderColor = "rgba(255, 77, 77, 0.5)";
+            } else if (currentMode === "CHALLENGE") {
+                modePill.style.background = "rgba(192, 132, 252, 0.2)";
+                modePill.style.color = "#e9d5ff";
+                modePill.style.borderColor = "rgba(192, 132, 252, 0.5)";
+            } else {
+                modePill.style.background = "rgba(255, 200, 49, 0.16)";
+                modePill.style.color = "#ffc831";
+                modePill.style.borderColor = "rgba(255, 200, 49, 0.4)";
+            }
+        }
+
+        document.getElementById('boss-hud-name').innerText = `${boss.name} (Lv.${boss.level})`;
+        document.getElementById('xmas-hud-pill').innerText = isXmasCookieEventActive()
+            ? "🍪 คุกกี้ CHRISTMAS EVENT (ถึง 10 ม.ค. 2027)"
+            : "🍪 หมดเขตกิจกรรมคุกกี้แล้ว (10 ม.ค. 2027)";
+
+        let bossBehaviorText = "ปกติ";
+        if (currentMode === "CHALLENGE") bossBehaviorText = "👑 ชาเลนจ์โหดจัด";
+        else if (currentMode === "HARDCORE") bossBehaviorText = "🔥 ฮาร์ดคอร์ดุเดือด";
+        else if (boss.level <= 30) bossBehaviorText = "🛡️ สงบนิ่ง";
+        else if (boss.level <= 70) bossBehaviorText = "💨 หลบหลีก";
+        else if (boss.level <= 110) bossBehaviorText = "⚔️ โต้กลับปานกลาง";
+        else bossBehaviorText = "🔥 โจมตีรุนแรงดุเดือด";
+        document.getElementById('boss-behavior-tag').innerText = `พฤติกรรม: ${bossBehaviorText}`;
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            alert("กรุณาล็อกอินก่อนเข้าสู่สนามรบหอคอย");
+            window.location.href = "login.html";
+            return;
+        }
+        currentUserUid = user.uid;
+
+        if (rawTeam1.length === 0 && rawTeam2.length === 0) {
+            alert("ไม่พบข้อมูลทีมต่อสู้ กรุณาจัดทีมก่อนเข้าสู่หอคอย");
+            window.location.href = "tower_4.html";
+            return;
+        }
+
+        initFloorBattle(currentFloor, true);
+    });
+
+    function initFloorBattle(floorNum, checkServerCleared = false) {
+        currentFloor = Math.min(modeCfg.maxFloors, Math.max(1, floorNum));
+        sessionStorage.setItem("tower_battle_floor", String(currentFloor));
+
+        battleActive = false;
+        cooldownRemainingSec = 0;
+        lastSwitchedAwayTeam = null;
+        if (cooldownIntervalId) {
+            clearInterval(cooldownIntervalId);
+            cooldownIntervalId = null;
+        }
+        if (countdownTimerId) {
+            clearInterval(countdownTimerId);
+            countdownTimerId = null;
+        }
+
+        document.getElementById('result-screen').style.display = 'none';
+        document.getElementById('btn-next-floor').style.display = 'none';
+
+        boss = createBossForFloor(currentFloor, currentMode);
+        team1Units = formatUnits(rawTeam1, 't1');
+        team2Units = formatUnits(rawTeam2, 't2');
+
+        updateFloorHUD();
+
+        if (checkServerCleared && currentUserUid) {
+            getDoc(doc(db, "users", currentUserUid)).then(snap => {
+                if (snap.exists()) {
+                    const cleared = isFloorAlreadyClearedInMode(snap.data(), currentFloor, currentMode);
+                    sessionStorage.setItem("tower_already_cleared", String(cleared));
+                }
+            }).catch(() => {});
+        } else {
+            sessionStorage.setItem("tower_already_cleared", "false");
+        }
+
+        const initialWave = team1Units.length > 0 ? 1 : 2;
+        setupWave(initialWave, false);
+        startCountdown();
+    }
+
+    window.goToNextFloor = () => {
+        if (currentFloor >= modeCfg.maxFloors) return;
+        initFloorBattle(currentFloor + 1, false);
+    };
+
+    function formatUnits(rawList, prefix) {
+        return rawList.map((c, idx) => {
+            const lv = Number(c.level || 1);
+            const stars = Number(c.stars || 0);
+            const hp = 800 + (lv * 150) + (stars * 300);
+            const baseAtk = 120 + (lv * 35) + (stars * 50);
+
+            return {
+                id: `${prefix}_${idx}`,
+                name: c.name || 'Cookie',
+                level: lv,
+                hp: hp,
+                maxHp: hp,
+                atk: Math.floor(baseAtk * modeCfg.playerDmgMult),
+                speed: 3.5 + (Math.random() * 1),
+                x: 0,
+                y: 0,
+                img: c.img || c.image || '',
+                isBoss: false
+            };
+        });
+    }
+
+    function renderLeftTeamDock() {
+        const teamsMap = { 1: team1Units, 2: team2Units };
+        const banner = document.getElementById('dock-cooldown-banner');
+
+        if (banner) {
+            if (cooldownRemainingSec > 0) {
+                banner.classList.add('active-cd');
+                banner.innerHTML = `<i class="fas fa-hourglass-half"></i> คูลดาวน์สลับทีม: <b>${cooldownRemainingSec}s</b>`;
+            } else {
+                banner.classList.remove('active-cd');
+                banner.innerHTML = `<i class="fas fa-bolt" style="color:#00ff88;"></i> พร้อมสลับทีม (เปลี่ยน 10วิ / กลับเดิม 15วิ)`;
+            }
+        }
+
+        [1, 2].forEach(tNum => {
+            const units = teamsMap[tNum] || [];
+            const cardEl = document.getElementById(`switch-card-${tNum}`);
+            const statusEl = document.getElementById(`switch-status-${tNum}`);
+            const thumbsEl = document.getElementById(`mini-thumbs-${tNum}`);
+            const btnEl = document.getElementById(`btn-switch-${tNum}`);
+
+            const isCurrent = currentActiveTeamWave === tNum;
+            const aliveCount = units.filter(u => u.hp > 0).length;
+
+            if (cardEl) {
+                cardEl.classList.toggle('active-wave', isCurrent);
+            }
+
+            if (thumbsEl) {
+                thumbsEl.innerHTML = "";
+                for (let i = 0; i < 4; i++) {
+                    const u = units[i];
+                    if (u && u.img) {
+                        const img = document.createElement('img');
+                        img.src = u.img;
+                        img.alt = u.name;
+                        img.className = `team-mini-thumb ${u.hp <= 0 ? 'dead' : ''}`;
+                        thumbsEl.appendChild(img);
+                    } else {
+                        const emptySlot = document.createElement('div');
+                        emptySlot.className = 'team-mini-thumb empty';
+                        emptySlot.innerText = '-';
+                        thumbsEl.appendChild(emptySlot);
+                    }
+                }
+            }
+
+            if (statusEl) {
+                if (isCurrent) {
+                    statusEl.style.color = '#00ff88';
+                    statusEl.innerText = 'กำลังรบ';
+                } else if (aliveCount > 0) {
+                    statusEl.style.color = '#ffc831';
+                    statusEl.innerText = `พร้อม (${aliveCount})`;
+                } else {
+                    statusEl.style.color = '#ef4444';
+                    statusEl.innerText = 'หมดสภาพ';
+                }
+            }
+
+            if (btnEl) {
+                if (isCurrent) {
+                    btnEl.disabled = true;
+                    btnEl.innerText = 'กำลังใช้งาน';
+                } else if (units.length === 0 || aliveCount === 0) {
+                    btnEl.disabled = true;
+                    btnEl.innerText = units.length === 0 ? 'ไม่มีการ์ด' : 'ทีมหมดสภาพ';
+                } else if (cooldownRemainingSec > 0) {
+                    btnEl.disabled = true;
+                    btnEl.innerText = `รอ ${cooldownRemainingSec}วิ`;
+                } else {
+                    btnEl.disabled = false;
+                    const isReturningToPrev = lastSwitchedAwayTeam === tNum;
+                    btnEl.innerText = isReturningToPrev ? `กลับไปทีม ${tNum} (15วิ)` : `สลับไปทีม ${tNum} (10วิ)`;
+                }
+            }
+        });
+    }
+
+    function startSwitchCooldown(seconds) {
+        cooldownRemainingSec = seconds;
+        if (cooldownIntervalId) {
+            clearInterval(cooldownIntervalId);
+            cooldownIntervalId = null;
+        }
+        renderLeftTeamDock();
+
+        cooldownIntervalId = setInterval(() => {
+            cooldownRemainingSec = Math.max(0, cooldownRemainingSec - 1);
+            renderLeftTeamDock();
+            if (cooldownRemainingSec <= 0) {
+                clearInterval(cooldownIntervalId);
+                cooldownIntervalId = null;
+            }
+        }, 1000);
+    }
+
+    window.requestSwitchTeam = (targetWave) => {
+        if (!battleActive) return;
+        if (targetWave === currentActiveTeamWave) return;
+        if (cooldownRemainingSec > 0) return;
+
+        const targetUnits = targetWave === 1 ? team1Units : team2Units;
+        const aliveTarget = targetUnits.filter(u => u.hp > 0);
+        if (aliveTarget.length === 0) return;
+
+        const isReturningToPrev = lastSwitchedAwayTeam === targetWave;
+        const cdSec = isReturningToPrev ? RETURN_TO_PREV_CD_SEC : SWITCH_TO_OTHER_CD_SEC;
+
+        lastSwitchedAwayTeam = currentActiveTeamWave;
+        setupWave(targetWave, false);
+        startSwitchCooldown(cdSec);
+    };
+
+    function setupWave(waveNum, preserveBossPos = false) {
+        currentActiveTeamWave = waveNum;
+        const sourceList = waveNum === 1 ? team1Units : team2Units;
+        activeUnits = sourceList.filter(u => u.hp > 0);
+
+        document.getElementById('active-team-label').innerText = waveNum === 1
+            ? `ทีมผู้เล่น (ชุดที่ 1 • ${activeUnits.length}/${team1Units.length} ใบ)`
+            : `⚔️ ทีมผู้เล่น (ชุดที่ 2 • ${activeUnits.length}/${team2Units.length} ใบ)`;
+        document.getElementById('player-status-sub').innerText = waveNum === 1
+            ? "กำลังรบในแนวหน้า (ทีม 1)"
+            : "กำลังรบในแนวหน้า (ทีม 2)";
+
+        field.innerHTML = '';
+        spawnBoardEntities(preserveBossPos);
+        updateHUD();
+        renderLeftTeamDock();
+    }
+
+    function spawnBoardEntities(preserveBossPos = false) {
+        const stageHeight = window.innerHeight;
+        const stageWidth = window.innerWidth;
+
+        if (!preserveBossPos || (boss.x === 0 && boss.y === 0)) {
+            boss.x = stageWidth - 220;
+            boss.y = stageHeight / 2 - 77;
+        }
+        createCardElem(boss);
+
+        activeUnits.forEach((u, idx) => {
+            const colOffset = (idx % 2) * 55;
+            u.x = 225 + colOffset;
+            u.y = ((stageHeight - 120) / (activeUnits.length + 1)) * (idx + 1) + 40;
+            createCardElem(u);
+        });
+    }
+
+    function createCardElem(c) {
+        const div = document.createElement('div');
+        div.id = `card-${c.id}`;
+        div.className = `battle-unit ${c.isBoss ? 'boss-unit' : ''}`;
+        div.style.left = `${c.x}px`;
+        div.style.top = `${c.y}px`;
+        div.innerHTML = `
+            <div class="unit-lv">Lv.${c.level}</div>
+            <div class="unit-hp-bar-container">
+                <div class="unit-hp-fill" id="hp-${c.id}"></div>
+            </div>
+            <img src="${c.img}" alt="${c.name}">
+        `;
+        field.appendChild(div);
+        updateUnitHpUI(c);
+    }
+
+    function updateUnitHpUI(c) {
+        const fill = document.getElementById(`hp-${c.id}`);
+        if (fill) {
+            const pct = Math.max(0, (c.hp / c.maxHp) * 100);
+            fill.style.width = `${pct}%`;
+        }
+    }
+
+    function startCountdown() {
+        let count = 3;
+        const overlay = document.getElementById('countdown-screen');
+        const numElem = document.getElementById('countdown-num');
+        numElem.style.fontSize = "5rem";
+        numElem.innerText = count;
+        overlay.style.display = 'flex';
+
+        countdownTimerId = setInterval(() => {
+            count--;
+            if (count > 0) {
+                numElem.innerText = count;
+            } else if (count === 0) {
+                numElem.style.fontSize = "3.5rem";
+                numElem.innerText = `${modeCfg.label} • ชั้นที่ ${currentFloor} เปิดฉาก!`;
+            } else {
+                clearInterval(countdownTimerId);
+                countdownTimerId = null;
+                overlay.style.display = 'none';
+                battleActive = true;
+                renderLeftTeamDock();
+                requestAnimationFrame(gameLoop);
+            }
+        }, 1000);
+    }
+
+    function updateHUD() {
+        const totalMax = activeUnits.reduce((acc, u) => acc + u.maxHp, 0);
+        const totalCurrent = activeUnits.reduce((acc, u) => acc + Math.max(0, u.hp), 0);
+        const pPct = totalMax > 0 ? (totalCurrent / totalMax) * 100 : 0;
+        document.getElementById('player-team-hp-bar').style.width = `${pPct}%`;
+
+        const bPct = Math.max(0, (boss.hp / boss.maxHp) * 100);
+        document.getElementById('boss-team-hp-bar').style.width = `${bPct}%`;
+    }
+
+    function gameLoop() {
+        if (!battleActive) return;
+
+        activeUnits = activeUnits.filter(u => u.hp > 0);
+
+        if (boss.hp <= 0) {
+            battleActive = false;
+            showResult(true);
+            return;
+        }
+
+        if (activeUnits.length === 0) {
+            const otherWave = currentActiveTeamWave === 1 ? 2 : 1;
+            const otherUnitsAlive = (otherWave === 1 ? team1Units : team2Units).filter(u => u.hp > 0);
+
+            if (otherUnitsAlive.length > 0) {
+                battleActive = false;
+                setTimeout(() => {
+                    lastSwitchedAwayTeam = currentActiveTeamWave;
+                    setupWave(otherWave, true);
+                    battleActive = true;
+                    requestAnimationFrame(gameLoop);
+                }, 800);
+                return;
+            } else {
+                battleActive = false;
+                showResult(false);
+                return;
+            }
+        }
+
+        activeUnits.forEach(unit => updateUnitBehavior(unit, boss));
+        updateUnitBehavior(boss, activeUnits);
+
+        updateHUD();
+        renderLeftTeamDock();
+        requestAnimationFrame(gameLoop);
+    }
+
+    function updateUnitBehavior(unit, target) {
+        if (!target || target.hp <= 0) return;
+
+        let dist = Math.hypot(target.x - unit.x, target.y - unit.y);
+
+        if (dist > 90) {
+            let angle = Math.atan2(target.y - unit.y, target.x - unit.x);
+            unit.x += Math.cos(angle) * unit.speed;
+            unit.y += Math.sin(angle) * unit.speed;
+
+            const elem = document.getElementById(`card-${unit.id}`);
+            if (elem) {
+                elem.style.left = `${unit.x}px`;
+                elem.style.top = `${unit.y}px`;
+            }
+        } else {
+            const attackCd = currentMode === "CHALLENGE" ? 750 : (currentMode === "HARDCORE" ? 820 : 900);
+            if (!unit.lastAttack || Date.now() - unit.lastAttack > attackCd) {
+                unit.lastAttack = Date.now();
+                performAttack(unit, target);
+            }
+        }
+    }
+
+    function performAttack(attacker, target) {
+        const elem = document.getElementById(`card-${attacker.id}`);
+        if (elem) {
+            elem.style.transform = 'scale(1.2)';
+            setTimeout(() => elem.style.transform = 'scale(1)', 150);
+        }
+
+        let dmg = Math.floor(attacker.atk * (0.9 + Math.random() * 0.3));
+        target.hp = Math.max(0, target.hp - dmg);
+
+        updateUnitHpUI(target);
+        showDamagePop(target.x + 35, target.y - 10, dmg);
+
+        if (target.hp <= 0) {
+            const targetElem = document.getElementById(`card-${target.id}`);
+            if (targetElem) {
+                targetElem.style.opacity = '0';
+                setTimeout(() => targetElem.remove(), 400);
+            }
+        }
+    }
+
+    function showDamagePop(x, y, text) {
+        const pop = document.createElement('div');
+        pop.className = 'damage-pop';
+        pop.style.left = `${x}px`;
+        pop.style.top = `${y}px`;
+        pop.innerText = `-${text}`;
+        field.appendChild(pop);
+        setTimeout(() => pop.remove(), 600);
+    }
+
+    async function showResult(isWin) {
+        if (cooldownIntervalId) {
+            clearInterval(cooldownIntervalId);
+            cooldownIntervalId = null;
+        }
+        const resPanel = document.getElementById('result-screen');
+        const resTitle = document.getElementById('result-title');
+        const rewardText = document.getElementById('reward-details-text');
+        const nextBtn = document.getElementById('btn-next-floor');
+        const nextLabel = document.getElementById('next-floor-label');
+
+        nextBtn.style.display = 'none';
+        resPanel.style.display = 'flex';
+
+        if (isWin) {
+            resTitle.innerText = "VICTORY!";
+            resTitle.className = "result-title win";
+
+            const baseRewards = calculateModeFloorRewards(currentFloor, currentMode);
+            let alreadyCleared = sessionStorage.getItem("tower_already_cleared") === "true";
+
+            let grantedCoins = baseRewards.coins;
+            let grantedDiamonds = baseRewards.diamonds;
+            let grantedCookies = isXmasCookieEventActive() ? baseRewards.cookies : 0;
+
+            if (currentUserUid) {
+                try {
+                    const userRef = doc(db, "users", currentUserUid);
+                    const userSnap = await getDoc(userRef);
+                    if (userSnap.exists()) {
+                        const uData = userSnap.data();
+
+                        if (isFloorAlreadyClearedInMode(uData, currentFloor, currentMode)) {
+                            alreadyCleared = true;
+                        }
+
+                        if (alreadyCleared) {
+                            const repeatRewards = getRepeatFloorRewards(baseRewards.coins, baseRewards.diamonds);
+                            grantedCoins = repeatRewards.coins;
+                            grantedDiamonds = repeatRewards.diamonds;
+                            grantedCookies = 0; // หน่วยเงินอีเว้นรับซ้ำไม่ได้อีก
+                        }
+
+                        const nextFloor = Math.min(modeCfg.maxFloors, currentFloor + 1);
+                        let updatePayload = {};
+
+                        if (currentMode === "NORMAL") {
+                            const prevMax = Math.min(50, Math.max(1, Number(uData.tower_floor || 1)));
+                            const updatedMax = Math.max(prevMax, nextFloor);
+                            updatePayload.tower_floor = updatedMax;
+                            updatePayload["tower_modes.NORMAL.maxFloor"] = updatedMax;
+                            updatePayload.tower_claimed_floors = arrayUnion(currentFloor);
+                            updatePayload["tower_modes.NORMAL.claimedFloors"] = arrayUnion(currentFloor);
+                        } else if (currentMode === "HARDCORE") {
+                            const prevHcMax = Math.min(30, Math.max(1, Number(uData.tower_modes?.HARDCORE?.maxFloor ?? uData.tower_hardcore_floor ?? 1)));
+                            const updatedHcMax = Math.max(prevHcMax, nextFloor);
+                            updatePayload["tower_modes.HARDCORE.maxFloor"] = updatedHcMax;
+                            updatePayload.tower_hardcore_floor = updatedHcMax;
+                            updatePayload["tower_modes.HARDCORE.claimedFloors"] = arrayUnion(currentFloor);
+                            updatePayload.tower_hardcore_claimed_floors = arrayUnion(currentFloor);
+                        } else if (currentMode === "CHALLENGE") {
+                            const prevChMax = Math.min(20, Math.max(1, Number(uData.tower_modes?.CHALLENGE?.maxFloor ?? uData.tower_challenge_floor ?? 1)));
+                            const updatedChMax = Math.max(prevChMax, nextFloor);
+                            updatePayload["tower_modes.CHALLENGE.maxFloor"] = updatedChMax;
+                            updatePayload.tower_challenge_floor = updatedChMax;
+                            updatePayload["tower_modes.CHALLENGE.claimedFloors"] = arrayUnion(currentFloor);
+                            updatePayload.tower_challenge_claimed_floors = arrayUnion(currentFloor);
+                        }
+
+                        updatePayload.points = increment(grantedCoins);
+                        updatePayload.diamonds = increment(grantedDiamonds);
+                        if (grantedCookies > 0) {
+                            updatePayload.cookie_coins = increment(grantedCookies);
+                        }
+
+                        await updateDoc(userRef, updatePayload);
+                    }
+                } catch (e) {
+                    console.error("บันทึกรางวัลลง Firebase ไม่สำเร็จ:", e);
+                }
+            } else if (alreadyCleared) {
+                const repeatRewards = getRepeatFloorRewards(baseRewards.coins, baseRewards.diamonds);
+                grantedCoins = repeatRewards.coins;
+                grantedDiamonds = repeatRewards.diamonds;
+                grantedCookies = 0;
+            }
+
+            if (currentFloor < modeCfg.maxFloors) {
+                nextLabel.innerText = `ชั้นที่ ${currentFloor + 1}`;
+                nextBtn.style.display = 'inline-flex';
+            }
+
+            const cookieRowHTML = alreadyCleared
+                ? `<div class="result-reward-row no-repeat"><span>🍪 คุกกี้คริสต์มาส (รับซ้ำไม่ได้)</span><span>+0</span></div>`
+                : (grantedCookies > 0
+                    ? `<div class="result-reward-row xmas"><span>🍪 คุกกี้คริสต์มาส (${modeCfg.label})</span><span>+${grantedCookies.toLocaleString()}</span></div>`
+                    : `<div class="result-reward-row" style="opacity:0.65;"><span>🍪 คุกกี้คริสต์มาส</span><span>หมดเขต 10 ม.ค. 2027</span></div>`);
+
+            rewardText.innerHTML = `
+                ${cookieRowHTML}
+                <div class="result-reward-row"><span>🪙 เหรียญ (${modeCfg.label}${alreadyCleared ? ' • ซ้ำ' : ''})</span><span>+${grantedCoins.toLocaleString()}</span></div>
+                <div class="result-reward-row"><span>💎 เพชร (${modeCfg.label}${alreadyCleared ? ' • ซ้ำ' : ''})</span><span>+${grantedDiamonds.toLocaleString()}</span></div>
+            `;
+        } else {
+            resTitle.innerText = "DEFEAT";
+            resTitle.className = "result-title lose";
+            rewardText.innerHTML = `
+                <div style="color:#cbd5e1; font-size:0.98rem;">
+                    ทีมของคุณพ่ายแพ้ต่อบอส <b>${boss.name}</b> ในโหมด <b>${modeCfg.label}</b>...<br>
+                    กลับไปจัดทีม 2 ชุด (ทีมละ 4 ใบ) และอัปเกรดการ์ดใหม่ได้เลย!
+                </div>
+            `;
+        }
+    }
+</script>
+</body>
+</html>
