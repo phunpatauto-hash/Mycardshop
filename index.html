@@ -453,6 +453,13 @@
         @keyframes bluePulse { 0% { box-shadow: 0 0 8px rgba(0, 229, 255, 0.5); } 100% { box-shadow: 0 0 18px rgba(0, 229, 255, 0.9); } }
 
         .nav-whale-title { background: linear-gradient(135deg, rgba(255, 200, 49, 0.2), rgba(255, 159, 0, 0.2)); border: 1px solid #ffc831; color: #ffc831; font-size: 0.65rem; padding: 1px 6px; border-radius: 4px; font-weight: bold; margin-left: 6px; display: inline-block; text-shadow: 0 0 4px rgba(255, 200, 49, 0.5); }
+        .nav-whale-title.christmas-badge {
+            background: linear-gradient(135deg, rgba(214, 40, 57, 0.85), rgba(21, 128, 61, 0.85));
+            border: 1px solid #ffd166;
+            color: #fffdf7;
+            box-shadow: 0 0 10px rgba(255, 209, 102, 0.6);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+        }
         .banner-diamond-shop { background: linear-gradient(135deg, #091a3a 0%, #0055ff 50%, #00e5ff 100%); color: white; border: 1px solid rgba(0, 229, 255, 0.3); box-shadow: 0 0 15px rgba(0, 229, 255, 0.1); }
         .banner-diamond-shop:hover { border-color: #00e5ff; box-shadow: 0 0 25px rgba(0, 229, 255, 0.4); }
         .banner-diamond-shop .shop-glow-icon { color: #00e5ff; text-shadow: 0 0 15px rgba(0, 229, 255, 0.8); }
@@ -556,6 +563,39 @@
             20% { transform: rotate(30deg) translate(100%, 100%); }
             100% { transform: rotate(30deg) translate(100%, 100%); }
         }
+
+        /* --- 🎄 เอฟเฟกต์คริสต์มาสสำหรับยศคริสต์มาสทั้ง 5 ยศ --- */
+        .profile-link.christmas-glossy-bg {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(185, 28, 28, 0.78) 0%, rgba(21, 128, 61, 0.78) 52%, rgba(234, 179, 8, 0.65) 100%);
+            background-size: 250% 250%;
+            animation: christmasFestiveShimmer 5s ease infinite;
+            border: 1.5px solid #ffd166;
+            box-shadow: 0 0 18px rgba(220, 38, 38, 0.65), 0 0 12px rgba(34, 197, 94, 0.55);
+        }
+        .profile-link.christmas-glossy-bg::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 250, 230, 0.35) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(30deg) translate(-100%, -100%);
+            animation: glossySweep 3.5s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes christmasFestiveShimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
     </style>
 </head>
 <body>
@@ -584,6 +624,7 @@
             <li><a href="javascript:void(0)" onclick="checkAuthAndNavigate('Cookie city.html')"><i class="fas fa-city"></i> Cookie city</a></li>
             <li><a href="javascript:void(0)" onclick="checkAuthAndNavigate('Banner Selection.html')"><i class="fas fa-magic"></i> สุ่มการ์ดนำโชค</a></li>
             <li><a href="javascript:void(0)" onclick="checkAuthAndNavigate('Grand Arena.html')" style="color: #e63946;"><i class="fas fa-fist-raised"></i> Grand Arena</a></li>
+            <li><a href="javascript:void(0)" onclick="checkAuthAndNavigate('tower.html')" style="color: #ffc831;"><i class="fas fa-chess-rook"></i> หอคอยแห่งการต่อสู้</a></li>
             <li id="sidebar-logout-item" style="display: none; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
                 <button id="sidebar-logout-btn" style="color: #ff4d4d;"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</button>
             </li>
@@ -758,10 +799,16 @@
                 <i class="fas fa-swords"></i> อารีน่า
             </div>
 
-            <div class="modern-banner" style="background: linear-gradient(135deg, #e63946, #780000); color: white; grid-column: span 2;" onclick="checkAuthAndNavigate('Grand Arena.html')">
+            <div class="modern-banner" style="background: linear-gradient(135deg, #e63946, #780000); color: white;" onclick="checkAuthAndNavigate('Grand Arena.html')">
                 <h3>NEW!!⚔️ Grand Arena</h3>
                 <p>อารีน่าแบบใหม่เปิดให้เล่นแล้ว!!</p>
                 <i class="fas fa-fist-raised main-icon"></i>
+            </div>
+
+            <div class="modern-banner" style="background: linear-gradient(135deg, #ffc831, #b45309); color: #090b12;" onclick="checkAuthAndNavigate('tower.html')">
+                <h3>🏰 หอคอยแห่งการต่อสู้</h3>
+                <p>ต่อสู้กับบอสในแต่ละชั้นยิ่งสูงเท่าไหร่บอสยิ่งโหดและท่าท้ายขึ้นด้วย!</p>
+                <i class="fas fa-chess-rook main-icon"></i>
             </div>
 
             <div class="category-title">
@@ -809,7 +856,7 @@
             </div>
 
             <div class="modern-banner" style="background: linear-gradient(135deg, #ffc831, #ff8c00); color: #000; grid-column: span 2;" onclick="checkAuthAndNavigate('Pass (Battle Pass).html')">
-                <h3>🏆 BATTLE PASS SS9 เส้นเวลาที่ไม่หยุดนิ่ง</h3>
+                <h3>🏆 BATTLE PASS SS8 : คืนแห่งการไถ่บาป Halloween part 2</h3>
                 <p>ทำภารกิจเพื่อรับการ์ดระดับพรีเมียมประจำซีซั่น!</p>
                 <i class="fas fa-trophy main-icon"></i>
             </div>
@@ -863,6 +910,14 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+
+    const CHRISTMAS_TITLES = [
+        "CHRISTMAS is Time",
+        "Nicely wrapped up for the Holidays!",
+        "I decorated the cookie myself! Might be a little bitter haha...",
+        "I'm ready for more fun!",
+        "Bworf! Bork!"
+    ];
 
     window.isUserLoggedIn = false;
 
@@ -1267,21 +1322,28 @@
 
                     const titleDisplay = document.getElementById("user-title-display");
                     const profileLinkBox = document.getElementById("profile-container");
+                    const isChristmasTitle = CHRISTMAS_TITLES.includes(data.currentTitle);
                     
                     if (titleDisplay) {
+                        titleDisplay.classList.remove("christmas-badge");
                         if (data.currentTitle && data.currentTitle !== "none") {
                             titleDisplay.innerText = data.currentTitle;
                             titleDisplay.style.display = "inline-block";
+                            if (isChristmasTitle) {
+                                titleDisplay.classList.add("christmas-badge");
+                            }
                         } else {
                             titleDisplay.style.display = "none";
                         }
                     }
 
-                    /* --- ✨ ตรวจสอบเงื่อนไขยศพิเศษ (รองรับยศ ราชันย์ภูตผี👻) --- */
+                    /* --- ✨ ตรวจสอบเงื่อนไขยศพิเศษ (รองรับยศ ราชันย์ภูตผี👻 และยศคริสต์มาสทั้ง 5 ยศ) --- */
                     if (profileLinkBox) {
-                        profileLinkBox.classList.remove("rainbow-500lvl-bg", "pumpkin-rich-bg", "ghost-king-party-bg", "halloween-glossy-bg");
+                        profileLinkBox.classList.remove("rainbow-500lvl-bg", "pumpkin-rich-bg", "ghost-king-party-bg", "halloween-glossy-bg", "christmas-glossy-bg");
 
-                        if (data.currentTitle === "500 Lv พี่ยังไหว") {
+                        if (isChristmasTitle) {
+                            profileLinkBox.classList.add("christmas-glossy-bg");
+                        } else if (data.currentTitle === "500 Lv พี่ยังไหว") {
                             profileLinkBox.classList.add("rainbow-500lvl-bg");
                         } else if (data.currentTitle === "เศรษฐีฟักทอง🎃") {
                             profileLinkBox.classList.add("pumpkin-rich-bg");
